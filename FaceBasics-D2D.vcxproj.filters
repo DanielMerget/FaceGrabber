@@ -1,0 +1,43 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="ImageRenderer.cpp">
+      <Filter>Kinect</Filter>
+    </ClCompile>
+    <ClCompile Include="KinectHDFaceGrabber.cpp">
+      <Filter>Kinect</Filter>
+    </ClCompile>
+    <ClCompile Include="PCLViewer.cpp">
+      <Filter>PCL Viewer</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="ImageRenderer.h">
+      <Filter>Kinect</Filter>
+    </ClInclude>
+    <ClInclude Include="KinectHDFaceGrabber.h">
+      <Filter>Kinect</Filter>
+    </ClInclude>
+    <ClInclude Include="PCLViewer.h">
+      <Filter>PCL Viewer</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="app.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Kinect">
+      <UniqueIdentifier>{846da2e2-37ed-449f-bb16-0b70dbf1938e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PCL Viewer">
+      <UniqueIdentifier>{11f8c5d7-f06e-42e4-a730-1688e8ffaa28}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="FaceBasics.rc">
+      <Filter>Kinect</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
