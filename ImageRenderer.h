@@ -37,19 +37,19 @@ public:
     /// <param name="sourceHeight">height (in pixels) of image data to be drawn</param>
     /// <param name="sourceStride">length (in bytes) of a single scanline</param>
     /// <returns>indicates success or failure</returns>
-    HRESULT Initialize(HWND hwnd, ID2D1Factory* pD2DFactory, int sourceWidth, int sourceHeight, int sourceStride);
+    HRESULT initialize(HWND hwnd, ID2D1Factory* pD2DFactory, int sourceWidth, int sourceHeight, int sourceStride);
 
     /// <summary>
     /// Prepare device to begin drawing
     /// <returns>indicates success or failure</returns>
     /// </summary>
-    HRESULT BeginDrawing();
+    HRESULT beginDrawing();
 
     /// <summary>
     /// Ends drawing
     /// <returns>indicates success or failure</returns>
     /// </summary>    
-    HRESULT EndDrawing();
+    HRESULT endDrawing();
 
     /// <summary>
     /// Draws a 32 bit per pixel image of previously specified width, height, and stride to the associated hwnd
@@ -57,10 +57,10 @@ public:
     /// <param name="pImage">image data in RGBX format</param>
     /// <param name="cbImage">size of image data in bytes</param>
     /// <returns>indicates success or failure</returns>
-    HRESULT DrawBackground(BYTE* pImage, unsigned long cbImage);
+    HRESULT drawBackground(BYTE* pImage, unsigned long cbImage);
 
 
-	void DrawPoints(const std::vector<ColorSpacePoint> renderPoints);
+	void drawPoints(const std::vector<ColorSpacePoint> renderPoints);
     /// <summary>
     /// Draws face frame results
     /// </summary>
@@ -70,19 +70,19 @@ public:
     /// <param name="pFaceRotation">face rotation</param>
     /// <param name="pFaceProperties">face properties</param>
     /// <param name="pFaceTextLayout">face result text layout</param>
-    void DrawFaceFrameResults(int iFace, const RectI* pFaceBox, const PointF* pFacePoints, const Vector4* pFaceRotation, const DetectionResult* pFaceProperties, const D2D1_POINT_2F* pFaceTextLayout);
+    void drawFaceFrameResults(int iFace, const RectI* pFaceBox, const PointF* pFacePoints, const Vector4* pFaceRotation, const DetectionResult* pFaceProperties, const D2D1_POINT_2F* pFaceTextLayout);
 
 private:
     /// <summary>
     /// Ensure necessary Direct2d resources are created
     /// </summary>
     /// <returns>indicates success or failure</returns>
-    HRESULT EnsureResources();
+    HRESULT ensureResources();
 
     /// <summary>
     /// Dispose of Direct2d resources 
     /// </summary>
-    void DiscardResources();
+    void discardResources();
 
     /// <summary>
     /// Validates face bounding box and face points to be within screen space
@@ -90,7 +90,7 @@ private:
     /// <param name="pFaceBox">the face bounding box</param>
     /// <param name="pFacePoints">the face points</param>
     /// <returns>success or failure</returns>
-    bool ValidateFaceBoxAndPoints(const RectI* pFaceBox, const PointF* pFacePoints);
+    bool validateFaceBoxAndPoints(const RectI* pFaceBox, const PointF* pFacePoints);
 
     /// <summary>
     /// Converts rotation quaternion to Euler angles 
@@ -100,7 +100,7 @@ private:
     /// <param name="pPitch">rotation about the X-axis</param>
     /// <param name="pYaw">rotation about the Y-axis</param>
     /// <param name="pRoll">rotation about the Z-axis</param>
-    static void ExtractFaceRotationInDegrees(const Vector4* pQuaternion, int* pPitch, int* pYaw, int* pRoll);
+    static void extractFaceRotationInDegrees(const Vector4* pQuaternion, int* pPitch, int* pYaw, int* pRoll);
 
     HWND                     m_hWnd;
 

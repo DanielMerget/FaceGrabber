@@ -44,7 +44,7 @@ ImageRenderer::ImageRenderer() :
 /// </summary>
 ImageRenderer::~ImageRenderer()
 {
-    DiscardResources();
+    discardResources();
     SafeRelease(m_pTextFormat);
     SafeRelease(m_pDWriteFactory);
     SafeRelease(m_pD2DFactory);
@@ -54,7 +54,7 @@ ImageRenderer::~ImageRenderer()
 /// Ensure necessary Direct2d resources are created
 /// </summary>
 /// <returns>indicates success or failure</returns>
-HRESULT ImageRenderer::EnsureResources()
+HRESULT ImageRenderer::ensureResources()
 {
     HRESULT hr = S_OK;
 
@@ -116,7 +116,7 @@ HRESULT ImageRenderer::EnsureResources()
 
     if (FAILED(hr))
     {
-        DiscardResources();
+        discardResources();
     }
 
     return hr;
@@ -125,7 +125,7 @@ HRESULT ImageRenderer::EnsureResources()
 /// <summary>
 /// Dispose of Direct2d resources 
 /// </summary>
-void ImageRenderer::DiscardResources()
+void ImageRenderer::discardResources()
 {
     for (int i = 0; i < BODY_COUNT; i++)
     {
@@ -145,7 +145,7 @@ void ImageRenderer::DiscardResources()
 /// <param name="sourceHeight">height (in pixels) of image data to be drawn</param>
 /// <param name="sourceStride">length (in bytes) of a single scanline</param>
 /// <returns>indicates success or failure</returns>
-HRESULT ImageRenderer::Initialize(HWND hWnd, ID2D1Factory* pD2DFactory, int sourceWidth, int sourceHeight, int sourceStride)
+HRESULT ImageRenderer::initialize(HWND hWnd, ID2D1Factory* pD2DFactory, int sourceWidth, int sourceHeight, int sourceStride)
 {
     if (nullptr == pD2DFactory)
     {
@@ -200,11 +200,11 @@ HRESULT ImageRenderer::Initialize(HWND hWnd, ID2D1Factory* pD2DFactory, int sour
 /// Prepare device to begin drawing
 /// </summary>
 /// <returns>indicates success or failure</returns>
-HRESULT ImageRenderer::BeginDrawing()
+HRESULT ImageRenderer::beginDrawing()
 {
     // create the resources for this draw device
     // they will be recreated if previously lost
-    HRESULT hr = EnsureResources();
+    HRESULT hr = ensureResources();
 
     if (SUCCEEDED(hr))
     {
@@ -218,7 +218,7 @@ HRESULT ImageRenderer::BeginDrawing()
 /// Ends drawing
 /// </summary>    
 /// <returns>indicates success or failure</returns>
-HRESULT ImageRenderer::EndDrawing()
+HRESULT ImageRenderer::endDrawing()
 {
     HRESULT hr;
     hr = m_pRenderTarget->EndDraw();
@@ -228,7 +228,7 @@ HRESULT ImageRenderer::EndDrawing()
     if (hr == D2DERR_RECREATE_TARGET)
     {
         hr = S_OK;
-        DiscardResources();
+        discardResources();
     }
 
     return hr;
@@ -240,7 +240,7 @@ HRESULT ImageRenderer::EndDrawing()
 /// <param name="pImage">image data in RGBX format</param>
 /// <param name="cbImage">size of image data in bytes</param>
 /// <returns>indicates success or failure</returns>
-HRESULT ImageRenderer::DrawBackground(BYTE* pImage, unsigned long cbImage)
+HRESULT ImageRenderer::drawBackground(BYTE* pImage, unsigned long cbImage)
 {
     HRESULT hr = S_OK;
 
@@ -265,7 +265,7 @@ HRESULT ImageRenderer::DrawBackground(BYTE* pImage, unsigned long cbImage)
     return hr;
 }
 
-void ImageRenderer::DrawPoints(const std::vector<ColorSpacePoint> renderPoints){
+void ImageRenderer::drawPoints(const std::vector<ColorSpacePoint> renderPoints){
 	
 	for (int i = 0; i < renderPoints.size(); i++)
 	{
@@ -283,10 +283,10 @@ void ImageRenderer::DrawPoints(const std::vector<ColorSpacePoint> renderPoints){
 /// <param name="pFaceRotation">face rotation</param>
 /// <param name="pFaceProperties">face properties</param>
 /// <param name="pFaceTextLayout">face result text layout</param>
-void ImageRenderer::DrawFaceFrameResults(int iFace, const RectI* pFaceBox, const PointF* pFacePoints, const Vector4* pFaceRotation, const DetectionResult* pFaceProperties, const D2D1_POINT_2F* pFaceTextLayout)
+void ImageRenderer::drawFaceFrameResults(int iFace, const RectI* pFaceBox, const PointF* pFacePoints, const Vector4* pFaceRotation, const DetectionResult* pFaceProperties, const D2D1_POINT_2F* pFaceTextLayout)
 {
     // draw the face frame results only if the face bounding box is valid
-    if (ValidateFaceBoxAndPoints(pFaceBox, pFacePoints))
+    if (validateFaceBoxAndPoints(pFaceBox, pFacePoints))
     {
         ID2D1SolidColorBrush* brush = m_pFaceBrush[iFace];
 
@@ -363,7 +363,7 @@ void ImageRenderer::DrawFaceFrameResults(int iFace, const RectI* pFaceBox, const
 
         // extract face rotation in degrees as Euler angles
         int pitch, yaw, roll;
-        ExtractFaceRotationInDegrees(pFaceRotation, &pitch, &yaw, &roll);
+        extractFaceRotationInDegrees(pFaceRotation, &pitch, &yaw, &roll);
 
         faceText += L"FaceYaw : " + std::to_wstring(yaw) + L"\n";
         faceText += L"FacePitch : " + std::to_wstring(pitch) + L"\n";
@@ -388,7 +388,7 @@ void ImageRenderer::DrawFaceFrameResults(int iFace, const RectI* pFaceBox, const
 /// <param name="pFaceBox">the face bounding box</param>
 /// <param name="pFacePoints">the face points</param>
 /// <returns>success or failure</returns>
-bool ImageRenderer::ValidateFaceBoxAndPoints(const RectI* pFaceBox, const PointF* pFacePoints)
+bool ImageRenderer::validateFaceBoxAndPoints(const RectI* pFaceBox, const PointF* pFacePoints)
 {
     bool isFaceValid = false;
 
@@ -437,7 +437,7 @@ bool ImageRenderer::ValidateFaceBoxAndPoints(const RectI* pFaceBox, const PointF
 /// <param name="pPitch">rotation about the X-axis</param>
 /// <param name="pYaw">rotation about the Y-axis</param>
 /// <param name="pRoll">rotation about the Z-axis</param>
-void ImageRenderer::ExtractFaceRotationInDegrees(const Vector4* pQuaternion, int* pPitch, int* pYaw, int* pRoll)
+void ImageRenderer::extractFaceRotationInDegrees(const Vector4* pQuaternion, int* pPitch, int* pYaw, int* pRoll)
 {
     double x = pQuaternion->x;
     double y = pQuaternion->y;

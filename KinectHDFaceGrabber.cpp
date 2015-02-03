@@ -293,7 +293,7 @@ void KinectHDFaceGrabber::setImageRenderer(ImageRenderer* renderer){
 /// Initializes the default Kinect sensor
 /// </summary>
 /// <returns>S_OK on success else the failure code</returns>
-HRESULT KinectHDFaceGrabber::InitializeDefaultSensor()
+HRESULT KinectHDFaceGrabber::initializeDefaultSensor()
 {
     HRESULT hr;
 
@@ -407,7 +407,7 @@ HRESULT KinectHDFaceGrabber::InitializeDefaultSensor()
 	
     if (!m_pKinectSensor || FAILED(hr))
     {
-        SetStatusMessage(L"No ready Kinect found!", 10000, true);
+        setStatusMessage(L"No ready Kinect found!", 10000, true);
         return E_FAIL;
     }
 	
@@ -417,7 +417,7 @@ HRESULT KinectHDFaceGrabber::InitializeDefaultSensor()
 /// <summary>
 /// Main processing function
 /// </summary>
-void KinectHDFaceGrabber::Update()
+void KinectHDFaceGrabber::update()
 {
 	if (!m_pColorFrameReader || !m_pBodyFrameReader)
 	{
@@ -483,7 +483,7 @@ void KinectHDFaceGrabber::Update()
 	
         if (SUCCEEDED(hr))
         {
-            DrawStreams(nTime, pBuffer, nWidth, nHeight);
+            drawStreams(nTime, pBuffer, nWidth, nHeight);
         }
 	
         SafeRelease(pFrameDescription);		
@@ -498,12 +498,12 @@ void KinectHDFaceGrabber::Update()
 /// <param name="pBuffer">pointer to frame data</param>
 /// <param name="nWidth">width (in pixels) of input image data</param>
 /// <param name="nHeight">height (in pixels) of input image data</param>
-void KinectHDFaceGrabber::DrawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth, int nHeight)
+void KinectHDFaceGrabber::drawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth, int nHeight)
 {
 //    if (m_hWnd)
 //    {
         HRESULT hr;
-        hr = m_pDrawDataStreams->BeginDrawing();
+        hr = m_pDrawDataStreams->beginDrawing();
 
         if (SUCCEEDED(hr))
         {
@@ -511,7 +511,7 @@ void KinectHDFaceGrabber::DrawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth,
             if (pBuffer && (nWidth == cColorWidth) && (nHeight == cColorHeight))
             {
                 // Draw the data with Direct2D
-                hr = m_pDrawDataStreams->DrawBackground(reinterpret_cast<BYTE*>(pBuffer), cColorWidth * cColorHeight * sizeof(RGBQUAD));        
+                hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(pBuffer), cColorWidth * cColorHeight * sizeof(RGBQUAD));        
             }
             else
             {
@@ -522,10 +522,10 @@ void KinectHDFaceGrabber::DrawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth,
             if (SUCCEEDED(hr))
             {
                 // begin processing the face frames
-				ProcessFaces(pBuffer, nWidth, nHeight);
+				processFaces(pBuffer, nWidth, nHeight);
             }
 
-            m_pDrawDataStreams->EndDrawing();
+            m_pDrawDataStreams->endDrawing();
         }
 
         if (!m_nStartTime)
@@ -551,7 +551,7 @@ void KinectHDFaceGrabber::DrawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth,
         WCHAR szStatusMessage[64];
         StringCchPrintf(szStatusMessage, _countof(szStatusMessage), L" FPS = %0.2f    Time = %I64d", fps, (nTime - m_nStartTime));
 
-        if (SetStatusMessage(szStatusMessage, 1000, false))
+        if (setStatusMessage(szStatusMessage, 1000, false))
         {
             m_nLastCounter = qpcNow.QuadPart;
             m_nFramesSinceUpdate = 0;
@@ -562,11 +562,11 @@ void KinectHDFaceGrabber::DrawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth,
 /// <summary>
 /// Processes new face frames
 /// </summary>
-void KinectHDFaceGrabber::ProcessFaces(RGBQUAD* pBuffer, int nWidth, int nHeight)
+void KinectHDFaceGrabber::processFaces(RGBQUAD* pBuffer, int nWidth, int nHeight)
 {
     HRESULT hr;
     IBody* ppBodies[BODY_COUNT] = {0};
-    bool bHaveBodyData = SUCCEEDED( UpdateBodyData(ppBodies) );
+    bool bHaveBodyData = SUCCEEDED( updateBodyData(ppBodies) );
 	if (!bHaveBodyData)
 		return;
 
@@ -604,8 +604,8 @@ void KinectHDFaceGrabber::ProcessFaces(RGBQUAD* pBuffer, int nWidth, int nHeight
 
 					FaceModelBuilderCollectionStatus status;
 					hr = m_pFaceModelBuilder[iFace]->get_CollectionStatus(&status);
-					std::wstring statusString = GetCaptureStatusText(status);
-					SetStatusMessage(&statusString[0], 1000, true);
+					std::wstring statusString = getCaptureStatusText(status);
+					setStatusMessage(&statusString[0], 1000, true);
 					if (status == FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_Complete){
 						std::cout << "Status : Complete" << std::endl;
 						
@@ -639,7 +639,7 @@ void KinectHDFaceGrabber::ProcessFaces(RGBQUAD* pBuffer, int nWidth, int nHeight
 					
 					
 					//first = false;
-					m_pDrawDataStreams->DrawPoints(renderPoints);				
+					m_pDrawDataStreams->drawPoints(renderPoints);				
 				}
 			}
 		}
@@ -657,7 +657,7 @@ void KinectHDFaceGrabber::ProcessFaces(RGBQUAD* pBuffer, int nWidth, int nHeight
 }
 
 
-std::wstring KinectHDFaceGrabber::GetCaptureStatusText(FaceModelBuilderCollectionStatus status)
+std::wstring KinectHDFaceGrabber::getCaptureStatusText(FaceModelBuilderCollectionStatus status)
 {
 	
 	std::wstring result = L"";
@@ -750,7 +750,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 /// </summary>
 /// <param name="ppBodies">pointer to the body data storage</param>
 /// <returns>indicates success or failure</returns>
-HRESULT KinectHDFaceGrabber::UpdateBodyData(IBody** ppBodies)
+HRESULT KinectHDFaceGrabber::updateBodyData(IBody** ppBodies)
 {
     HRESULT hr = E_FAIL;
 
@@ -775,7 +775,7 @@ HRESULT KinectHDFaceGrabber::UpdateBodyData(IBody** ppBodies)
 /// <param name="showTimeMsec">time in milliseconds to ignore future status messages</param>
 /// <param name="bForce">force status update</param>
 /// <returns>success or failure</returns>
-bool KinectHDFaceGrabber::SetStatusMessage(_In_z_ WCHAR* szMessage, ULONGLONG nShowTimeMsec, bool bForce)
+bool KinectHDFaceGrabber::setStatusMessage(_In_z_ WCHAR* szMessage, ULONGLONG nShowTimeMsec, bool bForce)
 {
    /* ULONGLONG now = GetTickCount64();
 

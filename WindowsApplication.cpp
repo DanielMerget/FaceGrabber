@@ -30,7 +30,7 @@ WindowsApplication::~WindowsApplication()
 /// </summary>
 /// <param name="hInstance">handle to the application instance</param>
 /// <param name="nCmdShow">whether to display minimized, maximized, or normally</param>
-int WindowsApplication::Run(HINSTANCE hInstance, int nCmdShow)
+int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 {
 
 	MSG       msg = { 0 };
@@ -65,7 +65,7 @@ int WindowsApplication::Run(HINSTANCE hInstance, int nCmdShow)
 	while (WM_QUIT != msg.message)
 	{
 		//Update();
-		m_kinectFrameGrabber.Update();
+		m_kinectFrameGrabber.update();
 
 		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
 		{
@@ -140,14 +140,15 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		// Create and initialize a new Direct2D image renderer (take a look at ImageRenderer.h)
 		// We'll use this to draw the data we receive from the Kinect to the screen
 		m_pDrawDataStreams = new ImageRenderer();
-		HRESULT hr = m_pDrawDataStreams->Initialize(GetDlgItem(m_hWnd, IDC_VIDEOVIEW), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
+		HRESULT hr = m_pDrawDataStreams->initialize(GetDlgItem(m_hWnd, IDC_VIDEOVIEW), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
 		if (FAILED(hr))
 		{
 			SetStatusMessage(L"Failed to initialize the Direct2D draw device.", 10000, true);
 		}
 		m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
+
 		// Get and initialize the default Kinect sensor
-		m_kinectFrameGrabber.InitializeDefaultSensor();
+		m_kinectFrameGrabber.initializeDefaultSensor();
 
 	}
 		break;
@@ -161,12 +162,20 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		// Quit the main message pump
 		PostQuitMessage(0);
 		break;
+	case WM_COMMAND:
+		processUIMessage(wParam, lParam);
+		break;
 	}
 
 	return FALSE;
 }
-
-
+#include <iostream>
+void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM)
+{
+	if (IDC_RECORD_BUTTON == LOWORD(wParam) && BN_CLICKED == HIWORD(wParam)){
+		std::cout << "button pressed";
+	}
+}
 /// <summary>
 /// Set the status bar message
 /// </summary>

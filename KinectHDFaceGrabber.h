@@ -56,27 +56,23 @@ public:
 	/// <summary>
 	/// Main processing function
 	/// </summary>
-	void					Update();
+	void					update();
 	
 	/// <summary>
 	/// Initializes the default Kinect sensor
 	/// </summary>
 	/// <returns>S_OK on success else the failure code</returns>
-	HRESULT					InitializeDefaultSensor();
+	HRESULT					initializeDefaultSensor();
 
 
 	void setImageRenderer(ImageRenderer* renderer);
 
 private:
-	std::wstring GetCaptureStatusText(FaceModelBuilderCollectionStatus status);
+	std::wstring getCaptureStatusText(FaceModelBuilderCollectionStatus status);
 
 
 	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(std::vector<CameraSpacePoint>& renderPoints, const RGBQUAD* pBuffer, const int imageWidth, const int imageHeight);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(const std::vector<CameraSpacePoint>& renderPoints, const std::vector<ColorSpacePoint>& imagePoints, const RGBQUAD* pBuffer, const int imageWidth, const int imageHeight);
-
-   
-
-    
 
     /// <summary>
     /// Renders the color and face streams
@@ -85,12 +81,12 @@ private:
     /// <param name="pBuffer">pointer to frame data</param>
     /// <param name="nWidth">width (in pixels) of input image data</param>
     /// <param name="nHeight">height (in pixels) of input image data</param>
-    void					DrawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth, int nHeight);
+    void					drawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth, int nHeight);
 
     /// <summary>
     /// Processes new face frames
     /// </summary>
-	void					ProcessFaces(RGBQUAD* pBuffer, int nWidth, int nHeight);
+	void					processFaces(RGBQUAD* pBuffer, int nWidth, int nHeight);
 
 
     /// <summary>
@@ -98,7 +94,7 @@ private:
     /// </summary>
     /// <param name="ppBodies">pointer to the body data storage</param>
     /// <returns>indicates success or failure</returns>
-    HRESULT					UpdateBodyData(IBody** ppBodies);
+    HRESULT					updateBodyData(IBody** ppBodies);
 
     /// <summary>
     /// Set the status bar message
@@ -107,7 +103,7 @@ private:
     /// <param name="nShowTimeMsec">time in milliseconds for which to ignore future status messages</param>
     /// <param name="bForce">force status update</param>
     /// <returns>success or failure</returns>
-    bool					SetStatusMessage(_In_z_ WCHAR* szMessage, ULONGLONG nShowTimeMsec, bool bForce);
+    bool					setStatusMessage(_In_z_ WCHAR* szMessage, ULONGLONG nShowTimeMsec, bool bForce);
 
     //HWND					m_hWnd;
     //INT64					m_nStartTime;

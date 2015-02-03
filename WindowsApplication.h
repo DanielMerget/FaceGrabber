@@ -40,7 +40,10 @@ public:
 	/// <returns>result of message processing</returns>
 	LRESULT CALLBACK		DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	int						Run(HINSTANCE hInstance, int nCmdShow);
+	int						run(HINSTANCE hInstance, int nCmdShow);
+
+	void processUIMessage(WPARAM wParam, LPARAM);
+
 
 	bool					SetStatusMessage(_In_z_ WCHAR* szMessage, ULONGLONG nShowTimeMsec, bool bForce);
 
