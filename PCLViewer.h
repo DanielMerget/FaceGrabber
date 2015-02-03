@@ -2,7 +2,6 @@
 #undef max
 #undef min
 #include <pcl/visualization/cloud_viewer.h>
-
 class PCLViewer
 {
 public:

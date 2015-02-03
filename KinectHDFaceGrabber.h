@@ -34,7 +34,7 @@ public:
     /// <param name="wParam">message data</param>
     /// <param name="lParam">additional message data</param>
     /// <returns>result of message processing</returns>
-    static LRESULT CALLBACK	MessageRouter(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+   /* static LRESULT CALLBACK	MessageRouter(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);*/
 
     /// <summary>
     /// Handle windows messages for a class instance
@@ -44,14 +44,28 @@ public:
     /// <param name="wParam">message data</param>
     /// <param name="lParam">additional message data</param>
     /// <returns>result of message processing</returns>
-    LRESULT CALLBACK		DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    /*LRESULT CALLBACK		DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);*/
 
     /// <summary>
     /// Creates the main window and begins processing
     /// </summary>
     /// <param name="hInstance"></param>
     /// <param name="nCmdShow"></param>
-    int						Run(HINSTANCE hInstance, int nCmdShow);
+   /* int						Run(HINSTANCE hInstance, int nCmdShow);*/
+
+	/// <summary>
+	/// Main processing function
+	/// </summary>
+	void					Update();
+	
+	/// <summary>
+	/// Initializes the default Kinect sensor
+	/// </summary>
+	/// <returns>S_OK on success else the failure code</returns>
+	HRESULT					InitializeDefaultSensor();
+
+
+	void setImageRenderer(ImageRenderer* renderer);
 
 private:
 	std::wstring GetCaptureStatusText(FaceModelBuilderCollectionStatus status);
@@ -60,16 +74,9 @@ private:
 	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(std::vector<CameraSpacePoint>& renderPoints, const RGBQUAD* pBuffer, const int imageWidth, const int imageHeight);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(const std::vector<CameraSpacePoint>& renderPoints, const std::vector<ColorSpacePoint>& imagePoints, const RGBQUAD* pBuffer, const int imageWidth, const int imageHeight);
 
-    /// <summary>
-    /// Main processing function
-    /// </summary>
-    void					Update();
+   
 
-    /// <summary>
-    /// Initializes the default Kinect sensor
-    /// </summary>
-    /// <returns>S_OK on success else the failure code</returns>
-    HRESULT					InitializeDefaultSensor();
+    
 
     /// <summary>
     /// Renders the color and face streams
@@ -102,12 +109,12 @@ private:
     /// <returns>success or failure</returns>
     bool					SetStatusMessage(_In_z_ WCHAR* szMessage, ULONGLONG nShowTimeMsec, bool bForce);
 
-    HWND					m_hWnd;
-    INT64					m_nStartTime;
-    INT64					m_nLastCounter;
-    double					m_fFreq;
-    ULONGLONG				m_nNextStatusTime;
-    DWORD					m_nFramesSinceUpdate;
+    //HWND					m_hWnd;
+    //INT64					m_nStartTime;
+    //INT64					m_nLastCounter;
+    //double					m_fFreq;
+    //ULONGLONG				m_nNextStatusTime;
+    //DWORD					m_nFramesSinceUpdate;
 
     // Current Kinect
     IKinectSensor*			m_pKinectSensor;
@@ -136,9 +143,15 @@ private:
 	IFaceModelBuilder* m_pFaceModelBuilder[BODY_COUNT];
 	IFaceModel* m_pFaceModel[BODY_COUNT];
 
-    // Direct2D
+    //// Direct2D
     ImageRenderer*         m_pDrawDataStreams;
-    ID2D1Factory*          m_pD2DFactory;
+    //ID2D1Factory*          m_pD2DFactory;
     RGBQUAD*               m_pColorRGBX;	
+
+	INT64					m_nStartTime;
+	INT64					m_nLastCounter;
+	double					m_fFreq;
+	ULONGLONG				m_nNextStatusTime;
+	DWORD					m_nFramesSinceUpdate;
 };
 

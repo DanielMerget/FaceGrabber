@@ -42,33 +42,31 @@ static const DWORD c_FaceFrameFeatures =
 /// <param name="lpCmdLine">command line arguments</param>
 /// <param name="nCmdShow">whether to display minimized, maximized, or normally</param>
 /// <returns>status</returns>
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
-{
-    UNREFERENCED_PARAMETER(hPrevInstance);
-    UNREFERENCED_PARAMETER(lpCmdLine);
-
-	
-	PCLViewer viewer;
-	pcl::PCLPointCloud2 blob;
-
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
-	pcl::io::loadPLYFile("myFace", blob);
-	pcl::fromPCLPointCloud2(blob, *cloud);
-
-	viewer.updateCloud(cloud);
-	
-	
-	KinectHDFaceGrabber application;
-    application.Run(hInstance, nCmdShow);
-	
-	
-}
+//int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
+//{
+//    UNREFERENCED_PARAMETER(hPrevInstance);
+//    UNREFERENCED_PARAMETER(lpCmdLine);
+//
+//	
+//	/*PCLViewer viewer;
+//	pcl::PCLPointCloud2 blob;
+//
+//	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
+//	pcl::io::loadPLYFile("myFace", blob);
+//	pcl::fromPCLPointCloud2(blob, *cloud);
+//
+//	viewer.updateCloud(cloud);*/
+//	
+//	
+//	KinectHDFaceGrabber application;
+//    application.Run(hInstance, nCmdShow);
+//}
 
 /// <summary>
 /// Constructor
 /// </summary>
 KinectHDFaceGrabber::KinectHDFaceGrabber() :
-    m_hWnd(NULL),
+    //m_hWnd(NULL),
     m_nStartTime(0),
     m_nLastCounter(0),
     m_nFramesSinceUpdate(0),
@@ -76,18 +74,18 @@ KinectHDFaceGrabber::KinectHDFaceGrabber() :
     m_nNextStatusTime(0),
     m_pKinectSensor(nullptr),
     m_pCoordinateMapper(nullptr),
-    m_pColorFrameReader(nullptr),
-    m_pD2DFactory(nullptr),
+	m_pColorFrameReader(nullptr),
+    //m_pD2DFactory(nullptr),
     m_pDrawDataStreams(nullptr),
     m_pColorRGBX(nullptr),
     m_pBodyFrameReader(nullptr),
 	m_pclViewer(new PCLViewer())
 {
-    LARGE_INTEGER qpf = {0};
+    /*LARGE_INTEGER qpf = {0};
     if (QueryPerformanceFrequency(&qpf))
     {
         m_fFreq = double(qpf.QuadPart);
-    }
+    }*/
 
     for (int i = 0; i < BODY_COUNT; i++)
     {
@@ -118,8 +116,8 @@ KinectHDFaceGrabber::~KinectHDFaceGrabber()
         m_pColorRGBX = nullptr;
     }
 
-    // clean up Direct2D
-    SafeRelease(m_pD2DFactory);
+    //// clean up Direct2D
+    //SafeRelease(m_pD2DFactory);
 
     // done with face sources and readers
     for (int i = 0; i < BODY_COUNT; i++)
@@ -146,144 +144,150 @@ KinectHDFaceGrabber::~KinectHDFaceGrabber()
     SafeRelease(m_pKinectSensor);
 }
 
-/// <summary>
-/// Creates the main window and begins processing
-/// </summary>
-/// <param name="hInstance">handle to the application instance</param>
-/// <param name="nCmdShow">whether to display minimized, maximized, or normally</param>
-int KinectHDFaceGrabber::Run(HINSTANCE hInstance, int nCmdShow)
-{
 
-    MSG       msg = {0};
-    WNDCLASS  wc;
-
-    // Dialog custom window class
-    ZeroMemory(&wc, sizeof(wc));
-    wc.style         = CS_HREDRAW | CS_VREDRAW;
-    wc.cbWndExtra    = DLGWINDOWEXTRA;
-    wc.hCursor       = LoadCursorW(NULL, IDC_ARROW);
-    wc.hIcon         = LoadIconW(hInstance, MAKEINTRESOURCE(IDI_APP));
-    wc.lpfnWndProc   = DefDlgProcW;
-    wc.lpszClassName = L"KinectHDFaceGrabberAppDlgWndClass";
-
-    if (!RegisterClassW(&wc))
-    {
-        return 0;
-    }
-
-    // Create main application window
-    HWND hWndApp = CreateDialogParamW(
-        NULL,
-        MAKEINTRESOURCE(IDD_APP),
-        NULL,
-        (DLGPROC)KinectHDFaceGrabber::MessageRouter, 
-        reinterpret_cast<LPARAM>(this));
-
-    // Show window
-    ShowWindow(hWndApp, nCmdShow);
-
-    // Main message loop
-    while (WM_QUIT != msg.message)
-    {
-        Update();
-
-        while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
-        {
-            // If a dialog message will be taken care of by the dialog proc
-            if (hWndApp && IsDialogMessageW(hWndApp, &msg))
-            {
-                continue;
-            }
-
-            TranslateMessage(&msg);
-            DispatchMessageW(&msg);
-        }
-    }
-
-    return static_cast<int>(msg.wParam);
+void KinectHDFaceGrabber::setImageRenderer(ImageRenderer* renderer){
+	m_pDrawDataStreams = renderer;
 }
+//
+///// <summary>
+///// Creates the main window and begins processing
+///// </summary>
+///// <param name="hInstance">handle to the application instance</param>
+///// <param name="nCmdShow">whether to display minimized, maximized, or normally</param>
+//int KinectHDFaceGrabber::Run(HINSTANCE hInstance, int nCmdShow)
+//{
+//
+//    MSG       msg = {0};
+//    WNDCLASS  wc;
+//
+//    // Dialog custom window class
+//    ZeroMemory(&wc, sizeof(wc));
+//    wc.style         = CS_HREDRAW | CS_VREDRAW;
+//    wc.cbWndExtra    = DLGWINDOWEXTRA;
+//    wc.hCursor       = LoadCursorW(NULL, IDC_ARROW);
+//    wc.hIcon         = LoadIconW(hInstance, MAKEINTRESOURCE(IDI_APP));
+//    wc.lpfnWndProc   = DefDlgProcW;
+//    wc.lpszClassName = L"KinectHDFaceGrabberAppDlgWndClass";
+//
+//    if (!RegisterClassW(&wc))
+//    {
+//        return 0;
+//    }
+//
+//    // Create main application window
+//    HWND hWndApp = CreateDialogParamW(
+//        NULL,
+//        MAKEINTRESOURCE(IDD_APP),
+//        NULL,
+//        (DLGPROC)KinectHDFaceGrabber::MessageRouter, 
+//        reinterpret_cast<LPARAM>(this));
+//
+//    // Show window
+//    ShowWindow(hWndApp, nCmdShow);
+//
+//    // Main message loop
+//    while (WM_QUIT != msg.message)
+//    {
+//        Update();
+//
+//        while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+//        {
+//            // If a dialog message will be taken care of by the dialog proc
+//            if (hWndApp && IsDialogMessageW(hWndApp, &msg))
+//            {
+//                continue;
+//            }
+//
+//            TranslateMessage(&msg);
+//            DispatchMessageW(&msg);
+//        }
+//    }
+//
+//    return static_cast<int>(msg.wParam);
+//}
+////
+///// <summary>
+///// Handles window messages, passes most to the class instance to handle
+///// </summary>
+///// <param name="hWnd">window message is for</param>
+///// <param name="uMsg">message</param>
+///// <param name="wParam">message data</param>
+///// <param name="lParam">additional message data</param>
+///// <returns>result of message processing</returns>
+//LRESULT CALLBACK KinectHDFaceGrabber::MessageRouter(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+//{
+//    KinectHDFaceGrabber* pThis = nullptr;
+//
+//    if (WM_INITDIALOG == uMsg)
+//    {
+//        pThis = reinterpret_cast<KinectHDFaceGrabber*>(lParam);
+//        SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
+//    }
+//    else
+//    {
+//        pThis = reinterpret_cast<KinectHDFaceGrabber*>(::GetWindowLongPtr(hWnd, GWLP_USERDATA));
+//    }
+//
+//    if (pThis)
+//    {
+//        return pThis->DlgProc(hWnd, uMsg, wParam, lParam);
+//    }
+//
+//    return 0;
+//}
 
-/// <summary>
-/// Handles window messages, passes most to the class instance to handle
-/// </summary>
-/// <param name="hWnd">window message is for</param>
-/// <param name="uMsg">message</param>
-/// <param name="wParam">message data</param>
-/// <param name="lParam">additional message data</param>
-/// <returns>result of message processing</returns>
-LRESULT CALLBACK KinectHDFaceGrabber::MessageRouter(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    KinectHDFaceGrabber* pThis = nullptr;
-
-    if (WM_INITDIALOG == uMsg)
-    {
-        pThis = reinterpret_cast<KinectHDFaceGrabber*>(lParam);
-        SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
-    }
-    else
-    {
-        pThis = reinterpret_cast<KinectHDFaceGrabber*>(::GetWindowLongPtr(hWnd, GWLP_USERDATA));
-    }
-
-    if (pThis)
-    {
-        return pThis->DlgProc(hWnd, uMsg, wParam, lParam);
-    }
-
-    return 0;
-}
-
-/// <summary>
-/// Handle windows messages for the class instance
-/// </summary>
-/// <param name="hWnd">window message is for</param>
-/// <param name="uMsg">message</param>
-/// <param name="wParam">message data</param>
-/// <param name="lParam">additional message data</param>
-/// <returns>result of message processing</returns>
-LRESULT CALLBACK KinectHDFaceGrabber::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-    UNREFERENCED_PARAMETER(wParam);
-    UNREFERENCED_PARAMETER(lParam);
-
-    switch (message)
-    {
-    case WM_INITDIALOG:
-        {
-            // Bind application window handle
-            m_hWnd = hWnd;
-
-            // Init Direct2D
-            D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
-
-            // Create and initialize a new Direct2D image renderer (take a look at ImageRenderer.h)
-            // We'll use this to draw the data we receive from the Kinect to the screen
-            m_pDrawDataStreams = new ImageRenderer();
-            HRESULT hr = m_pDrawDataStreams->Initialize(GetDlgItem(m_hWnd, IDC_VIDEOVIEW), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD)); 
-            if (FAILED(hr))
-            {
-                SetStatusMessage(L"Failed to initialize the Direct2D draw device.", 10000, true);
-            }
-
-            // Get and initialize the default Kinect sensor
-            InitializeDefaultSensor();
-			
-        }
-        break;
-
-        // If the titlebar X is clicked, destroy app
-    case WM_CLOSE:
-        DestroyWindow(hWnd);
-        break;
-
-    case WM_DESTROY:
-        // Quit the main message pump
-        PostQuitMessage(0);
-        break;        
-    }
-
-    return FALSE;
-}
+//
+///// <summary>
+///// Handle windows messages for the class instance
+///// </summary>
+///// <param name="hWnd">window message is for</param>
+///// <param name="uMsg">message</param>
+///// <param name="wParam">message data</param>
+///// <param name="lParam">additional message data</param>
+///// <returns>result of message processing</returns>
+//LRESULT CALLBACK KinectHDFaceGrabber::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+//{
+//    UNREFERENCED_PARAMETER(wParam);
+//    UNREFERENCED_PARAMETER(lParam);
+//
+//    switch (message)
+//    {
+//    case WM_INITDIALOG:
+//        {
+//            // Bind application window handle
+//            m_hWnd = hWnd;
+//
+//            // Init Direct2D
+//            D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
+//
+//            // Create and initialize a new Direct2D image renderer (take a look at ImageRenderer.h)
+//            // We'll use this to draw the data we receive from the Kinect to the screen
+//            m_pDrawDataStreams = new ImageRenderer();
+//            HRESULT hr = m_pDrawDataStreams->Initialize(GetDlgItem(m_hWnd, IDC_VIDEOVIEW), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD)); 
+//            if (FAILED(hr))
+//            {
+//                SetStatusMessage(L"Failed to initialize the Direct2D draw device.", 10000, true);
+//            }
+//
+//            // Get and initialize the default Kinect sensor
+//            InitializeDefaultSensor();
+//			
+//        }
+//        break;
+//
+//        // If the titlebar X is clicked, destroy app
+//    case WM_CLOSE:
+//        DestroyWindow(hWnd);
+//        break;
+//
+//    case WM_DESTROY:
+//        // Quit the main message pump
+//        PostQuitMessage(0);
+//        break;        
+//    }
+//
+//    return FALSE;
+//}
 
 /// <summary>
 /// Initializes the default Kinect sensor
@@ -370,7 +374,6 @@ HRESULT KinectHDFaceGrabber::InitializeDefaultSensor()
 				
 				if (SUCCEEDED(hr)){
 					hr = m_pHDFaceSource[i]->OpenModelBuilder(FaceModelBuilderAttributes::FaceModelBuilderAttributes_None, &m_pFaceModelBuilder[i]);
-					
 				}
 
 				if (SUCCEEDED(hr)){
@@ -497,8 +500,8 @@ void KinectHDFaceGrabber::Update()
 /// <param name="nHeight">height (in pixels) of input image data</param>
 void KinectHDFaceGrabber::DrawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth, int nHeight)
 {
-    if (m_hWnd)
-    {
+//    if (m_hWnd)
+//    {
         HRESULT hr;
         hr = m_pDrawDataStreams->BeginDrawing();
 
@@ -553,7 +556,7 @@ void KinectHDFaceGrabber::DrawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth,
             m_nLastCounter = qpcNow.QuadPart;
             m_nFramesSinceUpdate = 0;
         }
-    }    
+//    }    
 }
 
 /// <summary>
@@ -572,10 +575,6 @@ void KinectHDFaceGrabber::ProcessFaces(RGBQUAD* pBuffer, int nWidth, int nHeight
     // iterate through each face reader
     for (int iFace = 0; iFace < BODY_COUNT; ++iFace)
     {
-
-
-
-
 		BOOLEAN bTrackingIdValid = false;
 		hr = m_pHDFaceSource[iFace]->get_IsTrackingIdValid(&bTrackingIdValid);
 		if (!bTrackingIdValid){
@@ -602,6 +601,7 @@ void KinectHDFaceGrabber::ProcessFaces(RGBQUAD* pBuffer, int nWidth, int nHeight
 				hr = pHDFaceFrame->GetAndRefreshFaceAlignmentResult(m_pFaceAlignment[iFace]);
 				if (SUCCEEDED(hr) && m_pFaceModelBuilder[iFace] != nullptr && m_pFaceAlignment[iFace] != nullptr && m_pFaceModel[iFace] != nullptr){
 					static bool isCompleted = false;
+
 					FaceModelBuilderCollectionStatus status;
 					hr = m_pFaceModelBuilder[iFace]->get_CollectionStatus(&status);
 					std::wstring statusString = GetCaptureStatusText(status);
@@ -643,7 +643,7 @@ void KinectHDFaceGrabber::ProcessFaces(RGBQUAD* pBuffer, int nWidth, int nHeight
 				}
 			}
 		}
-
+		
 
     }
 
@@ -777,7 +777,7 @@ HRESULT KinectHDFaceGrabber::UpdateBodyData(IBody** ppBodies)
 /// <returns>success or failure</returns>
 bool KinectHDFaceGrabber::SetStatusMessage(_In_z_ WCHAR* szMessage, ULONGLONG nShowTimeMsec, bool bForce)
 {
-    ULONGLONG now = GetTickCount64();
+   /* ULONGLONG now = GetTickCount64();
 
     if (m_hWnd && (bForce || (m_nNextStatusTime <= now)))
     {
@@ -785,7 +785,7 @@ bool KinectHDFaceGrabber::SetStatusMessage(_In_z_ WCHAR* szMessage, ULONGLONG nS
         m_nNextStatusTime = now + nShowTimeMsec;
 
         return true;
-    }
+    }*/
 
     return false;
 }
