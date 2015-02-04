@@ -10,8 +10,8 @@
 #include "KinectHDFaceGrabber.h"
 #include <iostream>
 #include <vector>
-#include <pcl\common\centroid.h>
-#include <pcl\common\transforms.h>
+#include <pcl/common/centroid.h>
+#include <pcl/common/transforms.h>
 #include <pcl/io/ply_io.h>
 
 // face property text layout offset in X axis
@@ -224,7 +224,8 @@ HRESULT KinectHDFaceGrabber::initializeDefaultSensor()
 	
     if (!m_pKinectSensor || FAILED(hr))
     {
-        setStatusMessage(L"No ready Kinect found!", 10000, true);
+        //setStatusMessage(L"No ready Kinect found!", 10000, true);
+		statusChanged(L"No ready Kinect found!", true);
         return E_FAIL;
     }
 	
@@ -368,7 +369,8 @@ void KinectHDFaceGrabber::drawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth,
         WCHAR szStatusMessage[64];
         StringCchPrintf(szStatusMessage, _countof(szStatusMessage), L" FPS = %0.2f    Time = %I64d", fps, (nTime - m_nStartTime));
 
-        if (setStatusMessage(szStatusMessage, 1000, false))
+        //if (setStatusMessage(szStatusMessage, 1000, false))
+		if (statusChanged(szStatusMessage, false))
         {
             m_nLastCounter = qpcNow.QuadPart;
             m_nFramesSinceUpdate = 0;
@@ -422,7 +424,8 @@ void KinectHDFaceGrabber::processFaces(RGBQUAD* pBuffer, int nWidth, int nHeight
 					FaceModelBuilderCollectionStatus status;
 					hr = m_pFaceModelBuilder[iFace]->get_CollectionStatus(&status);
 					std::wstring statusString = getCaptureStatusText(status);
-					setStatusMessage(&statusString[0], 1000, true);
+					//setStatusMessage(&statusString[0], 1000, true);
+					statusChanged(statusString, true);
 					if (status == FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_Complete){
 						std::cout << "Status : Complete" << std::endl;
 						
@@ -566,29 +569,3 @@ HRESULT KinectHDFaceGrabber::updateBodyData(IBody** ppBodies)
     return hr;
 }
 
-/// <summary>
-/// Set the status bar message
-/// </summary>
-/// <param name="szMessage">message to display</param>
-/// <param name="showTimeMsec">time in milliseconds to ignore future status messages</param>
-/// <param name="bForce">force status update</param>
-/// <returns>success or failure</returns>
-bool KinectHDFaceGrabber::setStatusMessage(_In_z_ WCHAR* szMessage, ULONGLONG nShowTimeMsec, bool bForce)
-{
-    ULONGLONG now = GetTickCount64();
-
-    if (m_hWnd && (bForce || (m_nNextStatusTime <= now)))
-    {
-        SetDlgItemText(m_hWnd, IDC_STATUS, szMessage);
-        m_nNextStatusTime = now + nShowTimeMsec;
-
-        return true;
-    }
-
-    return false;
-}
-
-void KinectHDFaceGrabber::setWindowHandle(HWND handle)
-{
-	m_hWnd = handle;
-}

@@ -2,17 +2,23 @@
 #undef max
 #undef min
 #include <pcl/visualization/cloud_viewer.h>
+#include <thread>
+#include <mutex>
 class PCLViewer
 {
 public:
-	PCLViewer::PCLViewer();
+	PCLViewer();
 	~PCLViewer();
 	
+	void updateCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud);
+
 	void updateCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud);
 	bool isStopped();
-	void updateCloudMsg(std::string updateMesg);
+
 private:
-	//pcl::visualization::CloudViewe rviewer;
+
 	pcl::visualization::PCLVisualizer viewer;
+	std::vector<std::thread> m_updateThreads;
+	std::mutex m_viewerMutex;
 };
 

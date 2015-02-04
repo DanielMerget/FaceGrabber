@@ -10,14 +10,23 @@ PCLViewer::PCLViewer() :
 
 PCLViewer::~PCLViewer()
 {
-	
+	for (auto& thread : m_updateThreads){
+		thread.join();
+	}
 }
 
 bool PCLViewer::isStopped(){
 	return viewer.wasStopped();
 }
 
-void PCLViewer::updateCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud){
+void PCLViewer::updateCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)
+{
+	m_updateThreads.push_back(std::thread(&PCLViewer::updateCloud, this, cloud));
+}
+
+void PCLViewer::updateCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)
+{
+	std::unique_lock<std::mutex> viewerLock(m_viewerMutex);
 	static bool first = true;
 	
 	if (first){
@@ -30,9 +39,4 @@ void PCLViewer::updateCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud){
 		viewer.updatePointCloud(cloud, "cloud");
 		viewer.spinOnce();
 	}
-}
-
-void PCLViewer::updateCloudMsg(std::string updateMesg)
-{
-	std::cout << "Cloud update msg: " << updateMesg << std::endl;
 }

@@ -72,10 +72,9 @@ public:
 
 	void setImageRenderer(ImageRenderer* renderer);
 
-	void setWindowHandle(HWND handle);
-
-
 	boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated;
+
+	boost::signal<bool(std::wstring, bool)> statusChanged;
 	
 private:
 	std::wstring getCaptureStatusText(FaceModelBuilderCollectionStatus status);
@@ -106,14 +105,7 @@ private:
     /// <returns>indicates success or failure</returns>
     HRESULT					updateBodyData(IBody** ppBodies);
 
-    /// <summary>
-    /// Set the status bar message
-    /// </summary>
-    /// <param name="szMessage">message to display</param>
-    /// <param name="nShowTimeMsec">time in milliseconds for which to ignore future status messages</param>
-    /// <param name="bForce">force status update</param>
-    /// <returns>success or failure</returns>
-    bool					setStatusMessage(_In_z_ WCHAR* szMessage, ULONGLONG nShowTimeMsec, bool bForce);
+
 
     //HWND					m_hWnd;
     //INT64					m_nStartTime;
@@ -151,7 +143,6 @@ private:
     ImageRenderer*			m_pDrawDataStreams;
     //ID2D1Factory*          m_pD2DFactory;
     RGBQUAD*				m_pColorRGBX;	
-	HWND					m_hWnd;
 
 	INT64					m_nStartTime;
 	INT64					m_nLastCounter;

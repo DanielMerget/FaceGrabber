@@ -46,8 +46,7 @@ public:
 
 	void processUIMessage(WPARAM wParam, LPARAM);
 
-
-	bool					SetStatusMessage(_In_z_ WCHAR* szMessage, ULONGLONG nShowTimeMsec, bool bForce);
+	bool					setStatusMessage(std::wstring statusString, bool bForce);
 
 	HWND					m_hWnd;
 	INT64					m_nStartTime;

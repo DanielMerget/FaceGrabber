@@ -145,17 +145,17 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		HRESULT hr = m_pDrawDataStreams->initialize(GetDlgItem(m_hWnd, IDC_VIDEOVIEW), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
 		if (FAILED(hr))
 		{
-			SetStatusMessage(L"Failed to initialize the Direct2D draw device.", 10000, true);
+			setStatusMessage(L"Failed to initialize the Direct2D draw device.", true);
 		}
 		
 		m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
-		m_kinectFrameGrabber.setWindowHandle(hWnd);
 		
 		// Get and initialize the default Kinect sensor
 		m_kinectFrameGrabber.initializeDefaultSensor();
 		
 		m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloud, m_pclViewer, _1));
 		m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
+		m_kinectFrameGrabber.statusChanged.connect(boost::bind(&WindowsApplication::setStatusMessage, this, _1, _2));
 
 	}
 		break;
@@ -191,10 +191,12 @@ void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM)
 /// <param name="showTimeMsec">time in milliseconds to ignore future status messages</param>
 /// <param name="bForce">force status update</param>
 /// <returns>success or failure</returns>
-bool WindowsApplication::SetStatusMessage(_In_z_ WCHAR* szMessage, ULONGLONG nShowTimeMsec, bool bForce)
+//bool WindowsApplication::SetStatusMessage(_In_z_ WCHAR* szMessage, bool bForce)
+bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce)
 {
+	_In_z_ WCHAR* szMessage = &statusString[0];
 	ULONGLONG now = GetTickCount64();
-
+	ULONGLONG nShowTimeMsec = 1000;
 	if (m_hWnd && (bForce || (m_nNextStatusTime <= now)))
 	{
 		SetDlgItemText(m_hWnd, IDC_STATUS, szMessage);

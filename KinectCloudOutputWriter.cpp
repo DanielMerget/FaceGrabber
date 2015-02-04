@@ -29,6 +29,7 @@ void KinectCloudOutputWriter::updateCloudThreated(pcl::PointCloud<pcl::PointXYZR
 {
 	m_updateThreads.push_back(std::thread(&KinectCloudOutputWriter::pushCloud, this, cloud));
 }
+
 void KinectCloudOutputWriter::pushCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloudToPush)
 {
 	/*if (!m_running){
