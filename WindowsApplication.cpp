@@ -7,8 +7,7 @@ WindowsApplication::WindowsApplication() :
 	m_nLastCounter(0),
 	m_nFramesSinceUpdate(0),
 	m_fFreq(0),
-	m_nNextStatusTime(0),
-	m_pclViewer(new PCLViewer())
+	m_nNextStatusTime(0)
 {
 	LARGE_INTEGER qpf = { 0 };
 	if (QueryPerformanceFrequency(&qpf))
@@ -141,6 +140,8 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		// Create and initialize a new Direct2D image renderer (take a look at ImageRenderer.h)
 		// We'll use this to draw the data we receive from the Kinect to the screen
 		m_pDrawDataStreams = new ImageRenderer();
+		m_pclViewer = std::shared_ptr<PCLViewer>(new PCLViewer());
+		m_cloudOutputWriter = std::shared_ptr<KinectCloudOutputWriter>(new KinectCloudOutputWriter);
 		HRESULT hr = m_pDrawDataStreams->initialize(GetDlgItem(m_hWnd, IDC_VIDEOVIEW), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
 		if (FAILED(hr))
 		{
@@ -154,6 +155,7 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		m_kinectFrameGrabber.initializeDefaultSensor();
 		
 		m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloud, m_pclViewer, _1));
+		m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
 
 	}
 		break;
@@ -179,6 +181,7 @@ void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM)
 {
 	if (IDC_RECORD_BUTTON == LOWORD(wParam) && BN_CLICKED == HIWORD(wParam)){
 		std::cout << "button pressed";
+		m_cloudOutputWriter->startWritingClouds();
 	}
 }
 /// <summary>

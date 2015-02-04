@@ -75,7 +75,7 @@ public:
 	void setWindowHandle(HWND handle);
 
 
-	boost::signal<void(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& cloud)> cloudUpdated;
+	boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated;
 	
 private:
 	std::wstring getCaptureStatusText(FaceModelBuilderCollectionStatus status);

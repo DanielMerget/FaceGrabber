@@ -19,10 +19,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="KinectDataBuffer.cpp" />
     <ClCompile Include="KinectHDFaceGrabber.cpp" />
     <ClCompile Include="ImageRenderer.cpp" />
+    <ClCompile Include="KinectCloudOutputWriter.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="PCLViewer.cpp" />
+    <ClCompile Include="PLYWriter.cpp" />
     <ClCompile Include="WindowsApplication.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -32,9 +35,12 @@
     <ResourceCompile Include="FaceBasics.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="KinectDataBuffer.h" />
     <ClInclude Include="KinectHDFaceGrabber.h" />
     <ClInclude Include="ImageRenderer.h" />
+    <ClInclude Include="KinectCloudOutputWriter.h" />
     <ClInclude Include="PCLViewer.h" />
+    <ClInclude Include="PLYWriter.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="WindowsApplication.h" />

@@ -10,6 +10,13 @@
     <ClCompile Include="PCLViewer.cpp">
       <Filter>PCL Viewer</Filter>
     </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>Kinect</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsApplication.cpp" />
+    <ClCompile Include="PLYWriter.cpp" />
+    <ClCompile Include="KinectDataBuffer.cpp" />
+    <ClCompile Include="KinectCloudOutputWriter.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -23,6 +30,10 @@
     <ClInclude Include="PCLViewer.h">
       <Filter>PCL Viewer</Filter>
     </ClInclude>
+    <ClInclude Include="WindowsApplication.h" />
+    <ClInclude Include="PLYWriter.h" />
+    <ClInclude Include="KinectDataBuffer.h" />
+    <ClInclude Include="KinectCloudOutputWriter.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="app.ico" />

@@ -7,6 +7,7 @@
 #include "ImageRenderer.h"
 #include "PCLViewer.h"
 #include <memory>
+#include "KinectCloudOutputWriter.h"
 
 class WindowsApplication
 {
@@ -62,5 +63,6 @@ public:
 
 	KinectHDFaceGrabber m_kinectFrameGrabber;
 	std::shared_ptr<PCLViewer>	m_pclViewer;
+	std::shared_ptr<KinectCloudOutputWriter> m_cloudOutputWriter;
 };
 

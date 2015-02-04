@@ -8,7 +8,7 @@ public:
 	PCLViewer::PCLViewer();
 	~PCLViewer();
 	
-	void updateCloud(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& cloud);
+	void updateCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud);
 	bool isStopped();
 	void updateCloudMsg(std::string updateMesg);
 private:

@@ -17,7 +17,7 @@ bool PCLViewer::isStopped(){
 	return viewer.wasStopped();
 }
 
-void PCLViewer::updateCloud(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& cloud){
+void PCLViewer::updateCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud){
 	static bool first = true;
 	
 	if (first){

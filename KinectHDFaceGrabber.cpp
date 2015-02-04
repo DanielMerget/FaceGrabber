@@ -39,7 +39,6 @@ static const DWORD c_FaceFrameFeatures =
 /// Constructor
 /// </summary>
 KinectHDFaceGrabber::KinectHDFaceGrabber() :
-    //m_hWnd(NULL),
     m_nStartTime(0),
     m_nLastCounter(0),
     m_nFramesSinceUpdate(0),
@@ -48,18 +47,10 @@ KinectHDFaceGrabber::KinectHDFaceGrabber() :
     m_pKinectSensor(nullptr),
     m_pCoordinateMapper(nullptr),
 	m_pColorFrameReader(nullptr),
-    //m_pD2DFactory(nullptr),
     m_pDrawDataStreams(nullptr),
     m_pColorRGBX(nullptr),
     m_pBodyFrameReader(nullptr)
-	//m_pclViewer(new PCLViewer())
 {
-    /*LARGE_INTEGER qpf = {0};
-    if (QueryPerformanceFrequency(&qpf))
-    {
-        m_fFreq = double(qpf.QuadPart);
-    }*/
-	//cloudUpdated.connect(boost::bind(&PCLViewer::updateCloud, m_pclViewer, _1));
     for (int i = 0; i < BODY_COUNT; i++)
     {
         m_pFaceFrameSources[i] = nullptr;
@@ -144,12 +135,6 @@ HRESULT KinectHDFaceGrabber::initializeDefaultSensor()
 		
         hr = m_pKinectSensor->Open();
 		
-		//if (SUCCEEDED(hr))
-		//{
-		//	//hr = m_pKinectSensor->OpenMultiSourceFrameReader(FrameSourceTypes::FrameSourceTypes_Color || FrameSourceTypes::FrameSourceTypes_Body
-		//	//|| FrameSourceTypes::)
-		//}
-		//
         
         if (SUCCEEDED(hr))
         {
