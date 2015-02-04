@@ -7,7 +7,8 @@ WindowsApplication::WindowsApplication() :
 	m_nLastCounter(0),
 	m_nFramesSinceUpdate(0),
 	m_fFreq(0),
-	m_nNextStatusTime(0)
+	m_nNextStatusTime(0),
+	m_pclViewer(new PCLViewer())
 {
 	LARGE_INTEGER qpf = { 0 };
 	if (QueryPerformanceFrequency(&qpf))
@@ -145,10 +146,14 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		{
 			SetStatusMessage(L"Failed to initialize the Direct2D draw device.", 10000, true);
 		}
+		
 		m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
 		m_kinectFrameGrabber.setWindowHandle(hWnd);
+		
 		// Get and initialize the default Kinect sensor
 		m_kinectFrameGrabber.initializeDefaultSensor();
+		
+		m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloud, m_pclViewer, _1));
 
 	}
 		break;

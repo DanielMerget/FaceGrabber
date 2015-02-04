@@ -8,7 +8,12 @@
 
 #include "resource.h"
 #include "ImageRenderer.h"
-#include "PCLViewer.h"
+//#include "PCLViewer.h"
+#undef max
+#undef min
+#include <boost/signals.hpp>
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
 
 class KinectHDFaceGrabber
 {
@@ -68,6 +73,10 @@ public:
 	void setImageRenderer(ImageRenderer* renderer);
 
 	void setWindowHandle(HWND handle);
+
+
+	boost::signal<void(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& cloud)> cloudUpdated;
+	
 private:
 	std::wstring getCaptureStatusText(FaceModelBuilderCollectionStatus status);
 
@@ -130,8 +139,6 @@ private:
 
     // Face readers
     IFaceFrameReader*		m_pFaceFrameReaders[BODY_COUNT];
-
-	std::shared_ptr<PCLViewer>	m_pclViewer;
 
 	//HDFace
 	IHighDefinitionFaceFrameSource* m_pHDFaceSource[BODY_COUNT];;

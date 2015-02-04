@@ -15,8 +15,8 @@ PCLViewer::~PCLViewer()
 
 bool PCLViewer::isStopped(){
 	return viewer.wasStopped();
-
 }
+
 void PCLViewer::updateCloud(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& cloud){
 	static bool first = true;
 	
@@ -30,4 +30,9 @@ void PCLViewer::updateCloud(const pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr& c
 		viewer.updatePointCloud(cloud, "cloud");
 		viewer.spinOnce();
 	}
+}
+
+void PCLViewer::updateCloudMsg(std::string updateMesg)
+{
+	std::cout << "Cloud update msg: " << updateMesg << std::endl;
 }

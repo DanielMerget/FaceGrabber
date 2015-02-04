@@ -6,6 +6,7 @@
 #include "resource.h"
 #include "ImageRenderer.h"
 #include "PCLViewer.h"
+#include <memory>
 
 class WindowsApplication
 {
@@ -60,5 +61,6 @@ public:
 	
 
 	KinectHDFaceGrabber m_kinectFrameGrabber;
+	std::shared_ptr<PCLViewer>	m_pclViewer;
 };
 

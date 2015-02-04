@@ -51,15 +51,15 @@ KinectHDFaceGrabber::KinectHDFaceGrabber() :
     //m_pD2DFactory(nullptr),
     m_pDrawDataStreams(nullptr),
     m_pColorRGBX(nullptr),
-    m_pBodyFrameReader(nullptr),
-	m_pclViewer(new PCLViewer())
+    m_pBodyFrameReader(nullptr)
+	//m_pclViewer(new PCLViewer())
 {
     /*LARGE_INTEGER qpf = {0};
     if (QueryPerformanceFrequency(&qpf))
     {
         m_fFreq = double(qpf.QuadPart);
     }*/
-
+	//cloudUpdated.connect(boost::bind(&PCLViewer::updateCloud, m_pclViewer, _1));
     for (int i = 0; i < BODY_COUNT; i++)
     {
         m_pFaceFrameSources[i] = nullptr;
@@ -461,7 +461,9 @@ void KinectHDFaceGrabber::processFaces(RGBQUAD* pBuffer, int nWidth, int nHeight
 						m_pCoordinateMapper->MapCameraPointsToColorSpace(facePoints.size(), facePoints.data(), renderPoints.size(), renderPoints.data());
 					}
 					auto cloud = convertKinectRGBPointsToPointCloud(facePoints, renderPoints, pBuffer, nWidth, nHeight);
-					m_pclViewer->updateCloud(cloud);
+					//m_pclViewer->updateCloud(cloud);
+					cloudUpdated(cloud);
+					//cloudUpdated("updated");
 					static bool written = false;
 					if (isCompleted && !written){
 						pcl::io::savePLYFile("myFace", *cloud, false);
