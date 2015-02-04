@@ -67,6 +67,7 @@ public:
 
 	void setImageRenderer(ImageRenderer* renderer);
 
+	void setWindowHandle(HWND handle);
 private:
 	std::wstring getCaptureStatusText(FaceModelBuilderCollectionStatus status);
 
@@ -140,9 +141,10 @@ private:
 	IFaceModel* m_pFaceModel[BODY_COUNT];
 
     //// Direct2D
-    ImageRenderer*         m_pDrawDataStreams;
+    ImageRenderer*			m_pDrawDataStreams;
     //ID2D1Factory*          m_pD2DFactory;
-    RGBQUAD*               m_pColorRGBX;	
+    RGBQUAD*				m_pColorRGBX;	
+	HWND					m_hWnd;
 
 	INT64					m_nStartTime;
 	INT64					m_nLastCounter;

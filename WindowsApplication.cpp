@@ -146,7 +146,7 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 			SetStatusMessage(L"Failed to initialize the Direct2D draw device.", 10000, true);
 		}
 		m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
-
+		m_kinectFrameGrabber.setWindowHandle(hWnd);
 		// Get and initialize the default Kinect sensor
 		m_kinectFrameGrabber.initializeDefaultSensor();
 
