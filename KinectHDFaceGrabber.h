@@ -106,14 +106,6 @@ private:
     HRESULT					updateBodyData(IBody** ppBodies);
 
 
-
-    //HWND					m_hWnd;
-    //INT64					m_nStartTime;
-    //INT64					m_nLastCounter;
-    //double					m_fFreq;
-    //ULONGLONG				m_nNextStatusTime;
-    //DWORD					m_nFramesSinceUpdate;
-
     // Current Kinect
     IKinectSensor*			m_pKinectSensor;
 
@@ -141,7 +133,6 @@ private:
 
     //// Direct2D
     ImageRenderer*			m_pDrawDataStreams;
-    //ID2D1Factory*          m_pD2DFactory;
     RGBQUAD*				m_pColorRGBX;	
 
 	INT64					m_nStartTime;

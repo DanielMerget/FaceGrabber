@@ -19,13 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="KinectDataBuffer.cpp" />
     <ClCompile Include="KinectHDFaceGrabber.cpp" />
     <ClCompile Include="ImageRenderer.cpp" />
     <ClCompile Include="KinectCloudOutputWriter.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="PCLInputReader.cpp" />
     <ClCompile Include="PCLViewer.cpp" />
-    <ClCompile Include="PLYWriter.cpp" />
     <ClCompile Include="WindowsApplication.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -35,12 +34,11 @@
     <ResourceCompile Include="FaceBasics.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="KinectDataBuffer.h" />
     <ClInclude Include="KinectHDFaceGrabber.h" />
     <ClInclude Include="ImageRenderer.h" />
     <ClInclude Include="KinectCloudOutputWriter.h" />
+    <ClInclude Include="PCLInputReader.h" />
     <ClInclude Include="PCLViewer.h" />
-    <ClInclude Include="PLYWriter.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="WindowsApplication.h" />
@@ -122,7 +120,7 @@
       <AdditionalIncludeDirectories>C:\Libraries\vxl\vxl\core;C:\Libraries\vxl\vxl\vcl;C:\Libraries\VTK-5.10\include\vtk-5.10;C:\Libraries\flann-1.8.4\include;C:\Libraries\Eigen\include;C:\Libraries\pcl-1.7\include\pcl-1.7;C:\Libraries\Boost\include\boost-1_53;C:\Libraries\vxl\vxl\build\vcl;C:\Libraries\vxl\vxl\build\core</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>
       </EntryPointSymbol>

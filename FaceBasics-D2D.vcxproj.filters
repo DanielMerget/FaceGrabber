@@ -13,14 +13,17 @@
     <ClCompile Include="Main.cpp">
       <Filter>Kinect</Filter>
     </ClCompile>
-    <ClCompile Include="WindowsApplication.cpp" />
-    <ClCompile Include="PLYWriter.cpp" />
-    <ClCompile Include="KinectDataBuffer.cpp" />
-    <ClCompile Include="KinectCloudOutputWriter.cpp" />
+    <ClCompile Include="WindowsApplication.cpp">
+      <Filter>WindowsApp</Filter>
+    </ClCompile>
+    <ClCompile Include="KinectCloudOutputWriter.cpp">
+      <Filter>Kinect</Filter>
+    </ClCompile>
+    <ClCompile Include="PCLInputReader.cpp">
+      <Filter>InputReader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h" />
-    <ClInclude Include="stdafx.h" />
     <ClInclude Include="ImageRenderer.h">
       <Filter>Kinect</Filter>
     </ClInclude>
@@ -30,13 +33,21 @@
     <ClInclude Include="PCLViewer.h">
       <Filter>PCL Viewer</Filter>
     </ClInclude>
-    <ClInclude Include="WindowsApplication.h" />
-    <ClInclude Include="PLYWriter.h" />
-    <ClInclude Include="KinectDataBuffer.h" />
-    <ClInclude Include="KinectCloudOutputWriter.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="app.ico" />
+    <ClInclude Include="WindowsApplication.h">
+      <Filter>WindowsApp</Filter>
+    </ClInclude>
+    <ClInclude Include="KinectCloudOutputWriter.h">
+      <Filter>Kinect</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>WindowsApp</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>WindowsApp</Filter>
+    </ClInclude>
+    <ClInclude Include="PCLInputReader.h">
+      <Filter>InputReader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Kinect">
@@ -45,10 +56,21 @@
     <Filter Include="PCL Viewer">
       <UniqueIdentifier>{11f8c5d7-f06e-42e4-a730-1688e8ffaa28}</UniqueIdentifier>
     </Filter>
+    <Filter Include="WindowsApp">
+      <UniqueIdentifier>{e550a893-db7a-48bb-8d51-aa130cb81681}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="InputReader">
+      <UniqueIdentifier>{cb22bb0e-944c-41ef-afcf-f0111e82829e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="FaceBasics.rc">
       <Filter>Kinect</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="app.ico">
+      <Filter>WindowsApp</Filter>
+    </Image>
   </ItemGroup>
 </Project>

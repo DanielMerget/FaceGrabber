@@ -26,17 +26,19 @@ void PCLViewer::updateCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr 
 
 void PCLViewer::updateCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)
 {
-	std::unique_lock<std::mutex> viewerLock(m_viewerMutex);
+	//std::unique_lock<std::mutex> viewerLock(m_viewerMutex);
+	std::lock_guard<std::mutex> viewerLock(m_viewerMutex);
 	static bool first = true;
-	
-	if (first){
-		viewer.addPointCloud(cloud, "cloud");
-		first = false;
-		viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "cloud");
-		viewer.initCameraParameters();
-	}
-	else{
-		viewer.updatePointCloud(cloud, "cloud");
-		viewer.spinOnce();
-	}
+	viewer.updatePointCloud(cloud, "cloud");
+
+	//if (first){
+	//	viewer.addPointCloud(cloud, "cloud");
+	//	first = false;
+	//	viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "cloud");
+	//	//viewer.initCameraParameters();
+	//}
+	//else{
+	//	viewer.updatePointCloud(cloud, "cloud");
+	//	viewer.spinOnce();
+	//}
 }

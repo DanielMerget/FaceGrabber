@@ -78,7 +78,7 @@ void KinectCloudOutputWriter::writeCloudToFile(int index)
 		{
 			auto cloudMeasurement = m_clouds.front();
 			std::stringstream fileName;
-			fileName << "Cloud_" << cloudMeasurement.index << "_" << index << ".ply";
+			fileName << "Cloud_" << cloudMeasurement.index << ".ply";
 			pcl::io::savePLYFile(fileName.str(), *cloudMeasurement.cloud, false);
 			m_clouds.pop();
 		}
