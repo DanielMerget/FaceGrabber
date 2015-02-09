@@ -49,7 +49,8 @@ KinectHDFaceGrabber::KinectHDFaceGrabber() :
 	m_pColorFrameReader(nullptr),
     m_pDrawDataStreams(nullptr),
     m_pColorRGBX(nullptr),
-    m_pBodyFrameReader(nullptr)
+    m_pBodyFrameReader(nullptr),
+	m_pDepthFrameReader(nullptr)
 {
     for (int i = 0; i < BODY_COUNT; i++)
     {
@@ -99,6 +100,7 @@ KinectHDFaceGrabber::~KinectHDFaceGrabber()
     // done with coordinate mapper
     SafeRelease(m_pCoordinateMapper);
 
+	SafeRelease(m_pDepthFrameReader);
     // close the Kinect Sensor
     if (m_pKinectSensor)
     {
@@ -111,6 +113,138 @@ KinectHDFaceGrabber::~KinectHDFaceGrabber()
 
 void KinectHDFaceGrabber::setImageRenderer(ImageRenderer* renderer){
 	m_pDrawDataStreams = renderer;
+}
+
+HRESULT KinectHDFaceGrabber::initColorFrameReader()
+{
+	IColorFrameSource* pColorFrameSource = nullptr;
+	HRESULT hr = m_pKinectSensor->get_ColorFrameSource(&pColorFrameSource);
+	
+	if (SUCCEEDED(hr)){
+		hr = pColorFrameSource->OpenReader(&m_pColorFrameReader);
+	}
+
+	IFrameDescription* pFrameDescription = nullptr;
+	if (SUCCEEDED(hr))
+	{
+		hr = pColorFrameSource->get_FrameDescription(&pFrameDescription);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pFrameDescription->get_Width(&m_colorWidth);
+	}
+
+	if (SUCCEEDED(hr))
+	{
+		hr = pFrameDescription->get_Height(&m_colorHeight);
+	}
+
+	if (SUCCEEDED(hr)){
+		m_colorBuffer.resize(m_colorHeight * m_colorWidth);
+	}
+
+	SafeRelease(pFrameDescription);
+	SafeRelease(pColorFrameSource);
+	
+	return hr;
+}
+
+HRESULT KinectHDFaceGrabber::initDepthFrameReader()
+{
+	
+	IDepthFrameSource* depthFrameSource = nullptr;
+	
+	HRESULT hr = m_pKinectSensor->get_DepthFrameSource(&depthFrameSource);
+	
+	IFrameDescription* frameDescription = nullptr;
+	if (SUCCEEDED(hr)){
+		hr = depthFrameSource->get_FrameDescription(&frameDescription);
+	}
+
+	if (SUCCEEDED(hr)){
+		hr = frameDescription->get_Width(&m_depthWidth);
+	}
+
+	if (SUCCEEDED(hr)){
+		hr = frameDescription->get_Height(&m_depthHeight);
+	}
+
+	if (SUCCEEDED(hr)){
+		m_depthBuffer.resize(m_depthHeight * m_depthWidth);
+	}
+
+	SafeRelease(frameDescription);
+	if (SUCCEEDED(hr)){
+		hr = depthFrameSource->OpenReader(&m_pDepthFrameReader);
+	}
+
+	SafeRelease(depthFrameSource);
+	return hr;
+}
+
+HRESULT KinectHDFaceGrabber::initHDFaceReader()
+{
+	IBodyFrameSource* pBodyFrameSource = nullptr;
+	HRESULT hr = m_pKinectSensor->get_BodyFrameSource(&pBodyFrameSource);
+	std::vector<std::vector<float>> deformations(BODY_COUNT, std::vector<float>(FaceShapeDeformations::FaceShapeDeformations_Count));
+
+	if (SUCCEEDED(hr)){
+		// create a face frame source + reader to track each body in the fov
+		for (int i = 0; i < BODY_COUNT; i++){
+			if (SUCCEEDED(hr)){
+				// create the face frame source by specifying the required face frame features
+				hr = CreateFaceFrameSource(m_pKinectSensor, 0, c_FaceFrameFeatures, &m_pFaceFrameSources[i]);
+			}
+
+			if (SUCCEEDED(hr)){
+				// open the corresponding reader
+				hr = m_pFaceFrameSources[i]->OpenReader(&m_pFaceFrameReaders[i]);
+			}
+			std::vector<std::vector<float>> deformations(BODY_COUNT, std::vector<float>(FaceShapeDeformations::FaceShapeDeformations_Count));
+
+			if (SUCCEEDED(hr)){
+				hr = CreateHighDefinitionFaceFrameSource(m_pKinectSensor, &m_pHDFaceSource[i]);
+				m_pHDFaceSource[i]->put_TrackingQuality(FaceAlignmentQuality_High);
+			}
+
+			if (SUCCEEDED(hr)){
+				hr = m_pHDFaceSource[i]->OpenReader(&m_pHDFaceReader[i]);
+			}
+
+			if (SUCCEEDED(hr)){
+				hr = m_pHDFaceSource[i]->OpenModelBuilder(FaceModelBuilderAttributes::FaceModelBuilderAttributes_None, &m_pFaceModelBuilder[i]);
+			}
+
+			if (SUCCEEDED(hr)){
+				hr = m_pFaceModelBuilder[i]->BeginFaceDataCollection();
+			}
+
+			if (SUCCEEDED(hr)){
+				hr = CreateFaceAlignment(&m_pFaceAlignment[i]);
+			}
+
+			// Create Face Model
+			hr = CreateFaceModel(1.0f, FaceShapeDeformations::FaceShapeDeformations_Count, &deformations[i][0], &m_pFaceModel[i]);
+			if (FAILED(hr)){
+				std::cerr << "Error : CreateFaceModel()" << std::endl;
+				return -1;
+			}
+		}
+		
+		if (SUCCEEDED(hr)){
+			hr = pBodyFrameSource->OpenReader(&m_pBodyFrameReader);
+		}
+		SafeRelease(pBodyFrameSource);
+	}
+
+
+	UINT32 vertices = 0;
+
+	if (SUCCEEDED(hr)){
+		hr = GetFaceModelVertexCount(&vertices);
+	}
+	return hr;
 }
 /// <summary>
 /// Initializes the default Kinect sensor
@@ -125,101 +259,32 @@ HRESULT KinectHDFaceGrabber::initializeDefaultSensor()
     {
         return hr;
     }
-	std::vector<std::vector<float>> deformations(BODY_COUNT, std::vector<float>(FaceShapeDeformations::FaceShapeDeformations_Count));
+	
     if (m_pKinectSensor)
     {
         // Initialize Kinect and get color, body and face readers
-        IColorFrameSource* pColorFrameSource = nullptr;
-        IBodyFrameSource* pBodyFrameSource = nullptr;
+        
+        
 		IMultiSourceFrameReader* reader;
 		
         hr = m_pKinectSensor->Open();
 		
-        
-        if (SUCCEEDED(hr))
-        {
-            hr = m_pKinectSensor->get_ColorFrameSource(&pColorFrameSource);
-        }
-		
-        if (SUCCEEDED(hr))
-        {
-            hr = m_pKinectSensor->get_BodyFrameSource(&pBodyFrameSource);
-        }
-
-		if (SUCCEEDED(hr))
-		{
-			hr = pColorFrameSource->OpenReader(&m_pColorFrameReader);
-		}
-		//
-        if (SUCCEEDED(hr))
-        {
-            hr = pBodyFrameSource->OpenReader(&m_pBodyFrameReader);
-        }
-		
-		if (SUCCEEDED(hr))
-		{
-		    hr = m_pKinectSensor->get_CoordinateMapper(&m_pCoordinateMapper);
-		}
-		
-
-        if (SUCCEEDED(hr))
-        {
-            // create a face frame source + reader to track each body in the fov
-            for (int i = 0; i < BODY_COUNT; i++)
-            {
-                if (SUCCEEDED(hr))
-                {
-                    // create the face frame source by specifying the required face frame features
-					
-                    hr = CreateFaceFrameSource(m_pKinectSensor, 0, c_FaceFrameFeatures, &m_pFaceFrameSources[i]);
-                }
-                if (SUCCEEDED(hr))
-                {
-                    // open the corresponding reader
-                    hr = m_pFaceFrameSources[i]->OpenReader(&m_pFaceFrameReaders[i]);
-                }
-				//
-
-				if (SUCCEEDED(hr)){
-					hr = CreateHighDefinitionFaceFrameSource(m_pKinectSensor, &m_pHDFaceSource[i]);
-					m_pHDFaceSource[i]->put_TrackingQuality(FaceAlignmentQuality_High);
-				}
-
-				if (SUCCEEDED(hr)){
-					hr = m_pHDFaceSource[i]->OpenReader(&m_pHDFaceReader[i]);
-				}
-				
-				if (SUCCEEDED(hr)){
-					hr = m_pHDFaceSource[i]->OpenModelBuilder(FaceModelBuilderAttributes::FaceModelBuilderAttributes_None, &m_pFaceModelBuilder[i]);
-				}
-
-				if (SUCCEEDED(hr)){
-					hr = m_pFaceModelBuilder[i]->BeginFaceDataCollection();
-				}
-
-				if (SUCCEEDED(hr)){
-					hr = CreateFaceAlignment(&m_pFaceAlignment[i]);
-				}
-
-				// Create Face Model
-				hr = CreateFaceModel(1.0f, FaceShapeDeformations::FaceShapeDeformations_Count, &deformations[i][0], &m_pFaceModel[i]);
-				if (FAILED(hr)){
-					std::cerr << "Error : CreateFaceModel()" << std::endl;
-					return -1;
-				}
-				
-            }
-        }        
-
-		
-		UINT32 vertices = 0;
-
 		if (SUCCEEDED(hr)){
-			hr = GetFaceModelVertexCount(&vertices);
+			hr = initColorFrameReader();
 		}
 		
-        SafeRelease(pColorFrameSource);
-        SafeRelease(pBodyFrameSource);
+		if (SUCCEEDED(hr)){
+			hr = initDepthFrameReader();
+		}
+		
+		if (SUCCEEDED(hr)){
+			hr = initHDFaceReader();
+		}
+
+		if (SUCCEEDED(hr))
+		{
+			hr = m_pKinectSensor->get_CoordinateMapper(&m_pCoordinateMapper);
+		}
     }
 	
     if (!m_pKinectSensor || FAILED(hr))
@@ -251,29 +316,13 @@ void KinectHDFaceGrabber::update()
     if (SUCCEEDED(hr))
     {
         INT64 nTime = 0;
-        IFrameDescription* pFrameDescription = nullptr;
-        int nWidth = 0;
-        int nHeight = 0;
         ColorImageFormat imageFormat = ColorImageFormat_None;
         UINT nBufferSize = 0;
         RGBQUAD *pBuffer = nullptr;
 	
         hr = pColorFrame->get_RelativeTime(&nTime);
 	
-        if (SUCCEEDED(hr))
-        {
-            hr = pColorFrame->get_FrameDescription(&pFrameDescription);
-        }
-	
-        if (SUCCEEDED(hr))
-        {
-            hr = pFrameDescription->get_Width(&nWidth);
-        }
-	
-        if (SUCCEEDED(hr))
-        {
-            hr = pFrameDescription->get_Height(&nHeight);
-        }
+        
 	
         if (SUCCEEDED(hr))
         {
@@ -282,28 +331,30 @@ void KinectHDFaceGrabber::update()
 	
         if (SUCCEEDED(hr))
         {
-            if (imageFormat == ColorImageFormat_Bgra)
-            {
-                hr = pColorFrame->AccessRawUnderlyingBuffer(&nBufferSize, reinterpret_cast<BYTE**>(&pBuffer));
-            }
-            else if (m_pColorRGBX)
-            {
-                pBuffer = m_pColorRGBX;
-                nBufferSize = cColorWidth * cColorHeight * sizeof(RGBQUAD);
-                hr = pColorFrame->CopyConvertedFrameDataToArray(nBufferSize, reinterpret_cast<BYTE*>(pBuffer), ColorImageFormat_Bgra);            
-            }
-            else
-            {
-                hr = E_FAIL;
-            }
+			nBufferSize = m_colorWidth * m_colorHeight * sizeof(RGBQUAD);
+			hr = pColorFrame->CopyConvertedFrameDataToArray(nBufferSize, reinterpret_cast<BYTE*>(m_colorBuffer.data()), ColorImageFormat_Bgra);
+            //if (imageFormat == ColorImageFormat_Bgra)
+            //{
+            //    hr = pColorFrame->AccessRawUnderlyingBuffer(&nBufferSize, reinterpret_cast<BYTE**>(m_colorBuffer.data()));
+            //}
+            //else if (m_pColorRGBX)
+            //{
+            //    pBuffer = m_pColorRGBX;
+            //    //nBufferSize = cColorWidth * cColorHeight * sizeof(RGBQUAD);
+				
+            //}
+            //else
+            //{
+            //    hr = E_FAIL;
+            //}
         }			
 	
         if (SUCCEEDED(hr))
         {
-            drawStreams(nTime, pBuffer, nWidth, nHeight);
+			drawStreams(nTime, m_colorBuffer.data());
+			//drawDepthImage(pBuffer);
         }
-	
-        SafeRelease(pFrameDescription);		
+        
     }
 	SafeRelease(pColorFrame);  
 }
@@ -315,7 +366,7 @@ void KinectHDFaceGrabber::update()
 /// <param name="pBuffer">pointer to frame data</param>
 /// <param name="nWidth">width (in pixels) of input image data</param>
 /// <param name="nHeight">height (in pixels) of input image data</param>
-void KinectHDFaceGrabber::drawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth, int nHeight)
+void KinectHDFaceGrabber::drawStreams(INT64 nTime, RGBQUAD* pBuffer)
 {
 //    if (m_hWnd)
 //    {
@@ -325,10 +376,10 @@ void KinectHDFaceGrabber::drawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth,
         if (SUCCEEDED(hr))
         {
             // Make sure we've received valid color data
-            if (pBuffer && (nWidth == cColorWidth) && (nHeight == cColorHeight))
+			if (pBuffer && (m_colorWidth > 0 ) && (m_colorHeight > 0))
             {
                 // Draw the data with Direct2D
-                hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(pBuffer), cColorWidth * cColorHeight * sizeof(RGBQUAD));        
+                hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(pBuffer), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
             }
             else
             {
@@ -339,7 +390,7 @@ void KinectHDFaceGrabber::drawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth,
             if (SUCCEEDED(hr))
             {
                 // begin processing the face frames
-				processFaces(pBuffer, nWidth, nHeight);
+				processFaces(pBuffer);
             }
 
             m_pDrawDataStreams->endDrawing();
@@ -378,7 +429,7 @@ void KinectHDFaceGrabber::drawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth,
 /// <summary>
 /// Processes new face frames
 /// </summary>
-void KinectHDFaceGrabber::processFaces(RGBQUAD* pBuffer, int nWidth, int nHeight)
+void KinectHDFaceGrabber::processFaces(RGBQUAD* pBuffer)
 {
     HRESULT hr;
     IBody* ppBodies[BODY_COUNT] = {0};
@@ -444,17 +495,9 @@ void KinectHDFaceGrabber::processFaces(RGBQUAD* pBuffer, int nWidth, int nHeight
 					if (SUCCEEDED(hr)){
 						m_pCoordinateMapper->MapCameraPointsToColorSpace(facePoints.size(), facePoints.data(), renderPoints.size(), renderPoints.data());
 					}
-					auto cloud = convertKinectRGBPointsToPointCloud(facePoints, renderPoints, pBuffer, nWidth, nHeight);
-					//m_pclViewer->updateCloud(cloud);
+					auto cloud = convertKinectRGBPointsToPointCloud(facePoints, renderPoints, pBuffer);
+
 					cloudUpdated(cloud);
-					//cloudUpdated("updated");
-					/*static bool written = false;
-					if (isCompleted && !written){
-						pcl::io::savePLYFile("myFace", *cloud, false);
-						written = true;
-					}*/
-					
-					
 					
 					//first = false;
 					m_pDrawDataStreams->drawPoints(renderPoints);				
@@ -475,32 +518,7 @@ void KinectHDFaceGrabber::processFaces(RGBQUAD* pBuffer, int nWidth, int nHeight
 }
 
 
-std::wstring KinectHDFaceGrabber::getCaptureStatusText(FaceModelBuilderCollectionStatus status)
-{
-	
-	std::wstring result = L"";
-	if ((status & FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_FrontViewFramesNeeded) != 0){
-		result += L"  Front View Needed";
-	}
-	if ((status & FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_LeftViewsNeeded) != 0){
-		result += L" Left Views Needed";
-	}
-	if ((status & FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_MoreFramesNeeded) != 0){
-		result += L" More Frames needed";
-	}
-	if ((status & FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_RightViewsNeeded) != 0){
-		result += L" Right Views needed";
-	}
-	if ((status & FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_TiltedUpViewsNeeded) != 0){
-		result += L" Tilted Up Views needed";
-	}
-	if ((status & FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_Complete) != 0){
-		result += L" Completed";
-	}
-	return result;
-}
-
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPointsToPointCloud(const std::vector<CameraSpacePoint>& renderPoints, const std::vector<ColorSpacePoint>& imagePoints, const RGBQUAD* pBuffer, const int imageWidth, const int imageHeight)
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPointsToPointCloud(const std::vector<CameraSpacePoint>& renderPoints, const std::vector<ColorSpacePoint>& imagePoints, const RGBQUAD* pBuffer)
 {
 	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>(imageWidth, imageHeight));
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
@@ -514,10 +532,10 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 
 		int colorX = static_cast<int>(std::floor(imageSpacePoint->X + 0.5f));
 		int colorY = static_cast<int>(std::floor(imageSpacePoint->Y + 0.5f));
-		if (colorY > imageHeight || colorX > imageWidth || colorY < 0 || colorX < 0)
+		if (colorY > m_colorHeight || colorX > m_colorWidth || colorY < 0 || colorX < 0)
 			continue;
 
-		int colorImageIndex = ((imageWidth * colorY) + colorX);
+		int colorImageIndex = ((m_colorWidth * colorY) + colorX);
 		RGBQUAD pixel = pBuffer[colorImageIndex];
 		//point.r = pixel.rgbRed;
 		point.r = pixel.rgbRed;
@@ -565,3 +583,28 @@ HRESULT KinectHDFaceGrabber::updateBodyData(IBody** ppBodies)
     return hr;
 }
 
+
+std::wstring KinectHDFaceGrabber::getCaptureStatusText(FaceModelBuilderCollectionStatus status)
+{
+
+	std::wstring result = L"";
+	if ((status & FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_FrontViewFramesNeeded) != 0){
+		result += L"  Front View Needed";
+	}
+	if ((status & FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_LeftViewsNeeded) != 0){
+		result += L" Left Views Needed";
+	}
+	if ((status & FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_MoreFramesNeeded) != 0){
+		result += L" More Frames needed";
+	}
+	if ((status & FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_RightViewsNeeded) != 0){
+		result += L" Right Views needed";
+	}
+	if ((status & FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_TiltedUpViewsNeeded) != 0){
+		result += L" Tilted Up Views needed";
+	}
+	if ((status & FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_Complete) != 0){
+		result += L" Completed";
+	}
+	return result;
+}

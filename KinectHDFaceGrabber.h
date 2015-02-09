@@ -8,7 +8,6 @@
 
 #include "resource.h"
 #include "ImageRenderer.h"
-//#include "PCLViewer.h"
 #undef max
 #undef min
 #include <boost/signals.hpp>
@@ -79,9 +78,14 @@ public:
 private:
 	std::wstring getCaptureStatusText(FaceModelBuilderCollectionStatus status);
 
+	HRESULT initColorFrameReader();
+	HRESULT initDepthFrameReader();
+	HRESULT initHDFaceReader();
+
+	void drawDepthImage(RGBQUAD* colorBuffer);
 
 	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(std::vector<CameraSpacePoint>& renderPoints, const RGBQUAD* pBuffer, const int imageWidth, const int imageHeight);
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(const std::vector<CameraSpacePoint>& renderPoints, const std::vector<ColorSpacePoint>& imagePoints, const RGBQUAD* pBuffer, const int imageWidth, const int imageHeight);
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(const std::vector<CameraSpacePoint>& renderPoints, const std::vector<ColorSpacePoint>& imagePoints, const RGBQUAD* pBuffer);
 
     /// <summary>
     /// Renders the color and face streams
@@ -90,12 +94,12 @@ private:
     /// <param name="pBuffer">pointer to frame data</param>
     /// <param name="nWidth">width (in pixels) of input image data</param>
     /// <param name="nHeight">height (in pixels) of input image data</param>
-    void					drawStreams(INT64 nTime, RGBQUAD* pBuffer, int nWidth, int nHeight);
+    void					drawStreams(INT64 nTime, RGBQUAD* pBuffer);
 
     /// <summary>
     /// Processes new face frames
     /// </summary>
-	void					processFaces(RGBQUAD* pBuffer, int nWidth, int nHeight);
+	void					processFaces(RGBQUAD* pBuffer);
 
 
     /// <summary>
@@ -115,6 +119,8 @@ private:
     // Color reader
     IColorFrameReader*		m_pColorFrameReader;
 
+	IDepthFrameReader*		m_pDepthFrameReader;
+
     // Body reader
     IBodyFrameReader*		m_pBodyFrameReader;
 
@@ -126,9 +132,13 @@ private:
 
 	//HDFace
 	IHighDefinitionFaceFrameSource* m_pHDFaceSource[BODY_COUNT];;
+
 	IHighDefinitionFaceFrameReader* m_pHDFaceReader[BODY_COUNT];
+
 	IFaceAlignment* m_pFaceAlignment[BODY_COUNT];
+
 	IFaceModelBuilder* m_pFaceModelBuilder[BODY_COUNT];
+
 	IFaceModel* m_pFaceModel[BODY_COUNT];
 
     //// Direct2D
@@ -140,5 +150,13 @@ private:
 	double					m_fFreq;
 	ULONGLONG				m_nNextStatusTime;
 	DWORD					m_nFramesSinceUpdate;
+
+	std::vector<UINT16> m_depthBuffer;
+	std::vector<RGBQUAD> m_colorBuffer;
+
+	int m_depthWidth;
+	int m_depthHeight;
+	int m_colorWidth;
+	int m_colorHeight;
 };
 
