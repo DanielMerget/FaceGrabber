@@ -49,12 +49,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 //	reader.join();
 }
 
-pcl::visualization::CloudViewer viewer("Cloud Viewer");
+//
 
-void update(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)
+void update(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud, pcl::visualization::CloudViewer* viewer)
 {
 	std::cout << "update.." << std::endl;
-	viewer.showCloud(cloud);
+	viewer->showCloud(cloud);
 }
 
 
@@ -68,8 +68,9 @@ int main()
 	
 	//PCLViewer viewer;
 	
-	
-	reader.cloudUpdated.connect(boost::bind(update, _1));
+	pcl::visualization::CloudViewer viewer("Cloud Viewer");
+
+	reader.cloudUpdated.connect(boost::bind(update, _1, &viewer));
 	reader.startReaderThreads();
 	
 	
