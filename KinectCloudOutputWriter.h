@@ -27,7 +27,6 @@ private:
 
 	bool m_notified;
 	std::vector<std::thread> m_writerThreads;
-	std::vector<std::thread> m_updateThreads;
 	std::queue<PointCloudMeasurement> m_clouds;
 	std::condition_variable m_checkCloud;
 	std::mutex m_lockCloud;

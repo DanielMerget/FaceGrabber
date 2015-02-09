@@ -163,10 +163,12 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		// If the titlebar X is clicked, destroy app
 	case WM_CLOSE:
 		DestroyWindow(hWnd);
+		m_pclViewer->stopViewer();
 		break;
 
 	case WM_DESTROY:
 		// Quit the main message pump
+		
 		PostQuitMessage(0);
 		break;
 	case WM_COMMAND:

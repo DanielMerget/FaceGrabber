@@ -1,24 +1,20 @@
 #include "KinectCloudOutputWriter.h"
 #include <pcl/io/ply_io.h>
-
+#include <future>
 
 KinectCloudOutputWriter::KinectCloudOutputWriter() :
 	m_running(false),
 	m_notified(false),
 	m_cloudCount(0),
 	m_clouds(),
-	m_writerThreads(),
-	m_updateThreads()
+	m_writerThreads()
 {
-	//startWritingClouds();
 }
 
 
 KinectCloudOutputWriter::~KinectCloudOutputWriter()
 {
-	for (auto& thread : m_updateThreads){
-		thread.join();
-	}
+
 	m_running = false;
 	for (auto& thread : m_writerThreads){
 		thread.join();
@@ -30,17 +26,12 @@ void KinectCloudOutputWriter::updateCloudThreated(pcl::PointCloud<pcl::PointXYZR
 	if (!m_running){
 		return;
 	}
-	m_updateThreads.push_back(std::thread(&KinectCloudOutputWriter::pushCloud, this, cloud));
+	//m_updateThreads.push_back(std::thread(&KinectCloudOutputWriter::pushCloud, this, cloud));
+	std::async(&KinectCloudOutputWriter::pushCloud, this, cloud);
 }
 
 void KinectCloudOutputWriter::pushCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloudToPush)
 {
-	/*if (!m_running){
-		return;
-	}*/
-	//if (!m_running){
-	//	startWritingClouds();
-	//}
 	std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
 	if (m_cloudCount > 100 || !m_running){
 		return;
@@ -54,7 +45,6 @@ void KinectCloudOutputWriter::pushCloud(pcl::PointCloud<pcl::PointXYZRGB>::Const
 	if (m_cloudCount == 100){
 		m_running = false;
 	}
-	//m_notified = true;
 	m_checkCloud.notify_one();
 }
 
@@ -72,10 +62,7 @@ void KinectCloudOutputWriter::writeCloudToFile(int index)
 	while (m_running)
 	{
 		std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
-		//while (!m_notified){
-			m_checkCloud.wait(cloudLocker);
-		//}
-		
+		m_checkCloud.wait(cloudLocker);
 
 		if (!m_clouds.empty())
 		{

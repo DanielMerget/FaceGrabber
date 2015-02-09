@@ -448,11 +448,11 @@ void KinectHDFaceGrabber::processFaces(RGBQUAD* pBuffer, int nWidth, int nHeight
 					//m_pclViewer->updateCloud(cloud);
 					cloudUpdated(cloud);
 					//cloudUpdated("updated");
-					static bool written = false;
+					/*static bool written = false;
 					if (isCompleted && !written){
 						pcl::io::savePLYFile("myFace", *cloud, false);
 						written = true;
-					}
+					}*/
 					
 					
 					
