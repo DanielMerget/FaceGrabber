@@ -47,7 +47,7 @@ void PCLViewer::updateLoop()
 			
 
 		viewer.addPointCloud(m_currentCloud, "cloud");
-		viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "cloud");
+		viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "cloud");
 		viewer.initCameraParameters();
 	}
 	while (!viewer.wasStopped() && m_isRunning)

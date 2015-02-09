@@ -88,7 +88,7 @@ void PCLInputReader::updateThreadFunc()
 		m_cloudBufferFree.notify_all();
 		printMessage("update thread sleeping");
 		
-		std::chrono::milliseconds dura(0);
+		std::chrono::milliseconds dura(100);
 		std::this_thread::sleep_for(dura);
 		printMessage("update thread woke up from sleeping");
 		numOfFilesRead++;
@@ -127,7 +127,7 @@ void PCLInputReader::readPLYFile(const int index)
 
 		//std::string name = "C:/Users/mas/Documents/Repositories/IDP-KinectHDFaceGrabber/Cloud_0.ply";
 		m_printMutex.lock();
-		pcl::io::loadPLYFile(fileName.str(), blob);
+		pcl::io::loadPLYFile(fileName.str(), blob );
 		
 		pcl::fromPCLPointCloud2(blob, *cloud);
 		m_printMutex.unlock();

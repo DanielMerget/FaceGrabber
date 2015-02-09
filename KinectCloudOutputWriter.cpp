@@ -30,10 +30,11 @@ void KinectCloudOutputWriter::updateCloudThreated(pcl::PointCloud<pcl::PointXYZR
 	std::async(&KinectCloudOutputWriter::pushCloud, this, cloud);
 }
 
+static int numOfFilesToWrite = 100;
 void KinectCloudOutputWriter::pushCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloudToPush)
 {
 	std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
-	if (m_cloudCount > 100 || !m_running){
+	if (m_cloudCount > numOfFilesToWrite || !m_running){
 		return;
 	}
 	//PointCloudMeasurement cloudMeasurement{ cloudToPush, m_cloudCount };	
@@ -42,7 +43,7 @@ void KinectCloudOutputWriter::pushCloud(pcl::PointCloud<pcl::PointXYZRGB>::Const
 	cloudMeasurement.index = m_cloudCount;
 	m_clouds.push(cloudMeasurement);
 	m_cloudCount++;
-	if (m_cloudCount == 100){
+	if (m_cloudCount == numOfFilesToWrite){
 		m_running = false;
 	}
 	m_checkCloud.notify_one();
@@ -50,7 +51,7 @@ void KinectCloudOutputWriter::pushCloud(pcl::PointCloud<pcl::PointXYZRGB>::Const
 
 void KinectCloudOutputWriter::startWritingClouds()
 {
-	const int threadsToStartCount = 5;
+	const int threadsToStartCount = numOfFilesToWrite;
 	m_running = true;
 	for (int i = 0; i < threadsToStartCount; i++){
 		m_writerThreads.push_back(std::thread(&KinectCloudOutputWriter::writeCloudToFile, this, i));
@@ -63,14 +64,16 @@ void KinectCloudOutputWriter::writeCloudToFile(int index)
 	{
 		std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
 		m_checkCloud.wait(cloudLocker);
-
+		
 		if (!m_clouds.empty())
 		{
 			auto cloudMeasurement = m_clouds.front();
 			std::stringstream fileName;
 			fileName << "Cloud_" << cloudMeasurement.index << ".ply";
-			pcl::io::savePLYFile(fileName.str(), *cloudMeasurement.cloud, false);
 			m_clouds.pop();
+			cloudLocker.unlock();
+			pcl::io::savePLYFile(fileName.str(), *cloudMeasurement.cloud, true);
+			
 		}
 		m_notified = false;
 	}

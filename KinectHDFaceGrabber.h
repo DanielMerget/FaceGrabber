@@ -72,6 +72,7 @@ public:
 	void setImageRenderer(ImageRenderer* renderer);
 
 	boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated;
+	boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> depthCloudUpdated;
 
 	boost::signal<bool(std::wstring, bool)> statusChanged;
 	
@@ -82,10 +83,10 @@ private:
 	HRESULT initDepthFrameReader();
 	HRESULT initHDFaceReader();
 
-	void drawDepthImage(RGBQUAD* colorBuffer);
-
+	void updateDepthCloud();
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertDepthBufferToPointCloud();
 	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(std::vector<CameraSpacePoint>& renderPoints, const RGBQUAD* pBuffer, const int imageWidth, const int imageHeight);
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(const std::vector<CameraSpacePoint>& renderPoints, const std::vector<ColorSpacePoint>& imagePoints, const RGBQUAD* pBuffer);
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(const std::vector<CameraSpacePoint>& renderPoints, const std::vector<ColorSpacePoint>& imagePoints);
 
     /// <summary>
     /// Renders the color and face streams
@@ -94,12 +95,12 @@ private:
     /// <param name="pBuffer">pointer to frame data</param>
     /// <param name="nWidth">width (in pixels) of input image data</param>
     /// <param name="nHeight">height (in pixels) of input image data</param>
-    void					drawStreams(INT64 nTime, RGBQUAD* pBuffer);
+    void					updateHDFaceAndColor(INT64 nTime);
 
     /// <summary>
     /// Processes new face frames
     /// </summary>
-	void					processFaces(RGBQUAD* pBuffer);
+	void					processFaces();
 
 
     /// <summary>
