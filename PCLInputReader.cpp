@@ -6,7 +6,7 @@ PCLInputReader::PCLInputReader(const std::string inputPath, const std::string fi
 	m_cloudBuffer(bufferSize),
 //	m_cloudBufferIsFreeVariables(bufferSize),
 //	m_cloudBufferPositionMutexes(bufferSize),
-	m_readerThreads(bufferSize),
+	m_readerThreads(),
 	m_inputPath(inputPath),
 	m_bufferSize(bufferSize),
 	m_fileNamePrefix(fileNamePrefix),
@@ -47,7 +47,7 @@ void PCLInputReader::startCloudUpdateThread()
 
 void PCLInputReader::startReaderThreads()
 { 
-	for (int i = 0; i < m_bufferSize; i++){
+	for (int i = 0; i < 5; i++){
 		m_readerThreads.push_back(std::thread(&PCLInputReader::readPLYFile, this, i));
 	}
 }
@@ -75,19 +75,19 @@ void PCLInputReader::updateThreadFunc()
 			return;
 		}
 		std::unique_lock<std::mutex> cloudBufferLock(m_cloudBufferMutex);
-		while (!isBufferAtIndexSet(currentUpdateIndex)){
+		while (!isBufferAtIndexSet(m_numOfFilesToRead-1)){
 			std::stringstream msg;
 			msg << "update thread waiting for index " << currentUpdateIndex << " after reading files: " << numOfFilesRead << std::endl;
 			printMessage(msg.str());
 			m_cloudBufferUpdated.wait(cloudBufferLock);
 		}
-		
+
 		printMessage("update thread woke up - updating");
 		cloudUpdated(m_cloudBuffer[currentUpdateIndex]);
 		m_cloudBuffer[currentUpdateIndex].reset();
 		m_cloudBufferFree.notify_all();
 		printMessage("update thread sleeping");
-		
+
 		std::chrono::milliseconds dura(100);
 		std::this_thread::sleep_for(dura);
 		printMessage("update thread woke up from sleeping");
@@ -96,41 +96,61 @@ void PCLInputReader::updateThreadFunc()
 	}
 }
 
+//void PCLInputReader::updateThreadFunc()
+//{
+//	printMessage("update thread started");
+//	int currentUpdateIndex = 0;
+//	int numOfFilesRead = currentUpdateIndex;
+//	while (true)
+//	{
+//		if (numOfFilesRead >= m_numOfFilesToRead){
+//			printMessage("update thread finished");
+//			return;
+//		}
+//		std::unique_lock<std::mutex> cloudBufferLock(m_cloudBufferMutex);
+//		while (!isBufferAtIndexSet(currentUpdateIndex)){
+//			std::stringstream msg;
+//			msg << "update thread waiting for index " << currentUpdateIndex << " after reading files: " << numOfFilesRead << std::endl;
+//			printMessage(msg.str());
+//			m_cloudBufferUpdated.wait(cloudBufferLock);
+//		}
+//		
+//		printMessage("update thread woke up - updating");
+//		cloudUpdated(m_cloudBuffer[currentUpdateIndex]);
+//		m_cloudBuffer[currentUpdateIndex].reset();
+//		m_cloudBufferFree.notify_all();
+//		printMessage("update thread sleeping");
+//		
+//		std::chrono::milliseconds dura(100);
+//		std::this_thread::sleep_for(dura);
+//		printMessage("update thread woke up from sleeping");
+//		numOfFilesRead++;
+//		currentUpdateIndex = (currentUpdateIndex + 1) % m_bufferSize;
+//	}
+//}
+
 void PCLInputReader::readPLYFile(const int index)
 {
 	int indexOfFileToRead = index;
 	std::stringstream msg;
 	msg << "thread for index: " << index << "started. " << std::endl;
 	printMessage(msg.str());
-	//while (true){
-	//	indexOfFileToRead = indexOfFileToRead + index + m_bufferSize;
-	//	std::cout << "thread for index: " << index << " now reading: " << indexOfFileToRead << std::endl;
-	//	if (indexOfFileToRead > m_numOfFilesToRead){
-	//		std::cout << "thread for index: " << index << " done " << std::endl;
-	//		return;
-	//	}
-	//}
-	//
-	//return;
+
 	while (true)
 	{
 		if (indexOfFileToRead > m_numOfFilesToRead){
 			return;
 		}
-		
-		pcl::PCLPointCloud2 blob;
-		
+
 		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
+		//construct filename
 		std::stringstream fileName;
-		//fileName << m_inputPath << "/" << m_fileNamePrefix << indexOfFileToRead << ".ply";
 		fileName << m_fileNamePrefix << indexOfFileToRead << ".ply";
 
-		//std::string name = "C:/Users/mas/Documents/Repositories/IDP-KinectHDFaceGrabber/Cloud_0.ply";
-		m_printMutex.lock();
-		pcl::io::loadPLYFile(fileName.str(), blob );
+		//load the ply file
+		pcl::io::loadPLYFile(fileName.str(), *cloud);
 		
-		pcl::fromPCLPointCloud2(blob, *cloud);
-		m_printMutex.unlock();
+		//store the cloud in the buffer it the index is free
 		std::unique_lock<std::mutex> cloudBufferLock(m_cloudBufferMutex);
 		const int cloudBufferIndex = indexOfFileToRead % m_bufferSize;
 		while (isBufferAtIndexSet(cloudBufferIndex)){
@@ -139,14 +159,17 @@ void PCLInputReader::readPLYFile(const int index)
 			printMessage(msg.str());
 			m_cloudBufferFree.wait(cloudBufferLock);
 		}
-
+		//store the cloud
 		m_cloudBuffer[cloudBufferIndex] = cloud;
 		std::stringstream msg;
-		int newIndexOfFileToRead = indexOfFileToRead + m_bufferSize;
 
+		//calc new buffer index
+		int newIndexOfFileToRead = indexOfFileToRead + m_readerThreads.size();
 		msg << "thread for index: " << index << " updated:" << cloudBufferIndex << " with: oldIndex: " << indexOfFileToRead << " new Index: " << newIndexOfFileToRead << std::endl;
 		printMessage(msg.str());
 		indexOfFileToRead = newIndexOfFileToRead;
+
+		//notify the updater thread
 		m_cloudBufferUpdated.notify_all();
 	}
 }
