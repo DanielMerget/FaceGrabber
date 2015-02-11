@@ -66,7 +66,7 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	{
 		//Update();
 		m_kinectFrameGrabber.update();
-
+		//m_kinectDepthGrabber.update();
 		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			// If a dialog message will be taken care of by the dialog proc
@@ -114,6 +114,12 @@ LRESULT CALLBACK WindowsApplication::MessageRouter(HWND hWnd, UINT uMsg, WPARAM 
 	return 0;
 }
 
+void WindowsApplication::imageUpdated(const unsigned char *data, unsigned width, unsigned height)
+{
+	OutputDebugString(L"Imageupdate");
+	
+	//this->m_imageViewer->showRGBImage(data, width, height);
+}
 /// <summary>
 /// Handle windows messages for the class instance
 /// </summary>
@@ -141,6 +147,7 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		// We'll use this to draw the data we receive from the Kinect to the screen
 		m_pDrawDataStreams = new ImageRenderer();
 		m_pclViewer = std::shared_ptr<PCLViewer>(new PCLViewer());
+		m_imageViewer = std::shared_ptr<pcl::visualization::ImageViewer>(new pcl::visualization::ImageViewer("testview"));
 		m_cloudOutputWriter = std::shared_ptr<KinectCloudOutputWriter>(new KinectCloudOutputWriter);
 		HRESULT hr = m_pDrawDataStreams->initialize(GetDlgItem(m_hWnd, IDC_VIDEOVIEW), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
 		if (FAILED(hr))
@@ -152,9 +159,15 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		
 		// Get and initialize the default Kinect sensor
 		m_kinectFrameGrabber.initializeDefaultSensor();
-		
-		m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclViewer, _1));
-		m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
+		//m_kinectDepthGrabber.initializeDefaultSensor();
+
+		//m_kinectDepthGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclViewer, _1));
+		m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclViewer, _1));
+		m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
+		//m_kinectFrameGrabber.imageUpdated.connect(boost::bind(&WindowsApplication::imageUpdated, this, _1, _2, _3));
+
+		//m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclViewer, _1));
+		//m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
 		m_kinectFrameGrabber.statusChanged.connect(boost::bind(&WindowsApplication::setStatusMessage, this, _1, _2));
 
 	}
@@ -168,7 +181,6 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 
 	case WM_DESTROY:
 		// Quit the main message pump
-		
 		PostQuitMessage(0);
 		break;
 	case WM_COMMAND:

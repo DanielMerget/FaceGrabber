@@ -21,7 +21,7 @@ void PCLViewer::stopViewer()
 
 void PCLViewer::updateCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)
 {
-	std::async(&PCLViewer::updateCloud, this, cloud);
+	std::async(std::launch::async, &PCLViewer::updateCloud, this, cloud);
 }
 
 void PCLViewer::updateCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)
@@ -47,14 +47,18 @@ void PCLViewer::updateLoop()
 			
 
 		viewer.addPointCloud(m_currentCloud, "cloud");
-		viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 1, "cloud");
+		viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "cloud");
 		viewer.initCameraParameters();
 	}
 	while (!viewer.wasStopped() && m_isRunning)
 	{
 		{
 			std::unique_lock<std::mutex> lock(m_cloudMutex);
-			m_cloudUpdate.wait(lock);
+			//m_cloudUpdate.wait(lock);
+			std::chrono::milliseconds dura(100);
+			while (!m_cloudUpdate.wait_for(lock, dura)){
+				viewer.spinOnce();
+			}
 			viewer.updatePointCloud(m_currentCloud, "cloud");
 		}
 		viewer.spinOnce(100);

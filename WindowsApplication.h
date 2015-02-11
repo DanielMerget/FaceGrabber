@@ -8,6 +8,8 @@
 #include "PCLViewer.h"
 #include <memory>
 #include "KinectCloudOutputWriter.h"
+#include "KinectDepthGrabber.h"
+#include <pcl/visualization/image_viewer.h>
 
 class WindowsApplication
 {
@@ -21,7 +23,7 @@ public:
 	WindowsApplication();
 	~WindowsApplication();
 
-
+	void imageUpdated(const unsigned char *data, unsigned width, unsigned height);
 	/// <summary>
 	/// Handles window messages, passes most to the class instance to handle
 	/// </summary>
@@ -61,7 +63,9 @@ public:
 	
 
 	KinectHDFaceGrabber m_kinectFrameGrabber;
+	KinectDepthGrabber m_kinectDepthGrabber;
 	std::shared_ptr<PCLViewer>	m_pclViewer;
+	std::shared_ptr<pcl::visualization::ImageViewer> m_imageViewer;
 	std::shared_ptr<KinectCloudOutputWriter> m_cloudOutputWriter;
 };
 

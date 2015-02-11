@@ -30,6 +30,9 @@ private:
 	std::queue<PointCloudMeasurement> m_clouds;
 	std::condition_variable m_checkCloud;
 	std::mutex m_lockCloud;
+
+	
+
 	bool m_running;
 	int m_cloudCount;
 

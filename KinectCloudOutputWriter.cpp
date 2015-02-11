@@ -27,7 +27,7 @@ void KinectCloudOutputWriter::updateCloudThreated(pcl::PointCloud<pcl::PointXYZR
 		return;
 	}
 	//m_updateThreads.push_back(std::thread(&KinectCloudOutputWriter::pushCloud, this, cloud));
-	std::async(&KinectCloudOutputWriter::pushCloud, this, cloud);
+	std::async(std::launch::async, &KinectCloudOutputWriter::pushCloud, this, cloud);
 }
 
 static int numOfFilesToWrite = 100;
@@ -85,6 +85,6 @@ void KinectCloudOutputWriter::writeCloudToFile(int index)
 		m_clouds.pop();
 		cloudIsEmpty = m_clouds.empty();
 		cloudLocker.unlock();
-		pcl::io::savePLYFile(fileName.str(), *cloudMeasurement.cloud, true);
+		pcl::io::savePLYFile(fileName.str(), *cloudMeasurement.cloud, false);
 	}
 }

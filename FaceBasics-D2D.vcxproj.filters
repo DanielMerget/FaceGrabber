@@ -22,6 +22,7 @@
     <ClCompile Include="PCLInputReader.cpp">
       <Filter>InputReader</Filter>
     </ClCompile>
+    <ClCompile Include="KinectDepthGrabber.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -48,6 +49,7 @@
     <ClInclude Include="PCLInputReader.h">
       <Filter>InputReader</Filter>
     </ClInclude>
+    <ClInclude Include="KinectDepthGrabber.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Kinect">

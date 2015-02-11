@@ -13,6 +13,8 @@
 #include <boost/signals.hpp>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <mutex>
+#include <condition_variable>
 
 class KinectHDFaceGrabber
 {
@@ -74,6 +76,8 @@ public:
 	boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated;
 	boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> depthCloudUpdated;
 
+	boost::signal<void(const unsigned char *data, unsigned width, unsigned height)> imageUpdated;
+
 	boost::signal<bool(std::wstring, bool)> statusChanged;
 	
 private:
@@ -95,7 +99,7 @@ private:
     /// <param name="pBuffer">pointer to frame data</param>
     /// <param name="nWidth">width (in pixels) of input image data</param>
     /// <param name="nHeight">height (in pixels) of input image data</param>
-    void					updateHDFaceAndColor(INT64 nTime);
+    void					updateHDFaceAndColor();
 
     /// <summary>
     /// Processes new face frames
@@ -146,14 +150,13 @@ private:
     ImageRenderer*			m_pDrawDataStreams;
     RGBQUAD*				m_pColorRGBX;	
 
-	INT64					m_nStartTime;
-	INT64					m_nLastCounter;
-	double					m_fFreq;
-	ULONGLONG				m_nNextStatusTime;
-	DWORD					m_nFramesSinceUpdate;
-
 	std::vector<UINT16> m_depthBuffer;
 	std::vector<RGBQUAD> m_colorBuffer;
+	std::mutex m_depthBufferMutex;
+	std::condition_variable m_bufferCondVariable;
+
+	bool m_depthImageProcessed;
+	std::mutex m_depthImageProcessedLock;
 
 	int m_depthWidth;
 	int m_depthHeight;

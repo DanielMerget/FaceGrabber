@@ -13,6 +13,7 @@
 #include <pcl/common/centroid.h>
 #include <pcl/common/transforms.h>
 #include <pcl/io/ply_io.h>
+#include <future>
 
 // face property text layout offset in X axis
 static const float c_FaceTextLayoutOffsetX = -0.1f;
@@ -39,18 +40,14 @@ static const DWORD c_FaceFrameFeatures =
 /// Constructor
 /// </summary>
 KinectHDFaceGrabber::KinectHDFaceGrabber() :
-    m_nStartTime(0),
-    m_nLastCounter(0),
-    m_nFramesSinceUpdate(0),
-    m_fFreq(0),
-    m_nNextStatusTime(0),
     m_pKinectSensor(nullptr),
     m_pCoordinateMapper(nullptr),
 	m_pColorFrameReader(nullptr),
     m_pDrawDataStreams(nullptr),
     m_pColorRGBX(nullptr),
     m_pBodyFrameReader(nullptr),
-	m_pDepthFrameReader(nullptr)
+	m_pDepthFrameReader(nullptr),
+	m_depthImageProcessed(true)
 {
     for (int i = 0; i < BODY_COUNT; i++)
     {
@@ -244,6 +241,10 @@ HRESULT KinectHDFaceGrabber::initHDFaceReader()
 	if (SUCCEEDED(hr)){
 		hr = GetFaceModelVertexCount(&vertices);
 	}
+	if (SUCCEEDED(hr)){
+		//std::thread updateThread(&KinectHDFaceGrabber::updateDepthCloud, this);
+		//updateThread.detach();
+	}
 	return hr;
 }
 /// <summary>
@@ -305,51 +306,121 @@ void KinectHDFaceGrabber::update()
 		return;
 	}
 
+	//m_depthImageProcessedLock.lock();
+	//if (!m_depthImageProcessed){
+	//	OutputDebugString(L"discarding\n");
+	//	m_depthImageProcessedLock.unlock();
+	//	return;
+	//}
+	//m_depthImageProcessedLock.unlock();
+	//OutputDebugString(L"got the lock\n");
+
 	bool produce[BODY_COUNT] = { false };
+	
+	//std::unique_lock<std::mutex> lock(m_depthBufferMutex);
+	//if (!m_depthBufferMutex.try_lock()){
+	//	//conversion is done on a seperate thread => conversion thread still working on old buffer
+	//	//discard this frame and try with next one
+	//	OutputDebugString(L"discarding\n");
+	//	return;
+	//}
 	
     IColorFrame* pColorFrame = nullptr;
     HRESULT hr = m_pColorFrameReader->AcquireLatestFrame(&pColorFrame);
+
+	IDepthFrame* depthFrame = nullptr;
+	if (SUCCEEDED(hr)){
+		hr = m_pDepthFrameReader->AcquireLatestFrame(&depthFrame);
+	}
 	
     if (SUCCEEDED(hr)){
-        INT64 nTime = 0;
         ColorImageFormat imageFormat = ColorImageFormat_None;
-        UINT nBufferSize = 0;
-        RGBQUAD *pBuffer = nullptr;
-	
-        hr = pColorFrame->get_RelativeTime(&nTime);
-	
+       
         if (SUCCEEDED(hr)){
             hr = pColorFrame->get_RawColorImageFormat(&imageFormat);
         }
 	
         if (SUCCEEDED(hr)){
-			nBufferSize = m_colorWidth * m_colorHeight * sizeof(RGBQUAD);
+			UINT nBufferSize = m_colorWidth * m_colorHeight * sizeof(RGBQUAD);
 			hr = pColorFrame->CopyConvertedFrameDataToArray(nBufferSize, reinterpret_cast<BYTE*>(m_colorBuffer.data()), ColorImageFormat_Bgra);
-        }			
-	
-        if (SUCCEEDED(hr)){
-			updateHDFaceAndColor(nTime);
-			updateDepthCloud();
         }
-        
-    }
+		
+		
+		if (SUCCEEDED(hr)){
+			hr = depthFrame->CopyFrameDataToArray(m_depthBuffer.size(), &m_depthBuffer[0]);
+		}
+		if (SUCCEEDED(hr)){
+			updateHDFaceAndColor();
+			//const unsigned *data, unsigned width, unsigned height)
+			//imageUpdated(reinterpret_cast<unsigned char*>(m_colorBuffer.data()), m_colorWidth, m_colorHeight);
+		}
+		
+		
+        //if (SUCCEEDED(hr)){
+		//	std::lock_guard<std::mutex> lock(m_depthBufferMutex);
+			
+		//	updateDepthCloud();
+		//	//std::async(std::launch::async, &KinectHDFaceGrabber::updateDepthCloud, this);
+		//	
+		//	//std::async
+		//	std::thread depthThread(&KinectHDFaceGrabber::updateDepthCloud, this);
+		//	depthThread.detach();
+        //}
+		
+	}
+	
+	//m_depthBufferMutex.unlock();
+	//m_bufferCondVariable.notify_all();
+	SafeRelease(depthFrame);
 	SafeRelease(pColorFrame);  
 }
 
+
+
 void KinectHDFaceGrabber::updateDepthCloud()
 {
-	IDepthFrame* depthFrame = nullptr;
-	HRESULT hr = m_pDepthFrameReader->AcquireLatestFrame(&depthFrame);
+	while (true){
+		std::unique_lock<std::mutex> lock(m_depthBufferMutex);
+		m_bufferCondVariable.wait(lock);
+		
+		m_depthImageProcessedLock.lock();
+		m_depthImageProcessed = false;
+		m_depthImageProcessedLock.unlock();
 
-	if (SUCCEEDED(hr)){
-		hr = depthFrame->CopyFrameDataToArray(m_depthBuffer.size(), &m_depthBuffer[0]);
+		LARGE_INTEGER before = { 0 };
+		QueryPerformanceCounter(&before);
+	
+
+		
+		//std::vector<CameraSpacePoint> depthPointsInCameraSpace(m_depthBuffer.size());
+		//std::vector<ColorSpacePoint> renderPoints(vertex);
+		//m_pCoordinateMapper->MapDepthFrameToCameraSpace(m_depthBuffer.size(), m_depthBuffer.data(), depthPointsInCameraSpace.size(), depthPointsInCameraSpace.data());
+		auto cloud = convertDepthBufferToPointCloud();
+
+		LARGE_INTEGER afterCopy = { 0 };
+		QueryPerformanceCounter(&afterCopy);
+		double time1 = afterCopy.QuadPart - before.QuadPart;
+		//618452
+		//759616
+		m_depthImageProcessedLock.lock();
+		m_depthImageProcessed = true;
+		m_depthImageProcessedLock.unlock();
+
+		depthCloudUpdated(cloud);
+
+		LARGE_INTEGER last = { 0 };
+		QueryPerformanceCounter(&last);
+
+		double time2 = last.QuadPart - afterCopy.QuadPart;
+		std::cout << "time1" << time1 << "time: " << time2 << std::endl;
+		std::wstring result = L"time1: ";
+		result += time1;
+		result += L"\ntime2:";
+		result += time2;
+		result += L"\n";
+		_In_z_ WCHAR* szMessage = &result[0];
+		OutputDebugString(szMessage);	
 	}
-	//std::vector<CameraSpacePoint> depthPointsInCameraSpace(m_depthBuffer.size());
-	//std::vector<ColorSpacePoint> renderPoints(vertex);
-	//m_pCoordinateMapper->MapDepthFrameToCameraSpace(m_depthBuffer.size(), m_depthBuffer.data(), depthPointsInCameraSpace.size(), depthPointsInCameraSpace.data());
-	auto cloud = convertDepthBufferToPointCloud();
-	depthCloudUpdated(cloud);
-	SafeRelease(depthFrame);
 }
 
 
@@ -361,8 +432,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertDepthBufferTo
 	pointCloud->height = static_cast<uint32_t>(m_depthHeight);
 	pointCloud->is_dense = false;
 	HRESULT hr;
-	for (int y = 0; y < m_depthHeight; y++)
-	{
+	for (int y = 0; y < m_depthHeight; y++){
 		for (int x = 0; x < m_depthWidth; x++){
 			pcl::PointXYZRGB point;
 			DepthSpacePoint depthPoint;
@@ -415,64 +485,34 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertDepthBufferTo
 /// <param name="pBuffer">pointer to frame data</param>
 /// <param name="nWidth">width (in pixels) of input image data</param>
 /// <param name="nHeight">height (in pixels) of input image data</param>
-void KinectHDFaceGrabber::updateHDFaceAndColor(INT64 nTime)
+void KinectHDFaceGrabber::updateHDFaceAndColor()
 {
-//    if (m_hWnd)
-//    {
-        HRESULT hr;
-        hr = m_pDrawDataStreams->beginDrawing();
+
+    HRESULT hr;
+    hr = m_pDrawDataStreams->beginDrawing();
+
+    if (SUCCEEDED(hr))
+    {
+        // Make sure we've received valid color data
+		if ((m_colorWidth > 0 ) && (m_colorHeight > 0))
+        {
+            // Draw the data with Direct2D
+            hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_colorBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+        }
+        else
+        {
+            // Recieved invalid data, stop drawing
+            hr = E_INVALIDARG;
+        }
 
         if (SUCCEEDED(hr))
         {
-            // Make sure we've received valid color data
-			if ((m_colorWidth > 0 ) && (m_colorHeight > 0))
-            {
-                // Draw the data with Direct2D
-                hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_colorBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
-            }
-            else
-            {
-                // Recieved invalid data, stop drawing
-                hr = E_INVALIDARG;
-            }
-
-            if (SUCCEEDED(hr))
-            {
-                // begin processing the face frames
-				processFaces();
-            }
-
-            m_pDrawDataStreams->endDrawing();
+            // begin processing the face frames
+			processFaces();
         }
 
-        if (!m_nStartTime)
-        {
-            m_nStartTime = nTime;
-        }
-
-        double fps = 0.0;
-
-        LARGE_INTEGER qpcNow = {0};
-        if (m_fFreq)
-        {
-            if (QueryPerformanceCounter(&qpcNow))
-            {
-                if (m_nLastCounter)
-                {
-                    m_nFramesSinceUpdate++;
-                    fps = m_fFreq * m_nFramesSinceUpdate / double(qpcNow.QuadPart - m_nLastCounter);
-                }
-            }
-        }
-
-        WCHAR szStatusMessage[64];
-        StringCchPrintf(szStatusMessage, _countof(szStatusMessage), L" FPS = %0.2f    Time = %I64d", fps, (nTime - m_nStartTime));
-
-		if (statusChanged(szStatusMessage, false))
-        {
-            m_nLastCounter = qpcNow.QuadPart;
-            m_nFramesSinceUpdate = 0;
-        }
+        m_pDrawDataStreams->endDrawing();
+    }
 }
 
 /// <summary>
@@ -544,6 +584,7 @@ void KinectHDFaceGrabber::processFaces()
 					if (SUCCEEDED(hr)){
 						m_pCoordinateMapper->MapCameraPointsToColorSpace(facePoints.size(), facePoints.data(), renderPoints.size(), renderPoints.data());
 					}
+					
 					auto cloud = convertKinectRGBPointsToPointCloud(facePoints, renderPoints);
 
 					cloudUpdated(cloud);
@@ -567,22 +608,43 @@ void KinectHDFaceGrabber::processFaces()
 }
 
 
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPointsToPointCloud(const std::vector<CameraSpacePoint>& renderPoints, const std::vector<ColorSpacePoint>& imagePoints)
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPointsToPointCloud(const std::vector<CameraSpacePoint>& cameraSpacePoints, const std::vector<ColorSpacePoint>& colorSpacePoints)
 {
 	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>(imageWidth, imageHeight));
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
 	cloud->is_dense = false;
-	auto imageSpacePoint = imagePoints.begin();
-	for (auto& colorSpacePoint : renderPoints){
+	auto colorSpacePoint = colorSpacePoints.begin();
+	float bottom	= - FLT_MAX;
+	float top		=   FLT_MAX;
+	float right		=   FLT_MAX;
+	float left		= - FLT_MAX;
+	float front		=   FLT_MAX;
+	float back		= - FLT_MAX;
+	for (auto& cameraSpacePoint : cameraSpacePoints){
 		pcl::PointXYZRGB point;
-		point.x = colorSpacePoint.X;
-		point.y = colorSpacePoint.Y;
-		point.z = colorSpacePoint.Z;
+		point.x = cameraSpacePoint.X;
+		point.y = cameraSpacePoint.Y;
+		point.z = cameraSpacePoint.Z;
+		pcl::PointXYZRGB point2;
 
-		int colorX = static_cast<int>(std::floor(imageSpacePoint->X + 0.5f));
-		int colorY = static_cast<int>(std::floor(imageSpacePoint->Y + 0.5f));
+		
+		int colorX = static_cast<int>(std::floor(colorSpacePoint->X + 0.5f));
+		int colorY = static_cast<int>(std::floor(colorSpacePoint->Y + 0.5f));
+
 		if (colorY > m_colorHeight || colorX > m_colorWidth || colorY < 0 || colorX < 0)
 			continue;
+
+		bottom = std::max(point.y, bottom);
+
+		top = std::min(point.y, top);
+
+		right = std::min(point.x, right);
+
+		left = std::max(point.x, left);
+
+		front = std::min(point.z, front);
+
+		back = std::max(point.z, back);
 
 		int colorImageIndex = ((m_colorWidth * colorY) + colorX);
 		RGBQUAD pixel = m_colorBuffer[colorImageIndex];
@@ -590,18 +652,123 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 		point.g = pixel.rgbGreen;
 		point.b = pixel.rgbBlue;
 
-		imageSpacePoint++;
+		colorSpacePoint++;
 		cloud->push_back(point);
 	}
 	
+
 	Eigen::Vector4f centroid;
-	
-	
+
+
 	pcl::compute3DCentroid(*cloud, centroid);
 	Eigen::Vector3f center(-centroid.x(), -centroid.y(), -centroid.z());
 	Eigen::Matrix4f m = Eigen::Affine3f(Eigen::Translation3f(center)).matrix();
 
 	pcl::transformPointCloud(*cloud, *cloud, m);
+
+	CameraSpacePoint camTopLeftFront;
+	camTopLeftFront.X = left;
+	camTopLeftFront.Y = top;
+	camTopLeftFront.Z = front;
+	DepthSpacePoint depthTopLeftFront;
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camTopLeftFront, &depthTopLeftFront);
+
+	CameraSpacePoint camTopLeftBack;
+	camTopLeftBack.X = left;
+	camTopLeftBack.Y = top;
+	camTopLeftBack.Z = back;
+	DepthSpacePoint depthTopLeftBack;
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camTopLeftBack, &depthTopLeftBack);
+
+	CameraSpacePoint camTopRightFront;
+	camTopRightFront.X = right;
+	camTopRightFront.Y = top;
+	camTopRightFront.Z = front;
+	DepthSpacePoint depthTopRightFront;
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camTopRightFront, &depthTopRightFront);
+
+	CameraSpacePoint camTopRightBack;
+	camTopRightBack.X = right;
+	camTopRightBack.Y = top;
+	camTopRightBack.Z = back;
+	DepthSpacePoint depthTopRightBack;
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camTopRightBack, &depthTopRightBack);
+
+	CameraSpacePoint camBottomLeftFront;
+	camBottomLeftFront.X = left;
+	camBottomLeftFront.Y = bottom;
+	camBottomLeftFront.Z = front;
+	DepthSpacePoint depthBottomLeftFront;
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomLeftFront, &depthBottomLeftFront);
+
+	CameraSpacePoint camBottomLeftBack;
+	camBottomLeftBack.X = left;
+	camBottomLeftBack.Y = bottom;
+	camBottomLeftBack.Z = back;
+	DepthSpacePoint depthBottomLeftBack;
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomLeftBack, &depthBottomLeftBack);
+
+	CameraSpacePoint camBottomRightFront;
+	camBottomRightFront.X = right;
+	camBottomRightFront.Y = bottom;
+	camBottomRightFront.Z = front;
+	DepthSpacePoint depthBottomRightFront;
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomRightFront, &depthBottomRightFront);
+
+	CameraSpacePoint camBottomRightBack;
+	camBottomRightBack.X = right;
+	camBottomRightBack.Y = bottom;
+	camBottomRightBack.Z = back;
+	DepthSpacePoint depthBottomRightBack;
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomRightBack, &depthBottomRightBack);
+
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr depthCloud(new pcl::PointCloud <pcl::PointXYZRGB>());
+	
+	for (int x = static_cast<int>(depthTopRightBack.X); x < static_cast<int>(depthTopLeftBack.X); x++){
+		for (int y = static_cast<int>(depthBottomLeftBack.Y); y < static_cast<int>(depthTopLeftBack.Y); y++){
+			pcl::PointXYZRGB point;
+			DepthSpacePoint depthPoint;
+			depthPoint.X = static_cast<float>(x);
+			depthPoint.Y = static_cast<float>(y);
+			
+			UINT16 depthOfCurrentPoint = m_depthBuffer[y * m_depthWidth + x];
+
+			ColorSpacePoint colorPoint;
+			HRESULT hr = m_pCoordinateMapper->MapDepthPointToColorSpace(depthPoint, depthOfCurrentPoint, &colorPoint);
+			if (FAILED(hr)){
+				continue;
+			}
+			int colorPixelMidX = static_cast<int>(std::floor(colorPoint.X + 0.5f));
+			int colorPixelMidY = static_cast<int>(std::floor(colorPoint.Y + 0.5f));
+			bool isInColor = false;
+			if ((0 <= colorPixelMidX) && (colorPixelMidX < m_colorWidth) && (0 <= colorPixelMidY) && (colorPixelMidY < m_colorHeight)){
+				RGBQUAD color = m_colorBuffer[colorPixelMidY * m_colorWidth + colorPixelMidX];
+				point.b = color.rgbBlue;
+				point.g = color.rgbGreen;
+				point.r = color.rgbRed;
+				isInColor = true;
+			}
+
+			CameraSpacePoint camPoint;
+			hr = m_pCoordinateMapper->MapDepthPointToCameraSpace(depthPoint, depthOfCurrentPoint, &camPoint);
+
+			if (FAILED(hr)){
+				continue;
+			}
+			bool isInDepth = false;
+			if ((0 <= colorPixelMidX) && (colorPixelMidX < m_colorWidth) && (0 <= colorPixelMidY) && (colorPixelMidY < m_colorHeight)){
+				point.x = camPoint.X;
+				point.y = camPoint.Y;
+				point.z = camPoint.Z;
+				isInDepth = true;
+			}
+			if (isInColor && isInDepth){
+				depthCloud->push_back(point);
+			}
+		}
+	}
+	
+	depthCloudUpdated(depthCloud);
 	
 	return cloud;
 }
