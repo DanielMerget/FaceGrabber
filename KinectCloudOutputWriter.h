@@ -15,6 +15,7 @@ public:
 	
 	void updateCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud);
 	void startWritingClouds();
+	void stopWritingClouds();
 private:
 	
 	void writeCloudToFile(int index);

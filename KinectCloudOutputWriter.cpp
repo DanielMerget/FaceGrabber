@@ -31,7 +31,7 @@ void KinectCloudOutputWriter::updateCloudThreated(pcl::PointCloud<pcl::PointXYZR
 	std::async(std::launch::async, &KinectCloudOutputWriter::pushCloud, this, cloud);
 }
 
-static int numOfFilesToWrite = 100;
+static int numOfFilesToWrite = 1000;
 void KinectCloudOutputWriter::pushCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloudToPush)
 {
 	std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
@@ -61,8 +61,12 @@ void KinectCloudOutputWriter::startWritingClouds()
 		m_writerThreads.push_back(std::thread(&KinectCloudOutputWriter::writeCloudToFile, this, i));
 	}
 }
-
-
+void KinectCloudOutputWriter::stopWritingClouds()
+{
+	std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
+	m_running = false;
+	m_checkCloud.notify_all();
+}
 
 void KinectCloudOutputWriter::writeCloudToFile(int index)
 {

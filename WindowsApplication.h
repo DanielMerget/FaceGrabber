@@ -10,7 +10,7 @@
 #include "KinectCloudOutputWriter.h"
 #include "KinectDepthGrabber.h"
 #include <pcl/visualization/image_viewer.h>
-
+#include <pcl/visualization/cloud_viewer.h>
 class WindowsApplication
 {
 public:
@@ -33,7 +33,7 @@ public:
 	/// <param name="lParam">additional message data</param>
 	/// <returns>result of message processing</returns>
 	static LRESULT CALLBACK	MessageRouter(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
+	void cloudUpdate(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud);
 	/// <summary>
 	/// Handle windows messages for a class instance
 	/// </summary>
@@ -60,12 +60,13 @@ public:
 	// Direct2D
 	ImageRenderer*         m_pDrawDataStreams;
 	ID2D1Factory*          m_pD2DFactory;
-	
+	bool				   m_isCloudWritingStarted;
 
 	KinectHDFaceGrabber m_kinectFrameGrabber;
-	KinectDepthGrabber m_kinectDepthGrabber;
-	std::shared_ptr<PCLViewer>	m_pclViewer;
 	
+	std::shared_ptr<PCLViewer>	m_pclFaceViewer;
+	std::shared_ptr<PCLViewer>	m_pclFaceRawViewer;
+	//pcl::visualization::CloudViewer m_cloudViewer;
 	std::shared_ptr<KinectCloudOutputWriter> m_cloudOutputWriter;
 };
 

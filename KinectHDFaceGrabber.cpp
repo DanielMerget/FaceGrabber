@@ -616,10 +616,15 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
 	cloud->is_dense = false;
 	auto colorSpacePoint = colorSpacePoints.begin();
-	float bottom	= - FLT_MAX;
-	float top		=   FLT_MAX;
-	float right		=   FLT_MAX;
-	float left		= - FLT_MAX;
+//	float bottom	= - FLT_MAX;
+//	float top		=   FLT_MAX;
+	float bottom	=	FLT_MAX;
+	float top		= - FLT_MAX;
+
+	//float right		=   FLT_MAX;
+	//float left		= - FLT_MAX;
+	float right		= - FLT_MAX;
+	float left		=   FLT_MAX;
 	float front		=   FLT_MAX;
 	float back		= - FLT_MAX;
 	std::vector<cv::Point2f> ellipsePoints;
@@ -639,13 +644,13 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 		
 		ellipsePoints.push_back(cv::Point2f(colorX, colorY));
 
-		bottom = std::max(point.y, bottom);
+		bottom = std::min(point.y, bottom);
 
-		top = std::min(point.y, top);
+		top = std::max(point.y, top);
 
-		right = std::min(point.x, right);
+		right = std::max(point.x, right);
 
-		left = std::max(point.x, left);
+		left = std::min(point.x, left);
 
 		front = std::min(point.z, front);
 
@@ -731,8 +736,11 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 	cv::vector<cv::Point2f> hullPoints;
 	
 	cv::convexHull(ellipsePoints, hullPoints);
-	for (int x = static_cast<int>(depthTopRightBack.X); x < static_cast<int>(depthTopLeftBack.X); x++){
-		for (int y = static_cast<int>(depthBottomLeftBack.Y); y < static_cast<int>(depthTopLeftBack.Y); y++){
+	//for (int x = static_cast<int>(depthTopRightBack.X); x < static_cast<int>(depthTopLeftBack.X); x++){
+	//	for (int y = static_cast<int>(depthBottomLeftBack.Y); y < static_cast<int>(depthTopLeftBack.Y); y++){
+	for (int x = static_cast<int>(depthTopLeftBack.X); x < static_cast<int>(depthTopRightBack.X); x++){
+		for (int y = static_cast<int>(depthTopLeftBack.Y); y < static_cast<int>(depthBottomLeftBack.Y); y++){
+
 			pcl::PointXYZRGB point;
 			DepthSpacePoint depthPoint;
 			depthPoint.X = static_cast<float>(x);
@@ -774,13 +782,17 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 				point.z = camPoint.Z;
 				isInDepth = true;
 			}
+
+			if (point.x < left || point.x > right)
+				continue;
+			
 			if (isInColor && isInDepth){
 				depthCloud->push_back(point);
 			}
 		}
 	}
 	
-
+	pcl::transformPointCloud(*depthCloud, *depthCloud, m);
 	depthCloudUpdated(depthCloud);
 	
 	return cloud;

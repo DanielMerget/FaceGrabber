@@ -7,7 +7,9 @@ WindowsApplication::WindowsApplication() :
 	m_nLastCounter(0),
 	m_nFramesSinceUpdate(0),
 	m_fFreq(0),
-	m_nNextStatusTime(0)
+	m_nNextStatusTime(0),
+	m_isCloudWritingStarted(false)
+	//m_cloudViewer("CloudViewer")
 {
 	LARGE_INTEGER qpf = { 0 };
 	if (QueryPerformanceFrequency(&qpf))
@@ -77,6 +79,7 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
 		}
+		//m_cloudViewer.wasStopped();
 	}
 
 	return static_cast<int>(msg.wParam);
@@ -119,6 +122,10 @@ void WindowsApplication::imageUpdated(const unsigned char *data, unsigned width,
 	
 	//this->m_imageViewer->showRGBImage(data, width, height);
 }
+void WindowsApplication::cloudUpdate(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)
+{
+	//m_cloudViewer.showCloud(cloud);
+}
 /// <summary>
 /// Handle windows messages for the class instance
 /// </summary>
@@ -145,7 +152,8 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		// Create and initialize a new Direct2D image renderer (take a look at ImageRenderer.h)
 		// We'll use this to draw the data we receive from the Kinect to the screen
 		m_pDrawDataStreams = new ImageRenderer();
-		m_pclViewer = std::shared_ptr<PCLViewer>(new PCLViewer());
+		m_pclFaceViewer = std::shared_ptr<PCLViewer>(new PCLViewer("HDFace"));
+		//m_pclFaceRawViewer = std::shared_ptr<PCLViewer>(new PCLViewer("Raw Face-Depth"));
 		
 		m_cloudOutputWriter = std::shared_ptr<KinectCloudOutputWriter>(new KinectCloudOutputWriter);
 		HRESULT hr = m_pDrawDataStreams->initialize(GetDlgItem(m_hWnd, IDC_VIDEOVIEW), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
@@ -159,10 +167,23 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		// Get and initialize the default Kinect sensor
 		m_kinectFrameGrabber.initializeDefaultSensor();
 		//m_kinectDepthGrabber.initializeDefaultSensor();
+		
+		//bool showFaceHD = true;
+		//if (showFaceHD)
+		//{
+			m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceViewer, _1, 1));
+			m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceViewer, _1, 2));
+			//m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&WindowsApplication::cloudUpdate, this, _1));
+			//m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
+		//}
+		//else{
+		//	m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceViewer, _1, 2));
+		//	m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
+		//}
+		
 
-		//m_kinectDepthGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclViewer, _1));
-		m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclViewer, _1));
-		m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
+
+		//m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceRawViewer, _1));
 		//m_kinectFrameGrabber.imageUpdated.connect(boost::bind(&WindowsApplication::imageUpdated, this, _1, _2, _3));
 
 		//m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclViewer, _1));
@@ -175,7 +196,8 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		// If the titlebar X is clicked, destroy app
 	case WM_CLOSE:
 		DestroyWindow(hWnd);
-		m_pclViewer->stopViewer();
+		//m_pclFaceRawViewer->stopViewer();
+		m_pclFaceViewer->stopViewer();
 		break;
 
 	case WM_DESTROY:
@@ -193,8 +215,16 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM)
 {
 	if (IDC_RECORD_BUTTON == LOWORD(wParam) && BN_CLICKED == HIWORD(wParam)){
-		std::cout << "button pressed";
-		m_cloudOutputWriter->startWritingClouds();
+		if (!m_isCloudWritingStarted)
+		{
+			m_cloudOutputWriter->startWritingClouds();
+			SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Stop");
+		}
+		else{
+			SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Record");
+			m_cloudOutputWriter->stopWritingClouds();
+		}
+		m_isCloudWritingStarted = !m_isCloudWritingStarted;
 	}
 }
 /// <summary>
