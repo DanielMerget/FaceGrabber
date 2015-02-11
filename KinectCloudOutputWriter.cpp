@@ -1,6 +1,7 @@
 #include "KinectCloudOutputWriter.h"
 #include <pcl/io/ply_io.h>
 #include <future>
+#include <pcl/io/pcd_io.h>
 
 KinectCloudOutputWriter::KinectCloudOutputWriter() :
 	m_running(false),
@@ -81,10 +82,13 @@ void KinectCloudOutputWriter::writeCloudToFile(int index)
 		}
 		auto cloudMeasurement = m_clouds.front();
 		std::stringstream fileName;
-		fileName << "Cloud_" << cloudMeasurement.index  << ".ply";
+		//fileName << "Cloud_" << cloudMeasurement.index  << ".ply";
+		fileName << "Cloud_" << cloudMeasurement.index << ".pcd";
 		m_clouds.pop();
 		cloudIsEmpty = m_clouds.empty();
 		cloudLocker.unlock();
-		pcl::io::savePLYFile(fileName.str(), *cloudMeasurement.cloud, false);
+		//pcl::io::savePLYFile(fileName.str(), *cloudMeasurement.cloud, false);
+		//pcl::io::savePCDFileASCII(fileName.str(), *cloudMeasurement.cloud);
+		pcl::io::savePCDFileBinaryCompressed(fileName.str(), *cloudMeasurement.cloud);
 	}
 }

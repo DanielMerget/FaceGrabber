@@ -1,6 +1,7 @@
 #include "PCLInputReader.h"
 #include <pcl/io/ply_io.h>
 #include <pcl/PCLPointCloud2.h>
+#include <pcl/io/pcd_io.h>
 
 PCLInputReader::PCLInputReader(const std::string inputPath, const std::string fileNamePrefix, const int bufferSize, const int numOfFilesToRead) :
 	m_cloudBuffer(bufferSize),
@@ -55,7 +56,6 @@ void PCLInputReader::startReaderThreads()
 bool PCLInputReader::isBufferAtIndexSet(const int index)
 {
 	return m_cloudBuffer[index];
-	//return m_cloudBuffer[index] != nullptr;
 }
 
 void PCLInputReader::printMessage(std::string msg)
@@ -96,39 +96,6 @@ void PCLInputReader::updateThreadFunc()
 	}
 }
 
-//void PCLInputReader::updateThreadFunc()
-//{
-//	printMessage("update thread started");
-//	int currentUpdateIndex = 0;
-//	int numOfFilesRead = currentUpdateIndex;
-//	while (true)
-//	{
-//		if (numOfFilesRead >= m_numOfFilesToRead){
-//			printMessage("update thread finished");
-//			return;
-//		}
-//		std::unique_lock<std::mutex> cloudBufferLock(m_cloudBufferMutex);
-//		while (!isBufferAtIndexSet(currentUpdateIndex)){
-//			std::stringstream msg;
-//			msg << "update thread waiting for index " << currentUpdateIndex << " after reading files: " << numOfFilesRead << std::endl;
-//			printMessage(msg.str());
-//			m_cloudBufferUpdated.wait(cloudBufferLock);
-//		}
-//		
-//		printMessage("update thread woke up - updating");
-//		cloudUpdated(m_cloudBuffer[currentUpdateIndex]);
-//		m_cloudBuffer[currentUpdateIndex].reset();
-//		m_cloudBufferFree.notify_all();
-//		printMessage("update thread sleeping");
-//		
-//		std::chrono::milliseconds dura(100);
-//		std::this_thread::sleep_for(dura);
-//		printMessage("update thread woke up from sleeping");
-//		numOfFilesRead++;
-//		currentUpdateIndex = (currentUpdateIndex + 1) % m_bufferSize;
-//	}
-//}
-
 void PCLInputReader::readPLYFile(const int index)
 {
 	int indexOfFileToRead = index;
@@ -141,15 +108,20 @@ void PCLInputReader::readPLYFile(const int index)
 		if (indexOfFileToRead > m_numOfFilesToRead){
 			return;
 		}
+		//pcl::PCLPointCloud2 blob;
 
 		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
 		//construct filename
 		std::stringstream fileName;
-		fileName << m_fileNamePrefix << indexOfFileToRead << ".ply";
+		//fileName << m_fileNamePrefix << indexOfFileToRead << ".ply";
+		fileName << m_fileNamePrefix << indexOfFileToRead << ".pcd";
 
 		//load the ply file
-		pcl::io::loadPLYFile(fileName.str(), *cloud);
-		
+		//m_printMutex.lock();
+		//pcl::io::loadPLYFile(fileName.str(), *cloud);
+		pcl::io::loadPCDFile(fileName.str(), *cloud);
+//		m_printMutex.unlock();
+
 		//store the cloud in the buffer it the index is free
 		std::unique_lock<std::mutex> cloudBufferLock(m_cloudBufferMutex);
 		const int cloudBufferIndex = indexOfFileToRead % m_bufferSize;

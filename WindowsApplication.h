@@ -65,7 +65,7 @@ public:
 	KinectHDFaceGrabber m_kinectFrameGrabber;
 	KinectDepthGrabber m_kinectDepthGrabber;
 	std::shared_ptr<PCLViewer>	m_pclViewer;
-	std::shared_ptr<pcl::visualization::ImageViewer> m_imageViewer;
+	
 	std::shared_ptr<KinectCloudOutputWriter> m_cloudOutputWriter;
 };
 

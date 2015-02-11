@@ -64,7 +64,6 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	// Main message loop
 	while (WM_QUIT != msg.message)
 	{
-		//Update();
 		m_kinectFrameGrabber.update();
 		//m_kinectDepthGrabber.update();
 		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
@@ -147,7 +146,7 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		// We'll use this to draw the data we receive from the Kinect to the screen
 		m_pDrawDataStreams = new ImageRenderer();
 		m_pclViewer = std::shared_ptr<PCLViewer>(new PCLViewer());
-		m_imageViewer = std::shared_ptr<pcl::visualization::ImageViewer>(new pcl::visualization::ImageViewer("testview"));
+		
 		m_cloudOutputWriter = std::shared_ptr<KinectCloudOutputWriter>(new KinectCloudOutputWriter);
 		HRESULT hr = m_pDrawDataStreams->initialize(GetDlgItem(m_hWnd, IDC_VIDEOVIEW), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
 		if (FAILED(hr))

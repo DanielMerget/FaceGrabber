@@ -44,7 +44,6 @@ void PCLViewer::updateLoop()
 		while (!m_cloudUpdate.wait_for(lock, dura)){
 			viewer.spinOnce();
 		} 
-			
 
 		viewer.addPointCloud(m_currentCloud, "cloud");
 		viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, "cloud");

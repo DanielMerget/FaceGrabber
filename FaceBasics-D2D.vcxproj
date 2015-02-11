@@ -119,7 +119,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>C:\Libraries\vxl\vxl\core;C:\Libraries\vxl\vxl\vcl;C:\Libraries\VTK-5.10\include\vtk-5.10;C:\Libraries\flann-1.8.4\include;C:\Libraries\Eigen\include;C:\Libraries\pcl-1.7\include\pcl-1.7;C:\Libraries\Boost\include\boost-1_53;C:\Libraries\vxl\vxl\build\vcl;C:\Libraries\vxl\vxl\build\core</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Libraries\vxl\vxl\core;C:\Libraries\vxl\vxl\vcl;C:\Libraries\VTK-5.10\include\vtk-5.10;C:\Libraries\flann-1.8.4\include;C:\Libraries\Eigen\include;C:\Libraries\pcl-1.7\include\pcl-1.7;C:\Libraries\Boost\include\boost-1_53;C:\Libraries\vxl\vxl\build\vcl;C:\Libraries\vxl\vxl\build\core;C:\Libraries\opencv\build\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

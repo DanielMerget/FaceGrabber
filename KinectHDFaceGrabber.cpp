@@ -14,6 +14,8 @@
 #include <pcl/common/transforms.h>
 #include <pcl/io/ply_io.h>
 #include <future>
+#include <pcl/filters/voxel_grid.h>
+#include <opencv2/imgproc/imgproc.hpp>
 
 // face property text layout offset in X axis
 static const float c_FaceTextLayoutOffsetX = -0.1f;
@@ -620,6 +622,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 	float left		= - FLT_MAX;
 	float front		=   FLT_MAX;
 	float back		= - FLT_MAX;
+	std::vector<cv::Point2f> ellipsePoints;
 	for (auto& cameraSpacePoint : cameraSpacePoints){
 		pcl::PointXYZRGB point;
 		point.x = cameraSpacePoint.X;
@@ -630,9 +633,11 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 		
 		int colorX = static_cast<int>(std::floor(colorSpacePoint->X + 0.5f));
 		int colorY = static_cast<int>(std::floor(colorSpacePoint->Y + 0.5f));
-
+		
 		if (colorY > m_colorHeight || colorX > m_colorWidth || colorY < 0 || colorX < 0)
 			continue;
+		
+		ellipsePoints.push_back(cv::Point2f(colorX, colorY));
 
 		bottom = std::max(point.y, bottom);
 
@@ -656,7 +661,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 		cloud->push_back(point);
 	}
 	
-
+	
 	Eigen::Vector4f centroid;
 
 
@@ -723,7 +728,9 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 	m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomRightBack, &depthBottomRightBack);
 
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr depthCloud(new pcl::PointCloud <pcl::PointXYZRGB>());
+	cv::vector<cv::Point2f> hullPoints;
 	
+	cv::convexHull(ellipsePoints, hullPoints);
 	for (int x = static_cast<int>(depthTopRightBack.X); x < static_cast<int>(depthTopLeftBack.X); x++){
 		for (int y = static_cast<int>(depthBottomLeftBack.Y); y < static_cast<int>(depthTopLeftBack.Y); y++){
 			pcl::PointXYZRGB point;
@@ -740,6 +747,11 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 			}
 			int colorPixelMidX = static_cast<int>(std::floor(colorPoint.X + 0.5f));
 			int colorPixelMidY = static_cast<int>(std::floor(colorPoint.Y + 0.5f));
+			auto result = cv::pointPolygonTest(hullPoints, cv::Point2f(colorPoint.X, colorPoint.Y), false);
+			if(result < 0){
+				continue;
+			}
+
 			bool isInColor = false;
 			if ((0 <= colorPixelMidX) && (colorPixelMidX < m_colorWidth) && (0 <= colorPixelMidY) && (colorPixelMidY < m_colorHeight)){
 				RGBQUAD color = m_colorBuffer[colorPixelMidY * m_colorWidth + colorPixelMidX];
@@ -768,6 +780,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 		}
 	}
 	
+
 	depthCloudUpdated(depthCloud);
 	
 	return cloud;
