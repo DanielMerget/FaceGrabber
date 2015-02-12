@@ -119,21 +119,13 @@ LRESULT CALLBACK WindowsApplication::MessageRouter(HWND hWnd, UINT uMsg, WPARAM 
 void WindowsApplication::imageUpdated(const unsigned char *data, unsigned width, unsigned height)
 {
 	OutputDebugString(L"Imageupdate");
-	
 	//this->m_imageViewer->showRGBImage(data, width, height);
 }
 void WindowsApplication::cloudUpdate(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)
 {
 	//m_cloudViewer.showCloud(cloud);
 }
-/// <summary>
-/// Handle windows messages for the class instance
-/// </summary>
-/// <param name="hWnd">window message is for</param>
-/// <param name="uMsg">message</param>
-/// <param name="wParam">message data</param>
-/// <param name="lParam">additional message data</param>
-/// <returns>result of message processing</returns>
+
 LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(wParam);
@@ -166,28 +158,14 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		
 		// Get and initialize the default Kinect sensor
 		m_kinectFrameGrabber.initializeDefaultSensor();
-		//m_kinectDepthGrabber.initializeDefaultSensor();
-		
-		//bool showFaceHD = true;
-		//if (showFaceHD)
-		//{
-			m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceViewer, _1, 0));
-			m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceViewer, _1, 1));
-			//m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&WindowsApplication::cloudUpdate, this, _1));
-			m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
-		//}
-		//else{
-		//	m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceViewer, _1, 2));
-		//	m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
-		//}
-		
+		//m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&WindowsApplication::cloudUpdate, this, _1));		
 
+		m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceViewer, _1, 0));
+		m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceViewer, _1, 1));
 
-		//m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceRawViewer, _1));
-		//m_kinectFrameGrabber.imageUpdated.connect(boost::bind(&WindowsApplication::imageUpdated, this, _1, _2, _3));
-
-		//m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclViewer, _1));
+		m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
 		//m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
+
 		m_kinectFrameGrabber.statusChanged.connect(boost::bind(&WindowsApplication::setStatusMessage, this, _1, _2));
 
 	}
@@ -227,14 +205,7 @@ void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM)
 		m_isCloudWritingStarted = !m_isCloudWritingStarted;
 	}
 }
-/// <summary>
-/// Set the status bar message
-/// </summary>
-/// <param name="szMessage">message to display</param>
-/// <param name="showTimeMsec">time in milliseconds to ignore future status messages</param>
-/// <param name="bForce">force status update</param>
-/// <returns>success or failure</returns>
-//bool WindowsApplication::SetStatusMessage(_In_z_ WCHAR* szMessage, bool bForce)
+
 bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce)
 {
 	_In_z_ WCHAR* szMessage = &statusString[0];

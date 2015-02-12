@@ -87,6 +87,9 @@ private:
 	HRESULT initDepthFrameReader();
 	HRESULT initHDFaceReader();
 
+	HRESULT updateHDFaceTrackingID(IHighDefinitionFaceFrameSource* faceFrame, IBody* trackedBody);
+	void updateFaceModelStatusOfFaceModelBuilder(IFaceModelBuilder** faceModelBuilder, IFaceModel* faceModel);
+
 	void updateDepthCloud();
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertDepthBufferToPointCloud();
 	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(std::vector<CameraSpacePoint>& renderPoints, const RGBQUAD* pBuffer, const int imageWidth, const int imageHeight);
@@ -149,6 +152,10 @@ private:
     //// Direct2D
     ImageRenderer*			m_pDrawDataStreams;
     RGBQUAD*				m_pColorRGBX;	
+
+	std::vector<CameraSpacePoint> m_HDFaceDetectedPointsCamSpace[BODY_COUNT];
+	std::vector<ColorSpacePoint> m_HDFaceDetectedPointsColorSpace[BODY_COUNT];
+	
 
 	std::vector<UINT16> m_depthBuffer;
 	std::vector<RGBQUAD> m_colorBuffer;

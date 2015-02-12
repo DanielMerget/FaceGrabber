@@ -185,7 +185,12 @@ HRESULT KinectHDFaceGrabber::initDepthFrameReader()
 HRESULT KinectHDFaceGrabber::initHDFaceReader()
 {
 	IBodyFrameSource* pBodyFrameSource = nullptr;
-	HRESULT hr = m_pKinectSensor->get_BodyFrameSource(&pBodyFrameSource);
+	UINT32 vertices = 0;
+	HRESULT hr = GetFaceModelVertexCount(&vertices);
+
+	if (SUCCEEDED(hr)){
+		hr = m_pKinectSensor->get_BodyFrameSource(&pBodyFrameSource);
+	}
 	std::vector<std::vector<float>> deformations(BODY_COUNT, std::vector<float>(FaceShapeDeformations::FaceShapeDeformations_Count));
 
 	if (SUCCEEDED(hr)){
@@ -222,7 +227,10 @@ HRESULT KinectHDFaceGrabber::initHDFaceReader()
 			if (SUCCEEDED(hr)){
 				hr = CreateFaceAlignment(&m_pFaceAlignment[i]);
 			}
-
+			if (SUCCEEDED(hr)){
+				m_HDFaceDetectedPointsCamSpace[i].resize(vertices);
+				m_HDFaceDetectedPointsColorSpace[i].resize(vertices);
+			}
 			// Create Face Model
 			hr = CreateFaceModel(1.0f, FaceShapeDeformations::FaceShapeDeformations_Count, deformations[i].data(), &m_pFaceModel[i]);
 			if (FAILED(hr)){
@@ -237,12 +245,7 @@ HRESULT KinectHDFaceGrabber::initHDFaceReader()
 		SafeRelease(pBodyFrameSource);
 	}
 
-
-	UINT32 vertices = 0;
-
-	if (SUCCEEDED(hr)){
-		hr = GetFaceModelVertexCount(&vertices);
-	}
+	
 	if (SUCCEEDED(hr)){
 		//std::thread updateThread(&KinectHDFaceGrabber::updateDepthCloud, this);
 		//updateThread.detach();
@@ -517,6 +520,46 @@ void KinectHDFaceGrabber::updateHDFaceAndColor()
     }
 }
 
+HRESULT KinectHDFaceGrabber::updateHDFaceTrackingID(IHighDefinitionFaceFrameSource* faceFrame, IBody* trackedBody)
+{
+	BOOLEAN bTrackingIdValid = false;
+	HRESULT hr = faceFrame->get_IsTrackingIdValid(&bTrackingIdValid);
+	if (!bTrackingIdValid){
+		BOOLEAN bTracked = false;
+		hr = trackedBody->get_IsTracked(&bTracked);
+		if (SUCCEEDED(hr) && bTracked){
+			// Set TrackingID to Detect Face
+			UINT64 trackingId = _UI64_MAX;
+			hr = trackedBody->get_TrackingId(&trackingId);
+			if (SUCCEEDED(hr)){
+				hr = faceFrame->put_TrackingId(trackingId);
+			}
+		}
+	}
+	return hr;
+}
+
+void KinectHDFaceGrabber::updateFaceModelStatusOfFaceModelBuilder(IFaceModelBuilder** faceModelBuilder, IFaceModel* faceModel)
+{
+	FaceModelBuilderCollectionStatus status;
+	HRESULT hr = faceModelBuilder[0]->get_CollectionStatus(&status);
+	if (SUCCEEDED(hr)){
+		std::wstring statusString = getCaptureStatusText(status);
+		statusChanged(statusString, true);
+		if (status == FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_Complete){
+			std::cout << "Status : Complete" << std::endl;
+
+			IFaceModelData* pFaceModelData = nullptr;
+			hr = faceModelBuilder[0]->GetFaceData(&pFaceModelData);
+			if (SUCCEEDED(hr) && pFaceModelData != nullptr){
+				hr = pFaceModelData->ProduceFaceModel(&faceModel);
+			}
+			faceModelBuilder[0]->Release();
+			SafeRelease(pFaceModelData);
+			faceModelBuilder[0] = nullptr;
+		}
+	}
+}
 /// <summary>
 /// Processes new face frames
 /// </summary>
@@ -533,70 +576,36 @@ void KinectHDFaceGrabber::processFaces()
     // iterate through each face reader
     for (int iFace = 0; iFace < BODY_COUNT; ++iFace)
     {
-		BOOLEAN bTrackingIdValid = false;
-		hr = m_pHDFaceSource[iFace]->get_IsTrackingIdValid(&bTrackingIdValid);
-		if (!bTrackingIdValid){
-			BOOLEAN bTracked = false;
-			hr = ppBodies[iFace]->get_IsTracked(&bTracked);
-			if (SUCCEEDED(hr) && bTracked){
+		updateHDFaceTrackingID(m_pHDFaceSource[iFace], ppBodies[iFace]);
 
-				// Set TrackingID to Detect Face
-				UINT64 trackingId = _UI64_MAX;
-				hr = ppBodies[iFace]->get_TrackingId(&trackingId);
-				if (SUCCEEDED(hr)){
-					m_pHDFaceSource[iFace]->put_TrackingId(trackingId);
-				}
-			}
-		}
-	
 		IHighDefinitionFaceFrame* pHDFaceFrame = nullptr;
 		hr = m_pHDFaceReader[iFace]->AcquireLatestFrame(&pHDFaceFrame);
-		
-		if (SUCCEEDED(hr) && pHDFaceFrame != nullptr){
-			BOOLEAN bFaceTracked = false;
-			hr = pHDFaceFrame->get_IsFaceTracked(&bFaceTracked);
-			if (SUCCEEDED(hr) && bFaceTracked){
-				hr = pHDFaceFrame->GetAndRefreshFaceAlignmentResult(m_pFaceAlignment[iFace]);
-				if (SUCCEEDED(hr) && m_pFaceModelBuilder[iFace] != nullptr && m_pFaceAlignment[iFace] != nullptr && m_pFaceModel[iFace] != nullptr){
-					static bool isCompleted = false;
-					
-					FaceModelBuilderCollectionStatus status;
-					hr = m_pFaceModelBuilder[iFace]->get_CollectionStatus(&status);
-					std::wstring statusString = getCaptureStatusText(status);
-					statusChanged(statusString, true);
-					if (status == FaceModelBuilderCollectionStatus::FaceModelBuilderCollectionStatus_Complete){
-						std::cout << "Status : Complete" << std::endl;
-						
-						IFaceModelData* pFaceModelData = nullptr;
-						hr = m_pFaceModelBuilder[iFace]->GetFaceData(&pFaceModelData);
-						if (SUCCEEDED(hr) && pFaceModelData != nullptr){
-							if (!isCompleted){
-								hr = pFaceModelData->ProduceFaceModel(&m_pFaceModel[iFace]);
-								isCompleted = true;
-							}
-						}
-						m_pFaceModelBuilder[iFace]->Release();
-						SafeRelease(pFaceModelData);
-						//m_pFaceModelBuilder[iFace]->Release();
-						m_pFaceModelBuilder[iFace] = nullptr;
-					}
-				}
-				std::vector<CameraSpacePoint> facePoints(vertex);
-				std::vector<ColorSpacePoint> renderPoints(vertex);
-				hr = m_pFaceModel[iFace]->CalculateVerticesForAlignment(m_pFaceAlignment[iFace], vertex, &facePoints[0]);
 
-				if (SUCCEEDED(hr)){
-					hr = m_pCoordinateMapper->MapCameraPointsToColorSpace(facePoints.size(), facePoints.data(), renderPoints.size(), renderPoints.data());
-				}
-				if (SUCCEEDED(hr)){
-					auto cloud = convertKinectRGBPointsToPointCloud(facePoints, renderPoints);
-					cloudUpdated(cloud);
-					m_pDrawDataStreams->drawPoints(renderPoints);
-				}
-			}
+		BOOLEAN bFaceTracked = false;
+		if (SUCCEEDED(hr) && pHDFaceFrame != nullptr){
+			hr = pHDFaceFrame->get_IsFaceTracked(&bFaceTracked);
+		}
+		if (SUCCEEDED(hr) && bFaceTracked){
+			hr = pHDFaceFrame->GetAndRefreshFaceAlignmentResult(m_pFaceAlignment[iFace]);
+		}
+		if (FAILED(hr) || m_pFaceAlignment[iFace] == nullptr){
+			continue;
+		}
+		if (m_pFaceModelBuilder[iFace] != nullptr){
+			updateFaceModelStatusOfFaceModelBuilder(&m_pFaceModelBuilder[iFace], m_pFaceModel[iFace]);
 		}
 		
+		hr = m_pFaceModel[iFace]->CalculateVerticesForAlignment(m_pFaceAlignment[iFace], m_HDFaceDetectedPointsCamSpace[iFace].size(), m_HDFaceDetectedPointsCamSpace[iFace].data());
 
+		if (SUCCEEDED(hr)){
+			hr = m_pCoordinateMapper->MapCameraPointsToColorSpace(m_HDFaceDetectedPointsCamSpace[iFace].size(), m_HDFaceDetectedPointsCamSpace[iFace].data(), m_HDFaceDetectedPointsColorSpace[iFace].size(), m_HDFaceDetectedPointsColorSpace[iFace].data());
+		}
+		if (SUCCEEDED(hr)){
+			auto cloud = convertKinectRGBPointsToPointCloud(m_HDFaceDetectedPointsCamSpace[iFace], m_HDFaceDetectedPointsColorSpace[iFace]);
+			cloudUpdated(cloud);
+			m_pDrawDataStreams->drawPoints(m_HDFaceDetectedPointsColorSpace[iFace]);
+		}
+		
     }
 
     if (bHaveBodyData)
@@ -611,17 +620,11 @@ void KinectHDFaceGrabber::processFaces()
 
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPointsToPointCloud(const std::vector<CameraSpacePoint>& cameraSpacePoints, const std::vector<ColorSpacePoint>& colorSpacePoints)
 {
-	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>(imageWidth, imageHeight));
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
 	cloud->is_dense = false;
 	auto colorSpacePoint = colorSpacePoints.begin();
-//	float bottom	= - FLT_MAX;
-//	float top		=   FLT_MAX;
 	float bottom	=	FLT_MAX;
 	float top		= - FLT_MAX;
-
-	//float right		=   FLT_MAX;
-	//float left		= - FLT_MAX;
 	float right		= - FLT_MAX;
 	float left		=   FLT_MAX;
 	float front		=   FLT_MAX;
@@ -643,17 +646,12 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 		
 		ellipsePoints.push_back(cv::Point2f(colorX, colorY));
 
-		bottom = std::min(point.y, bottom);
-
-		top = std::max(point.y, top);
-
-		right = std::max(point.x, right);
-
-		left = std::min(point.x, left);
-
-		front = std::min(point.z, front);
-
-		back = std::max(point.z, back);
+		bottom	= std::min(point.y, bottom);
+		top		= std::max(point.y, top);
+		right	= std::max(point.x, right);
+		left	= std::min(point.x, left);
+		front	= std::min(point.z, front);
+		back	= std::max(point.z, back);
 
 		int colorImageIndex = ((m_colorWidth * colorY) + colorX);
 		RGBQUAD pixel = m_colorBuffer[colorImageIndex];
@@ -735,8 +733,6 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 	cv::vector<cv::Point2f> hullPoints;
 	
 	cv::convexHull(ellipsePoints, hullPoints);
-	//for (int x = static_cast<int>(depthTopRightBack.X); x < static_cast<int>(depthTopLeftBack.X); x++){
-	//	for (int y = static_cast<int>(depthBottomLeftBack.Y); y < static_cast<int>(depthTopLeftBack.Y); y++){
 	for (int x = static_cast<int>(depthTopLeftBack.X); x < static_cast<int>(depthTopRightBack.X); x++){
 		for (int y = static_cast<int>(depthTopLeftBack.Y); y < static_cast<int>(depthBottomLeftBack.Y); y++){
 

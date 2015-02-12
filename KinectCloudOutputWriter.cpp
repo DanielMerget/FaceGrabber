@@ -27,7 +27,6 @@ void KinectCloudOutputWriter::updateCloudThreated(pcl::PointCloud<pcl::PointXYZR
 	if (!m_running){
 		return;
 	}
-	//m_updateThreads.push_back(std::thread(&KinectCloudOutputWriter::pushCloud, this, cloud));
 	std::async(std::launch::async, &KinectCloudOutputWriter::pushCloud, this, cloud);
 }
 
@@ -40,15 +39,12 @@ void KinectCloudOutputWriter::pushCloud(pcl::PointCloud<pcl::PointXYZRGB>::Const
 		m_checkCloud.notify_all();
 		return;
 	}
-	//PointCloudMeasurement cloudMeasurement{ cloudToPush, m_cloudCount };	
+
 	PointCloudMeasurement cloudMeasurement;
 	cloudMeasurement.cloud = cloudToPush;
 	cloudMeasurement.index = m_cloudCount;
 	m_clouds.push(cloudMeasurement);
 	m_cloudCount++;
-	//if (m_cloudCount == numOfFilesToWrite){
-	//	m_running = false;
-	//}
 	m_checkCloud.notify_all();
 }
 
@@ -91,6 +87,7 @@ void KinectCloudOutputWriter::writeCloudToFile(int index)
 		m_clouds.pop();
 		cloudIsEmpty = m_clouds.empty();
 		cloudLocker.unlock();
+
 		//pcl::io::savePLYFile(fileName.str(), *cloudMeasurement.cloud, false);
 		//pcl::io::savePCDFileASCII(fileName.str(), *cloudMeasurement.cloud);
 		pcl::io::savePCDFileBinaryCompressed(fileName.str(), *cloudMeasurement.cloud);
