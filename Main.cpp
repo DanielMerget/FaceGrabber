@@ -34,9 +34,9 @@ int main()
 	std::cout << "main started" << std::endl;
 	PCLInputReader reader("", "Cloud_", 99, 309);
 	
-	std::shared_ptr<PCLViewer> viewer(new PCLViewer());
+	std::shared_ptr<PCLViewer> viewer(new PCLViewer(1, "Face-Playback"));
 
-	reader.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, viewer, _1 , 1));
+	reader.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, viewer, _1 , 0));
 	reader.startReaderThreads();
 	
 	

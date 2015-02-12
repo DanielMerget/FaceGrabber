@@ -9,7 +9,7 @@
 class PCLViewer
 {
 public:
-	PCLViewer(std::string viewerName = "PCLViewer");
+	PCLViewer(int cloudCount, std::string viewerName = "PCLViewer");
 	~PCLViewer();
 	
 	void updateCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud, int index);
@@ -20,11 +20,14 @@ private:
 	
 	bool m_isRunning;
 	std::string m_viewerName;
-	pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr m_currentCloud1;
-	pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr m_currentCloud2;
+	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> m_clouds;
+
+	//pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr m_currentCloud1;
+	//pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr m_currentCloud2;
 
 	std::thread m_updateThread;
 	std::mutex m_cloudMutex;
+	int m_cloudCount;
 
 	std::condition_variable m_cloudUpdate;
 };

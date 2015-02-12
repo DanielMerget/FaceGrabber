@@ -224,7 +224,7 @@ HRESULT KinectHDFaceGrabber::initHDFaceReader()
 			}
 
 			// Create Face Model
-			hr = CreateFaceModel(1.0f, FaceShapeDeformations::FaceShapeDeformations_Count, &deformations[i][0], &m_pFaceModel[i]);
+			hr = CreateFaceModel(1.0f, FaceShapeDeformations::FaceShapeDeformations_Count, deformations[i].data(), &m_pFaceModel[i]);
 			if (FAILED(hr)){
 				std::cerr << "Error : CreateFaceModel()" << std::endl;
 				return -1;
@@ -559,7 +559,7 @@ void KinectHDFaceGrabber::processFaces()
 				hr = pHDFaceFrame->GetAndRefreshFaceAlignmentResult(m_pFaceAlignment[iFace]);
 				if (SUCCEEDED(hr) && m_pFaceModelBuilder[iFace] != nullptr && m_pFaceAlignment[iFace] != nullptr && m_pFaceModel[iFace] != nullptr){
 					static bool isCompleted = false;
-
+					
 					FaceModelBuilderCollectionStatus status;
 					hr = m_pFaceModelBuilder[iFace]->get_CollectionStatus(&status);
 					std::wstring statusString = getCaptureStatusText(status);
@@ -575,24 +575,23 @@ void KinectHDFaceGrabber::processFaces()
 								isCompleted = true;
 							}
 						}
-						//SafeRelease(pFaceModelData);
+						m_pFaceModelBuilder[iFace]->Release();
+						SafeRelease(pFaceModelData);
 						//m_pFaceModelBuilder[iFace]->Release();
-						//m_pFaceModelBuilder[iFace] = nullptr;
+						m_pFaceModelBuilder[iFace] = nullptr;
 					}
-					std::vector<CameraSpacePoint> facePoints(vertex);
-					std::vector<ColorSpacePoint> renderPoints(vertex);
-					hr = m_pFaceModel[iFace]->CalculateVerticesForAlignment(m_pFaceAlignment[iFace], vertex, &facePoints[0]);
-					
-					if (SUCCEEDED(hr)){
-						m_pCoordinateMapper->MapCameraPointsToColorSpace(facePoints.size(), facePoints.data(), renderPoints.size(), renderPoints.data());
-					}
-					
-					auto cloud = convertKinectRGBPointsToPointCloud(facePoints, renderPoints);
+				}
+				std::vector<CameraSpacePoint> facePoints(vertex);
+				std::vector<ColorSpacePoint> renderPoints(vertex);
+				hr = m_pFaceModel[iFace]->CalculateVerticesForAlignment(m_pFaceAlignment[iFace], vertex, &facePoints[0]);
 
+				if (SUCCEEDED(hr)){
+					hr = m_pCoordinateMapper->MapCameraPointsToColorSpace(facePoints.size(), facePoints.data(), renderPoints.size(), renderPoints.data());
+				}
+				if (SUCCEEDED(hr)){
+					auto cloud = convertKinectRGBPointsToPointCloud(facePoints, renderPoints);
 					cloudUpdated(cloud);
-					
-					//first = false;
-					m_pDrawDataStreams->drawPoints(renderPoints);				
+					m_pDrawDataStreams->drawPoints(renderPoints);
 				}
 			}
 		}

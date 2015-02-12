@@ -91,7 +91,7 @@ void PCLInputReader::updateThreadFunc()
 		m_cloudBufferFree.notify_all();
 		//printMessage("update thread sleeping");
 
-		std::chrono::milliseconds dura(50);
+		std::chrono::milliseconds dura(80);
 		std::this_thread::sleep_for(dura);
 		//printMessage("update thread woke up from sleeping");
 		numOfFilesRead++;
