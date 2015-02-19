@@ -99,7 +99,7 @@ private:
 	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(std::vector<CameraSpacePoint>& renderPoints, const RGBQUAD* pBuffer, const int imageWidth, const int imageHeight);
 
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr extractColouredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV);
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV);
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr extractClolouredFaceHDPoinCloudAndBoundingBox(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV);
 
     /// <summary>
     /// Renders the color and face streams

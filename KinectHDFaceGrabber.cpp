@@ -572,7 +572,7 @@ HRESULT KinectHDFaceGrabber::updateOutputStreams(IFaceModel* faceModel, IFaceAli
 		CameraSpacePoint boundingBoxPointBottomRight;
 		std::vector<cv::Point2f> hdFacePointsInCamSpaceOpenCV;
 
-		auto hdFaceCloud = convertKinectRGBPointsToPointCloud(bufferSize, detectedHDFacePointsCamSpace, detectedHDFacePointsColorSpace, boundingBoxPointTopLeft, boundingBoxPointBottomRight, hdFacePointsInCamSpaceOpenCV);
+		auto hdFaceCloud = extractClolouredFaceHDPoinCloudAndBoundingBox(bufferSize, detectedHDFacePointsCamSpace, detectedHDFacePointsColorSpace, boundingBoxPointTopLeft, boundingBoxPointBottomRight, hdFacePointsInCamSpaceOpenCV);
 		auto hdFaceRawDepthCloud = extractColouredDepthCloudFromBoundingBox(boundingBoxPointTopLeft, boundingBoxPointBottomRight, hdFacePointsInCamSpaceOpenCV);
 
 		Eigen::Vector4f centroid;
@@ -625,26 +625,10 @@ void KinectHDFaceGrabber::processFaces()
 		}
 		
 		hr = updateOutputStreams(m_pFaceModel[iFace], m_pFaceAlignment[iFace], std::min(m_HDFaceDetectedPointsCamSpace[iFace].size(), m_HDFaceDetectedPointsColorSpace[iFace].size()), m_HDFaceDetectedPointsCamSpace[iFace].data(), m_HDFaceDetectedPointsColorSpace[iFace].data());
-		//
-		//if (SUCCEEDED(hr)){
-		//	m_pDrawDataStreams->drawPoints(m_HDFaceDetectedPointsColorSpace[iFace]);
-		//}
-		
-		//hr = m_pFaceModel[iFace]->CalculateVerticesForAlignment(m_pFaceAlignment[iFace], m_HDFaceDetectedPointsCamSpace[iFace].size(), m_HDFaceDetectedPointsCamSpace[iFace].data());
-		
-		//if (SUCCEEDED(hr)){
-		//	hr = m_pCoordinateMapper->MapCameraPointsToColorSpace(m_HDFaceDetectedPointsCamSpace[iFace].size(), m_HDFaceDetectedPointsCamSpace[iFace].data(), m_HDFaceDetectedPointsColorSpace[iFace].size(), m_HDFaceDetectedPointsColorSpace[iFace].data());
-		//}
+	
 		if (SUCCEEDED(hr)){
 			m_pDrawDataStreams->drawPoints(m_HDFaceDetectedPointsColorSpace[iFace]);
-		}
-		/*
-		if (SUCCEEDED(hr)){
-			auto cloud = convertKinectRGBPointsToPointCloud(m_HDFaceDetectedPointsCamSpace[iFace], m_HDFaceDetectedPointsColorSpace[iFace]);
-			cloudUpdated(cloud);
-			m_pDrawDataStreams->drawPoints(m_HDFaceDetectedPointsColorSpace[iFace]);
-		}*/
-		
+		}		
     }
 
     if (bHaveBodyData)
@@ -725,7 +709,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::extractColouredDepth
 	return depthCloud;
 }
 
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPointsToPointCloud(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV)
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::extractClolouredFaceHDPoinCloudAndBoundingBox(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV)
 {
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
 	cloud->is_dense = false;
