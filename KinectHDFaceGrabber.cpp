@@ -560,6 +560,19 @@ void KinectHDFaceGrabber::updateFaceModelStatusOfFaceModelBuilder(IFaceModelBuil
 		}
 	}
 }
+
+HRESULT KinectHDFaceGrabber::updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize, CameraSpacePoint* detectedHDFacePointsCamSpace, ColorSpacePoint* detectedHDFacePointsColorSpace)
+{
+	HRESULT hr = faceModel->CalculateVerticesForAlignment(faceAlignment, bufferSize, detectedHDFacePointsCamSpace);
+	if (SUCCEEDED(hr)){
+		hr = m_pCoordinateMapper->MapCameraPointsToColorSpace(bufferSize, detectedHDFacePointsCamSpace, bufferSize, detectedHDFacePointsColorSpace);
+	}
+	if (SUCCEEDED(hr)){
+		auto cloud = convertKinectRGBPointsToPointCloud(bufferSize, detectedHDFacePointsCamSpace, detectedHDFacePointsColorSpace);
+		cloudUpdated(cloud);
+	}
+	return hr;
+}
 /// <summary>
 /// Processes new face frames
 /// </summary>
@@ -595,6 +608,12 @@ void KinectHDFaceGrabber::processFaces()
 			updateFaceModelStatusOfFaceModelBuilder(&m_pFaceModelBuilder[iFace], m_pFaceModel[iFace]);
 		}
 		
+		hr = updateOutputStreams(m_pFaceModel[iFace], m_pFaceAlignment[iFace], std::min(m_HDFaceDetectedPointsCamSpace[iFace].size(), m_HDFaceDetectedPointsColorSpace[iFace].size()), m_HDFaceDetectedPointsCamSpace->data(), m_HDFaceDetectedPointsColorSpace->data());
+
+		if (SUCCEEDED(hr)){
+			m_pDrawDataStreams->drawPoints(m_HDFaceDetectedPointsColorSpace[iFace]);
+		}
+		/*
 		hr = m_pFaceModel[iFace]->CalculateVerticesForAlignment(m_pFaceAlignment[iFace], m_HDFaceDetectedPointsCamSpace[iFace].size(), m_HDFaceDetectedPointsCamSpace[iFace].data());
 
 		if (SUCCEEDED(hr)){
@@ -604,7 +623,7 @@ void KinectHDFaceGrabber::processFaces()
 			auto cloud = convertKinectRGBPointsToPointCloud(m_HDFaceDetectedPointsCamSpace[iFace], m_HDFaceDetectedPointsColorSpace[iFace]);
 			cloudUpdated(cloud);
 			m_pDrawDataStreams->drawPoints(m_HDFaceDetectedPointsColorSpace[iFace]);
-		}
+		}*/
 		
     }
 
@@ -618,11 +637,11 @@ void KinectHDFaceGrabber::processFaces()
 }
 
 
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPointsToPointCloud(const std::vector<CameraSpacePoint>& cameraSpacePoints, const std::vector<ColorSpacePoint>& colorSpacePoints)
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPointsToPointCloud(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints)
 {
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
 	cloud->is_dense = false;
-	auto colorSpacePoint = colorSpacePoints.begin();
+	//auto colorSpacePoint = colorSpacePoints.begin();
 	float bottom	=	FLT_MAX;
 	float top		= - FLT_MAX;
 	float right		= - FLT_MAX;
@@ -630,7 +649,10 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 	float front		=   FLT_MAX;
 	float back		= - FLT_MAX;
 	std::vector<cv::Point2f> ellipsePoints;
-	for (auto& cameraSpacePoint : cameraSpacePoints){
+	for (int i = 0; i < bufferSize; i++){
+	//for (auto& cameraSpacePoint : cameraSpacePoints){
+		auto cameraSpacePoint = *cameraSpacePoints;
+		auto colorSpacePoint = *colorSpacePoints;
 		pcl::PointXYZRGB point;
 		point.x = cameraSpacePoint.X;
 		point.y = cameraSpacePoint.Y;
@@ -638,8 +660,8 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 		pcl::PointXYZRGB point2;
 
 		
-		int colorX = static_cast<int>(std::floor(colorSpacePoint->X + 0.5f));
-		int colorY = static_cast<int>(std::floor(colorSpacePoint->Y + 0.5f));
+		int colorX = static_cast<int>(std::floor(colorSpacePoint.X + 0.5f));
+		int colorY = static_cast<int>(std::floor(colorSpacePoint.Y + 0.5f));
 		
 		if (colorY > m_colorHeight || colorX > m_colorWidth || colorY < 0 || colorX < 0)
 			continue;
@@ -659,8 +681,10 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 		point.g = pixel.rgbGreen;
 		point.b = pixel.rgbBlue;
 
-		colorSpacePoint++;
 		cloud->push_back(point);
+
+		colorSpacePoints++;
+		cameraSpacePoints++;
 	}
 	
 	
