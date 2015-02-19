@@ -15,6 +15,7 @@
 #include <pcl/point_cloud.h>
 #include <mutex>
 #include <condition_variable>
+#include <opencv2/imgproc/imgproc.hpp>
 
 class KinectHDFaceGrabber
 {
@@ -89,11 +90,16 @@ private:
 
 	HRESULT updateHDFaceTrackingID(IHighDefinitionFaceFrameSource* faceFrame, IBody* trackedBody);
 	void updateFaceModelStatusOfFaceModelBuilder(IFaceModelBuilder** faceModelBuilder, IFaceModel* faceModel);
+
+	
+
 	HRESULT updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize, CameraSpacePoint* detectedHDFacePointsCamSpace, ColorSpacePoint* detectedHDFacePointsColorSpace);
 	void updateDepthCloud();
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertDepthBufferToPointCloud();
 	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(std::vector<CameraSpacePoint>& renderPoints, const RGBQUAD* pBuffer, const int imageWidth, const int imageHeight);
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack);
+
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr extractColouredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV);
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV);
 
     /// <summary>
     /// Renders the color and face streams

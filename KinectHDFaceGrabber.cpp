@@ -568,8 +568,24 @@ HRESULT KinectHDFaceGrabber::updateOutputStreams(IFaceModel* faceModel, IFaceAli
 		hr = m_pCoordinateMapper->MapCameraPointsToColorSpace(bufferSize, detectedHDFacePointsCamSpace, bufferSize, detectedHDFacePointsColorSpace);
 	}
 	if (SUCCEEDED(hr)){
-		auto cloud = convertKinectRGBPointsToPointCloud(bufferSize, detectedHDFacePointsCamSpace, detectedHDFacePointsColorSpace);
-		cloudUpdated(cloud);
+		CameraSpacePoint boundingBoxPointTopLeft;
+		CameraSpacePoint boundingBoxPointBottomRight;
+		std::vector<cv::Point2f> hdFacePointsInCamSpaceOpenCV;
+
+		auto hdFaceCloud = convertKinectRGBPointsToPointCloud(bufferSize, detectedHDFacePointsCamSpace, detectedHDFacePointsColorSpace, boundingBoxPointTopLeft, boundingBoxPointBottomRight, hdFacePointsInCamSpaceOpenCV);
+		auto hdFaceRawDepthCloud = extractColouredDepthCloudFromBoundingBox(boundingBoxPointTopLeft, boundingBoxPointBottomRight, hdFacePointsInCamSpaceOpenCV);
+
+		Eigen::Vector4f centroid;
+		pcl::compute3DCentroid(*hdFaceCloud, centroid);
+		Eigen::Vector3f center(-centroid.x(), -centroid.y(), -centroid.z());
+		Eigen::Matrix4f m = Eigen::Affine3f(Eigen::Translation3f(center)).matrix();
+
+		pcl::transformPointCloud(*hdFaceCloud, *hdFaceCloud, m);
+		pcl::transformPointCloud(*hdFaceRawDepthCloud, *hdFaceRawDepthCloud, m);
+		
+
+		cloudUpdated(hdFaceCloud);
+		depthCloudUpdated(hdFaceRawDepthCloud);
 	}
 	return hr;
 }
@@ -640,12 +656,18 @@ void KinectHDFaceGrabber::processFaces()
     }
 }
 
-void extractColoredPoinCloudFromRawDepth()
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::extractColouredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV)
 {
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr depthCloud(new pcl::PointCloud <pcl::PointXYZRGB>());
-	cv::vector<cv::Point2f> hullPoints;
+	DepthSpacePoint depthTopLeftBack;
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camTopLeftBack, &depthTopLeftBack);
 
-	cv::convexHull(ellipsePoints, hullPoints);
+	DepthSpacePoint depthBottomRightBack;
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomRightBack, &depthBottomRightBack);
+
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr depthCloud(new pcl::PointCloud <pcl::PointXYZRGB>());
+
+	cv::vector<cv::Point2f> hullPoints;
+	cv::convexHull(hdFacePointsInCamSpaceOpenCV, hullPoints);
 	for (int x = static_cast<int>(depthTopLeftBack.X); x < static_cast<int>(depthBottomRightBack.X); x++){
 		for (int y = static_cast<int>(depthTopLeftBack.Y); y < static_cast<int>(depthBottomRightBack.Y); y++){
 
@@ -691,7 +713,7 @@ void extractColoredPoinCloudFromRawDepth()
 				isInDepth = true;
 			}
 
-			if (point.x < left || point.x > right)
+			if (point.x < camTopLeftBack.X || point.x > camBottomRightBack.X)
 				continue;
 
 			if (isInColor && isInDepth){
@@ -700,13 +722,11 @@ void extractColoredPoinCloudFromRawDepth()
 		}
 	}
 
-	pcl::transformPointCloud(*depthCloud, *depthCloud, m);
-	depthCloudUpdated(depthCloud);
+	return depthCloud;
 }
 
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPointsToPointCloud(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack)
+pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPointsToPointCloud(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV)
 {
-
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
 	cloud->is_dense = false;
 	float bottom	=	FLT_MAX;
@@ -731,7 +751,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 		if (colorY > m_colorHeight || colorX > m_colorWidth || colorY < 0 || colorX < 0)
 			continue;
 		
-		ellipsePoints.push_back(cv::Point2f(colorX, colorY));
+		hdFacePointsInCamSpaceOpenCV.push_back(cv::Point2f(colorX, colorY));
 
 		bottom	= std::min(point.y, bottom);
 		top		= std::max(point.y, top);
@@ -750,34 +770,16 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertKinectRGBPoin
 		cameraSpacePoints++;
 		colorSpacePoints++;
 	}
-
-	//CameraSpacePoint camTopLeftBack;
+	
+	
 	camTopLeftBack.X = left;
 	camTopLeftBack.Y = top;
 	camTopLeftBack.Z = back;
-	//DepthSpacePoint depthTopLeftBack;
-	//m_pCoordinateMapper->MapCameraPointToDepthSpace(camTopLeftBack, &depthTopLeftBack);
 
-
-	//CameraSpacePoint camBottomRightBack;
+	
 	camBottomRightBack.X = right;
 	camBottomRightBack.Y = bottom;
-	camBottomRightBack.Z = back;
-	//DepthSpacePoint depthBottomRightBack;
-	//m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomRightBack, &depthBottomRightBack);
-
-	
-	Eigen::Vector4f centroid;
-
-	
-	pcl::compute3DCentroid(*cloud, centroid);
-	Eigen::Vector3f center(-centroid.x(), -centroid.y(), -centroid.z());
-	Eigen::Matrix4f m = Eigen::Affine3f(Eigen::Translation3f(center)).matrix();
-
-	pcl::transformPointCloud(*cloud, *cloud, m);
-
-
-	
+	camBottomRightBack.Z = back;	
 	
 	return cloud;
 }
