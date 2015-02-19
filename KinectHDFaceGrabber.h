@@ -93,7 +93,7 @@ private:
 	void updateDepthCloud();
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertDepthBufferToPointCloud();
 	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(std::vector<CameraSpacePoint>& renderPoints, const RGBQUAD* pBuffer, const int imageWidth, const int imageHeight);
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(int bufferSize, CameraSpacePoint* renderPoints, ColorSpacePoint* imagePoints);
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertKinectRGBPointsToPointCloud(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack);
 
     /// <summary>
     /// Renders the color and face streams
