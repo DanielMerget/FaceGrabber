@@ -46,7 +46,7 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	wc.hIcon = LoadIconW(hInstance, MAKEINTRESOURCE(IDI_APP));
 	wc.lpfnWndProc = DefDlgProcW;
 	wc.lpszClassName = L"KinectHDFaceGrabberAppDlgWndClass";
-
+	m_hInstance = hInstance;
 	if (!RegisterClassW(&wc))
 	{
 		return 0;
@@ -149,6 +149,26 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		
 		m_cloudOutputWriter = std::shared_ptr<KinectCloudOutputWriter>(new KinectCloudOutputWriter);
 		HRESULT hr = m_pDrawDataStreams->initialize(GetDlgItem(m_hWnd, IDC_VIDEOVIEW), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
+		
+		//HRESULT hr = m_pDrawDataStreams->initialize(GetDlgItem(m_hWnd, IDC_TAB2), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
+		TCITEM tab1Data;
+		tab1Data.mask = TCIF_TEXT;
+		tab1Data.pszText = L"Tab1";
+
+		TabCtrl_InsertItem(m_hWnd, 0, &tab1Data);
+		
+		TCITEM tab2Data;
+		tab2Data.mask = TCIF_TEXT;
+		tab2Data.pszText = L"Tab2";
+
+		TabCtrl_InsertItem(m_hWnd, 1, &tab2Data);
+		
+		HWND tab1Handle = CreateWindow(WC_STATIC, L"blabla1", WS_CHILD, 6, 40, 474, 320, m_hWnd, NULL, m_hInstance, NULL);
+		HWND tab2Handle = CreateWindow(WC_STATIC, L"blabla2", WS_CHILD, 6, 40, 474, 320, m_hWnd, NULL, m_hInstance, NULL);
+		ShowWindow(tab1Handle, SW_SHOW);
+
+		//HRESULT hr = m_pDrawDataStreams->initialize(tab1Handle, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
+
 		if (FAILED(hr))
 		{
 			setStatusMessage(L"Failed to initialize the Direct2D draw device.", true);

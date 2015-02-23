@@ -589,6 +589,7 @@ HRESULT KinectHDFaceGrabber::updateOutputStreams(IFaceModel* faceModel, IFaceAli
 	}
 	return hr;
 }
+
 /// <summary>
 /// Processes new face frames
 /// </summary>

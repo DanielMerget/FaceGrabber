@@ -49,7 +49,7 @@ public:
 	void processUIMessage(WPARAM wParam, LPARAM);
 
 	bool					setStatusMessage(std::wstring statusString, bool bForce);
-
+	HINSTANCE				m_hInstance;
 	HWND					m_hWnd;
 	INT64					m_nStartTime;
 	INT64					m_nLastCounter;

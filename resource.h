@@ -9,6 +9,8 @@
 #define IDC_BUTTON_SCREENSHOT           1002
 #define IDC_RECORD_BUTTON               1004
 #define IDC_LIST1                       1005
+#define IDC_BUTTON1                     1007
+#define IDC_TAB2                        1009
 
 // Next default values for new objects
 // 
@@ -17,7 +19,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        101
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1006
+#define _APS_NEXT_CONTROL_VALUE         1010
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
