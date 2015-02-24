@@ -125,6 +125,15 @@ void WindowsApplication::cloudUpdate(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr
 {
 	//m_cloudViewer.showCloud(cloud);
 }
+int InsertTabItem(HWND hTab, LPTSTR pszText, int iid)
+{
+	TCITEM ti = { 0 };
+	ti.mask = TCIF_TEXT;
+	ti.pszText = pszText;
+	ti.cchTextMax = wcslen(pszText);
+
+	return (int)SendMessage(hTab, TCM_INSERTITEM, iid, (LPARAM)&ti);
+}
 
 LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -147,27 +156,42 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		m_pclFaceViewer = std::shared_ptr<PCLViewer>(new PCLViewer(2, "Face-Viewer"));
 		//m_pclFaceRawViewer = std::shared_ptr<PCLViewer>(new PCLViewer("Raw Face-Depth"));
 		
-		m_cloudOutputWriter = std::shared_ptr<KinectCloudOutputWriter>(new KinectCloudOutputWriter);
-		HRESULT hr = m_pDrawDataStreams->initialize(GetDlgItem(m_hWnd, IDC_VIDEOVIEW), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
+
 		
 		//HRESULT hr = m_pDrawDataStreams->initialize(GetDlgItem(m_hWnd, IDC_TAB2), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
-		TCITEM tab1Data;
-		tab1Data.mask = TCIF_TEXT;
-		tab1Data.pszText = L"Tab1";
-
-		TabCtrl_InsertItem(m_hWnd, 0, &tab1Data);
 		
+		/*
 		TCITEM tab2Data;
 		tab2Data.mask = TCIF_TEXT;
 		tab2Data.pszText = L"Tab2";
 
-		TabCtrl_InsertItem(m_hWnd, 1, &tab2Data);
+		TabCtrl_InsertItem(m_hWnd, 1, &tab2Data);*/
 		
-		HWND tab1Handle = CreateWindow(WC_STATIC, L"blabla1", WS_CHILD, 6, 40, 474, 320, m_hWnd, NULL, m_hInstance, NULL);
-		HWND tab2Handle = CreateWindow(WC_STATIC, L"blabla2", WS_CHILD, 6, 40, 474, 320, m_hWnd, NULL, m_hInstance, NULL);
-		ShowWindow(tab1Handle, SW_SHOW);
+		RECT windowRect;
 
+		GetWindowRect(m_hWnd, &windowRect);
+		m_tabHandle = GetDlgItem(m_hWnd, IDC_TAB2);
+		
+		InsertTabItem(m_tabHandle, L"Record", 0);
+		InsertTabItem(m_tabHandle, L"Playback", 1);
+		
+		//TabCtrl_InsertItem(m_hWnd, 0, &tab1Data);
+		
+		TabCtrl_SetCurSel(m_tabHandle, 0);
+		ShowWindow(m_tabHandle, SW_SHOW);
+
+		RECT tabControlRect;
+		GetWindowRect(m_tabHandle, &tabControlRect);
+		
+		//HWND m_liveViewWindow = CreateDialog(m_hInstance, MAKEINTRESOURCE(IDC_TAB_1), m_tabHandle, 0); // Setting dialog to tab one by default
 		//HRESULT hr = m_pDrawDataStreams->initialize(tab1Handle, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
+		//InsertTabItem(tab, L"myItem", 0);
+		
+		m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, tabControlRect.left, tabControlRect.bottom, tabControlRect.right - tabControlRect.left, windowRect.bottom - tabControlRect.bottom - 180, m_hWnd, NULL, m_hInstance, NULL);
+		
+		
+		m_cloudOutputWriter = std::shared_ptr<KinectCloudOutputWriter>(new KinectCloudOutputWriter);
+		HRESULT hr = m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
 
 		if (FAILED(hr))
 		{
@@ -205,14 +229,39 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 	case WM_COMMAND:
 		processUIMessage(wParam, lParam);
 		break;
+	case WM_NOTIFY:
+		switch (((LPNMHDR)lParam)->code)
+		{
+		case TCN_SELCHANGE:
+			int iPage = TabCtrl_GetCurSel(m_tabHandle);
+			//HWND tab = CreateDialog(m_hInstance, L"blabla", m_tabHandle, 0); // Setting dialog to tab one by default
+			if (iPage == 0){
+				ShowWindow(m_liveViewWindow, SW_SHOW);
+			}
+			else{
+				//ShowWindow(m_liveViewWindow, SW_SHOWNOACTIVATE);
+				ShowWindow(m_liveViewWindow, SW_HIDE);
+			}
+			break;
+		}
+
 	}
 
 	return FALSE;
 }
 #include <iostream>
+#include <Windows.h>
+#include <Windowsx.h>
+#include <Commdlg.h>
 void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM)
 {
-	if (IDC_RECORD_BUTTON == LOWORD(wParam) && BN_CLICKED == HIWORD(wParam)){
+
+	if (BN_CLICKED != HIWORD(wParam)){
+		return;
+	}
+	switch (LOWORD(wParam))
+	{
+	case IDC_RECORD_BUTTON:
 		if (!m_isCloudWritingStarted)
 		{
 			m_cloudOutputWriter->startWritingClouds();
@@ -223,6 +272,47 @@ void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM)
 			m_cloudOutputWriter->stopWritingClouds();
 		}
 		m_isCloudWritingStarted = !m_isCloudWritingStarted;
+		break;
+	case IDC_HD_FACE_CHECKBOX:
+		Edit_Enable(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
+		break;
+	case IDC_FACE_RAW_DEPTH_CHECKBOX:
+		Edit_Enable(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_DEPTH_CHECKBOX));
+		break;
+	case IDC_FULL_RAW_DEPTH_CHECKBOX:
+		Edit_Enable(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
+		break;
+	case IDC_BUTTON_CHOOSE_OUTPUT_DIRECTORY:
+	{
+		WCHAR szDir[MAX_PATH];
+		BROWSEINFO bInfo;
+		bInfo.hwndOwner = m_hWnd;
+		bInfo.pidlRoot = NULL;
+		bInfo.pszDisplayName = szDir; // Address of a buffer to receive the display name of the folder selected by the user
+		bInfo.lpszTitle = L"Please, select a output folder"; // Title of the dialog
+		bInfo.ulFlags = 0;
+		bInfo.lpfn = NULL;
+		bInfo.lParam = 0;
+		bInfo.iImage = -1;
+
+		LPITEMIDLIST lpItem = SHBrowseForFolder(&bInfo);
+		if (lpItem != NULL)
+		{
+			if (SHGetPathFromIDList(lpItem, szDir)){
+				OutputDebugString(szDir);
+				SetDlgItemText(m_hWnd, IDC_FILE_PATH_EDIT_BOX, szDir);
+
+				//A std:string  using the char* constructor.
+				char ch[MAX_PATH];
+				char DefChar = ' ';
+				WideCharToMultiByte(CP_ACP, 0, szDir, -1, ch, MAX_PATH, &DefChar, NULL);
+				m_selectedOutputPath = std::string(ch);
+			}
+		}
+		break;
+	}
+	default:
+		break;
 	}
 }
 

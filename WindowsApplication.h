@@ -8,7 +8,6 @@
 #include "PCLViewer.h"
 #include <memory>
 #include "KinectCloudOutputWriter.h"
-#include "KinectDepthGrabber.h"
 #include <pcl/visualization/image_viewer.h>
 #include <pcl/visualization/cloud_viewer.h>
 class WindowsApplication
@@ -51,6 +50,8 @@ public:
 	bool					setStatusMessage(std::wstring statusString, bool bForce);
 	HINSTANCE				m_hInstance;
 	HWND					m_hWnd;
+	HWND					m_tabHandle;
+	HWND					m_liveViewWindow;
 	INT64					m_nStartTime;
 	INT64					m_nLastCounter;
 	double					m_fFreq;
@@ -63,7 +64,7 @@ public:
 	bool				   m_isCloudWritingStarted;
 
 	KinectHDFaceGrabber m_kinectFrameGrabber;
-	
+	std::string					m_selectedOutputPath;
 	std::shared_ptr<PCLViewer>	m_pclFaceViewer;
 	std::shared_ptr<PCLViewer>	m_pclFaceRawViewer;
 	//pcl::visualization::CloudViewer m_cloudViewer;

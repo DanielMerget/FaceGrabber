@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="KinectDepthGrabber.cpp" />
     <ClCompile Include="KinectHDFaceGrabber.cpp" />
     <ClCompile Include="ImageRenderer.cpp" />
     <ClCompile Include="KinectCloudOutputWriter.cpp" />
@@ -35,7 +34,6 @@
     <ResourceCompile Include="FaceBasics.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="KinectDepthGrabber.h" />
     <ClInclude Include="KinectHDFaceGrabber.h" />
     <ClInclude Include="ImageRenderer.h" />
     <ClInclude Include="KinectCloudOutputWriter.h" />

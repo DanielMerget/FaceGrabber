@@ -367,3 +367,5 @@ x64/Debug/vc120.idb
 FaceBasics-D2D.sdf
 x64/
 Debug/
+*.ply
+*.pcd
