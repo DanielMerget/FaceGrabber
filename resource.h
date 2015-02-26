@@ -26,8 +26,11 @@
 #define IDC_LIST2                       1039
 #define IDC_COMBO1                      1040
 #define IDC_BUTTON2                     1041
+#define IDC_FACE_RAW_DEPTH_COMBO_BOX    1041
 #define IDC_BUTTON3                     1042
+#define IDC_HD_FACE_COMBO_BOX           1042
 #define IDC_BUTTON4                     1043
+#define IDC_FULL_RAW_DEPTH_COMBO_BOX    1043
 #define IDC_BUTTON5                     1044
 #define IDC_BUTTON6                     1045
 #define IDC_FACE_RAW_DEPTH_CHECKBOX     1046
@@ -38,6 +41,7 @@
 #define IDC_FULL_RAW_DEPTH_EDIT_BOX     1051
 #define IDC_HD_FACE_CHECKBOX            1052
 #define IDC_HDFACE_EDIT_BOX             1053
+#define IDC_OUTPUT_FOLDER_LABEL         1057
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -47,7 +51,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1054
+#define _APS_NEXT_CONTROL_VALUE         1058
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

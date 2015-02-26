@@ -9,13 +9,30 @@ WindowsApplication::WindowsApplication() :
 	m_fFreq(0),
 	m_nNextStatusTime(0),
 	m_isCloudWritingStarted(false)
-	//m_cloudViewer("CloudViewer")
 {
 	LARGE_INTEGER qpf = { 0 };
 	if (QueryPerformanceFrequency(&qpf))
 	{
 		m_fFreq = double(qpf.QuadPart);
 	}
+	initRecordDataModel();
+}
+
+void WindowsApplication::initRecordDataModel()
+{
+	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+		m_recordingConfiguration.emplace_back(static_cast<RecordCloudType>(i), PLY);
+	}
+	m_recordingConfiguration[HDFace].recordConfigurationStatusChanged.connect(		boost::bind(&WindowsApplication::recordConfigurationStatusChanged, this, _1, _2));
+	m_recordingConfiguration[HDFace].recordPathOrFileNameChanged.connect(boost::bind(&WindowsApplication::recordPathChanged, this, _1));
+	
+	m_recordingConfiguration[FaceRaw].recordConfigurationStatusChanged.connect(		boost::bind(&WindowsApplication::recordConfigurationStatusChanged, this, _1, _2));
+	m_recordingConfiguration[FaceRaw].recordPathOrFileNameChanged.connect(boost::bind(&WindowsApplication::recordPathChanged, this, _1));
+	
+	m_recordingConfiguration[FullDepthRaw].recordConfigurationStatusChanged.connect(boost::bind(&WindowsApplication::recordConfigurationStatusChanged, this, _1, _2));
+	m_recordingConfiguration[FullDepthRaw].recordPathOrFileNameChanged.connect(boost::bind(&WindowsApplication::recordPathChanged, this, _1));
+
+	
 }
 
 
@@ -125,15 +142,18 @@ void WindowsApplication::cloudUpdate(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr
 {
 	//m_cloudViewer.showCloud(cloud);
 }
+
+#include <windowsx.h>
+
 int InsertTabItem(HWND hTab, LPTSTR pszText, int iid)
 {
 	TCITEM ti = { 0 };
 	ti.mask = TCIF_TEXT;
 	ti.pszText = pszText;
 	ti.cchTextMax = wcslen(pszText);
-
-	return (int)SendMessage(hTab, TCM_INSERTITEM, iid, (LPARAM)&ti);
+	return TabCtrl_InsertItem(hTab, iid, &ti);
 }
+
 
 LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -169,7 +189,7 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		
 		RECT windowRect;
 
-		GetWindowRect(m_hWnd, &windowRect);
+		GetClientRect(m_hWnd, &windowRect);
 		m_tabHandle = GetDlgItem(m_hWnd, IDC_TAB2);
 		
 		InsertTabItem(m_tabHandle, L"Record", 0);
@@ -183,12 +203,47 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		RECT tabControlRect;
 		GetWindowRect(m_tabHandle, &tabControlRect);
 		
+		
+
+		m_listView.OnCreate(m_hWnd, reinterpret_cast<CREATESTRUCT*>(lParam),
+			tabControlRect.left, tabControlRect.bottom, (tabControlRect.right - tabControlRect.left) / 2,
+			(windowRect.bottom - tabControlRect.bottom - 180) / 2);
+
+
+
+		Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), m_recordingConfiguration[HDFace].getFileName());
+		Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), m_recordingConfiguration[FaceRaw].getFileName());
+		Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), m_recordingConfiguration[FullDepthRaw].getFileName());
+
+		HWND hdFaceComboBox			= GetDlgItem(m_hWnd, IDC_HD_FACE_COMBO_BOX);
+		HWND facerawDepthComboBox	= GetDlgItem(m_hWnd, IDC_FACE_RAW_DEPTH_COMBO_BOX);
+		HWND fullRawDepthCombobox	= GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_COMBO_BOX);
+
+		//for (int i = RECORD_FILE_FORMAT_COUNT-1; i >= 0; --i){
+		for (int i = 0; i < RECORD_FILE_FORMAT_COUNT; i++){
+			LPTSTR fileFormatName = RecordingConfiguration::getFileFormatAsString(static_cast<RecordingFileFormat>(i));
+			ComboBox_AddString(hdFaceComboBox,		 fileFormatName);
+			ComboBox_AddString(facerawDepthComboBox, fileFormatName);
+			ComboBox_AddString(fullRawDepthCombobox, fileFormatName);
+			if (i == 0){
+				ComboBox_SetCurSel(hdFaceComboBox,			i);
+				ComboBox_SetCurSel(facerawDepthComboBox,	i);
+				ComboBox_SetCurSel(fullRawDepthCombobox,	i);
+			}
+		}
+
+		// Load and register Listview control class
+		
 		//HWND m_liveViewWindow = CreateDialog(m_hInstance, MAKEINTRESOURCE(IDC_TAB_1), m_tabHandle, 0); // Setting dialog to tab one by default
 		//HRESULT hr = m_pDrawDataStreams->initialize(tab1Handle, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
 		//InsertTabItem(tab, L"myItem", 0);
+		const int width = 869;
+		const int height = 489;
+		const int xPos = (windowRect.right - windowRect.left - width)/2;
+		m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, tabControlRect.top, width, height, m_hWnd, NULL, m_hInstance, NULL);
 		
-		m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, tabControlRect.left, tabControlRect.bottom, tabControlRect.right - tabControlRect.left, windowRect.bottom - tabControlRect.bottom - 180, m_hWnd, NULL, m_hInstance, NULL);
-		
+		RECT liveViewRect;
+		GetWindowRect(m_liveViewWindow, &liveViewRect);
 		
 		m_cloudOutputWriter = std::shared_ptr<KinectCloudOutputWriter>(new KinectCloudOutputWriter);
 		HRESULT hr = m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
@@ -211,7 +266,9 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		//m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
 
 		m_kinectFrameGrabber.statusChanged.connect(boost::bind(&WindowsApplication::setStatusMessage, this, _1, _2));
-
+		
+		
+		
 	}
 		break;
 
@@ -224,6 +281,7 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 
 	case WM_DESTROY:
 		// Quit the main message pump
+		m_listView.OnDestroy(m_hWnd);
 		PostQuitMessage(0);
 		break;
 	case WM_COMMAND:
@@ -234,31 +292,100 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		{
 		case TCN_SELCHANGE:
 			int iPage = TabCtrl_GetCurSel(m_tabHandle);
-			//HWND tab = CreateDialog(m_hInstance, L"blabla", m_tabHandle, 0); // Setting dialog to tab one by default
 			if (iPage == 0){
-				ShowWindow(m_liveViewWindow, SW_SHOW);
+				onRecordTabSelected();
 			}
 			else{
-				//ShowWindow(m_liveViewWindow, SW_SHOWNOACTIVATE);
-				ShowWindow(m_liveViewWindow, SW_HIDE);
+				onPlaybackSelected();
 			}
 			break;
 		}
+	
+		default:
+			break;
+		
+		break;
 
 	}
-
 	return FALSE;
 }
-#include <iostream>
-#include <Windows.h>
-#include <Windowsx.h>
-#include <Commdlg.h>
-void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM)
-{
 
-	if (BN_CLICKED != HIWORD(wParam)){
-		return;
+void WindowsApplication::onRecordTabSelected()
+{
+	m_listView.OnHide();
+	ShowWindow(m_liveViewWindow, SW_SHOW);
+}
+void WindowsApplication::onPlaybackSelected()
+{
+	m_listView.OnShow();
+	ShowWindow(m_liveViewWindow, SW_HIDE);
+}
+
+void WindowsApplication::checkRecordingConfigurationPossible()
+{
+	bool oneEnabled = false;
+	bool allValid = true;
+	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+		oneEnabled |= m_recordingConfiguration[i].isEnabled();
+		allValid &= m_recordingConfiguration[i].isRecordConfigurationValid();
 	}
+	if (!oneEnabled || !allValid){
+		Button_Enable(GetDlgItem(m_hWnd, IDC_RECORD_BUTTON), false);
+	}
+	else{
+		Button_Enable(GetDlgItem(m_hWnd, IDC_RECORD_BUTTON), true);
+	}
+	
+}
+
+void WindowsApplication::onSelectionChanged(WPARAM wParam, LPARAM handle)
+{
+	int currentSelection = ComboBox_GetCurSel(GetDlgItem(m_hWnd, LOWORD(wParam)));
+	switch (LOWORD(wParam))
+	{
+	case IDC_FACE_RAW_DEPTH_COMBO_BOX:
+	{
+		m_recordingConfiguration[FaceRaw].setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+		break;
+	}
+	case IDC_FULL_RAW_DEPTH_COMBO_BOX:
+		m_recordingConfiguration[FullDepthRaw].setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+		break;
+	case IDC_HD_FACE_COMBO_BOX:
+		m_recordingConfiguration[HDFace].setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+		break;
+	}
+}
+void WindowsApplication::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
+{
+	HWND editBoxHandle = GetDlgItem(m_hWnd, LOWORD(wParam));
+	
+	//std::vector<wchar_t> buffer(Edit_GetTextLength(editBoxHandle));
+	std::vector<wchar_t> buffer(MAX_PATH);
+	Edit_GetText(editBoxHandle, buffer.data(), buffer.size());
+	switch (LOWORD(wParam)){
+	case IDC_FACE_RAW_EDIT_BOX:
+		m_recordingConfiguration[FaceRaw].setFileName(buffer.data());
+		break;
+	case IDC_HDFACE_EDIT_BOX:
+		m_recordingConfiguration[HDFace].setFileName(buffer.data());
+		break;
+	case IDC_FULL_RAW_DEPTH_EDIT_BOX:
+		m_recordingConfiguration[FullDepthRaw].setFileName(buffer.data());
+		break;
+	case IDC_FILE_PATH_EDIT_BOX:
+	{
+		for (auto& recordConfig : m_recordingConfiguration){
+			recordConfig.setFilePath(buffer.data());
+		}
+		break;
+	}
+	default:
+		break;
+	}
+}
+void WindowsApplication::onButtonClicked(WPARAM wParam, LPARAM handle)
+{
 	switch (LOWORD(wParam))
 	{
 	case IDC_RECORD_BUTTON:
@@ -274,13 +401,13 @@ void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM)
 		m_isCloudWritingStarted = !m_isCloudWritingStarted;
 		break;
 	case IDC_HD_FACE_CHECKBOX:
-		Edit_Enable(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
+		m_recordingConfiguration[HDFace].setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
 		break;
 	case IDC_FACE_RAW_DEPTH_CHECKBOX:
-		Edit_Enable(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_DEPTH_CHECKBOX));
+		m_recordingConfiguration[FaceRaw].setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_DEPTH_CHECKBOX));
 		break;
 	case IDC_FULL_RAW_DEPTH_CHECKBOX:
-		Edit_Enable(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
+		m_recordingConfiguration[FullDepthRaw].setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
 		break;
 	case IDC_BUTTON_CHOOSE_OUTPUT_DIRECTORY:
 	{
@@ -301,12 +428,9 @@ void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM)
 			if (SHGetPathFromIDList(lpItem, szDir)){
 				OutputDebugString(szDir);
 				SetDlgItemText(m_hWnd, IDC_FILE_PATH_EDIT_BOX, szDir);
-
-				//A std:string  using the char* constructor.
-				char ch[MAX_PATH];
-				char DefChar = ' ';
-				WideCharToMultiByte(CP_ACP, 0, szDir, -1, ch, MAX_PATH, &DefChar, NULL);
-				m_selectedOutputPath = std::string(ch);
+				for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+					m_recordingConfiguration[i].setFilePath(szDir);
+				}
 			}
 		}
 		break;
@@ -314,6 +438,23 @@ void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM)
 	default:
 		break;
 	}
+}
+void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM handle)
+{
+
+	switch (HIWORD(wParam))
+	{
+	case CBN_SELCHANGE:
+		onSelectionChanged(wParam, handle);
+		break;
+	case BN_CLICKED:
+		onButtonClicked(wParam, handle);
+		break;
+	case EN_CHANGE:
+		onEditBoxeChanged(wParam, handle);
+	default:
+		break;
+	}	
 }
 
 bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce)
@@ -330,4 +471,34 @@ bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce
 	}
 
 	return false;
+}
+
+void WindowsApplication::recordPathChanged(RecordCloudType type)
+{
+	checkRecordingConfigurationPossible();
+}
+
+void WindowsApplication::recordConfigurationStatusChanged(RecordCloudType type, bool newState)
+{
+	switch (type)
+	{
+	case HDFace:
+		Edit_Enable(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), newState);
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_HD_FACE_COMBO_BOX), newState);
+		break;
+	case FaceRaw:
+		Edit_Enable(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), newState);
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_FACE_RAW_DEPTH_COMBO_BOX), newState);
+		break;
+	case FullDepthRaw:
+		Edit_Enable(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), newState);
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_COMBO_BOX), newState);
+		break;
+	case RECORD_CLOUD_TYPE_COUNT:
+		break;
+	default:
+		break;
+	}
+
+	checkRecordingConfigurationPossible();
 }

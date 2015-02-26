@@ -46,7 +46,6 @@ KinectHDFaceGrabber::KinectHDFaceGrabber() :
     m_pCoordinateMapper(nullptr),
 	m_pColorFrameReader(nullptr),
     m_pDrawDataStreams(nullptr),
-    m_pColorRGBX(nullptr),
     m_pBodyFrameReader(nullptr),
 	m_pDepthFrameReader(nullptr),
 	m_depthImageProcessed(true)
@@ -56,9 +55,6 @@ KinectHDFaceGrabber::KinectHDFaceGrabber() :
         m_pFaceFrameSources[i] = nullptr;
         m_pFaceFrameReaders[i] = nullptr;
     }
-	
-    // create heap storage for color pixel data in RGBX format
-    m_pColorRGBX = new RGBQUAD[cColorWidth * cColorHeight];
 }
 
 
@@ -72,12 +68,6 @@ KinectHDFaceGrabber::~KinectHDFaceGrabber()
     {
         delete m_pDrawDataStreams;
         m_pDrawDataStreams = nullptr;
-    }
-
-    if (m_pColorRGBX)
-    {
-        delete [] m_pColorRGBX;
-        m_pColorRGBX = nullptr;
     }
 
     //// clean up Direct2D

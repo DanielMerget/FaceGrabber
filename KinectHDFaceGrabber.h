@@ -146,34 +146,30 @@ private:
 
 	//HDFace
 	IHighDefinitionFaceFrameSource* m_pHDFaceSource[BODY_COUNT];;
-
 	IHighDefinitionFaceFrameReader* m_pHDFaceReader[BODY_COUNT];
 
 	IFaceAlignment* m_pFaceAlignment[BODY_COUNT];
-
 	IFaceModelBuilder* m_pFaceModelBuilder[BODY_COUNT];
-
 	IFaceModel* m_pFaceModel[BODY_COUNT];
 
     //// Direct2D
-    ImageRenderer*			m_pDrawDataStreams;
-    RGBQUAD*				m_pColorRGBX;	
+    ImageRenderer*				m_pDrawDataStreams;
 
-	std::vector<CameraSpacePoint> m_HDFaceDetectedPointsCamSpace[BODY_COUNT];
+	std::vector<CameraSpacePoint>m_HDFaceDetectedPointsCamSpace[BODY_COUNT];
 	std::vector<ColorSpacePoint> m_HDFaceDetectedPointsColorSpace[BODY_COUNT];
 	
 
-	std::vector<UINT16> m_depthBuffer;
-	std::vector<RGBQUAD> m_colorBuffer;
-	std::mutex m_depthBufferMutex;
-	std::condition_variable m_bufferCondVariable;
+	std::vector<UINT16>			m_depthBuffer;
+	std::vector<RGBQUAD>		m_colorBuffer;
+	std::mutex					m_depthBufferMutex;
+	std::condition_variable		m_bufferCondVariable;
 
-	bool m_depthImageProcessed;
-	std::mutex m_depthImageProcessedLock;
+	bool						m_depthImageProcessed;
+	std::mutex					m_depthImageProcessedLock;
 
-	int m_depthWidth;
-	int m_depthHeight;
-	int m_colorWidth;
-	int m_colorHeight;
+	int							m_depthWidth;
+	int							m_depthHeight;
+	int							m_colorWidth;
+	int							m_colorHeight;
 };
 

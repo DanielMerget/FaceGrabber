@@ -22,6 +22,9 @@
     <ClCompile Include="PCLInputReader.cpp">
       <Filter>InputReader</Filter>
     </ClCompile>
+    <ClCompile Include="ListView.cpp">
+      <Filter>WindowsApp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -47,6 +50,12 @@
     </ClInclude>
     <ClInclude Include="PCLInputReader.h">
       <Filter>InputReader</Filter>
+    </ClInclude>
+    <ClInclude Include="ListView.h">
+      <Filter>WindowsApp</Filter>
+    </ClInclude>
+    <ClInclude Include="RecordingConfiguration.h">
+      <Filter>WindowsApp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

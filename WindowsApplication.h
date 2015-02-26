@@ -1,5 +1,6 @@
 #pragma once
 #include "stdafx.h"
+#include "ListView.h"
 #include <strsafe.h>
 #include "resource.h"
 #include "KinectHDFaceGrabber.h"
@@ -10,6 +11,8 @@
 #include "KinectCloudOutputWriter.h"
 #include <pcl/visualization/image_viewer.h>
 #include <pcl/visualization/cloud_viewer.h>
+#include "RecordingConfiguration.h"
+
 class WindowsApplication
 {
 public:
@@ -44,7 +47,20 @@ public:
 	LRESULT CALLBACK		DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 	int						run(HINSTANCE hInstance, int nCmdShow);
+	
+	
+private:
+	void onSelectionChanged(WPARAM wParam, LPARAM handle);
+	void onButtonClicked(WPARAM wParam, LPARAM handle);
+	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
+	void					recordPathChanged(RecordCloudType type);
+	void					recordConfigurationStatusChanged(RecordCloudType type, bool newState);
 
+	void initRecordDataModel();
+	void checkRecordingConfigurationPossible();
+
+	void onPlaybackSelected();
+	void onRecordTabSelected();
 	void processUIMessage(WPARAM wParam, LPARAM);
 
 	bool					setStatusMessage(std::wstring statusString, bool bForce);
@@ -63,11 +79,14 @@ public:
 	ID2D1Factory*          m_pD2DFactory;
 	bool				   m_isCloudWritingStarted;
 
-	KinectHDFaceGrabber m_kinectFrameGrabber;
-	std::string					m_selectedOutputPath;
+	KinectHDFaceGrabber			m_kinectFrameGrabber;
 	std::shared_ptr<PCLViewer>	m_pclFaceViewer;
 	std::shared_ptr<PCLViewer>	m_pclFaceRawViewer;
 	//pcl::visualization::CloudViewer m_cloudViewer;
 	std::shared_ptr<KinectCloudOutputWriter> m_cloudOutputWriter;
+	ListView				m_listView;
+	//RecordingConfiguration	m_recordingConfiguration[RECORD_CLOUD_TYPE_COUNT];
+	std::vector<RecordingConfiguration>	m_recordingConfiguration;
+	//std::shared_ptr<RecordingConfiguration>	m_recordingConfiguration;
 };
 

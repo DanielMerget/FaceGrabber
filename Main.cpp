@@ -1,11 +1,11 @@
 
 #include "stdafx.h"
-#include <strsafe.h>
+
 #include "resource.h"
 #include "KinectHDFaceGrabber.h"
 
 #include "WindowsApplication.h"
-
+#include <strsafe.h>
 #include "PCLInputReader.h"
 #include "PCLViewer.h"
 #include <pcl/io/ply_io.h>
@@ -15,7 +15,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
-
+	//m_recordingConfiguration[i].recordConfigurationEnabled.connect(boost::bind(&WindowsApplication::recordConfigurationStatusChanged, this));
+	
 	WindowsApplication application;
 	application.run(hInstance, nCmdShow);
 }
