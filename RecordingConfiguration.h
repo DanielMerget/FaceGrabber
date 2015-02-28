@@ -3,6 +3,7 @@
 #include "stdafx.h"
 #include <boost/signal.hpp>
 #include <boost/bind.hpp>
+#include <atlstr.h>
 enum RecordingFileFormat{
 	PLY,
 	PLY_BINARY,
@@ -25,7 +26,7 @@ public:
 	{}
 
 	RecordingConfiguration(RecordingConfiguration&& recordConfiguration) :
-		m_filePath(recordConfiguration.getFilePath()),
+		m_filePath(recordConfiguration.getFilePathCString()),
 		m_cloudType(recordConfiguration.getRecordCloudType()),
 		m_enabled(false),
 		m_fileFormat(recordConfiguration.getRecordFileFormat()),
@@ -90,13 +91,20 @@ public:
 			return true;
 		}
 		bool fileNameLengthExists = (wcslen(m_fileName) > 0);
-		bool filePathSet = !m_filePath.empty();
+		bool filePathSet = !m_filePath.IsEmpty();
 		return fileNameLengthExists && filePathSet;
+	}
+
+	CString getFilePathCString()
+	{
+		return m_filePath;
 	}
 
 	std::string getFilePath()
 	{
-		return m_filePath;
+		CT2CA pszConvertedAnsiString(m_filePath);
+		std::string strStd(pszConvertedAnsiString);
+		return strStd;
 	}
 
 	bool isEnabled()
@@ -113,9 +121,14 @@ public:
 		return m_fileFormat;
 	}
 
-	LPTSTR getFileName()
+	CString getFileNameCString()
 	{
 		return m_fileName;
+	}
+
+	LPTSTR getFileName()
+	{
+		return m_fileName.GetBuffer(0);
 	}
 
 	void setFileName(LPTSTR fileName)
@@ -126,18 +139,19 @@ public:
 
 	void setFilePath(std::string filePath)
 	{
-		m_filePath = filePath;
+		m_filePath = CString(filePath.c_str());
 		recordPathOrFileNameChanged(m_cloudType);
 	}
 
 	void setFilePath(LPTSTR filePath)
 	{
 		//A std:string  using the char* constructor.
-		char ch[MAX_PATH];
-		char DefChar = ' ';
-		WideCharToMultiByte(CP_ACP, 0, filePath, -1, ch, MAX_PATH, &DefChar, NULL);
-
-		m_filePath = std::string(ch);
+		//char ch[MAX_PATH];
+		//char DefChar = ' ';
+		//WideCharToMultiByte(CP_ACP, 0, filePath, -1, ch, MAX_PATH, &DefChar, NULL);
+		//
+		//m_filePath = std::string(ch);
+		m_filePath = CString(filePath);
 		recordPathOrFileNameChanged(m_cloudType);
 	}
 
@@ -155,10 +169,13 @@ public:
 	boost::signal<void(RecordCloudType, bool)> recordConfigurationStatusChanged;
 	boost::signal<void(RecordCloudType)>	recordPathOrFileNameChanged;
 private:
-	std::string			m_filePath;
+	//std::string			m_filePath;
+	CString				m_filePath;
 	RecordCloudType		m_cloudType;
 	RecordingFileFormat	m_fileFormat;
-	LPTSTR				m_fileName;
+
+	CString				m_fileName;
+	//LPTSTR				m_fileName;
 	bool				m_enabled;
 };
 
