@@ -13,7 +13,7 @@
 #include <pcl/visualization/cloud_viewer.h>
 #include "RecordingConfiguration.h"
 #include "RecordTabHandler.h"
-
+#include "PlaybackTabHandler.h"
 
 class WindowsApplication
 {
@@ -53,7 +53,9 @@ public:
 	
 	int						run(HINSTANCE hInstance, int nCmdShow);
 	
-	
+	static bool openFileDialog(WCHAR* szDir, HWND handle);
+	static bool openDirectoryDialog(WCHAR* szDir, HWND handle);
+
 private:
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
@@ -71,7 +73,9 @@ private:
 	bool					setStatusMessage(std::wstring statusString, bool bForce);
 	HINSTANCE				m_hInstance;
 	HWND					m_hWnd;
-	HWND					m_tabHandle;
+	HWND					m_recordTabHandle;
+	HWND					m_playbackTabHandle;
+
 	HWND					m_liveViewWindow;
 	INT64					m_nStartTime;
 	INT64					m_nLastCounter;
@@ -95,5 +99,6 @@ private:
 	//std::shared_ptr<RecordingConfiguration>	m_recordingConfiguration;
 
 	RecordTabHandler			m_recordTabHandler;
+	PlaybackTabHandler			m_plackBackTabHandler;
 };
 

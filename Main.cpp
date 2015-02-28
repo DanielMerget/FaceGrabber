@@ -1,10 +1,10 @@
 
+#include "WindowsApplication.h"
 #include "stdafx.h"
 
 #include "resource.h"
 #include "KinectHDFaceGrabber.h"
 
-#include "WindowsApplication.h"
 #include <strsafe.h>
 #include "PCLInputReader.h"
 #include "PCLViewer.h"

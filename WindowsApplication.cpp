@@ -1,5 +1,5 @@
 #include "WindowsApplication.h"
-
+#include <Commdlg.h>
 
 WindowsApplication::WindowsApplication() :
 	m_hWnd(NULL),
@@ -183,13 +183,22 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		//m_pclFaceRawViewer = std::shared_ptr<PCLViewer>(new PCLViewer("Raw Face-Depth"));
 
 		m_recordTabHandler.setSharedRecordingConfiguration(m_recordingConfiguration);
-		m_tabHandle = CreateDialogParamW(
+		m_recordTabHandle = CreateDialogParamW(
 			NULL,
-			MAKEINTRESOURCE(IDC_TAB_1),
+			MAKEINTRESOURCE(IDC_TAB_RECORD),
 			m_hWnd,
 			(DLGPROC)RecordTabHandler::MessageRouterTab,
 			reinterpret_cast<LPARAM>(&m_recordTabHandler));
-		
+
+		m_plackBackTabHandler.setSharedRecordingConfiguration(m_recordingConfiguration);
+
+		m_playbackTabHandle = CreateDialogParamW(
+			NULL,
+			MAKEINTRESOURCE(IDC_TAB_PLAYBACK),
+			m_hWnd,
+			(DLGPROC)PlaybackTabHandler::MessageRouterTab,
+			reinterpret_cast<LPARAM>(&m_plackBackTabHandler));
+		ShowWindow(m_playbackTabHandle, SW_HIDE);
 		//HRESULT hr = m_pDrawDataStreams->initialize(GetDlgItem(m_hWnd, IDC_TAB2), m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
 		
 		/*
@@ -215,13 +224,13 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		RECT tabControlRect;
 		GetWindowRect(tabControlHandle, &tabControlRect);
 		
-		
+		/*
 
 		m_listView.OnCreate(m_hWnd, reinterpret_cast<CREATESTRUCT*>(lParam),
 			tabControlRect.left, tabControlRect.bottom, (tabControlRect.right - tabControlRect.left) / 2,
 			(windowRect.bottom - tabControlRect.bottom - 180) / 2);
-
-
+*/
+		
 
 		//Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), m_recordingConfiguration[HDFace].getFileName());
 		//Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), m_recordingConfiguration[FaceRaw].getFileName());
@@ -293,7 +302,7 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 
 	case WM_DESTROY:
 		// Quit the main message pump
-		m_listView.OnDestroy(m_hWnd);
+		//m_listView.OnDestroy(m_hWnd);
 		PostQuitMessage(0);
 		break;
 	case WM_COMMAND:
@@ -324,16 +333,71 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 
 void WindowsApplication::onRecordTabSelected()
 {
-	m_listView.OnHide();
+	//m_listView.OnHide();
 	ShowWindow(m_liveViewWindow, SW_SHOW);
-	ShowWindow(m_tabHandle, SW_SHOW);
+	ShowWindow(m_recordTabHandle, SW_SHOW);
+	ShowWindow(m_playbackTabHandle, SW_HIDE);
 }
 void WindowsApplication::onPlaybackSelected()
 {
-	m_listView.OnShow();
+	//m_listView.OnShow();
 	ShowWindow(m_liveViewWindow, SW_HIDE);
-	ShowWindow(m_tabHandle, SW_HIDE);
+	ShowWindow(m_recordTabHandle, SW_HIDE);
+	ShowWindow(m_playbackTabHandle, SW_SHOW);
 }
+
+bool WindowsApplication::openFileDialog(WCHAR* szDir, HWND handle)
+{
+	OPENFILENAME ofn;
+	ZeroMemory(&ofn, sizeof(ofn));
+
+	// Initialize OPENFILENAME
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = handle;
+	ofn.lpstrFile = szDir;
+
+	// Set lpstrFile[0] to '\0' so that GetOpenFileName does not
+	// use the contents of szFile to initialize itself.
+	ofn.lpstrFile[0] = '\0';
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrFilter = L"ply\0*.ply\0pcd\0*.pcd\0";
+	ofn.nFilterIndex = 1;
+	ofn.lpstrFileTitle = NULL;
+	ofn.nMaxFileTitle = 0;
+	ofn.lpstrInitialDir = NULL;
+	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileName(&ofn))
+	{
+		// Do something usefull with the filename stored in szFileName 
+		return true;
+	}
+	return false;
+}
+
+bool WindowsApplication::openDirectoryDialog(WCHAR* szDir, HWND handle)
+{
+	BROWSEINFO bInfo;
+	bInfo.hwndOwner = handle;
+	bInfo.pidlRoot = NULL;
+	bInfo.pszDisplayName = szDir; // Address of a buffer to receive the display name of the folder selected by the user
+	bInfo.lpszTitle = L"Please, select a output folder"; // Title of the dialog
+	bInfo.ulFlags = BIF_USENEWUI;
+	bInfo.lpfn = NULL;
+	bInfo.lParam = 0;
+	bInfo.iImage = -1;
+
+	LPITEMIDLIST lpItem = SHBrowseForFolder(&bInfo);
+	if (lpItem != NULL)
+	{
+		if (SHGetPathFromIDList(lpItem, szDir)){
+			return true;
+		}
+	}
+	return false;
+}
+
 //
 //void WindowsApplication::checkRecordingConfigurationPossible()
 //{

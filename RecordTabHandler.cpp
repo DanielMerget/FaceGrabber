@@ -1,5 +1,5 @@
 #include "RecordTabHandler.h"
-#include <windowsx.h>
+
 
 RecordTabHandler::RecordTabHandler()
 {

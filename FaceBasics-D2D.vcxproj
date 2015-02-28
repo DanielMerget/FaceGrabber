@@ -26,6 +26,7 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="PCLInputReader.cpp" />
     <ClCompile Include="PCLViewer.cpp" />
+    <ClCompile Include="PlaybackTabHandler.cpp" />
     <ClCompile Include="RecordTabHandler.cpp" />
     <ClCompile Include="WindowsApplication.cpp" />
   </ItemGroup>
@@ -42,6 +43,7 @@
     <ClInclude Include="ListView.h" />
     <ClInclude Include="PCLInputReader.h" />
     <ClInclude Include="PCLViewer.h" />
+    <ClInclude Include="PlaybackTabHandler.h" />
     <ClInclude Include="RecordingConfiguration.h" />
     <ClInclude Include="RecordTabHandler.h" />
     <ClInclude Include="resource.h" />

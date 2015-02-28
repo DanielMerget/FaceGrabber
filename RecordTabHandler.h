@@ -2,6 +2,7 @@
 #include "stdafx.h"
 #include "resource.h"
 #include "RecordingConfiguration.h"
+#include <windowsx.h>
 #include <strsafe.h>
 #include <memory>
 typedef std::shared_ptr<std::vector<RecordingConfiguration>> SharedRecordingConfiguration;
@@ -12,8 +13,8 @@ public:
 	~RecordTabHandler();
 
 	void setSharedRecordingConfiguration(SharedRecordingConfiguration recordingConfiguration);
-
-	LRESULT CALLBACK		DlgProcTab(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
+	
+		   LRESULT CALLBACK	DlgProcTab(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
 	static LRESULT CALLBACK	MessageRouterTab(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);;
 
 	void onCreate(WPARAM wParam, LPARAM);
@@ -24,8 +25,8 @@ public:
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
-	void					recordPathChanged(RecordCloudType type);
-	void					recordConfigurationStatusChanged(RecordCloudType type, bool newState);
+	void recordPathChanged(RecordCloudType type);
+	void recordConfigurationStatusChanged(RecordCloudType type, bool newState);
 
 	SharedRecordingConfiguration m_recordingConfiguration;
 
