@@ -25,6 +25,7 @@
     <ClCompile Include="ListView.cpp">
       <Filter>WindowsApp</Filter>
     </ClCompile>
+    <ClCompile Include="RecordTabHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -57,6 +58,7 @@
     <ClInclude Include="RecordingConfiguration.h">
       <Filter>WindowsApp</Filter>
     </ClInclude>
+    <ClInclude Include="RecordTabHandler.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Kinect">

@@ -12,6 +12,8 @@
 #include <pcl/visualization/image_viewer.h>
 #include <pcl/visualization/cloud_viewer.h>
 #include "RecordingConfiguration.h"
+#include "RecordTabHandler.h"
+
 
 class WindowsApplication
 {
@@ -35,6 +37,9 @@ public:
 	/// <param name="lParam">additional message data</param>
 	/// <returns>result of message processing</returns>
 	static LRESULT CALLBACK	MessageRouter(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+	
+
 	void cloudUpdate(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud);
 	/// <summary>
 	/// Handle windows messages for a class instance
@@ -45,7 +50,7 @@ public:
 	/// <param name="lParam">additional message data</param>
 	/// <returns>result of message processing</returns>
 	LRESULT CALLBACK		DlgProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
+	
 	int						run(HINSTANCE hInstance, int nCmdShow);
 	
 	
@@ -86,7 +91,9 @@ private:
 	std::shared_ptr<KinectCloudOutputWriter> m_cloudOutputWriter;
 	ListView				m_listView;
 	//RecordingConfiguration	m_recordingConfiguration[RECORD_CLOUD_TYPE_COUNT];
-	std::vector<RecordingConfiguration>	m_recordingConfiguration;
+	SharedRecordingConfiguration	m_recordingConfiguration;
 	//std::shared_ptr<RecordingConfiguration>	m_recordingConfiguration;
+
+	RecordTabHandler			m_recordTabHandler;
 };
 
