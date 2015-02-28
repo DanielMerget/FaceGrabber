@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include "ListView.h"
-#include <strsafe.h>
+
 #include "resource.h"
 #include "KinectHDFaceGrabber.h"
 #include "resource.h"

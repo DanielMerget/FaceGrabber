@@ -1,4 +1,5 @@
 #include "RecordTabHandler.h"
+#include "WindowsApplication.h"
 
 
 RecordTabHandler::RecordTabHandler()
@@ -189,28 +190,36 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		break;
 	case IDC_BUTTON_CHOOSE_OUTPUT_DIRECTORY:
 	{
-		WCHAR szDir[MAX_PATH];
-		BROWSEINFO bInfo;
-		bInfo.hwndOwner = m_hWnd;
-		bInfo.pidlRoot = NULL;
-		bInfo.pszDisplayName = szDir; // Address of a buffer to receive the display name of the folder selected by the user
-		bInfo.lpszTitle = L"Please, select a output folder"; // Title of the dialog
-		bInfo.ulFlags = 0;
-		bInfo.lpfn = NULL;
-		bInfo.lParam = 0;
-		bInfo.iImage = -1;
 
-		LPITEMIDLIST lpItem = SHBrowseForFolder(&bInfo);
-		if (lpItem != NULL)
-		{
-			if (SHGetPathFromIDList(lpItem, szDir)){
-				OutputDebugString(szDir);
-				SetDlgItemText(m_hWnd, IDC_FILE_PATH_EDIT_BOX, szDir);
-				for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-					m_recordingConfiguration->at(i).setFilePath(szDir);
-				}
+		WCHAR szDir[MAX_PATH];
+		if (WindowsApplication::openDirectoryDialog(szDir, m_hWnd)){
+			SetDlgItemText(m_hWnd, IDC_FILE_PATH_EDIT_BOX, szDir);
+			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+				m_recordingConfiguration->at(i).setFilePath(szDir);
 			}
 		}
+		//WCHAR szDir[MAX_PATH];
+		//BROWSEINFO bInfo;
+		//bInfo.hwndOwner = m_hWnd;
+		//bInfo.pidlRoot = NULL;
+		//bInfo.pszDisplayName = szDir; // Address of a buffer to receive the display name of the folder selected by the user
+		//bInfo.lpszTitle = L"Please, select a output folder"; // Title of the dialog
+		//bInfo.ulFlags = 0;
+		//bInfo.lpfn = NULL;
+		//bInfo.lParam = 0;
+		//bInfo.iImage = -1;
+
+		//LPITEMIDLIST lpItem = SHBrowseForFolder(&bInfo);
+		//if (lpItem != NULL)
+		//{
+		//	if (SHGetPathFromIDList(lpItem, szDir)){
+		//		OutputDebugString(szDir);
+		//		SetDlgItemText(m_hWnd, IDC_FILE_PATH_EDIT_BOX, szDir);
+		//		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+		//			m_recordingConfiguration->at(i).setFilePath(szDir);
+		//		}
+		//	}
+		//}
 		break;
 	}
 	default:

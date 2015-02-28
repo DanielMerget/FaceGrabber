@@ -1,9 +1,10 @@
 #pragma once
+#include <windowsx.h>
 #include "stdafx.h"
 #include "resource.h"
 #include "RecordingConfiguration.h"
-#include <windowsx.h>
-#include <strsafe.h>
+
+
 #include <memory>
 typedef std::shared_ptr<std::vector<RecordingConfiguration>> SharedRecordingConfiguration;
 class RecordTabHandler
