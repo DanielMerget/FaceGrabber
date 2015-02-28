@@ -87,7 +87,9 @@ void PCLViewer::updateLoop()
 		while (!m_cloudUpdate.wait_for(lock, dura)){
 			viewer.spinOnce();
 		} 
-
+		if (!m_isRunning){
+			return;
+		}
 		for (int i = 0; i < m_cloudCount; i++){
 			viewer.addPointCloud(m_clouds[i], cloudIDs[i], viewPorts[i]);
 			viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, cloudIDs[i]);

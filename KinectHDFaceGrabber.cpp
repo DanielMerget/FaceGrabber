@@ -57,7 +57,8 @@ KinectHDFaceGrabber::KinectHDFaceGrabber() :
     }
 }
 
-
+//// Direct2D
+ImageRenderer*				m_pDrawDataStreams;
 /// <summary>
 /// Destructor
 /// </summary>
@@ -78,6 +79,12 @@ KinectHDFaceGrabber::~KinectHDFaceGrabber()
     {
         SafeRelease(m_pFaceFrameSources[i]);
         SafeRelease(m_pFaceFrameReaders[i]);		
+		SafeRelease(m_pHDFaceSource[i]);
+		SafeRelease(m_pHDFaceReader[i]);
+
+		SafeRelease(m_pFaceAlignment[i]);
+		SafeRelease(m_pFaceModelBuilder[i]);
+		SafeRelease(m_pFaceModel[i]);
     }
 
     // done with body frame reader
