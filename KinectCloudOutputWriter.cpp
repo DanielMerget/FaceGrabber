@@ -1,54 +1,58 @@
 #include "KinectCloudOutputWriter.h"
 #include <pcl/io/ply_io.h>
-#include <future>
+
 #include <pcl/io/pcd_io.h>
 
-KinectCloudOutputWriter::KinectCloudOutputWriter() :
-	m_running(false),
-	m_notified(false),
-	m_cloudCount(0),
-	m_clouds(),
-	m_writerThreads()
-{
-}
+//template < class PointCloudType >
+//KinectCloudOutputWriter< PointCloudType >::KinectCloudOutputWriter() :
+//	m_running(false),
+//	m_notified(false),
+//	m_cloudCount(0),
+//	m_clouds(),
+//	m_writerThreads()
+//{
+//}
+//
+//template < typename PointCloudType >
+//KinectCloudOutputWriter< PointCloudType >::~KinectCloudOutputWriter()
+//{
+//
+//	m_running = false;
+//	for (auto& thread : m_writerThreads){
+//		thread.join();
+//	}
+//}
+
+//template < typename PointCloudType >
+//void KinectCloudOutputWriter< PointCloudType >::updateCloudThreated(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloud)
+//{
+//	if (!m_running){
+//		return;
+//	}
+//	std::async(std::launch::async, &KinectCloudOutputWriter::pushCloud, this, cloud);
+//}
 
 
-KinectCloudOutputWriter::~KinectCloudOutputWriter()
-{
+//template < typename PointCloudType >
+//void KinectCloudOutputWriter<PointCloudType>::pushCloud(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloudToPush)
+//{
+//	std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
+//	if (m_cloudCount >= numOfFilesToWrite || !m_running){
+//		m_running = false;
+//		m_checkCloud.notify_all();
+//		return;
+//	}
+//
+//	PointCloudMeasurement cloudMeasurement;
+//	cloudMeasurement.cloud = cloudToPush;
+//	cloudMeasurement.index = m_cloudCount;
+//	m_clouds.push(cloudMeasurement);
+//	m_cloudCount++;
+//	m_checkCloud.notify_all();
+//}
 
-	m_running = false;
-	for (auto& thread : m_writerThreads){
-		thread.join();
-	}
-}
-
-void KinectCloudOutputWriter::updateCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)
-{
-	if (!m_running){
-		return;
-	}
-	std::async(std::launch::async, &KinectCloudOutputWriter::pushCloud, this, cloud);
-}
-
-static int numOfFilesToWrite = 1000;
-void KinectCloudOutputWriter::pushCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloudToPush)
-{
-	std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
-	if (m_cloudCount >= numOfFilesToWrite || !m_running){
-		m_running = false;
-		m_checkCloud.notify_all();
-		return;
-	}
-
-	PointCloudMeasurement cloudMeasurement;
-	cloudMeasurement.cloud = cloudToPush;
-	cloudMeasurement.index = m_cloudCount;
-	m_clouds.push(cloudMeasurement);
-	m_cloudCount++;
-	m_checkCloud.notify_all();
-}
-
-void KinectCloudOutputWriter::startWritingClouds()
+template < typename PointCloudType >
+void KinectCloudOutputWriter< PointCloudType >::startWritingClouds()
 {
 	const int threadsToStartCount = numOfFilesToWrite;
 	m_running = true;
@@ -57,14 +61,16 @@ void KinectCloudOutputWriter::startWritingClouds()
 		m_writerThreads.push_back(std::thread(&KinectCloudOutputWriter::writeCloudToFile, this, i));
 	}
 }
-void KinectCloudOutputWriter::stopWritingClouds()
+template < typename PointCloudType >
+void KinectCloudOutputWriter<PointCloudType>::stopWritingClouds()
 {
 	std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
 	m_running = false;
 	m_checkCloud.notify_all();
 }
 
-void KinectCloudOutputWriter::writeCloudToFile(int index)
+template < typename PointCloudType >
+void KinectCloudOutputWriter<PointCloudType>::writeCloudToFile(int index)
 {
 	bool cloudIsEmpty = false;
 	while (m_running || !cloudIsEmpty)

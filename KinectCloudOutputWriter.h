@@ -6,23 +6,74 @@
 #include <pcl/point_cloud.h>
 #include <thread>
 #include <vector>
-
+#include <future>
+template < class PointCloudType >
 class KinectCloudOutputWriter
 {
 public:
-	KinectCloudOutputWriter();
-	~KinectCloudOutputWriter();
+	//template < class PointCloudType >
+	KinectCloudOutputWriter() :
+		m_running(false),
+		m_notified(false),
+		m_cloudCount(0),
+		m_clouds(),
+		m_writerThreads()
+	{
+	}
+	//~KinectCloudOutputWriter();
+	//template < typename PointCloudType >
+	~KinectCloudOutputWriter()
+	{
+
+		m_running = false;
+		for (auto& thread : m_writerThreads){
+			thread.join();
+		}
+	}
 	
-	void updateCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud);
+	//void updateCloudThreated(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloud);
+	//template < typename PointCloudType >
+	void KinectCloudOutputWriter< PointCloudType >::updateCloudThreated(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloud)
+	{
+		if (!m_running){
+			return;
+		}
+		std::async(std::launch::async, &KinectCloudOutputWriter::pushCloud, this, cloud);
+	}
+
 	void startWritingClouds();
 	void stopWritingClouds();
+
+
+
+
 private:
 	
 	void writeCloudToFile(int index);
-	void pushCloud(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud);
+
+	//void pushCloud(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloud);
+
 	
+	void pushCloud(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloudToPush)
+	{
+		std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
+		const int numOfFilesToWrite = 1000;
+		if (m_cloudCount >= numOfFilesToWrite || !m_running){
+			m_running = false;
+			m_checkCloud.notify_all();
+			return;
+		}
+
+		PointCloudMeasurement cloudMeasurement;
+		cloudMeasurement.cloud = cloudToPush;
+		cloudMeasurement.index = m_cloudCount;
+		m_clouds.push(cloudMeasurement);
+		m_cloudCount++;
+		m_checkCloud.notify_all();
+	}
+
 	struct PointCloudMeasurement{
-		pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud;
+		boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloud;
 		int index;
 	};
 

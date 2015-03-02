@@ -268,7 +268,9 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		RECT liveViewRect;
 		GetWindowRect(m_liveViewWindow, &liveViewRect);
 		
-		m_cloudOutputWriter = std::shared_ptr<KinectCloudOutputWriter>(new KinectCloudOutputWriter);
+		m_cloudOutputWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
+		m_colouredOutputStreamUpdater = std::shared_ptr<ColouredOutputStreamUpdater>(new ColouredOutputStreamUpdater);
+		
 		HRESULT hr = m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
 
 		if (FAILED(hr))
@@ -281,11 +283,16 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		// Get and initialize the default Kinect sensor
 		m_kinectFrameGrabber.initializeDefaultSensor();
 		//m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&WindowsApplication::cloudUpdate, this, _1));		
+		int depthWidth, depthHeight, colorWidth, colorHeight;
+		m_kinectFrameGrabber.getColourAndDepthSize(depthWidth, depthHeight, colorWidth, colorHeight);
+		m_colouredOutputStreamUpdater->initialize(m_kinectFrameGrabber.getCoordinateMapper(), depthWidth, depthHeight, colorWidth, colorHeight);
 
-		m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceViewer, _1, 0));
-		m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceViewer, _1, 1));
+		m_kinectFrameGrabber.setOutputStreamUpdater(m_colouredOutputStreamUpdater);
 
-		m_kinectFrameGrabber.depthCloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
+		m_colouredOutputStreamUpdater->cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceViewer, _1, 0));
+		m_colouredOutputStreamUpdater->depthCloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, m_pclFaceViewer, _1, 1));
+
+		m_colouredOutputStreamUpdater->depthCloudUpdated.connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, m_cloudOutputWriter, _1));
 		//m_kinectFrameGrabber.cloudUpdated.connect(boost::bind(&KinectCloudOutputWriter::updateCloudThreated, m_cloudOutputWriter, _1));
 
 		m_kinectFrameGrabber.statusChanged.connect(boost::bind(&WindowsApplication::setStatusMessage, this, _1, _2));

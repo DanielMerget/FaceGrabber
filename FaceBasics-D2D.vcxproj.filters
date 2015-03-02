@@ -31,6 +31,15 @@
     <ClCompile Include="PlaybackTabHandler.cpp">
       <Filter>WindowsApp</Filter>
     </ClCompile>
+    <ClCompile Include="OutputStreamsUpdaterStragedy.cpp">
+      <Filter>Kinect</Filter>
+    </ClCompile>
+    <ClCompile Include="ColouredOutputStreamUpdater.cpp">
+      <Filter>Kinect</Filter>
+    </ClCompile>
+    <ClCompile Include="NonColouredOutputStreamsUpdater.cpp">
+      <Filter>Kinect</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -71,6 +80,15 @@
     </ClInclude>
     <ClInclude Include="PlaybackConfiguration.h">
       <Filter>WindowsApp</Filter>
+    </ClInclude>
+    <ClInclude Include="OutputStreamsUpdaterStragedy.h">
+      <Filter>Kinect</Filter>
+    </ClInclude>
+    <ClInclude Include="ColouredOutputStreamUpdater.h">
+      <Filter>Kinect</Filter>
+    </ClInclude>
+    <ClInclude Include="NonColouredOutputStreamsUpdater.h">
+      <Filter>Kinect</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

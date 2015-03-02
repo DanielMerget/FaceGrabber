@@ -12,6 +12,7 @@
 #include "RecordingConfiguration.h"
 #include "RecordTabHandler.h"
 #include "PlaybackTabHandler.h"
+#include "ColouredOutputStreamUpdater.h"
 
 class WindowsApplication
 {
@@ -90,7 +91,8 @@ private:
 	std::shared_ptr<PCLViewer>	m_pclFaceViewer;
 	std::shared_ptr<PCLViewer>	m_pclFaceRawViewer;
 	//pcl::visualization::CloudViewer m_cloudViewer;
-	std::shared_ptr<KinectCloudOutputWriter> m_cloudOutputWriter;
+
+	std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>> m_cloudOutputWriter;
 	
 	//RecordingConfiguration	m_recordingConfiguration[RECORD_CLOUD_TYPE_COUNT];
 	SharedRecordingConfiguration	m_recordingConfiguration;
@@ -98,5 +100,6 @@ private:
 
 	RecordTabHandler			m_recordTabHandler;
 	PlaybackTabHandler			m_plackBackTabHandler;
+	std::shared_ptr<ColouredOutputStreamUpdater> m_colouredOutputStreamUpdater;
 };
 
