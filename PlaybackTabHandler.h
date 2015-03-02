@@ -21,6 +21,7 @@ public:
 
 
 	void setSharedRecordingConfiguration(SharedRecordingConfiguration recordingConfiguration);
+	void playbackConfigurationChanged();
 private:
 	void onCreate(WPARAM wParam, LPARAM);
 	void checkPlayBackPossible();

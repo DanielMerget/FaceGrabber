@@ -347,6 +347,7 @@ void WindowsApplication::onRecordTabSelected()
 	ShowWindow(m_recordTabHandle, SW_SHOW);
 	ShowWindow(m_playbackTabHandle, SW_HIDE);
 }
+
 void WindowsApplication::onPlaybackSelected()
 {
 	//m_listView.OnShow();

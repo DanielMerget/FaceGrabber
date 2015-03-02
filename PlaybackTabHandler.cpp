@@ -16,27 +16,9 @@ void PlaybackTabHandler::setSharedRecordingConfiguration(SharedRecordingConfigur
 	
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		m_playbackConfiguration[i] = std::shared_ptr<PlaybackConfiguration>(new PlaybackConfiguration(*recordingConfiguration[i]));
+		m_playbackConfiguration[i]->playbackConfigurationChanged.connect(boost::bind(&PlaybackTabHandler::playbackConfigurationChanged, this));
 	}
-	//for (auto recordConfiguration : recordingConfiguration){
-	//	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-	//		m_recordingConfiguration[i] = std::shared_ptr<RecordingConfiguration>(new RecordingConfiguration(static_cast<RecordCloudType>(i), PLY));
-	//		m_recordingConfiguration[i]->recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
-	//		m_recordingConfiguration[i]->recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));
-	//	}
-	//
-	//	//PlaybackConfiguration playbackConfig;
-	//	//playbackConfig.setFileFormat(recordConfiguration.getRecordFileFormat());
-	//	//playbackConfig.setFileName(recordConfiguration.getFileName());
-	//	//playbackConfig.setFilePath(recordConfiguration.getFullRecordingPath());
-	//	//playbackConfig.findFilesAtPath();
-	//	//auto test = m_playbackConfiguration->begin() + recordConfiguration.getRecordCloudType();
-	//	////m_playbackConfiguration->emplace(m_playbackConfiguration->begin() + recordConfiguration.getRecordCloudType(), recordConfiguration);
-	//	//m_playbackConfiguration->emplace(test, recordConfiguration);
-	//	//m_playbackConfiguration->emplace_back(recordConfiguration);
-	//	//auto it = recordingConfiguration->emplace(recordingConfiguration->begin() + recordConfiguration.getRecordCloudType(), recordConfiguration);
-	//	//(*m_playbackConfiguration)[recordConfiguration.getRecordCloudType()] = playbackConfig;
-	//}
-	//m_recordingConfiguration = recordingConfiguration;
+	playbackConfigurationChanged();
 }
 
 void PlaybackTabHandler::onCreate(WPARAM wParam, LPARAM)
@@ -88,15 +70,16 @@ void PlaybackTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 	{
 	case IDC_RECODINGS_LIST_BOX:
 	{
-		TCHAR tchBuffer[MAX_PATH];
-		DlgDirSelectEx(m_hWnd, tchBuffer, MAX_PATH, IDC_RECODINGS_LIST_BOX);
-		Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX			), tchBuffer);
-		Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX		), tchBuffer);
-		Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX	), tchBuffer);
-		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-			// TODO: 
-			//m_playbackConfiguration[i]->;
+		CString timeStampFolderNameBuffer;
+		DlgDirSelectEx(m_hWnd, timeStampFolderNameBuffer.GetBuffer(MAX_PATH), MAX_PATH, IDC_RECODINGS_LIST_BOX);
+		CString inputFolder;
+		Edit_GetText(GetDlgItem(m_hWnd, IDC_FILE_PATH_EDIT_BOX), inputFolder.GetBuffer(MAX_PATH), MAX_PATH);
+
+		for (auto& playbackConfig : m_playbackConfiguration){
+			auto fullPath = RecordingConfiguration::getFullRecordingPathForCloudType(playbackConfig->getRecordCloudType(), inputFolder, timeStampFolderNameBuffer);
+			playbackConfig->setFullFilePath(fullPath);
 		}
+
 	}
 		break;
 	default:
@@ -136,9 +119,6 @@ void PlaybackTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 	{
 		WCHAR szDir[MAX_PATH];
 		if (WindowsApplication::openDirectoryDialog(szDir, m_hWnd)){
-			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-				m_playbackConfiguration[i]->setFilePath(szDir);
-			}
 			DlgDirList(m_hWnd,
 				szDir,
 				IDC_RECODINGS_LIST_BOX,
@@ -156,7 +136,30 @@ void PlaybackTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 
 }
 
-
+void PlaybackTabHandler::playbackConfigurationChanged()
+{
+	if (auto playbackConfig = m_playbackConfiguration[HDFace]){
+		auto firstFile = playbackConfig->getFirstPlaybackFile();
+		Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), firstFile);
+	}
+	else{
+		Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), L"");
+	}
+	if (auto playbackConfig = m_playbackConfiguration[FaceRaw]){
+		auto firstFile = playbackConfig->getFirstPlaybackFile();
+		Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), firstFile);
+	}
+	else{
+		Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), L"");
+	}
+	if (auto playbackConfig = m_playbackConfiguration[FullDepthRaw]){
+		auto firstFile = playbackConfig->getFirstPlaybackFile();
+		Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), firstFile);
+	}
+	else{
+		Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), L"");
+	}
+}
 
 LRESULT CALLBACK PlaybackTabHandler::MessageRouterTab(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {

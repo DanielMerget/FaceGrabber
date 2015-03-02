@@ -7,6 +7,7 @@
 #include <atlstr.h>
 #include <regex>
 
+
 enum RecordingFileFormat{
 	PLY,
 	PLY_BINARY,
@@ -158,6 +159,7 @@ public:
 		recordPathOrFileNameChanged(m_cloudType);
 	}
 
+	
 	void setEnabled(bool enabled)
 	{
 		m_enabled = enabled;
@@ -169,34 +171,51 @@ public:
 		m_fileFormat = fileFormat;
 	}
 
-	static std::string getSubFolderNameForCloudType(RecordCloudType cloudType)
+	void setTimeStampFolderName(std::string folderName)
+	{
+		m_timeStampFolderName = CString(folderName.c_str());
+	}
+
+	
+	static CString getSubFolderNameForCloudType(RecordCloudType cloudType)
 	{
 		switch (cloudType)
 		{
 		case HDFace:
-			return "HDFace";
+			return L"HDFace";
 		case FaceRaw:
-			return "FaceRaw";
+			return L"FaceRaw";
 		case FullDepthRaw:
-			return "FullDepthRaw";
+			return L"FullDepthRaw";
 		case RECORD_CLOUD_TYPE_COUNT:
 			break;
 		default:
 			break;
 		}
-		return "UKNOWN CLOUD TYPE";
+		return L"UKNOWN CLOUD TYPE";
 	}
 
-	static std::string getFullRecordingPathForCloudType(RecordCloudType cloudType, std::string filePath)
+	CString getFullRecordingPath()
 	{
-		std::string subFolder = getSubFolderNameForCloudType(cloudType);
-
-		std::stringstream fullPath;
-		fullPath << filePath;
-		fullPath << "\\";
-		fullPath << subFolder;
-		std::string result = fullPath.str();
+		auto result = getFullRecordingPathForCloudType(m_cloudType, m_outputFolder, m_timeStampFolderName);
 		return result;
+	}
+
+	static CString getFullRecordingPathForCloudType(RecordCloudType cloudType, CString outputFolder, CString timeStampFolderName)
+	{
+		CString subFolder = getSubFolderNameForCloudType(cloudType);
+		CString fullPath;
+		fullPath += outputFolder.GetString();
+		fullPath += _T("\\");
+		fullPath += timeStampFolderName.GetString();
+		fullPath += subFolder;
+		//fullPath << outputFolder;
+		//fullPath << "\\";
+		//fullPath << timeStampFolderName;
+		//fullPath << "\\";
+		//fullPath << subFolder;
+		//std::string result = fullPath.str();
+		return fullPath;
 	}
 
 	boost::signal<void(RecordCloudType, bool)> recordConfigurationStatusChanged;
@@ -208,13 +227,9 @@ private:
 	CString					m_outputFolder;
 	CString					m_timeStampFolderName;
 	CString					m_fileName;
-
 	RecordCloudType			m_cloudType;
 	RecordingFileFormat		m_fileFormat;
-	bool					m_colourInformation;
-
 	
-	//LPTSTR					m_fileName;
 	bool					m_enabled;
 };
 

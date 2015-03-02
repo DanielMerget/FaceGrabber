@@ -2,7 +2,7 @@
 #include "WindowsApplication.h"
 
 
-RecordTabHandler::RecordTabHandler()
+RecordTabHandler::RecordTabHandler() : m_colorEnabled(true)
 {
 }
 
@@ -43,7 +43,7 @@ void RecordTabHandler::onCreate(WPARAM wParam, LPARAM)
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_recordingConfiguration[   HDFace	 ]->getFileName());
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_recordingConfiguration[  FaceRaw	 ]->getFileName());
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX),	m_recordingConfiguration[FullDepthRaw]->getFileName());
-
+	CheckDlgButton(m_hWnd, IDC_RECORD_COLOR, m_colorEnabled);
 	HWND hdFaceComboBox = GetDlgItem(m_hWnd, IDC_HD_FACE_COMBO_BOX);
 	HWND facerawDepthComboBox = GetDlgItem(m_hWnd, IDC_FACE_RAW_DEPTH_COMBO_BOX);
 	HWND fullRawDepthCombobox = GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_COMBO_BOX);
@@ -161,13 +161,39 @@ void RecordTabHandler::checkRecordingConfigurationPossible()
 	}
 
 }
+#define MAX_DATE 20
+#include <time.h>
+std::string getRecordTimeStamp()
+{
+	time_t now;
+	char the_date[MAX_DATE];
+
+	the_date[0] = '\0';
+
+	now = time(NULL);
+
+	if (now != -1)
+	{
+		strftime(the_date, MAX_DATE, "%Y_%m_%d_%H_%M_%S", gmtime(&now));
+	}
+
+	return std::string(the_date);
+}
 
 
 void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 {
 	switch (LOWORD(wParam))
 	{
+	case IDC_RECORD_COLOR:
+		m_colorEnabled = IsDlgButtonChecked(m_hWnd, IDC_RECORD_COLOR);
+		break;
 	case IDC_RECORD_BUTTON:
+	{
+		std::string timeStamp = getRecordTimeStamp();
+		for (auto& recordConfig : m_recordingConfiguration){
+			recordConfig->setTimeStampFolderName(timeStamp);
+		}
 		//if (!m_isCloudWritingStarted)
 		//{
 		//	m_cloudOutputWriter->startWritingClouds();
@@ -179,6 +205,7 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		//}
 		//m_isCloudWritingStarted = !m_isCloudWritingStarted;
 		break;
+	}
 	case IDC_HD_FACE_CHECKBOX:
 		m_recordingConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
 		break;
@@ -226,7 +253,6 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		break;
 	}
 }
-
 
 
 void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)

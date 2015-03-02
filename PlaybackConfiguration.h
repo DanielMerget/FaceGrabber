@@ -20,7 +20,7 @@ public:
 		m_fileName(recordConfiguration.getFileName()),
 		m_cloudType(recordConfiguration.getRecordCloudType())
 	{
-		auto fullFilePath = RecordingConfiguration::getFullRecordingPathForCloudType(recordConfiguration.getRecordCloudType(), recordConfiguration.getFilePath());
+		auto fullFilePath = recordConfiguration.getFullRecordingPath();
 		setFullFilePath(fullFilePath);
 		findFilesAtPath();
 	}
@@ -94,14 +94,18 @@ public:
 		playbackConfigurationChanged();
 	}
 
-	
-	void setFullFilePath(std::string filePath)
+	void setFullFilePath(CString filePath)
 	{
-		m_filePath = CString(filePath.c_str());
+		m_filePath = filePath;
 		findFilesAtPath();
 		playbackConfigurationChanged();
 	}
 
+	void setFullFilePath(std::string filePath)
+	{
+		setFullFilePath(CString(filePath.c_str()));
+	}
+/*
 	void setFilePath(std::string filePath)
 	{
 		auto fullFilePath = RecordingConfiguration::getFullRecordingPathForCloudType(m_cloudType, filePath);
@@ -119,7 +123,7 @@ public:
 		setFullFilePath(fullFilePath);
 		findFilesAtPath();
 		playbackConfigurationChanged();
-	}
+	}*/
 
 	void setEnabled(bool enabled)
 	{
@@ -143,7 +147,7 @@ public:
 	void findFilesAtPath()
 	{
 		std::string filePath = getFilePath();		
-		
+		m_foundCloudFiles.clear();
 		if (!boost::filesystem::is_directory(filePath)){
 			return;
 		}
@@ -159,14 +163,14 @@ public:
 		}
 	}
 
-	LPTSTR getFirstPlaybackFile()
+	CString getFirstPlaybackFile()
 	{
 		if (m_foundCloudFiles.size() > 0){
 			CString result(m_foundCloudFiles[0].c_str());
-			return result.GetBuffer();
+			return result;
 		}
 		CString result = "";
-		return result.GetBuffer();
+		return result;
 	}
 
 	bool isValidFileConfiguration()

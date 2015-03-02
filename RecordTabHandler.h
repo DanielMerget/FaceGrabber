@@ -33,7 +33,7 @@ private:
 
 	SharedRecordingConfiguration m_recordingConfiguration;
 
-
+	bool m_colorEnabled;
 	HWND m_hWnd;
 };
 
