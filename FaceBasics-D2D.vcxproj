@@ -43,6 +43,7 @@
     <ClInclude Include="ListView.h" />
     <ClInclude Include="PCLInputReader.h" />
     <ClInclude Include="PCLViewer.h" />
+    <ClInclude Include="PlaybackConfiguration.h" />
     <ClInclude Include="PlaybackTabHandler.h" />
     <ClInclude Include="RecordingConfiguration.h" />
     <ClInclude Include="RecordTabHandler.h" />

@@ -6,7 +6,6 @@
 
 
 #include <memory>
-typedef std::shared_ptr<std::vector<RecordingConfiguration>> SharedRecordingConfiguration;
 class RecordTabHandler
 {
 public:
@@ -22,12 +21,15 @@ public:
 	void checkRecordingConfigurationPossible();
 	void processUIMessage(WPARAM wParam, LPARAM);
 
+	SharedRecordingConfiguration getRecordConfiguration();
+	void recordPathChanged(RecordCloudType type);
+	void recordConfigurationStatusChanged(RecordCloudType type, bool newState);
+private:
 	
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
-	void recordPathChanged(RecordCloudType type);
-	void recordConfigurationStatusChanged(RecordCloudType type, bool newState);
+	
 
 	SharedRecordingConfiguration m_recordingConfiguration;
 

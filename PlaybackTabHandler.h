@@ -7,6 +7,7 @@
 #include "RecordTabHandler.h"
 #include <strsafe.h>
 #include <memory>
+#include "PlaybackConfiguration.h"
 
 class PlaybackTabHandler
 {
@@ -31,8 +32,8 @@ private:
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
 	
 	
-	SharedRecordingConfiguration m_recordingConfiguration;
-
+	//SharedRecordingConfiguration m_recordingConfiguration;
+	SharedPlaybackConfiguration m_playbackConfiguration;
 	HWND m_hWnd;
 };
 

@@ -1,6 +1,8 @@
 #include "PlaybackTabHandler.h"
+#include "WindowsApplication.h"
 
-PlaybackTabHandler::PlaybackTabHandler()
+PlaybackTabHandler::PlaybackTabHandler() :
+	m_playbackConfiguration(RECORD_CLOUD_TYPE_COUNT)
 {
 }
 
@@ -11,12 +13,39 @@ PlaybackTabHandler::~PlaybackTabHandler()
 
 void PlaybackTabHandler::setSharedRecordingConfiguration(SharedRecordingConfiguration recordingConfiguration)
 {
-	m_recordingConfiguration = recordingConfiguration;
+	
+	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+		m_playbackConfiguration[i] = std::shared_ptr<PlaybackConfiguration>(new PlaybackConfiguration(*recordingConfiguration[i]));
+	}
+	//for (auto recordConfiguration : recordingConfiguration){
+	//	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+	//		m_recordingConfiguration[i] = std::shared_ptr<RecordingConfiguration>(new RecordingConfiguration(static_cast<RecordCloudType>(i), PLY));
+	//		m_recordingConfiguration[i]->recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
+	//		m_recordingConfiguration[i]->recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));
+	//	}
+	//
+	//	//PlaybackConfiguration playbackConfig;
+	//	//playbackConfig.setFileFormat(recordConfiguration.getRecordFileFormat());
+	//	//playbackConfig.setFileName(recordConfiguration.getFileName());
+	//	//playbackConfig.setFilePath(recordConfiguration.getFullRecordingPath());
+	//	//playbackConfig.findFilesAtPath();
+	//	//auto test = m_playbackConfiguration->begin() + recordConfiguration.getRecordCloudType();
+	//	////m_playbackConfiguration->emplace(m_playbackConfiguration->begin() + recordConfiguration.getRecordCloudType(), recordConfiguration);
+	//	//m_playbackConfiguration->emplace(test, recordConfiguration);
+	//	//m_playbackConfiguration->emplace_back(recordConfiguration);
+	//	//auto it = recordingConfiguration->emplace(recordingConfiguration->begin() + recordConfiguration.getRecordCloudType(), recordConfiguration);
+	//	//(*m_playbackConfiguration)[recordConfiguration.getRecordCloudType()] = playbackConfig;
+	//}
+	//m_recordingConfiguration = recordingConfiguration;
 }
 
 void PlaybackTabHandler::onCreate(WPARAM wParam, LPARAM)
 {
-	auto filePath = m_recordingConfiguration->at(0).getFilePath();
+	
+	if (!m_playbackConfiguration[0]){
+		return;
+	}
+	auto filePath = m_playbackConfiguration[0]->getFilePath();
 	CString testDir(filePath.c_str());
 
 	DlgDirList(m_hWnd,
@@ -24,17 +53,17 @@ void PlaybackTabHandler::onCreate(WPARAM wParam, LPARAM)
 		IDC_RECODINGS_LIST_BOX,
 		IDC_FILE_PATH_EDIT_BOX,
 		DDL_EXCLUSIVE | DDL_READWRITE | DDL_DIRECTORY);
-
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_recordingConfiguration->at(	HDFace	 ).getFileName());
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_recordingConfiguration->at(	FaceRaw	 ).getFileName());
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX),	m_recordingConfiguration->at(FullDepthRaw).getFileName());
+	
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_playbackConfiguration[	HDFace	 ]->getFirstPlaybackFile());
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_playbackConfiguration[	FaceRaw	 ]->getFirstPlaybackFile());
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX),	m_playbackConfiguration[FullDepthRaw ]->getFirstPlaybackFile());
 
 }
 void PlaybackTabHandler::checkPlayBackPossible()
 {
 
 }
-#include "WindowsApplication.h"
+
 void PlaybackTabHandler::processUIMessage(WPARAM wParam, LPARAM handle)
 {
 	switch (HIWORD(wParam))
@@ -64,6 +93,10 @@ void PlaybackTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX			), tchBuffer);
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX		), tchBuffer);
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX	), tchBuffer);
+		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+			// TODO: 
+			//m_playbackConfiguration[i]->;
+		}
 	}
 		break;
 	default:
@@ -104,7 +137,7 @@ void PlaybackTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		WCHAR szDir[MAX_PATH];
 		if (WindowsApplication::openDirectoryDialog(szDir, m_hWnd)){
 			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-				m_recordingConfiguration->at(i).setFilePath(szDir);
+				m_playbackConfiguration[i]->setFilePath(szDir);
 			}
 			DlgDirList(m_hWnd,
 				szDir,
@@ -170,7 +203,6 @@ LRESULT CALLBACK PlaybackTabHandler::DlgProcTab(HWND hWnd, UINT message, WPARAM 
 
 	case WM_DESTROY:
 		// Quit the main message pump
-		//m_listView.OnDestroy(m_hWnd);
 		PostQuitMessage(0);
 		break;
 	case WM_COMMAND:
@@ -179,8 +211,6 @@ LRESULT CALLBACK PlaybackTabHandler::DlgProcTab(HWND hWnd, UINT message, WPARAM 
 		break;
 	}
 	case WM_SIZE:
-		//m_listView.OnSize(m_hWnd, LOWORD(lParam), HIWORD(lParam), static_cast<UINT>(wParam));
-		//m_listView.OnSize(m_hWnd, LOWORD(lParam), HIWORD(lParam), static_cast<UINT>(wParam));
 		break;
 	case WM_NOTIFY:
 		break;

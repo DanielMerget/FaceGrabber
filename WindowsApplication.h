@@ -1,7 +1,5 @@
 #pragma once
 #include "stdafx.h"
-#include "ListView.h"
-
 #include "resource.h"
 #include "KinectHDFaceGrabber.h"
 #include "resource.h"
@@ -93,7 +91,7 @@ private:
 	std::shared_ptr<PCLViewer>	m_pclFaceRawViewer;
 	//pcl::visualization::CloudViewer m_cloudViewer;
 	std::shared_ptr<KinectCloudOutputWriter> m_cloudOutputWriter;
-	ListView				m_listView;
+	
 	//RecordingConfiguration	m_recordingConfiguration[RECORD_CLOUD_TYPE_COUNT];
 	SharedRecordingConfiguration	m_recordingConfiguration;
 	//std::shared_ptr<RecordingConfiguration>	m_recordingConfiguration;

@@ -9,7 +9,7 @@ WindowsApplication::WindowsApplication() :
 	m_fFreq(0),
 	m_nNextStatusTime(0),
 	m_isCloudWritingStarted(false),
-	m_recordingConfiguration(new std::vector<RecordingConfiguration>())
+	m_recordingConfiguration(RECORD_CLOUD_TYPE_COUNT)
 {
 	LARGE_INTEGER qpf = { 0 };
 	if (QueryPerformanceFrequency(&qpf))
@@ -22,18 +22,20 @@ WindowsApplication::WindowsApplication() :
 void WindowsApplication::initRecordDataModel()
 {
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		m_recordingConfiguration->emplace_back(static_cast<RecordCloudType>(i), PLY);
+		m_recordingConfiguration[i] = std::shared_ptr<RecordingConfiguration>(new RecordingConfiguration(static_cast<RecordCloudType>(i), PLY));
+		m_recordingConfiguration[i]->recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
+		m_recordingConfiguration[i]->recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));
 	}
 	
 	
-	m_recordingConfiguration->at(	HDFace	 ).recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
-	m_recordingConfiguration->at(	FaceRaw	 ).recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
-	m_recordingConfiguration->at(FullDepthRaw).recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
-	
-
-	m_recordingConfiguration->at(	HDFace	 ).recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));
-	m_recordingConfiguration->at(	FaceRaw	 ).recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));	
-	m_recordingConfiguration->at(FullDepthRaw).recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));
+	//m_recordingConfiguration[	HDFace	 ]->recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
+	//m_recordingConfiguration[	FaceRaw	 ]->recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
+	//m_recordingConfiguration[FullDepthRaw]->recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
+	//
+	//
+	//m_recordingConfiguration[	HDFace	 ]->recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));
+	//m_recordingConfiguration[	FaceRaw	 ]->recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));	
+	//m_recordingConfiguration[FullDepthRaw]->recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));
 
 	
 	
@@ -342,6 +344,7 @@ void WindowsApplication::onPlaybackSelected()
 {
 	//m_listView.OnShow();
 	ShowWindow(m_liveViewWindow, SW_HIDE);
+	m_plackBackTabHandler.setSharedRecordingConfiguration(m_recordTabHandler.getRecordConfiguration());
 	ShowWindow(m_recordTabHandle, SW_HIDE);
 	ShowWindow(m_playbackTabHandle, SW_SHOW);
 }

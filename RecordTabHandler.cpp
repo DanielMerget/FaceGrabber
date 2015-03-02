@@ -40,9 +40,9 @@ LRESULT CALLBACK RecordTabHandler::MessageRouterTab(HWND hWnd, UINT uMsg, WPARAM
 
 void RecordTabHandler::onCreate(WPARAM wParam, LPARAM)
 {
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_recordingConfiguration->at(   HDFace	).getFileName());
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_recordingConfiguration->at(  FaceRaw	).getFileName());
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX),	m_recordingConfiguration->at(FullDepthRaw).getFileName());
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_recordingConfiguration[   HDFace	 ]->getFileName());
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_recordingConfiguration[  FaceRaw	 ]->getFileName());
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX),	m_recordingConfiguration[FullDepthRaw]->getFileName());
 
 	HWND hdFaceComboBox = GetDlgItem(m_hWnd, IDC_HD_FACE_COMBO_BOX);
 	HWND facerawDepthComboBox = GetDlgItem(m_hWnd, IDC_FACE_RAW_DEPTH_COMBO_BOX);
@@ -132,14 +132,14 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 	{
 	case IDC_FACE_RAW_DEPTH_COMBO_BOX:
 	{
-		m_recordingConfiguration->at(FaceRaw).setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+		m_recordingConfiguration[FaceRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
 		break;
 	}
 	case IDC_FULL_RAW_DEPTH_COMBO_BOX:
-		m_recordingConfiguration->at(FullDepthRaw).setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+		m_recordingConfiguration[FullDepthRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
 		break;
 	case IDC_HD_FACE_COMBO_BOX:
-		m_recordingConfiguration->at(HDFace).setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+		m_recordingConfiguration[HDFace]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
 		break;
 	}
 }
@@ -150,8 +150,8 @@ void RecordTabHandler::checkRecordingConfigurationPossible()
 	bool oneEnabled = false;
 	bool allValid = true;
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		oneEnabled |=	m_recordingConfiguration->at(i).isEnabled();
-		allValid &=		m_recordingConfiguration->at(i).isRecordConfigurationValid();
+		oneEnabled |=	m_recordingConfiguration[i]->isEnabled();
+		allValid &=		m_recordingConfiguration[i]->isRecordConfigurationValid();
 	}
 	if (!oneEnabled || !allValid){
 		Button_Enable(GetDlgItem(m_hWnd, IDC_RECORD_BUTTON), false);
@@ -180,13 +180,13 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		//m_isCloudWritingStarted = !m_isCloudWritingStarted;
 		break;
 	case IDC_HD_FACE_CHECKBOX:
-		m_recordingConfiguration->at(HDFace).setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
+		m_recordingConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
 		break;
 	case IDC_FACE_RAW_DEPTH_CHECKBOX:
-		m_recordingConfiguration->at(FaceRaw).setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_DEPTH_CHECKBOX));
+		m_recordingConfiguration[FaceRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_DEPTH_CHECKBOX));
 		break;
 	case IDC_FULL_RAW_DEPTH_CHECKBOX:
-		m_recordingConfiguration->at(FullDepthRaw).setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
+		m_recordingConfiguration[FullDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
 		break;
 	case IDC_BUTTON_CHOOSE_OUTPUT_DIRECTORY:
 	{
@@ -195,7 +195,7 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		if (WindowsApplication::openDirectoryDialog(szDir, m_hWnd)){
 			SetDlgItemText(m_hWnd, IDC_FILE_PATH_EDIT_BOX, szDir);
 			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-				m_recordingConfiguration->at(i).setFilePath(szDir);
+				m_recordingConfiguration[i]->setFilePath(szDir);
 			}
 		}
 		//WCHAR szDir[MAX_PATH];
@@ -238,18 +238,18 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 	Edit_GetText(editBoxHandle, buffer.data(), buffer.size());
 	switch (LOWORD(wParam)){
 	case IDC_FACE_RAW_EDIT_BOX:
-		m_recordingConfiguration->at(FaceRaw).setFileName(buffer.data());
+		m_recordingConfiguration[FaceRaw]->setFileName(buffer.data());
 		break;
 	case IDC_HDFACE_EDIT_BOX:
-		m_recordingConfiguration->at(HDFace).setFileName(buffer.data());
+		m_recordingConfiguration[HDFace]->setFileName(buffer.data());
 		break;
 	case IDC_FULL_RAW_DEPTH_EDIT_BOX:
-		m_recordingConfiguration->at(FullDepthRaw).setFileName(buffer.data());
+		m_recordingConfiguration[FullDepthRaw]->setFileName(buffer.data());
 		break;
 	case IDC_FILE_PATH_EDIT_BOX:
 	{
-		for (auto& recordConfig : *m_recordingConfiguration){
-			recordConfig.setFilePath(buffer.data());
+		for (auto recordConfig : m_recordingConfiguration){
+			recordConfig->setFilePath(buffer.data());
 		}
 		break;
 	}
@@ -286,4 +286,9 @@ void RecordTabHandler::recordConfigurationStatusChanged(RecordCloudType type, bo
 void RecordTabHandler::recordPathChanged(RecordCloudType type)
 {
 	checkRecordingConfigurationPossible();
+}
+
+SharedRecordingConfiguration RecordTabHandler::getRecordConfiguration()
+{
+	return m_recordingConfiguration;
 }

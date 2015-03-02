@@ -90,6 +90,7 @@ void KinectCloudOutputWriter::writeCloudToFile(int index)
 
 		//pcl::io::savePLYFile(fileName.str(), *cloudMeasurement.cloud, false);
 		//pcl::io::savePCDFileASCII(fileName.str(), *cloudMeasurement.cloud);
+		
 		pcl::io::savePCDFileBinaryCompressed(fileName.str(), *cloudMeasurement.cloud);
 	}
 }
