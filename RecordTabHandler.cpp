@@ -163,7 +163,7 @@ void RecordTabHandler::checkRecordingConfigurationPossible()
 }
 #define MAX_DATE 20
 #include <time.h>
-std::string getRecordTimeStamp()
+CString getRecordTimeStamp()
 {
 	time_t now;
 	char the_date[MAX_DATE];
@@ -176,8 +176,8 @@ std::string getRecordTimeStamp()
 	{
 		strftime(the_date, MAX_DATE, "%Y_%m_%d_%H_%M_%S", gmtime(&now));
 	}
-
-	return std::string(the_date);
+	
+	return CString(the_date);
 }
 
 
@@ -190,9 +190,13 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		break;
 	case IDC_RECORD_BUTTON:
 	{
-		std::string timeStamp = getRecordTimeStamp();
+		auto timeStamp = getRecordTimeStamp();
 		for (auto& recordConfig : m_recordingConfiguration){
 			recordConfig->setTimeStampFolderName(timeStamp);
+			if (recordConfig->isEnabled()){
+				auto fullRecordingPath = recordConfig->getFullRecordingPath();
+				SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
+			}
 		}
 		//if (!m_isCloudWritingStarted)
 		//{

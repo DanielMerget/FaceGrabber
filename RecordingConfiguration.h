@@ -171,9 +171,14 @@ public:
 		m_fileFormat = fileFormat;
 	}
 
-	void setTimeStampFolderName(std::string folderName)
+	void setTimeStampFolderName(CString folderName)
 	{
-		m_timeStampFolderName = CString(folderName.c_str());
+		m_timeStampFolderName = folderName;
+	}
+
+	CString getTimeStampFolderName()
+	{
+		return m_timeStampFolderName;
 	}
 
 	
@@ -205,16 +210,18 @@ public:
 	{
 		CString subFolder = getSubFolderNameForCloudType(cloudType);
 		CString fullPath;
+		
 		fullPath += outputFolder.GetString();
-		fullPath += _T("\\");
+		auto outputEnding = fullPath.Right(1);
+		if (outputEnding != L"\\"){
+			fullPath += _T("\\");
+		}
 		fullPath += timeStampFolderName.GetString();
+		outputEnding = fullPath.Right(1);
+		if (outputEnding != L"\\"){
+			fullPath += _T("\\");
+		}
 		fullPath += subFolder;
-		//fullPath << outputFolder;
-		//fullPath << "\\";
-		//fullPath << timeStampFolderName;
-		//fullPath << "\\";
-		//fullPath << subFolder;
-		//std::string result = fullPath.str();
 		return fullPath;
 	}
 

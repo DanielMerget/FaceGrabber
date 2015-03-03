@@ -11,6 +11,18 @@ PlaybackTabHandler::~PlaybackTabHandler()
 {
 }
 
+void PlaybackTabHandler::resetUIElements()
+{
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), L"");
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), L"");
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), L"");
+
+	DlgDirList(m_hWnd,
+		L"",
+		IDC_RECODINGS_LIST_BOX,
+		IDC_FILE_PATH_EDIT_BOX,
+		DDL_EXCLUSIVE | DDL_READWRITE | DDL_DIRECTORY);
+}
 void PlaybackTabHandler::setSharedRecordingConfiguration(SharedRecordingConfiguration recordingConfiguration)
 {
 	
@@ -18,27 +30,47 @@ void PlaybackTabHandler::setSharedRecordingConfiguration(SharedRecordingConfigur
 		m_playbackConfiguration[i] = std::shared_ptr<PlaybackConfiguration>(new PlaybackConfiguration(*recordingConfiguration[i]));
 		m_playbackConfiguration[i]->playbackConfigurationChanged.connect(boost::bind(&PlaybackTabHandler::playbackConfigurationChanged, this));
 	}
-	playbackConfigurationChanged();
+	auto outputFolderPath = recordingConfiguration[HDFace]->getFilePathCString();
+	
+
+	DlgDirList(m_hWnd,
+		outputFolderPath.GetBuffer(),
+		IDC_RECODINGS_LIST_BOX,
+		IDC_FILE_PATH_EDIT_BOX,
+		DDL_EXCLUSIVE | DDL_READWRITE | DDL_DIRECTORY);
+	auto timeStampFolder = recordingConfiguration[HDFace]->getTimeStampFolderName();
+	if (!timeStampFolder.IsEmpty()){
+		
+		SendMessage(GetDlgItem(m_hWnd, IDC_RECODINGS_LIST_BOX), LB_SELECTSTRING,
+			1, (LPARAM)timeStampFolder.GetBuffer());
+	}
+	//DlgDirList(m_hWnd,
+	//	outputFolderPath.GetBuffer(),
+	//	IDC_RECODINGS_LIST_BOX,
+	//	IDC_FILE_PATH_EDIT_BOX,
+	//	DDL_EXCLUSIVE | DDL_READWRITE | DDL_DIRECTORY);
 }
+
+
 
 void PlaybackTabHandler::onCreate(WPARAM wParam, LPARAM)
 {
 	
-	if (!m_playbackConfiguration[0]){
-		return;
-	}
-	auto filePath = m_playbackConfiguration[0]->getFilePath();
-	CString testDir(filePath.c_str());
-
-	DlgDirList(m_hWnd,
-		testDir.GetBuffer(0),
-		IDC_RECODINGS_LIST_BOX,
-		IDC_FILE_PATH_EDIT_BOX,
-		DDL_EXCLUSIVE | DDL_READWRITE | DDL_DIRECTORY);
-	
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_playbackConfiguration[	HDFace	 ]->getFirstPlaybackFile());
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_playbackConfiguration[	FaceRaw	 ]->getFirstPlaybackFile());
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX),	m_playbackConfiguration[FullDepthRaw ]->getFirstPlaybackFile());
+	//if (!m_playbackConfiguration[0]){
+	//	return;
+	//}
+	//auto filePath = m_playbackConfiguration[0]->getFilePath();
+	//CString testDir(filePath.c_str());
+	//
+	//DlgDirList(m_hWnd,
+	//	testDir.GetBuffer(0),
+	//	IDC_RECODINGS_LIST_BOX,
+	//	IDC_FILE_PATH_EDIT_BOX,
+	//	DDL_EXCLUSIVE | DDL_READWRITE | DDL_DIRECTORY);
+	//
+	//Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_playbackConfiguration[	HDFace	 ]->getFirstPlaybackFile());
+	//Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_playbackConfiguration[	FaceRaw	 ]->getFirstPlaybackFile());
+	//Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX),	m_playbackConfiguration[FullDepthRaw ]->getFirstPlaybackFile());
 
 }
 void PlaybackTabHandler::checkPlayBackPossible()

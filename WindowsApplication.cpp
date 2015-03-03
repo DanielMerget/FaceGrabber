@@ -352,6 +352,7 @@ void WindowsApplication::onPlaybackSelected()
 {
 	//m_listView.OnShow();
 	ShowWindow(m_liveViewWindow, SW_HIDE);
+	m_plackBackTabHandler.resetUIElements();
 	m_plackBackTabHandler.setSharedRecordingConfiguration(m_recordTabHandler.getRecordConfiguration());
 	ShowWindow(m_recordTabHandle, SW_HIDE);
 	ShowWindow(m_playbackTabHandle, SW_SHOW);

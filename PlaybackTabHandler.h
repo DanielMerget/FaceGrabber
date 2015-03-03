@@ -22,11 +22,12 @@ public:
 
 	void setSharedRecordingConfiguration(SharedRecordingConfiguration recordingConfiguration);
 	void playbackConfigurationChanged();
+	void resetUIElements();
 private:
 	void onCreate(WPARAM wParam, LPARAM);
 	void checkPlayBackPossible();
 	void processUIMessage(WPARAM wParam, LPARAM);
-
+	void updateUIConfiguration();
 
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
