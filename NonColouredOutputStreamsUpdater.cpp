@@ -144,6 +144,11 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr NonColouredOutputStreamsUpdater::extractDept
 				continue;
 			}
 			
+			if ((0 <= colorPixelMidX) && (colorPixelMidX < m_colorWidth) && (0 <= colorPixelMidY) && (colorPixelMidY < m_colorHeight)){
+				point.x = camPoint.X;
+				point.y = camPoint.Y;
+				point.z = camPoint.Z;
+			}
 
 			if (point.x < camTopLeftBack.X || point.x > camBottomRightBack.X)
 				continue;
