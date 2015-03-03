@@ -13,7 +13,7 @@
 #include "RecordTabHandler.h"
 #include "PlaybackTabHandler.h"
 #include "ColouredOutputStreamUpdater.h"
-
+#include "NonColouredOutputStreamsUpdater.h"
 class WindowsApplication
 {
 public:
@@ -69,6 +69,8 @@ private:
 	void onRecordTabSelected();
 	void processUIMessage(WPARAM wParam, LPARAM);
 
+	void colorStreamingChangedTo(bool enable);
+
 	bool					setStatusMessage(std::wstring statusString, bool bForce);
 	HINSTANCE				m_hInstance;
 	HWND					m_hWnd;
@@ -92,7 +94,8 @@ private:
 	std::shared_ptr<PCLViewer>	m_pclFaceRawViewer;
 	//pcl::visualization::CloudViewer m_cloudViewer;
 
-	std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>> m_cloudOutputWriter;
+	std::vector<std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>> m_colorCloudOutputWriter;
+	std::vector<std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>>	m_nonColoredCloudOutputWriter;
 	
 	//RecordingConfiguration	m_recordingConfiguration[RECORD_CLOUD_TYPE_COUNT];
 	SharedRecordingConfiguration	m_recordingConfiguration;
@@ -101,5 +104,6 @@ private:
 	RecordTabHandler			m_recordTabHandler;
 	PlaybackTabHandler			m_plackBackTabHandler;
 	std::shared_ptr<ColouredOutputStreamUpdater> m_colouredOutputStreamUpdater;
+	std::shared_ptr<NonColouredOutputStreamsUpdater> m_nonColoredOutputStreamUpdater;
 };
 

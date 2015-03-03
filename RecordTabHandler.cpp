@@ -2,7 +2,9 @@
 #include "WindowsApplication.h"
 
 
-RecordTabHandler::RecordTabHandler() : m_colorEnabled(true)
+RecordTabHandler::RecordTabHandler() : 
+	m_colorEnabled(true),
+	m_isRecording(false)
 {
 }
 
@@ -180,24 +182,58 @@ CString getRecordTimeStamp()
 	return CString(the_date);
 }
 
+void RecordTabHandler::setupRecording()
+{
+	auto timeStamp = getRecordTimeStamp();
+	for (auto& recordConfig : m_recordingConfiguration){
+		recordConfig->setTimeStampFolderName(timeStamp);
+		if (recordConfig->isEnabled()){
+			auto fullRecordingPath = recordConfig->getFullRecordingPath();
+			SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
+		}
+	}
+	
+}
+//BOOL CALLBACK RecordTabHandler::EnumChildProc(HWND hwnd, LPARAM lParam)
+//{
+//	cout << "hwnd_Child = " << hwnd << endl;
+//	auto recordButton = GetDlgItem(m_hWnd, IDC_RECORD_BUTTON);
+//	if (hwnd != recordButton){
+//		EnableWindow(hwnd, m_isRecording);
+//	}
+//	
+//	return TRUE; // must return TRUE; If return is FALSE it stops the recursion
+//}
+
+void RecordTabHandler::setRecording(bool enable)
+{
+	m_isRecording = enable;
+	if (enable){
+		setupRecording();
+		SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Stop");
+	}
+	else{
+		SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Record");
+	}	
+}
+
+void RecordTabHandler::setColorEnabled(bool enable)
+{
+	m_colorEnabled = enable;
+	colorConfigurationChanged(enable);
+}
 
 void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 {
 	switch (LOWORD(wParam))
 	{
 	case IDC_RECORD_COLOR:
-		m_colorEnabled = IsDlgButtonChecked(m_hWnd, IDC_RECORD_COLOR);
+		setColorEnabled(IsDlgButtonChecked(m_hWnd, IDC_RECORD_COLOR));
 		break;
 	case IDC_RECORD_BUTTON:
 	{
-		auto timeStamp = getRecordTimeStamp();
-		for (auto& recordConfig : m_recordingConfiguration){
-			recordConfig->setTimeStampFolderName(timeStamp);
-			if (recordConfig->isEnabled()){
-				auto fullRecordingPath = recordConfig->getFullRecordingPath();
-				SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
-			}
-		}
+		
+		setRecording(!m_isRecording);
 		//if (!m_isCloudWritingStarted)
 		//{
 		//	m_cloudOutputWriter->startWritingClouds();

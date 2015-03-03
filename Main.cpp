@@ -37,7 +37,7 @@ int main()
 	
 	std::shared_ptr<PCLViewer> viewer(new PCLViewer(1, "Face-Playback"));
 
-	reader.cloudUpdated.connect(boost::bind(&PCLViewer::updateCloudThreated, viewer, _1 , 0));
+	reader.cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, viewer, _1, 0));
 	reader.startReaderThreads();
 	
 	
