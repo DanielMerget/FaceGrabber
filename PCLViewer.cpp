@@ -142,7 +142,6 @@ void PCLViewer::updateLoop()
 			for (int i = 0; i < m_cloudCount; i++){
 				std::lock_guard<std::mutex> lock(m_useColoredCloudMutex);
 				updateCurrentCloudWithIndexAndIdentifier(i, cloudIDs[i], viewer);
-				
 			}
 		}
 		viewer.spinOnce(100);

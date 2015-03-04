@@ -2,7 +2,8 @@
 #include "WindowsApplication.h"
 
 PlaybackTabHandler::PlaybackTabHandler() :
-	m_playbackConfiguration(RECORD_CLOUD_TYPE_COUNT)
+	m_playbackConfiguration(RECORD_CLOUD_TYPE_COUNT),
+	m_isPlaybackRunning(false)
 {
 }
 
@@ -44,6 +45,9 @@ void PlaybackTabHandler::setSharedRecordingConfiguration(SharedRecordingConfigur
 		SendMessage(GetDlgItem(m_hWnd, IDC_RECODINGS_LIST_BOX), LB_SELECTSTRING,
 			1, (LPARAM)timeStampFolder.GetBuffer());
 	}
+	m_playbackConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
+	m_playbackConfiguration[FaceRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_DEPTH_CHECKBOX));
+	m_playbackConfiguration[FullDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
 	//DlgDirList(m_hWnd,
 	//	outputFolderPath.GetBuffer(),
 	//	IDC_RECODINGS_LIST_BOX,
@@ -118,13 +122,32 @@ void PlaybackTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 		break;
 	}
 }
+
+void PlaybackTabHandler::setPlaybackStatus(bool enable)
+{
+	m_isPlaybackRunning = enable;
+	if (enable){
+		startPlayback(m_playbackConfiguration);
+		SetDlgItemText(m_hWnd, IDC_PLAY_STOP_BUTTON, L"Stop");
+	}
+	else{
+		stopPlayback();
+		
+	}
+}
+void PlaybackTabHandler::playbackStopped()
+{
+	SetDlgItemText(m_hWnd, IDC_PLAY_STOP_BUTTON, L"Play");
+	m_isPlaybackRunning = false;
+}
+
 void PlaybackTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 {
 
 	switch (LOWORD(wParam))
 	{
 	case IDC_PLAY_STOP_BUTTON:
-		startPlayback(m_playbackConfiguration);
+		setPlaybackStatus(!m_isPlaybackRunning);
 		break;
 	case IDC_HD_FACE_CHECKBOX:
 		m_playbackConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
@@ -186,6 +209,7 @@ void PlaybackTabHandler::playbackConfigurationChanged()
 	if (auto playbackConfig = m_playbackConfiguration[HDFace]){
 		auto firstFile = playbackConfig->getFirstPlaybackFile();
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), firstFile);
+		//m_playbackConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
 		isValidConfiguration &= playbackConfig->isPlaybackConfigurationValid();
 	}
 	else{
@@ -195,6 +219,7 @@ void PlaybackTabHandler::playbackConfigurationChanged()
 	if (auto playbackConfig = m_playbackConfiguration[FaceRaw]){
 		auto firstFile = playbackConfig->getFirstPlaybackFile();
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), firstFile);
+		//m_playbackConfiguration[FaceRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_DEPTH_CHECKBOX));
 		isValidConfiguration &= playbackConfig->isPlaybackConfigurationValid();
 	}
 	else{
@@ -204,6 +229,7 @@ void PlaybackTabHandler::playbackConfigurationChanged()
 	if (auto playbackConfig = m_playbackConfiguration[FullDepthRaw]){
 		auto firstFile = playbackConfig->getFirstPlaybackFile();
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), firstFile);
+		//m_playbackConfiguration[FullDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
 		isValidConfiguration &= playbackConfig->isPlaybackConfigurationValid();
 	}
 	else{

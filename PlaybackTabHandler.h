@@ -24,9 +24,12 @@ public:
 	void setSharedRecordingConfiguration(SharedRecordingConfiguration recordingConfiguration);
 	void playbackConfigurationChanged();
 	void resetUIElements();
+	void playbackStopped();
 
 	boost::signal<void(SharedPlaybackConfiguration)> startPlayback;
+	boost::signal<void(void)> stopPlayback;
 private:
+	void setPlaybackStatus(bool enable);
 	void onCreate(WPARAM wParam, LPARAM);
 	void checkPlayBackPossible();
 	void processUIMessage(WPARAM wParam, LPARAM);
@@ -39,6 +42,7 @@ private:
 	
 	//SharedRecordingConfiguration m_recordingConfiguration;
 	SharedPlaybackConfiguration m_playbackConfiguration;
+	bool m_isPlaybackRunning;
 	HWND m_hWnd;
 };
 

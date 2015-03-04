@@ -14,6 +14,7 @@
 #include "PlaybackTabHandler.h"
 #include "ColouredOutputStreamUpdater.h"
 #include "NonColouredOutputStreamsUpdater.h"
+#include "PCLInputReader.h"
 class WindowsApplication
 {
 public:
@@ -56,21 +57,31 @@ public:
 	static bool openDirectoryDialog(WCHAR* szDir, HWND handle);
 
 private:
+	void onCreate();
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
-	void					recordPathChanged(RecordCloudType type);
-	void					recordConfigurationStatusChanged(RecordCloudType type, bool newState);
+	void recordPathChanged(RecordCloudType type);
+	void recordConfigurationStatusChanged(RecordCloudType type, bool newState);
 
 	void initRecordDataModel();
 	void checkRecordingConfigurationPossible();
+	void onPlaybackFinished();
 
 	void onPlaybackSelected();
 	void onRecordTabSelected();
 	void startRecording(bool isColoredStream);
 	void stopRecording(bool isColoredStream);
-	void processUIMessage(WPARAM wParam, LPARAM);
 
+	void startPlayback(SharedPlaybackConfiguration playbackConfig);
+	void stopPlayback();
+
+	void processUIMessage(WPARAM wParam, LPARAM);
+	void connectWriterAndViewerToKinect();
+	void connectInputReaderToViewer();
+
+	void disconnectWriterAndViewerToKinect();
+	void disconnectInputReaderFromViewer();
 	void colorStreamingChangedTo(bool enable);
 
 	bool					setStatusMessage(std::wstring statusString, bool bForce);
@@ -93,7 +104,8 @@ private:
 
 	KinectHDFaceGrabber			m_kinectFrameGrabber;
 	std::shared_ptr<PCLViewer>	m_pclFaceViewer;
-	std::shared_ptr<PCLViewer>	m_pclFaceRawViewer;
+	std::vector<std::shared_ptr<PCLInputReader>>	m_inputFileReader;
+
 	//pcl::visualization::CloudViewer m_cloudViewer;
 
 	std::vector<std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>> m_colorCloudOutputWriter;

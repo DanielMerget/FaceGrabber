@@ -220,6 +220,7 @@ void WindowsApplication::onCreate()
 		reinterpret_cast<LPARAM>(&m_plackBackTabHandler));
 	ShowWindow(m_playbackTabHandle, SW_HIDE);
 	m_plackBackTabHandler.startPlayback.connect(boost::bind(&WindowsApplication::startPlayback, this, _1));
+	m_plackBackTabHandler.stopPlayback.connect(boost::bind(&WindowsApplication::stopPlayback, this));
 
 	RECT windowRect;
 
@@ -329,8 +330,26 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 	return FALSE;
 }
 
+void WindowsApplication::connectInputReaderToViewer()
+{
+	for (int i = 0; i < 2; i++){
+		m_inputFileReader[i] = std::shared_ptr<PCLInputReader>(new PCLInputReader(5));
+		m_inputFileReader[i]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(i)));
+		m_inputFileReader[i]->playbackFinished.connect(boost::bind(&WindowsApplication::onPlaybackFinished, this));
+	}
+	m_inputFileReader[0]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(1)));
+}
+
+void WindowsApplication::disconnectInputReaderFromViewer()
+{
+	for (int i = 0; i < 2; i++){
+		m_inputFileReader[i]->cloudUpdated.disconnect_all_slots();
+		m_inputFileReader[i]->playbackFinished.disconnect_all_slots();
+	}
+}
 void WindowsApplication::onRecordTabSelected()
 {
+	disconnectInputReaderFromViewer();
 	connectWriterAndViewerToKinect();
 	ShowWindow(m_liveViewWindow, SW_SHOW);
 	ShowWindow(m_recordTabHandle, SW_SHOW);
@@ -340,6 +359,7 @@ void WindowsApplication::onRecordTabSelected()
 void WindowsApplication::onPlaybackSelected()
 {
 	disconnectWriterAndViewerToKinect();
+	connectInputReaderToViewer();
 	ShowWindow(m_liveViewWindow, SW_HIDE);
 	m_plackBackTabHandler.resetUIElements();
 	m_plackBackTabHandler.setSharedRecordingConfiguration(m_recordTabHandler.getRecordConfiguration());
@@ -449,25 +469,24 @@ void WindowsApplication::startRecording(bool isColoredStream)
 
 void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfig)
 {
-	for (auto& config : playbackConfig){
-		auto cloudType = config->getRecordCloudType();
-		if (config->isEnabled()){
-			
-			m_inputFileReader[cloudType]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(cloudType)));
-			m_inputFileReader[cloudType]->setPlaybackConfiguration(config);
-			m_inputFileReader[cloudType]->startCloudUpdateThread();
-			m_inputFileReader[cloudType]->startReaderThreads();
-		}
-		else{
-			
-		}
+	for (int i = 0; i < 2; i++){
+		auto cloudType = playbackConfig[i]->getRecordCloudType();
+		m_inputFileReader[cloudType]->setPlaybackConfiguration(playbackConfig[i]);
+		m_inputFileReader[cloudType]->startCloudUpdateThread();
+		m_inputFileReader[cloudType]->startReaderThreads();
 	}
-	m_inputFileReader[0]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, 1));
+}
+
+void WindowsApplication::onPlaybackFinished()
+{
+	m_plackBackTabHandler.playbackStopped();
 }
 
 void WindowsApplication::stopPlayback()
 {
-
+	for (auto& inputReader : m_inputFileReader){
+		inputReader->stopReaderThreads();
+	}
 }
 
 void WindowsApplication::stopRecording(bool isColoredStream)

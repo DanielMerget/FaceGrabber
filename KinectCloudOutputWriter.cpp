@@ -123,6 +123,7 @@ template < typename PointCloudType >
 void KinectCloudOutputWriter<PointCloudType>::setRecordingConfiguration(RecordingConfigurationPtr recordingConfiguration)
 {
 	m_recordingConfiguration = recordingConfiguration;
+	writeCloudToDisk.disconnect_all_slots();
 	auto recordingType = m_recordingConfiguration->getRecordFileFormat();
 	switch (recordingType)
 	{

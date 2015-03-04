@@ -8,13 +8,17 @@ PCLInputReader::PCLInputReader(const int bufferSize) :
 //	m_cloudBufferIsFreeVariables(bufferSize),
 //	m_cloudBufferPositionMutexes(bufferSize),
 	m_readerThreads(),
-	m_bufferSize(bufferSize)
+	m_bufferSize(bufferSize),
+	m_isPlaybackRunning(false)
 {
 
 }
 
 void PCLInputReader::join()
 {
+	if (m_updateThread.joinable()){
+		m_updateThread.join();
+	}
 	for (auto& thread : m_readerThreads)
 	{
 		if (thread.joinable()){
@@ -22,33 +26,48 @@ void PCLInputReader::join()
 			std::cout << "main joining thread" << std::endl;
 		}
 	}
-	if (m_updateThread.joinable()){
-		m_updateThread.join();
-	}
 	
+	m_readerThreads.clear();
 }
 
 PCLInputReader::~PCLInputReader()
 {
-	//for (auto& thread : m_readerThreads)
-	//{
-	//	thread.join();
-	//}
-	////m_updateThread.join();
 	join();
 }
 
 void PCLInputReader::startCloudUpdateThread()
 {
+	if (!m_playbackConfiguration->isEnabled()){
+		return;
+	}
+	join();
+	
+	m_cloudBuffer.clear();
+	m_cloudBuffer.resize(m_bufferSize);
+	
 	m_updateThread = std::thread(&PCLInputReader::updateThreadFunc, this);
 }
 
 void PCLInputReader::startReaderThreads()
 { 
+	if (!m_playbackConfiguration->isEnabled()){
+		return;
+	}
+	m_isPlaybackRunning = true;
 	for (int i = 0; i < 1; i++){
 		m_readerThreads.push_back(std::thread(&PCLInputReader::readPLYFile, this, i));
 	}
 }
+
+void PCLInputReader::stopReaderThreads()
+{ 
+	if (!m_isPlaybackRunning){
+		return;
+	}
+	m_isPlaybackRunning = false;
+	m_cloudBufferUpdated.notify_all();
+}
+
 
 bool PCLInputReader::isBufferAtIndexSet(const int index)
 {
@@ -58,7 +77,10 @@ bool PCLInputReader::isBufferAtIndexSet(const int index)
 void PCLInputReader::printMessage(std::string msg)
 {
 	std::lock_guard<std::mutex> lock(m_printMutex);
-	std::cout << msg;
+	
+	auto msgCstring = CString(msg.c_str());
+	msgCstring += L"\n";
+	OutputDebugString(msgCstring);
 }
 
 void PCLInputReader::updateThreadFunc()
@@ -68,8 +90,9 @@ void PCLInputReader::updateThreadFunc()
 	int numOfFilesRead = currentUpdateIndex;
 	while (true)
 	{
-		if (numOfFilesRead >= m_playbackConfiguration->getCloudFilesToPlay().size()){
-			printMessage("update thread finished");
+		if (numOfFilesRead >= m_playbackConfiguration->getCloudFilesToPlay().size() || !m_isPlaybackRunning){
+			printMessage("update thread finished or read everything");
+			playbackFinished();
 			return;
 		}
 		std::unique_lock<std::mutex> cloudBufferLock(m_cloudBufferMutex);
@@ -78,6 +101,12 @@ void PCLInputReader::updateThreadFunc()
 			msg << "update thread waiting for index " << currentUpdateIndex << " after reading files: " << numOfFilesRead << std::endl;
 			//printMessage(msg.str());
 			m_cloudBufferUpdated.wait(cloudBufferLock);
+			if (!m_isPlaybackRunning){
+				std::stringstream msg;
+				msg << "update done because of stop"<< std::endl;
+				printMessage(msg.str());
+				return;
+			}
 		}
 
 		//printMessage("update thread woke up - updating ");
@@ -107,7 +136,8 @@ void PCLInputReader::readPLYFile(const int index)
 	auto cloudFilesToPlay = m_playbackConfiguration->getCloudFilesToPlay();
 	while (true)
 	{
-		if (indexOfFileToRead >= cloudFilesToPlay.size()){
+		if (indexOfFileToRead >= cloudFilesToPlay.size() || !m_isPlaybackRunning){
+			msg << "thread for index: " << index << " done because of stop or size end" << std::endl;
 			return;
 		}
 
@@ -117,7 +147,8 @@ void PCLInputReader::readPLYFile(const int index)
 		//fileName << m_fileNamePrefix << indexOfFileToRead << ".pcd";
 		
 		auto currentFileName = cloudFilesToPlay[indexOfFileToRead];
-		pcl::io::loadPCDFile(currentFileName, *cloud);
+		//pcl::io::loadPCDFile(currentFileName, *cloud);
+		readCloudFromDisk(currentFileName, *cloud);
 		//load the ply file
 		//pcl::io::loadPCDFile(fileName.str(), *cloud);
 
@@ -135,6 +166,12 @@ void PCLInputReader::readPLYFile(const int index)
 			msg << "thread for index: " << index << " waiting for updater thread for slot " << cloudBufferIndex << std::endl;
 			//printMessage(msg.str());
 			m_cloudBufferFree.wait(cloudBufferLock);
+			if (!m_isPlaybackRunning){
+				std::stringstream msg;
+				msg << "thread for index: " << index << " done because of stop " << std::endl;
+				printMessage(msg.str());
+				return;
+			}
 		}
 		//store the cloud
 		m_cloudBuffer[cloudBufferIndex] = cloud;
@@ -156,4 +193,25 @@ void PCLInputReader::readPLYFile(const int index)
 void PCLInputReader::setPlaybackConfiguration(PlaybackConfigurationPtr playbackConfig)
 {
 	m_playbackConfiguration = playbackConfig;
+	auto recordingType = playbackConfig->getRecordFileFormat();
+	readCloudFromDisk.disconnect_all_slots();
+	switch (recordingType)
+	{
+	case PLY:
+		readCloudFromDisk.connect(boost::bind(&pcl::io::loadPLYFile<pcl::PointXYZRGB>, _1, _2));
+		break;
+	case PLY_BINARY:
+		readCloudFromDisk.connect(boost::bind(&pcl::io::loadPLYFile<pcl::PointXYZRGB>, _1, _2));
+		break;
+	case PCD:
+		readCloudFromDisk.connect(boost::bind(&pcl::io::loadPCDFile<pcl::PointXYZRGB>, _1, _2));
+		break;
+	case PCD_BINARY:
+		readCloudFromDisk.connect(boost::bind(&pcl::io::loadPCDFile<pcl::PointXYZRGB>, _1, _2));
+		break;
+	case RECORD_FILE_FORMAT_COUNT:
+		break;
+	default:
+		break;
+	}
 }
