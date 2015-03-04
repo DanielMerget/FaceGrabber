@@ -130,6 +130,13 @@ public:
 		return m_fileName;
 	}
 
+	std::string getFileNameString()
+	{
+		CT2CA pszConvertedAnsiString(m_fileName);
+		std::string strStd(pszConvertedAnsiString);
+		return strStd;
+	}
+
 	LPTSTR getFileName()
 	{
 		return m_fileName.GetBuffer(0);
@@ -200,10 +207,20 @@ public:
 		return L"UKNOWN CLOUD TYPE";
 	}
 
+
 	CString getFullRecordingPath()
 	{
 		auto result = getFullRecordingPathForCloudType(m_cloudType, m_outputFolder, m_timeStampFolderName);
 		return result;
+	}
+
+
+	std::string getFullRecordingPathString()
+	{
+		CString fullPath = getFullRecordingPath();
+		CT2CA pszConvertedAnsiString(fullPath);
+		std::string strStd(pszConvertedAnsiString);
+		return strStd;
 	}
 
 	static CString getFullRecordingPathForCloudType(RecordCloudType cloudType, CString outputFolder, CString timeStampFolderName)
@@ -239,5 +256,5 @@ private:
 	
 	bool					m_enabled;
 };
-
-typedef std::vector<std::shared_ptr<RecordingConfiguration>> SharedRecordingConfiguration;
+typedef std::shared_ptr<RecordingConfiguration> RecordingConfigurationPtr;
+typedef std::vector<RecordingConfigurationPtr> SharedRecordingConfiguration;

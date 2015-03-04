@@ -41,8 +41,9 @@ HRESULT ColouredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, 
 		pcl::transformPointCloud(*hdFaceRawDepthCloud, *hdFaceRawDepthCloud, m);
 
 
-		cloudUpdated(hdFaceCloud);
-		depthCloudUpdated(hdFaceRawDepthCloud);
+		cloudUpdated[0](hdFaceCloud);
+		cloudUpdated[1](hdFaceRawDepthCloud);
+		//depthCloudUpdated(hdFaceRawDepthCloud);
 	}
 	return hr;
 }

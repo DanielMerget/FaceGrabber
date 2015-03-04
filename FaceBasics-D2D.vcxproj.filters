@@ -16,9 +16,6 @@
     <ClCompile Include="WindowsApplication.cpp">
       <Filter>WindowsApp</Filter>
     </ClCompile>
-    <ClCompile Include="KinectCloudOutputWriter.cpp">
-      <Filter>Kinect</Filter>
-    </ClCompile>
     <ClCompile Include="PCLInputReader.cpp">
       <Filter>InputReader</Filter>
     </ClCompile>
@@ -40,6 +37,9 @@
     <ClCompile Include="NonColouredOutputStreamsUpdater.cpp">
       <Filter>Kinect</Filter>
     </ClCompile>
+    <ClCompile Include="KinectCloudOutputWriter.cpp">
+      <Filter>FileWriter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -53,9 +53,6 @@
     </ClInclude>
     <ClInclude Include="WindowsApplication.h">
       <Filter>WindowsApp</Filter>
-    </ClInclude>
-    <ClInclude Include="KinectCloudOutputWriter.h">
-      <Filter>Kinect</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>WindowsApp</Filter>
@@ -90,6 +87,9 @@
     <ClInclude Include="NonColouredOutputStreamsUpdater.h">
       <Filter>Kinect</Filter>
     </ClInclude>
+    <ClInclude Include="KinectCloudOutputWriter.h">
+      <Filter>FileWriter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Kinect">
@@ -103,6 +103,9 @@
     </Filter>
     <Filter Include="InputReader">
       <UniqueIdentifier>{cb22bb0e-944c-41ef-afcf-f0111e82829e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileWriter">
+      <UniqueIdentifier>{32d72b10-368d-4e5b-af47-a9c5c1f79aca}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

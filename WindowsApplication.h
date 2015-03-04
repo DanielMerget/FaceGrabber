@@ -67,6 +67,8 @@ private:
 
 	void onPlaybackSelected();
 	void onRecordTabSelected();
+	void startRecording(bool isColoredStream);
+	void stopRecording(bool isColoredStream);
 	void processUIMessage(WPARAM wParam, LPARAM);
 
 	void colorStreamingChangedTo(bool enable);

@@ -27,6 +27,8 @@ public:
 	void recordConfigurationStatusChanged(RecordCloudType type, bool newState);
 
 	boost::signal<void(bool)> colorConfigurationChanged;
+	boost::signal<void(bool)> startWriting;
+	boost::signal<void(bool)> stopWriting;
 private:
 	void setupRecording();
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);

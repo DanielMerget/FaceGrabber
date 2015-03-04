@@ -210,9 +210,11 @@ void RecordTabHandler::setRecording(bool enable)
 	m_isRecording = enable;
 	if (enable){
 		setupRecording();
+		startWriting(m_colorEnabled);
 		SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Stop");
 	}
 	else{
+		stopWriting(m_colorEnabled);
 		SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Record");
 	}	
 }

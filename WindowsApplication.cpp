@@ -192,6 +192,8 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 			(DLGPROC)RecordTabHandler::MessageRouterTab,
 			reinterpret_cast<LPARAM>(&m_recordTabHandler));
 		m_recordTabHandler.colorConfigurationChanged.connect(boost::bind(&WindowsApplication::colorStreamingChangedTo, this, _1));
+		m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1));
+		m_recordTabHandler.stopWriting.connect(boost::bind(&WindowsApplication::stopRecording, this, _1));
 
 		m_plackBackTabHandler.setSharedRecordingConfiguration(m_recordingConfiguration);
 		
@@ -228,20 +230,6 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		RECT liveViewRect;
 		GetWindowRect(m_liveViewWindow, &liveViewRect);
 		
-		m_colouredOutputStreamUpdater = std::shared_ptr<ColouredOutputStreamUpdater>(new ColouredOutputStreamUpdater);
-		m_nonColoredOutputStreamUpdater = std::shared_ptr<NonColouredOutputStreamsUpdater>(new NonColouredOutputStreamsUpdater);
-
-		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-			auto nonColoredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>(new KinectCloudOutputWriter<pcl::PointXYZ>);
-			m_nonColoredOutputStreamUpdater->cloudUpdated.connect(		boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudThreated,	nonColoredCloudWriter, _1));
-			m_nonColoredOutputStreamUpdater->depthCloudUpdated.connect(	boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudThreated,	nonColoredCloudWriter, _1));
-			m_nonColoredCloudOutputWriter.push_back(nonColoredCloudWriter);
-
-			auto coloredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
-			m_colouredOutputStreamUpdater->cloudUpdated.connect(		boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, coloredCloudWriter, _1));
-			m_colouredOutputStreamUpdater->depthCloudUpdated.connect(	boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, coloredCloudWriter, _1));
-			m_colorCloudOutputWriter.push_back(coloredCloudWriter);
-		}
 				
 		HRESULT hr = m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
 
@@ -257,16 +245,37 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		int depthWidth, depthHeight, colorWidth, colorHeight;
 
 		m_kinectFrameGrabber.getColourAndDepthSize(depthWidth, depthHeight, colorWidth, colorHeight);
+		
+
+
+		m_colouredOutputStreamUpdater = std::shared_ptr<ColouredOutputStreamUpdater>(new ColouredOutputStreamUpdater);
+		m_nonColoredOutputStreamUpdater = std::shared_ptr<NonColouredOutputStreamsUpdater>(new NonColouredOutputStreamsUpdater);
+
 		m_kinectFrameGrabber.setOutputStreamUpdater(m_colouredOutputStreamUpdater);
 
 		m_colouredOutputStreamUpdater->initialize(m_kinectFrameGrabber.getCoordinateMapper(), depthWidth, depthHeight, colorWidth, colorHeight);
-		m_colouredOutputStreamUpdater->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated,			m_pclFaceViewer, _1, 0));
-		m_colouredOutputStreamUpdater->depthCloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated,	m_pclFaceViewer, _1, 1));
-		
 		m_nonColoredOutputStreamUpdater->initialize(m_kinectFrameGrabber.getCoordinateMapper(), depthWidth, depthHeight, colorWidth, colorHeight);
-		m_nonColoredOutputStreamUpdater->cloudUpdated.connect(boost::bind(&PCLViewer::updateNonColoredCloudThreated,		m_pclFaceViewer, _1, 0));
-		m_nonColoredOutputStreamUpdater->depthCloudUpdated.connect(boost::bind(&PCLViewer::updateNonColoredCloudThreated,	m_pclFaceViewer, _1, 1));
 
+		for (int i = 0; i < 2; i++){
+			auto nonColoredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>(new KinectCloudOutputWriter<pcl::PointXYZ>);
+			m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudThreated, nonColoredCloudWriter, _1));
+			m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&PCLViewer::updateNonColoredCloudThreated, m_pclFaceViewer, _1, i));
+			m_nonColoredCloudOutputWriter.push_back(nonColoredCloudWriter);
+
+			auto coloredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
+			m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, coloredCloudWriter, _1));
+			m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, i));
+			m_colorCloudOutputWriter.push_back(coloredCloudWriter);		
+		}
+
+		//m_colouredOutputStreamUpdater->cloudUpdated[0].connect(boost::bind(&PCLViewer::updateColoredCloudThreated,			m_pclFaceViewer, _1, 0));
+		//
+		//m_colouredOutputStreamUpdater->depthCloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated,		m_pclFaceViewer, _1, 1));
+		//
+		
+		//m_nonColoredOutputStreamUpdater->cloudUpdated.connect(boost::bind(&PCLViewer::updateNonColoredCloudThreated,		m_pclFaceViewer, _1, 0));
+		//m_nonColoredOutputStreamUpdater->depthCloudUpdated.connect(boost::bind(&PCLViewer::updateNonColoredCloudThreated,	m_pclFaceViewer, _1, 1));
+		//
 
 		m_kinectFrameGrabber.statusChanged.connect(boost::bind(&WindowsApplication::setStatusMessage, this, _1, _2));
 		
@@ -392,6 +401,65 @@ bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce
 
 	return false;
 }
+
+void WindowsApplication::startRecording(bool isColoredStream)
+{
+	int numEnabledCloudWriters = 0;
+	for (int i = 0; i < 2; i++){
+		auto recordingConfig = m_recordingConfiguration[i];
+		if (recordingConfig->isEnabled()){
+			numEnabledCloudWriters++;
+		}
+	}
+	int numOfThreadsToStartPerWriter = 5 / numEnabledCloudWriters;
+	numOfThreadsToStartPerWriter = std::max(numOfThreadsToStartPerWriter, 1);
+
+	if (isColoredStream){
+		
+		for (int i = 0; i < 2; i++){
+			auto recordingConfig = m_recordingConfiguration[i];
+			auto cloudWriter = m_colorCloudOutputWriter[i];
+			cloudWriter->setRecordingConfiguration(recordingConfig);
+			if (recordingConfig->isEnabled()){
+				cloudWriter->startWritingClouds(numOfThreadsToStartPerWriter);
+			}
+		}
+	}
+	else{
+
+		for (int i = 0; i < 2; i++){
+			auto recordingConfig = m_recordingConfiguration[i];
+			auto cloudWriter = m_nonColoredCloudOutputWriter[i];
+			cloudWriter->setRecordingConfiguration(recordingConfig);
+			if (recordingConfig->isEnabled()){
+				cloudWriter->startWritingClouds(numOfThreadsToStartPerWriter);
+			}
+		}
+	}
+}
+
+void WindowsApplication::stopRecording(bool isColoredStream)
+{
+	if (isColoredStream){
+		for (int i = 0; i < 2; i++){
+			auto recordingConfig = m_recordingConfiguration[i];
+			auto cloudWriter = m_colorCloudOutputWriter[i];
+			if (recordingConfig->isEnabled()){
+				cloudWriter->stopWritingClouds();
+			}
+		}
+	}
+	else{
+		for (int i = 0; i < 2; i++){
+			auto recordingConfig = m_recordingConfiguration[i];
+			auto cloudWriter = m_nonColoredCloudOutputWriter[i];
+			if (recordingConfig->isEnabled()){
+				cloudWriter->stopWritingClouds();
+			}
+		}
+	}
+}
+
 
 void WindowsApplication::colorStreamingChangedTo(bool enable)
 {
