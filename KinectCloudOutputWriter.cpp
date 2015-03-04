@@ -41,7 +41,6 @@ void KinectCloudOutputWriter< PointCloudType >::startWritingClouds(int threadsTo
 template < typename PointCloudType >
 void KinectCloudOutputWriter<PointCloudType>::stopWritingClouds()
 {
-	//std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
 	m_running = false;
 	m_cloudCount = 0;
 	m_checkCloud.notify_all();
@@ -60,20 +59,12 @@ void KinectCloudOutputWriter<PointCloudType>::writeCloudToFile(int index)
 	do{
 		std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
 		while (m_clouds.empty()){
-			/*if (!m_checkCloud.wait_for(cloudLocker, std::chrono::milliseconds(100)) && !m_running){
-				OutputDebugString(L"writer finished");
-				return;
-			}*/
 			if (!m_checkCloud.wait_for(cloudLocker, std::chrono::milliseconds(100))){
 				if (m_clouds.empty() && !m_running){
 					return;
 				}
 			}
 		}
-		//if (!m_running){
-		//	OutputDebugString(L"writer finished");
-		//	return;
-		//}
 		if (m_clouds.empty()){
 			return;
 		}
@@ -81,17 +72,11 @@ void KinectCloudOutputWriter<PointCloudType>::writeCloudToFile(int index)
 
 		auto filePath = m_recordingConfiguration->getFullRecordingPathString();
 		auto fileName = m_recordingConfiguration->getFileNameString();
+		auto fileFormatExtension = m_recordingConfiguration->getFileFormatFileExtension();
 		std::stringstream outputFileWithPath;
 		
-		outputFileWithPath << filePath;
-		outputFileWithPath << "\\";
-		outputFileWithPath << fileName;
-
-		outputFileWithPath << "_";
-		outputFileWithPath << "Cloud_" << cloudMeasurement.index << ".ply";
-		//fileName << "Cloud_" << cloudMeasurement.index << ".pcd";
-		//outputFileWithPath << cloudMeasurement.index << ".pcd";
-
+		outputFileWithPath << filePath << "\\" << fileName << "_Cloud_" << cloudMeasurement.index << fileFormatExtension;
+		
 		m_clouds.pop();
 		cloudIsEmpty = m_clouds.empty();
 		cloudLocker.unlock();
@@ -99,10 +84,6 @@ void KinectCloudOutputWriter<PointCloudType>::writeCloudToFile(int index)
 		OutputDebugString(index + L"starting to write \n");
 		writeCloudToDisk(outputFileWithPath.str(), *cloudMeasurement.cloud);
 		OutputDebugString(index + L"stop to write \n" );
-		//pcl::io::savePLYFile(fileName.str(), *cloudMeasurement.cloud, false);
-		//pcl::io::savePCDFileASCII(fileName.str(), *cloudMeasurement.cloud);
-		
-		//pcl::io::savePCDFileBinaryCompressed(fileName.str(), *cloudMeasurement.cloud);
 	} while (!m_clouds.empty() || m_running);
 	OutputDebugString(L"writer finished");
 
@@ -127,30 +108,6 @@ void KinectCloudOutputWriter<PointCloudType>::pushCloud(boost::shared_ptr<const 
 	m_clouds.push(cloudMeasurement);
 	m_cloudCount++;
 	m_checkCloud.notify_all();
-}
-
-template <>
-void KinectCloudOutputWriter< pcl::PointXYZRGB >::updateCloudThreated(boost::shared_ptr<const pcl::PointCloud<pcl::PointXYZRGB>> cloud)
-{
-	if (!m_running){
-		return;
-	}
-	
-	OutputDebugString(L" thread pushed cloud PointXYZRGB \n");
-	
-	std::async(std::launch::async, &KinectCloudOutputWriter::pushCloud, this, cloud);
-}
-
-
-template < >
-void KinectCloudOutputWriter< pcl::PointXYZ >::updateCloudThreated(boost::shared_ptr<const pcl::PointCloud<pcl::PointXYZ>> cloud)
-{
-	if (!m_running){
-		return;
-	}
-	
-	OutputDebugString(L" thread pushed cloud PointXYZ \n");
-	std::async(std::launch::async, &KinectCloudOutputWriter::pushCloud, this, cloud);
 }
 
 template < typename PointCloudType >

@@ -48,7 +48,29 @@ public:
 	}
 
 
-
+	std::string getFileFormatFileExtension()
+	{
+		switch (m_fileFormat)
+		{
+		case PLY:
+			return ".ply";
+			break;
+		case PLY_BINARY:
+			return ".ply";
+			break;
+		case PCD:
+			return ".pcd";
+			break;
+		case PCD_BINARY:
+			return ".pcd";
+			break;
+		case RECORD_FILE_FORMAT_COUNT:
+			break;
+		default:
+			break;
+		}
+		return ".UNKNOWN_FILE_FORMAT";
+	}
 	static LPTSTR getFileFormatAsString(RecordingFileFormat fileFormat)
 	{
 		switch (fileFormat)
