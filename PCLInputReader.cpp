@@ -3,15 +3,12 @@
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/io/pcd_io.h>
 
-PCLInputReader::PCLInputReader(const std::string inputPath, const std::string fileNamePrefix, const int bufferSize, const int numOfFilesToRead) :
+PCLInputReader::PCLInputReader(const int bufferSize) :
 	m_cloudBuffer(bufferSize),
 //	m_cloudBufferIsFreeVariables(bufferSize),
 //	m_cloudBufferPositionMutexes(bufferSize),
 	m_readerThreads(),
-	m_inputPath(inputPath),
-	m_bufferSize(bufferSize),
-	m_fileNamePrefix(fileNamePrefix),
-	m_numOfFilesToRead(numOfFilesToRead)
+	m_bufferSize(bufferSize)
 {
 
 }
@@ -48,7 +45,7 @@ void PCLInputReader::startCloudUpdateThread()
 
 void PCLInputReader::startReaderThreads()
 { 
-	for (int i = 0; i < 5; i++){
+	for (int i = 0; i < 1; i++){
 		m_readerThreads.push_back(std::thread(&PCLInputReader::readPLYFile, this, i));
 	}
 }
@@ -63,6 +60,7 @@ void PCLInputReader::printMessage(std::string msg)
 	std::lock_guard<std::mutex> lock(m_printMutex);
 	std::cout << msg;
 }
+
 void PCLInputReader::updateThreadFunc()
 {
 	printMessage("update thread started");
@@ -70,7 +68,7 @@ void PCLInputReader::updateThreadFunc()
 	int numOfFilesRead = currentUpdateIndex;
 	while (true)
 	{
-		if (numOfFilesRead >= m_numOfFilesToRead){
+		if (numOfFilesRead >= m_playbackConfiguration->getCloudFilesToPlay().size()){
 			printMessage("update thread finished");
 			return;
 		}
@@ -106,25 +104,26 @@ void PCLInputReader::readPLYFile(const int index)
 	msg << "thread for index: " << index << "started. " << std::endl;
 	printMessage(msg.str());
 
+	auto cloudFilesToPlay = m_playbackConfiguration->getCloudFilesToPlay();
 	while (true)
 	{
-		if (indexOfFileToRead > m_numOfFilesToRead){
+		if (indexOfFileToRead >= cloudFilesToPlay.size()){
 			return;
 		}
-		//pcl::PCLPointCloud2 blob;
 
 		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
 		//construct filename
-		std::stringstream fileName;
-		//fileName << m_fileNamePrefix << indexOfFileToRead << ".ply";
-		fileName << m_fileNamePrefix << indexOfFileToRead << ".pcd";
-
+		//std::stringstream fileName;
+		//fileName << m_fileNamePrefix << indexOfFileToRead << ".pcd";
+		
+		auto currentFileName = cloudFilesToPlay[indexOfFileToRead];
+		pcl::io::loadPCDFile(currentFileName, *cloud);
 		//load the ply file
-		//m_printMutex.lock();
-		//pcl::io::loadPLYFile(fileName.str(), *cloud);
-		pcl::io::loadPCDFile(fileName.str(), *cloud);
+		//pcl::io::loadPCDFile(fileName.str(), *cloud);
+
+
 		std::stringstream readingMsg;
-		readingMsg << "ReadingFile: " << fileName.str() << std::endl;
+		readingMsg << "ReadingFile: " << currentFileName << std::endl;
 		printMessage(readingMsg.str());
 //		m_printMutex.unlock();
 
@@ -152,4 +151,9 @@ void PCLInputReader::readPLYFile(const int index)
 			m_cloudBufferUpdated.notify_all();
 		}
 	}
+}
+
+void PCLInputReader::setPlaybackConfiguration(PlaybackConfigurationPtr playbackConfig)
+{
+	m_playbackConfiguration = playbackConfig;
 }

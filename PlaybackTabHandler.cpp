@@ -123,6 +123,18 @@ void PlaybackTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 
 	switch (LOWORD(wParam))
 	{
+	case IDC_PLAY_STOP_BUTTON:
+		startPlayback(m_playbackConfiguration);
+		break;
+	case IDC_HD_FACE_CHECKBOX:
+		m_playbackConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
+		break;
+	case IDC_FACE_RAW_DEPTH_CHECKBOX:
+		m_playbackConfiguration[FaceRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_DEPTH_CHECKBOX));
+		break;
+	case IDC_FULL_RAW_DEPTH_CHECKBOX:
+		m_playbackConfiguration[FullDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
+		break;
 	case IDC_FULL_RAW_DEPTH_BUTTON_CHOOSE_INPUT:
 	{
 		WCHAR filePath[MAX_PATH];
@@ -170,27 +182,35 @@ void PlaybackTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 
 void PlaybackTabHandler::playbackConfigurationChanged()
 {
+	bool isValidConfiguration = true;
 	if (auto playbackConfig = m_playbackConfiguration[HDFace]){
 		auto firstFile = playbackConfig->getFirstPlaybackFile();
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), firstFile);
+		isValidConfiguration &= playbackConfig->isPlaybackConfigurationValid();
 	}
 	else{
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), L"");
+		isValidConfiguration = false;
 	}
 	if (auto playbackConfig = m_playbackConfiguration[FaceRaw]){
 		auto firstFile = playbackConfig->getFirstPlaybackFile();
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), firstFile);
+		isValidConfiguration &= playbackConfig->isPlaybackConfigurationValid();
 	}
 	else{
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), L"");
+		isValidConfiguration = false;
 	}
 	if (auto playbackConfig = m_playbackConfiguration[FullDepthRaw]){
 		auto firstFile = playbackConfig->getFirstPlaybackFile();
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), firstFile);
+		isValidConfiguration &= playbackConfig->isPlaybackConfigurationValid();
 	}
 	else{
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), L"");
+		isValidConfiguration = false;
 	}
+	Button_Enable(GetDlgItem(m_hWnd, IDC_PLAY_STOP_BUTTON), isValidConfiguration);
 }
 
 LRESULT CALLBACK PlaybackTabHandler::MessageRouterTab(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

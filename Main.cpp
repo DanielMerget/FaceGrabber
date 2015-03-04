@@ -32,16 +32,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 int main()
 {
 	
-	std::cout << "main started" << std::endl;
-	PCLInputReader reader("", "Cloud_", 99, 309);
-	
-	std::shared_ptr<PCLViewer> viewer(new PCLViewer(1, "Face-Playback"));
-
-	reader.cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, viewer, _1, 0));
-	reader.startReaderThreads();
-	
-	
-	reader.startCloudUpdateThread();
-	reader.join();
+	//std::cout << "main started" << std::endl;
+	//PCLInputReader reader("", "Cloud_", 99, 309);
+	//
+	//std::shared_ptr<PCLViewer> viewer(new PCLViewer(1, "Face-Playback"));
+	//
+	//reader.cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, viewer, _1, 0));
+	//reader.startReaderThreads();
+	//
+	//
+	//reader.startCloudUpdateThread();
+	//reader.join();
 
 }

@@ -162,6 +162,122 @@ int InsertTabItem(HWND hTab, LPTSTR pszText, int iid)
 	return TabCtrl_InsertItem(hTab, iid, &ti);
 }
 
+void WindowsApplication::disconnectWriterAndViewerToKinect()
+{
+	for (int i = 0; i < 2; i++){
+		m_nonColoredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+		m_colouredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+	}
+	m_colorCloudOutputWriter.clear();
+	m_nonColoredCloudOutputWriter.clear();
+}
+
+
+void WindowsApplication::connectWriterAndViewerToKinect()
+{
+	for (int i = 0; i < 2; i++){
+		auto nonColoredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>(new KinectCloudOutputWriter<pcl::PointXYZ>);
+		m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudThreated, nonColoredCloudWriter, _1));
+		m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&PCLViewer::updateNonColoredCloudThreated,	m_pclFaceViewer, _1, i));
+		m_nonColoredCloudOutputWriter.push_back(nonColoredCloudWriter);
+
+		auto coloredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
+		m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, coloredCloudWriter, _1));
+		m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, i));
+		m_colorCloudOutputWriter.push_back(coloredCloudWriter);
+	}
+}
+
+void WindowsApplication::onCreate()
+{
+
+	// Init Direct2D
+	D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
+
+	// Create and initialize a new Direct2D image renderer (take a look at ImageRenderer.h)
+	// We'll use this to draw the data we receive from the Kinect to the screen
+	m_pDrawDataStreams = new ImageRenderer();
+	m_pclFaceViewer = std::shared_ptr<PCLViewer>(new PCLViewer(2, "Face-Viewer"));
+
+	m_recordTabHandler.setSharedRecordingConfiguration(m_recordingConfiguration);
+	m_recordTabHandle = CreateDialogParamW(
+		NULL,
+		MAKEINTRESOURCE(IDC_TAB_RECORD),
+		m_hWnd,
+		(DLGPROC)RecordTabHandler::MessageRouterTab,
+		reinterpret_cast<LPARAM>(&m_recordTabHandler));
+	m_recordTabHandler.colorConfigurationChanged.connect(boost::bind(&WindowsApplication::colorStreamingChangedTo, this, _1));
+	m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1));
+	m_recordTabHandler.stopWriting.connect(boost::bind(&WindowsApplication::stopRecording, this, _1));
+
+	m_plackBackTabHandler.setSharedRecordingConfiguration(m_recordingConfiguration);
+
+	m_playbackTabHandle = CreateDialogParamW(
+		NULL,
+		MAKEINTRESOURCE(IDC_TAB_PLAYBACK),
+		m_hWnd,
+		(DLGPROC)PlaybackTabHandler::MessageRouterTab,
+		reinterpret_cast<LPARAM>(&m_plackBackTabHandler));
+	ShowWindow(m_playbackTabHandle, SW_HIDE);
+	m_plackBackTabHandler.startPlayback.connect(boost::bind(&WindowsApplication::startPlayback, this, _1));
+
+	RECT windowRect;
+
+	GetClientRect(m_hWnd, &windowRect);
+	HWND tabControlHandle = GetDlgItem(m_hWnd, IDC_TAB2);
+
+	InsertTabItem(tabControlHandle, L"Record", 0);
+	InsertTabItem(tabControlHandle, L"Playback", 1);
+
+	//TabCtrl_InsertItem(m_hWnd, 0, &tab1Data);
+
+	TabCtrl_SetCurSel(tabControlHandle, 0);
+	ShowWindow(tabControlHandle, SW_SHOW);
+
+	RECT tabControlRect;
+	GetWindowRect(tabControlHandle, &tabControlRect);
+
+
+	const int width = 869;
+	const int height = 489;
+	const int xPos = (windowRect.right - windowRect.left - width) / 2;
+	m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, tabControlRect.top, width, height, m_hWnd, NULL, m_hInstance, NULL);
+
+	RECT liveViewRect;
+	GetWindowRect(m_liveViewWindow, &liveViewRect);
+
+
+	HRESULT hr = m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
+
+	if (FAILED(hr))
+	{
+		setStatusMessage(L"Failed to initialize the Direct2D draw device.", true);
+	}
+
+	m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
+
+	// Get and initialize the default Kinect sensor
+	m_kinectFrameGrabber.initializeDefaultSensor();
+	int depthWidth, depthHeight, colorWidth, colorHeight;
+
+	m_kinectFrameGrabber.getColourAndDepthSize(depthWidth, depthHeight, colorWidth, colorHeight);
+
+
+
+	m_colouredOutputStreamUpdater = std::shared_ptr<ColouredOutputStreamUpdater>(new ColouredOutputStreamUpdater);
+	m_nonColoredOutputStreamUpdater = std::shared_ptr<NonColouredOutputStreamsUpdater>(new NonColouredOutputStreamsUpdater);
+
+	m_kinectFrameGrabber.setOutputStreamUpdater(m_colouredOutputStreamUpdater);
+
+	m_colouredOutputStreamUpdater->initialize(m_kinectFrameGrabber.getCoordinateMapper(), depthWidth, depthHeight, colorWidth, colorHeight);
+	m_nonColoredOutputStreamUpdater->initialize(m_kinectFrameGrabber.getCoordinateMapper(), depthWidth, depthHeight, colorWidth, colorHeight);
+
+	connectWriterAndViewerToKinect();
+	m_kinectFrameGrabber.statusChanged.connect(boost::bind(&WindowsApplication::setStatusMessage, this, _1, _2));
+
+	m_inputFileReader.push_back(std::shared_ptr<PCLInputReader>(new PCLInputReader(5)));
+	m_inputFileReader.push_back(std::shared_ptr<PCLInputReader>(new PCLInputReader(5)));
+}
 
 LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -171,123 +287,14 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 	switch (message)
 	{
 	case WM_INITDIALOG:
-	{
 		// Bind application window handle
 		m_hWnd = hWnd;
-
-		// Init Direct2D
-		D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
-
-		// Create and initialize a new Direct2D image renderer (take a look at ImageRenderer.h)
-		// We'll use this to draw the data we receive from the Kinect to the screen
-		m_pDrawDataStreams = new ImageRenderer();
-		m_pclFaceViewer = std::shared_ptr<PCLViewer>(new PCLViewer(2, "Face-Viewer"));
-		//m_pclFaceRawViewer = std::shared_ptr<PCLViewer>(new PCLViewer("Raw Face-Depth"));
-
-		m_recordTabHandler.setSharedRecordingConfiguration(m_recordingConfiguration);
-		m_recordTabHandle = CreateDialogParamW(
-			NULL,
-			MAKEINTRESOURCE(IDC_TAB_RECORD),
-			m_hWnd,
-			(DLGPROC)RecordTabHandler::MessageRouterTab,
-			reinterpret_cast<LPARAM>(&m_recordTabHandler));
-		m_recordTabHandler.colorConfigurationChanged.connect(boost::bind(&WindowsApplication::colorStreamingChangedTo, this, _1));
-		m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1));
-		m_recordTabHandler.stopWriting.connect(boost::bind(&WindowsApplication::stopRecording, this, _1));
-
-		m_plackBackTabHandler.setSharedRecordingConfiguration(m_recordingConfiguration);
-		
-		m_playbackTabHandle = CreateDialogParamW(
-			NULL,
-			MAKEINTRESOURCE(IDC_TAB_PLAYBACK),
-			m_hWnd,
-			(DLGPROC)PlaybackTabHandler::MessageRouterTab,
-			reinterpret_cast<LPARAM>(&m_plackBackTabHandler));
-		ShowWindow(m_playbackTabHandle, SW_HIDE);
-			
-		RECT windowRect;
-
-		GetClientRect(m_hWnd, &windowRect);
-		HWND tabControlHandle = GetDlgItem(m_hWnd, IDC_TAB2);
-		
-		InsertTabItem(tabControlHandle, L"Record", 0);
-		InsertTabItem(tabControlHandle, L"Playback", 1);
-		
-		//TabCtrl_InsertItem(m_hWnd, 0, &tab1Data);
-		
-		TabCtrl_SetCurSel(tabControlHandle, 0);
-		ShowWindow(tabControlHandle, SW_SHOW);
-
-		RECT tabControlRect;
-		GetWindowRect(tabControlHandle, &tabControlRect);
-		
-	
-		const int width = 869;
-		const int height = 489;
-		const int xPos = (windowRect.right - windowRect.left - width)/2;
-		m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, tabControlRect.top, width, height, m_hWnd, NULL, m_hInstance, NULL);
-		
-		RECT liveViewRect;
-		GetWindowRect(m_liveViewWindow, &liveViewRect);
-		
-				
-		HRESULT hr = m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
-
-		if (FAILED(hr))
-		{
-			setStatusMessage(L"Failed to initialize the Direct2D draw device.", true);
-		}
-		
-		m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
-		
-		// Get and initialize the default Kinect sensor
-		m_kinectFrameGrabber.initializeDefaultSensor();
-		int depthWidth, depthHeight, colorWidth, colorHeight;
-
-		m_kinectFrameGrabber.getColourAndDepthSize(depthWidth, depthHeight, colorWidth, colorHeight);
-		
-
-
-		m_colouredOutputStreamUpdater = std::shared_ptr<ColouredOutputStreamUpdater>(new ColouredOutputStreamUpdater);
-		m_nonColoredOutputStreamUpdater = std::shared_ptr<NonColouredOutputStreamsUpdater>(new NonColouredOutputStreamsUpdater);
-
-		m_kinectFrameGrabber.setOutputStreamUpdater(m_colouredOutputStreamUpdater);
-
-		m_colouredOutputStreamUpdater->initialize(m_kinectFrameGrabber.getCoordinateMapper(), depthWidth, depthHeight, colorWidth, colorHeight);
-		m_nonColoredOutputStreamUpdater->initialize(m_kinectFrameGrabber.getCoordinateMapper(), depthWidth, depthHeight, colorWidth, colorHeight);
-
-		for (int i = 0; i < 2; i++){
-			auto nonColoredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>(new KinectCloudOutputWriter<pcl::PointXYZ>);
-			m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudThreated, nonColoredCloudWriter, _1));
-			m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&PCLViewer::updateNonColoredCloudThreated, m_pclFaceViewer, _1, i));
-			m_nonColoredCloudOutputWriter.push_back(nonColoredCloudWriter);
-
-			auto coloredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
-			m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, coloredCloudWriter, _1));
-			m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, i));
-			m_colorCloudOutputWriter.push_back(coloredCloudWriter);		
-		}
-
-		//m_colouredOutputStreamUpdater->cloudUpdated[0].connect(boost::bind(&PCLViewer::updateColoredCloudThreated,			m_pclFaceViewer, _1, 0));
-		//
-		//m_colouredOutputStreamUpdater->depthCloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated,		m_pclFaceViewer, _1, 1));
-		//
-		
-		//m_nonColoredOutputStreamUpdater->cloudUpdated.connect(boost::bind(&PCLViewer::updateNonColoredCloudThreated,		m_pclFaceViewer, _1, 0));
-		//m_nonColoredOutputStreamUpdater->depthCloudUpdated.connect(boost::bind(&PCLViewer::updateNonColoredCloudThreated,	m_pclFaceViewer, _1, 1));
-		//
-
-		m_kinectFrameGrabber.statusChanged.connect(boost::bind(&WindowsApplication::setStatusMessage, this, _1, _2));
-		
-		
-		
-	}
+		onCreate();
 		break;
 
 		// If the titlebar X is clicked, destroy app
 	case WM_CLOSE:
 		DestroyWindow(hWnd);
-		//m_pclFaceRawViewer->stopViewer();
 		m_pclFaceViewer->stopViewer();
 		break;
 
@@ -324,7 +331,7 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 
 void WindowsApplication::onRecordTabSelected()
 {
-	//m_listView.OnHide();
+	connectWriterAndViewerToKinect();
 	ShowWindow(m_liveViewWindow, SW_SHOW);
 	ShowWindow(m_recordTabHandle, SW_SHOW);
 	ShowWindow(m_playbackTabHandle, SW_HIDE);
@@ -332,7 +339,7 @@ void WindowsApplication::onRecordTabSelected()
 
 void WindowsApplication::onPlaybackSelected()
 {
-	//m_listView.OnShow();
+	disconnectWriterAndViewerToKinect();
 	ShowWindow(m_liveViewWindow, SW_HIDE);
 	m_plackBackTabHandler.resetUIElements();
 	m_plackBackTabHandler.setSharedRecordingConfiguration(m_recordTabHandler.getRecordConfiguration());
@@ -436,6 +443,31 @@ void WindowsApplication::startRecording(bool isColoredStream)
 			}
 		}
 	}
+}
+
+
+
+void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfig)
+{
+	for (auto& config : playbackConfig){
+		auto cloudType = config->getRecordCloudType();
+		if (config->isEnabled()){
+			
+			m_inputFileReader[cloudType]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(cloudType)));
+			m_inputFileReader[cloudType]->setPlaybackConfiguration(config);
+			m_inputFileReader[cloudType]->startCloudUpdateThread();
+			m_inputFileReader[cloudType]->startReaderThreads();
+		}
+		else{
+			
+		}
+	}
+	m_inputFileReader[0]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, 1));
+}
+
+void WindowsApplication::stopPlayback()
+{
+
 }
 
 void WindowsApplication::stopRecording(bool isColoredStream)

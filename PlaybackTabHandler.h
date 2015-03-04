@@ -8,6 +8,7 @@
 #include <strsafe.h>
 #include <memory>
 #include "PlaybackConfiguration.h"
+#include <boost/signal.hpp>
 
 class PlaybackTabHandler
 {
@@ -23,6 +24,8 @@ public:
 	void setSharedRecordingConfiguration(SharedRecordingConfiguration recordingConfiguration);
 	void playbackConfigurationChanged();
 	void resetUIElements();
+
+	boost::signal<void(SharedPlaybackConfiguration)> startPlayback;
 private:
 	void onCreate(WPARAM wParam, LPARAM);
 	void checkPlayBackPossible();

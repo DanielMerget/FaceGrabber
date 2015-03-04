@@ -50,9 +50,8 @@ public:
 		if (!m_enabled){
 			return true;
 		}
-		bool fileNameLengthExists = (wcslen(m_fileName) > 0);
-		bool filePathSet = !m_filePath.IsEmpty();
-		return fileNameLengthExists && filePathSet;
+		findFilesAtPath();
+		return m_foundCloudFiles.size() > 0;
 	}
 
 	CString getFilePathCString()
@@ -173,9 +172,10 @@ public:
 		return result;
 	}
 
-	bool isValidFileConfiguration()
+	
+	std::vector<std::string> getCloudFilesToPlay()
 	{
-		return m_foundCloudFiles.size() > 0;
+		return m_foundCloudFiles;
 	}
 
 	boost::signal<void(void)> playbackConfigurationChanged;
@@ -188,4 +188,5 @@ private:
 	bool						m_enabled;
 };
 
-typedef std::vector<std::shared_ptr<PlaybackConfiguration>> SharedPlaybackConfiguration;
+typedef std::shared_ptr<PlaybackConfiguration> PlaybackConfigurationPtr;
+typedef std::vector<PlaybackConfigurationPtr> SharedPlaybackConfiguration;

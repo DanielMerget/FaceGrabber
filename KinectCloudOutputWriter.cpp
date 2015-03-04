@@ -127,16 +127,16 @@ void KinectCloudOutputWriter<PointCloudType>::setRecordingConfiguration(Recordin
 	switch (recordingType)
 	{
 	case PLY:
-		writeCloudToDisk.connect(boost::bind(&pcl::io::savePCDFile<PointCloudType>, _1, _2, false));
-		break;
-	case PLY_BINARY:
-		writeCloudToDisk.connect(boost::bind(&pcl::io::savePCDFile<PointCloudType>, _1, _2, true));
-		break;
-	case PCD:
 		writeCloudToDisk.connect(boost::bind(&pcl::io::savePLYFile<PointCloudType>, _1, _2, false));
 		break;
-	case PCD_BINARY:
+	case PLY_BINARY:
 		writeCloudToDisk.connect(boost::bind(&pcl::io::savePLYFile<PointCloudType>, _1, _2, true));
+		break;
+	case PCD:
+		writeCloudToDisk.connect(boost::bind(&pcl::io::savePCDFile<PointCloudType>, _1, _2, false));
+		break;
+	case PCD_BINARY:
+		writeCloudToDisk.connect(boost::bind(&pcl::io::savePCDFile<PointCloudType>, _1, _2, true));
 		break;
 	case RECORD_FILE_FORMAT_COUNT:
 		break;

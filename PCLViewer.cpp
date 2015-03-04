@@ -176,3 +176,4 @@ void PCLViewer::useColoredCloud(bool useColored)
 		updateCurrentCloudWithIndexAndIdentifier.connect(boost::bind(&PCLViewer::updateNonColoredCloud, this, _1, _2, _3));
 	}
 }
+
