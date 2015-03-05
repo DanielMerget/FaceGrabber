@@ -39,10 +39,9 @@ void PCLViewer::updateColoredCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::Co
 
 void PCLViewer::pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud, int index)
 {
-	if (index >= m_cloudCount){
-		return;
-	}
+
 	std::unique_lock<std::mutex> lock(m_cloudMutex);
+
 	m_coloredClouds[index] = cloud;
 	m_cloudUpdated[index] = true;
 	bool notify = true;
@@ -53,33 +52,16 @@ void PCLViewer::pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::Co
 		m_cloudUpdate.notify_all();
 		m_isRunning = true;
 	}
-	//
-	//if (!m_isRunning){
-	//	int numOfSetClouds = 0;
-	//
-	//	for (auto& cloud : m_coloredClouds){
-	//		if (cloud){
-	//			numOfSetClouds++;
-	//		}
-	//	}
-	//	std::lock_guard<std::mutex> lock(m_viewPortConfigurationChangedMutex);
-	//	if (numOfSetClouds != m_cloudCount){
-	//		return;
-	//	}
-	//	m_isRunning = true;
-	//	m_cloudUpdate.notify_all();
-	//}
-	//else{
-	//	m_cloudUpdate.notify_all();
-	//}
+
 }
 
 void PCLViewer::pushNewNonColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, int index)
 {
-	if (index >= m_cloudCount){
-		return;
-	}
+	//if (index >= m_cloudCount){
+	//	return;
+	//}
 	std::unique_lock<std::mutex> lock(m_cloudMutex);
+	
 	m_nonColoredClouds[index] = cloud;
 	
 	m_cloudUpdated[index] = true;
@@ -91,23 +73,7 @@ void PCLViewer::pushNewNonColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZ>::Co
 		m_cloudUpdate.notify_all();
 		m_isRunning = true;
 	}
-	//if (!m_isRunning){
-	//	int numOfSetClouds = 0;
-	//	for (auto& cloud : m_nonColoredClouds){
-	//		if (!cloud){
-	//			numOfSetClouds++;
-	//		}
-	//	}
-	//	std::lock_guard<std::mutex> lock(m_viewPortConfigurationChangedMutex);
-	//	if (numOfSetClouds != m_cloudCount){
-	//		return;
-	//	}
-	//	m_isRunning = true;
-	//	m_cloudUpdate.notify_all();
-	//}
-	//else{
-	//	m_cloudUpdate.notify_all();
-	//}
+
 }
 
 void PCLViewer::createViewPortsForViewer(pcl::visualization::PCLVisualizer::Ptr viewer)
@@ -188,9 +154,13 @@ void PCLViewer::updateLoop()
 
 void PCLViewer::setNumOfClouds(int numOfClouds)
 {
-	std::lock_guard<std::mutex> lock(m_viewPortConfigurationChangedMutex);
+	std::unique_lock<std::mutex> cloudLock(m_cloudMutex);
+	std::lock_guard<std::mutex> viePortConfigLock(m_viewPortConfigurationChangedMutex);
 	if (m_cloudCount != numOfClouds){
 		m_cloudCount = numOfClouds;
+		m_coloredClouds.resize(numOfClouds);
+		m_cloudUpdated.resize(numOfClouds);
+		m_nonColoredClouds.resize(numOfClouds);
 		m_viewPortConfigurationChanged = true;
 	}
 }

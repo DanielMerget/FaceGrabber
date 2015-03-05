@@ -82,7 +82,15 @@ void KinectCloudOutputWriter<PointCloudType>::writeCloudToFile(int index)
 		cloudLocker.unlock();
 		
 		OutputDebugString(index + L"starting to write \n");
+		//if (m_recordingConfiguration->getRecordFileFormat() == PLY){
+		//	pcl::PLYWriter writer;
+		//	writer.write<PointCloudType>(outputFileWithPath.str(), *cloudMeasurement.cloud, false);
+		//}
+		//else{
+		//	writeCloudToDisk(outputFileWithPath.str(), *cloudMeasurement.cloud);
+		//}
 		writeCloudToDisk(outputFileWithPath.str(), *cloudMeasurement.cloud);
+		
 		OutputDebugString(index + L"stop to write \n" );
 	} while (!m_clouds.empty() || m_running);
 	OutputDebugString(L"writer finished");

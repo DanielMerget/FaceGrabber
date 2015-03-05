@@ -23,12 +23,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 
 
 #include "stdafx.h"
-#define NOMINMAX
 #include <Windows.h>
 #include <Kinect.h>
-#include <pcl/visualization/cloud_viewer.h>
+//#include <pcl/visualization/cloud_viewer.h>
 
 #include <regex>
+
+//#include <pcl/io/pcd_grabber.h>
+//#include <pcl/console/parse.h>
+//#include <pcl/console/print.h>
+//#include <pcl/visualization/boost.h>
+//#include <pcl/visualization/cloud_viewer.h>
+//#include <pcl/visualization/image_viewer.h>
+
+/*
 int main()
 {
 	std::smatch m;
@@ -49,3 +57,4 @@ int main()
 	//reader.join();
 
 }
+*/

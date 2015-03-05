@@ -99,28 +99,29 @@ void PCLInputReader::updateThreadFunc()
 		while (!isBufferAtIndexSet(currentUpdateIndex)){
 			std::stringstream msg;
 			msg << "update thread waiting for index " << currentUpdateIndex << " after reading files: " << numOfFilesRead << std::endl;
-			//printMessage(msg.str());
+			printMessage(msg.str());
 			m_cloudBufferUpdated.wait(cloudBufferLock);
 			if (!m_isPlaybackRunning){
 				std::stringstream msg;
 				msg << "update done because of stop"<< std::endl;
+				m_cloudBufferFree.notify_all();
 				printMessage(msg.str());
 				return;
 			}
 		}
 
-		//printMessage("update thread woke up - updating ");
+		printMessage("update thread woke up - updating ");
 		std::stringstream updateMsg;
 		updateMsg << "updating: " << numOfFilesRead << std::endl;
 		printMessage(updateMsg.str());
 		cloudUpdated(m_cloudBuffer[currentUpdateIndex]);
 		m_cloudBuffer[currentUpdateIndex].reset();
 		m_cloudBufferFree.notify_all();
-		//printMessage("update thread sleeping");
+		printMessage("update thread sleeping");
 
 		std::chrono::milliseconds dura(80);
 		std::this_thread::sleep_for(dura);
-		//printMessage("update thread woke up from sleeping");
+		printMessage("update thread woke up from sleeping");
 		numOfFilesRead++;
 		currentUpdateIndex = (currentUpdateIndex + 1) % m_bufferSize;
 	}
@@ -134,10 +135,14 @@ void PCLInputReader::readPLYFile(const int index)
 	printMessage(msg.str());
 
 	auto cloudFilesToPlay = m_playbackConfiguration->getCloudFilesToPlay();
+	
 	while (true)
 	{
 		if (indexOfFileToRead >= cloudFilesToPlay.size() || !m_isPlaybackRunning){
-			msg << "thread for index: " << index << " done because of stop or size end" << std::endl;
+			m_cloudBufferUpdated.notify_all();
+			std::stringstream doneMsg;
+			doneMsg<< "thread for index: " << index << " done because of stop or size end" << std::endl;
+			printMessage(doneMsg.str());
 			return;
 		}
 
@@ -162,14 +167,14 @@ void PCLInputReader::readPLYFile(const int index)
 		std::unique_lock<std::mutex> cloudBufferLock(m_cloudBufferMutex);
 		const int cloudBufferIndex = indexOfFileToRead % m_bufferSize;
 		while (isBufferAtIndexSet(cloudBufferIndex)){
-			std::stringstream msg;
-			msg << "thread for index: " << index << " waiting for updater thread for slot " << cloudBufferIndex << std::endl;
-			//printMessage(msg.str());
+			std::stringstream waitMSg;
+			waitMSg << "thread for index: " << index << " waiting for updater thread for slot " << cloudBufferIndex << std::endl;
+			printMessage(waitMSg.str());
 			m_cloudBufferFree.wait(cloudBufferLock);
 			if (!m_isPlaybackRunning){
-				std::stringstream msg;
-				msg << "thread for index: " << index << " done because of stop " << std::endl;
-				printMessage(msg.str());
+				std::stringstream playbackFinishedMSG;
+				playbackFinishedMSG << "thread for index: " << index << " done because of stop " << std::endl;
+				printMessage(playbackFinishedMSG.str());
 				return;
 			}
 		}
@@ -180,7 +185,7 @@ void PCLInputReader::readPLYFile(const int index)
 		//calc new buffer index
 		int newIndexOfFileToRead = indexOfFileToRead + m_readerThreads.size();
 		msg << "thread for index: " << index << " updated:" << cloudBufferIndex << " with: oldIndex: " << indexOfFileToRead << " new Index: " << newIndexOfFileToRead << std::endl;
-		//printMessage(msg.str());
+		printMessage(msg.str());
 		indexOfFileToRead = newIndexOfFileToRead;
 
 		//notify the updater thread

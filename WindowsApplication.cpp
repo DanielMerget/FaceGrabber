@@ -349,6 +349,7 @@ void WindowsApplication::disconnectInputReaderFromViewer()
 }
 void WindowsApplication::onRecordTabSelected()
 {
+	m_plackBackTabHandler.playbackStopped();
 	disconnectInputReaderFromViewer();
 	connectWriterAndViewerToKinect();
 	m_pclFaceViewer->setNumOfClouds(2);
