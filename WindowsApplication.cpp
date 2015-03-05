@@ -276,8 +276,8 @@ void WindowsApplication::onCreate()
 	connectWriterAndViewerToKinect();
 	m_kinectFrameGrabber.statusChanged.connect(boost::bind(&WindowsApplication::setStatusMessage, this, _1, _2));
 
-	m_inputFileReader.push_back(std::shared_ptr<PCLInputReader>(new PCLInputReader(5)));
-	m_inputFileReader.push_back(std::shared_ptr<PCLInputReader>(new PCLInputReader(5)));
+	m_inputFileReader.push_back(std::shared_ptr<PCLInputReader>(new PCLInputReader(50)));
+	m_inputFileReader.push_back(std::shared_ptr<PCLInputReader>(new PCLInputReader(50)));
 }
 
 LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -333,7 +333,7 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 void WindowsApplication::connectInputReaderToViewer()
 {
 	for (int i = 0; i < 2; i++){
-		m_inputFileReader[i] = std::shared_ptr<PCLInputReader>(new PCLInputReader(5));
+		m_inputFileReader[i] = std::shared_ptr<PCLInputReader>(new PCLInputReader(50));
 		m_inputFileReader[i]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(i)));
 		m_inputFileReader[i]->playbackFinished.connect(boost::bind(&WindowsApplication::onPlaybackFinished, this));
 	}

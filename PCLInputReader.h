@@ -3,6 +3,7 @@
 #include <vector>
 #include <thread>
 #include <boost/signals.hpp>
+#include <boost/signals2.hpp>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <condition_variable>
@@ -32,8 +33,9 @@ private:
 	void readPLYFile(const int index);
 	void updateThreadFunc();
 	void printMessage(std::string msg);
+	boost::signals2::signal<void(std::string, pcl::PointCloud<pcl::PointXYZRGB>&)> readCloudFromDisk;
+	//boost::signal<void(std::string, pcl::PointCloud<pcl::PointXYZRGB>&)> readCloudFromDisk;
 
-	boost::signal<void(std::string, pcl::PointCloud<pcl::PointXYZRGB>&)> readCloudFromDisk;
 	std::mutex m_printMutex;
 	std::mutex m_cloudBufferMutex;
 	std::condition_variable m_cloudBufferFree;
@@ -43,8 +45,8 @@ private:
 	
 	std::thread m_updateThread;
 	bool m_isPlaybackRunning;
-	const int m_bufferSize;
-
+	int m_bufferSize;
+	int	m_bufferFillLevel;
 	PlaybackConfigurationPtr m_playbackConfiguration;
 };
 

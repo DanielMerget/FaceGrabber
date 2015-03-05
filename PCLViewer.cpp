@@ -36,10 +36,11 @@ void PCLViewer::updateColoredCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::Co
 {
 	std::async(std::launch::async, &PCLViewer::pushNewColoredCloudAtIndex, this, cloud, index);
 }
-
+#include <Windows.h>
 void PCLViewer::pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud, int index)
 {
-
+	
+	OutputDebugString(index + L"pushNewColoredCloudAtIndex\n");
 	std::unique_lock<std::mutex> lock(m_cloudMutex);
 
 	m_coloredClouds[index] = cloud;
@@ -49,8 +50,9 @@ void PCLViewer::pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::Co
 		notify &= isUpdated;
 	}
 	if (notify){
-		m_cloudUpdate.notify_all();
+		OutputDebugString(index + L"pushNewColoredCloudAtIndex: notify \n");
 		m_isRunning = true;
+		m_cloudUpdate.notify_all();
 	}
 
 }
@@ -60,6 +62,7 @@ void PCLViewer::pushNewNonColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZ>::Co
 	//if (index >= m_cloudCount){
 	//	return;
 	//}
+	OutputDebugString(index + L"pushNewNonColoredCloudAtIndex\n");
 	std::unique_lock<std::mutex> lock(m_cloudMutex);
 	
 	m_nonColoredClouds[index] = cloud;
@@ -70,8 +73,9 @@ void PCLViewer::pushNewNonColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZ>::Co
 		notify &= isUpdated;
 	}
 	if (notify){
-		m_cloudUpdate.notify_all();
+		OutputDebugString(index + L"pushNewNonColoredCloudAtIndex: notify \n");
 		m_isRunning = true;
+		m_cloudUpdate.notify_all();
 	}
 
 }
