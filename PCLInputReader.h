@@ -9,6 +9,7 @@
 #include <condition_variable>
 #include <mutex>
 #include "PlaybackConfiguration.h"
+#include "Buffer.h"
 
 class PCLInputReader
 {
@@ -30,23 +31,31 @@ private:
 
 	bool isBufferAtIndexSet(const int index);
 	
-	void readPLYFile(const int index);
+	void readCloudData(const int index);
 	void updateThreadFunc();
 	void printMessage(std::string msg);
 	boost::signals2::signal<void(std::string, pcl::PointCloud<pcl::PointXYZRGB>&)> readCloudFromDisk;
 	//boost::signal<void(std::string, pcl::PointCloud<pcl::PointXYZRGB>&)> readCloudFromDisk;
 
 	std::mutex m_printMutex;
-	std::mutex m_cloudBufferMutex;
-	std::condition_variable m_cloudBufferFree;
-	std::condition_variable m_cloudBufferUpdated;
-	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> m_cloudBuffer;
-	std::vector<std::thread> m_readerThreads;
+
 	
-	std::thread m_updateThread;
+	std::vector<std::thread> m_readerThreads;
+
+
 	bool m_isPlaybackRunning;
-	int m_bufferSize;
-	int	m_bufferFillLevel;
+	
+	std::mutex m_readMutex;
+	//std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> m_cloudBuffer;
+	//std::mutex m_cloudBufferMutex;
+	//std::condition_variable m_cloudBufferFree;
+	//std::condition_variable m_cloudBufferUpdated;
+	//int m_bufferSize;
+	//int	m_bufferFillLevel;
+	
+	Buffer m_buffer;
+
+	std::thread m_updateThread;
 	PlaybackConfigurationPtr m_playbackConfiguration;
 };
 

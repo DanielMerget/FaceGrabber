@@ -39,7 +39,10 @@ void PCLViewer::updateColoredCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::Co
 #include <Windows.h>
 void PCLViewer::pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud, int index)
 {
-	
+	if (!cloud){
+		OutputDebugString(L"pushed point cloud is null");
+		return;
+	}
 	OutputDebugString(index + L"pushNewColoredCloudAtIndex\n");
 	std::unique_lock<std::mutex> lock(m_cloudMutex);
 

@@ -37,6 +37,12 @@
     <ClCompile Include="Main.cpp">
       <Filter>WindowsApp</Filter>
     </ClCompile>
+    <ClCompile Include="Buffer.cpp">
+      <Filter>InputReader</Filter>
+    </ClCompile>
+    <ClCompile Include="BufferSynchronizer.cpp">
+      <Filter>InputReader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -83,6 +89,12 @@
     </ClInclude>
     <ClInclude Include="KinectCloudOutputWriter.h">
       <Filter>FileWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffer.h">
+      <Filter>InputReader</Filter>
+    </ClInclude>
+    <ClInclude Include="BufferSynchronizer.h">
+      <Filter>InputReader</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

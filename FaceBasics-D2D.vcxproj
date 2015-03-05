@@ -19,6 +19,8 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="BufferSynchronizer.cpp" />
     <ClCompile Include="ColouredOutputStreamUpdater.cpp" />
     <ClCompile Include="KinectHDFaceGrabber.cpp" />
     <ClCompile Include="ImageRenderer.cpp" />
@@ -39,6 +41,8 @@
     <ResourceCompile Include="FaceBasics.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Buffer.h" />
+    <ClInclude Include="BufferSynchronizer.h" />
     <ClInclude Include="ColouredOutputStreamUpdater.h" />
     <ClInclude Include="KinectHDFaceGrabber.h" />
     <ClInclude Include="ImageRenderer.h" />
