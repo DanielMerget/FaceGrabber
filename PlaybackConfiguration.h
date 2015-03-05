@@ -6,7 +6,13 @@
 #include <boost/bind.hpp>
 #include <atlstr.h>
 #include "RecordingConfiguration.h"
-
+#include <regex>
+#include <algorithm>
+struct CloudFile{
+	RecordingFileFormat format;
+	std::string fileName;
+	std::string fullFilePath;
+};
 class PlaybackConfiguration{
 
 public:
@@ -143,6 +149,27 @@ public:
 		return m_cloudType;
 	}
 
+	static int extractCloudCountFromString(std::string input)
+	{
+		if (input == ""){
+			return -1;
+		}
+		std::smatch m;
+		std::regex_match(input, m, std::regex("([A-z0-9]*)_([0-9]*).(ply|pcd)"));
+		if (m.size() > 2){
+			std::cout << "result: " << m[2] << std::endl;
+			int numberAsInt = std::stoi(m[2]);
+			std::cout << "result as INT: " << numberAsInt << std::endl;
+			return numberAsInt;
+		}
+		return -1;
+	}
+
+	static bool sortByIntegerEnding(const CloudFile& cloudFile1, const CloudFile cloudFile2)
+	{
+		return extractCloudCountFromString(cloudFile1.fileName) < extractCloudCountFromString(cloudFile2.fileName);
+	}
+
 	void findFilesAtPath()
 	{
 		std::string filePath = getFilePath();		
@@ -156,31 +183,52 @@ public:
 				continue;
 			}
 			auto fileExtension = i->path().extension().string();
-			if (fileExtension == ".pcd" || fileExtension == ".ply"){
-				m_foundCloudFiles.push_back(i->path().string());
+			CloudFile cloudFile;
+			if (fileExtension == ".pcd"){
+				cloudFile.format = PCD;
 			}
+			else if (fileExtension == ".ply"){
+				cloudFile.format = PLY;
+			}
+			else{
+				continue;
+			}
+			cloudFile.fullFilePath = i->path().string();
+			cloudFile.fileName = i->path().filename().string();
+			m_foundCloudFiles.push_back(cloudFile);
+			//if (fileExtension == ".pcd" || fileExtension == ".ply"){
+			//	m_foundCloudFiles.push_back(i->path().string());
+			//}
 		}
+		std::sort(m_foundCloudFiles.begin(), m_foundCloudFiles.end(), &PlaybackConfiguration::sortByIntegerEnding);
 	}
 
 	CString getFirstPlaybackFile()
 	{
 		if (m_foundCloudFiles.size() > 0){
-			CString result(m_foundCloudFiles[0].c_str());
+			CString result(m_foundCloudFiles[0].fileName.c_str());
 			return result;
 		}
 		CString result = "";
 		return result;
 	}
 
-	
-	std::vector<std::string> getCloudFilesToPlay()
+	std::vector<CloudFile> getCloudFilesToPlay()
 	{
 		return m_foundCloudFiles;
 	}
 
+	
+	//std::vector<std::string> getCloudFilesToPlay()
+	//{
+	//	return m_foundCloudFiles;
+	//}
+
 	boost::signal<void(void)> playbackConfigurationChanged;
 private:
-	std::vector<std::string>	m_foundCloudFiles;
+	
+	//std::vector<std::string>	m_foundCloudFiles;
+	std::vector<CloudFile>	m_foundCloudFiles;
 	CString						m_filePath;
 	RecordingFileFormat			m_fileFormat;
 	RecordCloudType				m_cloudType;

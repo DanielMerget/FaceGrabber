@@ -28,10 +28,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 #include <Kinect.h>
 #include <pcl/visualization/cloud_viewer.h>
 
-
+#include <regex>
 int main()
 {
-	
+	std::smatch m;
+	const std::string input = "Cloud_1234.ply";
+	std::regex_search(input, m, std::regex("([a-z])*_(?)(.ply)"));
+	std::cout << "prefix: " << m.prefix() << " suffix: " << m.suffix() << std::endl;
+
 	//std::cout << "main started" << std::endl;
 	//PCLInputReader reader("", "Cloud_", 99, 309);
 	//

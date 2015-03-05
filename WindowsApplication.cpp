@@ -337,7 +337,7 @@ void WindowsApplication::connectInputReaderToViewer()
 		m_inputFileReader[i]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(i)));
 		m_inputFileReader[i]->playbackFinished.connect(boost::bind(&WindowsApplication::onPlaybackFinished, this));
 	}
-	m_inputFileReader[0]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(1)));
+	//m_inputFileReader[0]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(1)));
 }
 
 void WindowsApplication::disconnectInputReaderFromViewer()
@@ -351,6 +351,7 @@ void WindowsApplication::onRecordTabSelected()
 {
 	disconnectInputReaderFromViewer();
 	connectWriterAndViewerToKinect();
+	m_pclFaceViewer->setNumOfClouds(2);
 	ShowWindow(m_liveViewWindow, SW_SHOW);
 	ShowWindow(m_recordTabHandle, SW_SHOW);
 	ShowWindow(m_playbackTabHandle, SW_HIDE);
@@ -367,67 +368,6 @@ void WindowsApplication::onPlaybackSelected()
 	ShowWindow(m_playbackTabHandle, SW_SHOW);
 }
 
-
-void WindowsApplication::onSelectionChanged(WPARAM wParam, LPARAM handle)
-{
-	
-	switch (LOWORD(wParam))
-	{
-	default:
-		break;
-	}
-}
-void WindowsApplication::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
-{
-	
-	switch (LOWORD(wParam))
-	{
-	default:
-		break;
-	}
-}
-
-void WindowsApplication::onButtonClicked(WPARAM wParam, LPARAM handle)
-{
-	switch (LOWORD(wParam))
-	{
-	default:
-		break;
-	}
-}
-void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM handle)
-{
-
-	switch (HIWORD(wParam))
-	{
-	case CBN_SELCHANGE:
-		onSelectionChanged(wParam, handle);
-		break;
-	case BN_CLICKED:
-		onButtonClicked(wParam, handle);
-		break;
-	case EN_CHANGE:
-		onEditBoxeChanged(wParam, handle);
-	default:
-		break;
-	}	
-}
-
-bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce)
-{
-	_In_z_ WCHAR* szMessage = &statusString[0];
-	ULONGLONG now = GetTickCount64();
-	ULONGLONG nShowTimeMsec = 1000;
-	if (m_hWnd && (bForce || (m_nNextStatusTime <= now)))
-	{
-		SetDlgItemText(m_hWnd, IDC_STATUS, szMessage);
-		m_nNextStatusTime = now + nShowTimeMsec;
-
-		return true;
-	}
-
-	return false;
-}
 
 void WindowsApplication::startRecording(bool isColoredStream)
 {
@@ -469,8 +409,17 @@ void WindowsApplication::startRecording(bool isColoredStream)
 
 void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfig)
 {
+	int enabledClouds = 0;
 	for (int i = 0; i < 2; i++){
-		auto cloudType = playbackConfig[i]->getRecordCloudType();
+		auto& currentConfig = playbackConfig[i];
+		if (currentConfig->isEnabled()){
+			enabledClouds++;
+		}
+	}
+	m_pclFaceViewer->setNumOfClouds(enabledClouds);
+	for (int i = 0; i < 2; i++){
+		auto& currentConfig = playbackConfig[i];
+		auto cloudType = currentConfig->getRecordCloudType();
 		m_inputFileReader[cloudType]->setPlaybackConfiguration(playbackConfig[i]);
 		m_inputFileReader[cloudType]->startCloudUpdateThread();
 		m_inputFileReader[cloudType]->startReaderThreads();
@@ -522,6 +471,70 @@ void WindowsApplication::colorStreamingChangedTo(bool enable)
 	}
 	m_pclFaceViewer->useColoredCloud(enable);
 }
+
+
+
+void WindowsApplication::onSelectionChanged(WPARAM wParam, LPARAM handle)
+{
+
+	switch (LOWORD(wParam))
+	{
+	default:
+		break;
+	}
+}
+void WindowsApplication::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
+{
+
+	switch (LOWORD(wParam))
+	{
+	default:
+		break;
+	}
+}
+
+void WindowsApplication::onButtonClicked(WPARAM wParam, LPARAM handle)
+{
+	switch (LOWORD(wParam))
+	{
+	default:
+		break;
+	}
+}
+void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM handle)
+{
+
+	switch (HIWORD(wParam))
+	{
+	case CBN_SELCHANGE:
+		onSelectionChanged(wParam, handle);
+		break;
+	case BN_CLICKED:
+		onButtonClicked(wParam, handle);
+		break;
+	case EN_CHANGE:
+		onEditBoxeChanged(wParam, handle);
+	default:
+		break;
+	}
+}
+
+bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce)
+{
+	_In_z_ WCHAR* szMessage = &statusString[0];
+	ULONGLONG now = GetTickCount64();
+	ULONGLONG nShowTimeMsec = 1000;
+	if (m_hWnd && (bForce || (m_nNextStatusTime <= now)))
+	{
+		SetDlgItemText(m_hWnd, IDC_STATUS, szMessage);
+		m_nNextStatusTime = now + nShowTimeMsec;
+
+		return true;
+	}
+
+	return false;
+}
+
 
 void WindowsApplication::recordPathChanged(RecordCloudType type)
 {

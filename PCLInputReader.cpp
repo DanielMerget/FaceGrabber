@@ -146,15 +146,15 @@ void PCLInputReader::readPLYFile(const int index)
 		//std::stringstream fileName;
 		//fileName << m_fileNamePrefix << indexOfFileToRead << ".pcd";
 		
-		auto currentFileName = cloudFilesToPlay[indexOfFileToRead];
+		auto filePath = cloudFilesToPlay[indexOfFileToRead].fullFilePath;
 		//pcl::io::loadPCDFile(currentFileName, *cloud);
-		readCloudFromDisk(currentFileName, *cloud);
+		readCloudFromDisk(filePath, *cloud);
 		//load the ply file
 		//pcl::io::loadPCDFile(fileName.str(), *cloud);
 
 
 		std::stringstream readingMsg;
-		readingMsg << "ReadingFile: " << currentFileName << std::endl;
+		readingMsg << "ReadingFile: " << filePath << std::endl;
 		printMessage(readingMsg.str());
 //		m_printMutex.unlock();
 

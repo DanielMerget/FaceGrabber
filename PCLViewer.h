@@ -17,14 +17,19 @@ public:
 	void updateNonColoredCloudThreated(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, int index);
 	void stopViewer();
 	void useColoredCloud(bool useColored);
+	void setNumOfClouds(int numOfClouds);
 private:
 	void pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud, int index);
 	void pushNewNonColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, int index);
 
 	void updateLoop();
-	void updateColoredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer& viewer);
-	void updateNonColoredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer& viewer);
-	boost::signal<void(int cloudIndex, std::string, pcl::visualization::PCLVisualizer&)> updateCurrentCloudWithIndexAndIdentifier;
+	void updateColoredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer::Ptr viewer);
+	void updateNonColoredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer::Ptr viewer);
+	
+	boost::signal<void(int cloudIndex, std::string, pcl::visualization::PCLVisualizer::Ptr)> updateCurrentCloudWithIndexAndIdentifier;
+
+	void createViewPortsForViewer(pcl::visualization::PCLVisualizer::Ptr viewer);
+	void matchPointCloudsToViewPorts(pcl::visualization::PCLVisualizer::Ptr viewer);
 
 	bool m_isRunning;
 	std::string m_viewerName;
@@ -33,6 +38,12 @@ private:
 
 	//pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr m_currentCloud1;
 	//pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr m_currentCloud2;
+	bool m_viewPortConfigurationChanged;
+	std::mutex m_viewPortConfigurationChangedMutex;
+	std::vector<bool> m_cloudUpdated;
+	std::vector<int> m_viewPorts;
+	std::vector<std::string> m_cloudIDs;
+
 	
 
 	std::thread m_updateThread;
