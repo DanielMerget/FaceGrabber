@@ -28,6 +28,18 @@ void PCLViewer::stopViewer()
 	m_cloudUpdate.notify_all();
 }
 
+void PCLViewer::updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> clouds)
+{
+	std::unique_lock<std::mutex> lock(m_cloudMutex);
+	auto it = m_coloredClouds.begin();
+	for (auto cloud : clouds){
+		*it = cloud;
+		it++;
+	}
+	m_isRunning = true;
+	m_cloudUpdate.notify_all();
+}
+
 void PCLViewer::updateNonColoredCloudThreated(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, int index)
 {
 	std::async(std::launch::async, &PCLViewer::pushNewNonColoredCloudAtIndex, this, cloud, index);

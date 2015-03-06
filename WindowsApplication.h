@@ -15,6 +15,8 @@
 #include "ColouredOutputStreamUpdater.h"
 #include "NonColouredOutputStreamsUpdater.h"
 #include "PCLInputReader.h"
+#include "BufferSynchronizer.h"
+#include <thread>
 class WindowsApplication
 {
 public:
@@ -114,6 +116,8 @@ private:
 	//RecordingConfiguration	m_recordingConfiguration[RECORD_CLOUD_TYPE_COUNT];
 	SharedRecordingConfiguration	m_recordingConfiguration;
 	//std::shared_ptr<RecordingConfiguration>	m_recordingConfiguration;
+	BufferSynchronizer			m_bufferSynchronizer;
+	std::thread					m_bufferSynchronizerThread;
 
 	RecordTabHandler			m_recordTabHandler;
 	PlaybackTabHandler			m_plackBackTabHandler;

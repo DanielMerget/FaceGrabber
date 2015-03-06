@@ -14,15 +14,17 @@
 class PCLInputReader
 {
 public:
-	PCLInputReader(const int bufferSize);
+	PCLInputReader();
 	~PCLInputReader();
 	void startCloudUpdateThread();
 	void startReaderThreads();
 	void stopReaderThreads();
 
 	void join();
+	std::shared_ptr<Buffer> getBuffer();
+	void setBuffer(std::shared_ptr<Buffer> buffer);
 
-	boost::signal<void(void)> playbackFinished;
+	
 
 	boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated;
 
@@ -35,7 +37,6 @@ private:
 	void updateThreadFunc();
 	void printMessage(std::string msg);
 	boost::signals2::signal<void(std::string, pcl::PointCloud<pcl::PointXYZRGB>&)> readCloudFromDisk;
-	//boost::signal<void(std::string, pcl::PointCloud<pcl::PointXYZRGB>&)> readCloudFromDisk;
 
 	std::mutex m_printMutex;
 
@@ -46,14 +47,8 @@ private:
 	bool m_isPlaybackRunning;
 	
 	std::mutex m_readMutex;
-	//std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> m_cloudBuffer;
-	//std::mutex m_cloudBufferMutex;
-	//std::condition_variable m_cloudBufferFree;
-	//std::condition_variable m_cloudBufferUpdated;
-	//int m_bufferSize;
-	//int	m_bufferFillLevel;
-	
-	Buffer m_buffer;
+
+	std::shared_ptr<Buffer> m_buffer;
 
 	std::thread m_updateThread;
 	PlaybackConfigurationPtr m_playbackConfiguration;

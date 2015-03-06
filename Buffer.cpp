@@ -29,7 +29,7 @@ Buffer::~Buffer()
 
 void Buffer::resetBuffer()
 {
-	std::unique_lock<std::mutex> cloudBufferLock(*m_cloudBufferMutex);
+	std::lock_guard<std::mutex> cloudBufferLock(*m_cloudBufferMutex);
 	m_bufferFillLevel = 0;
 	m_pullDataPosition = 0;
 	m_producerFinished = false;
@@ -52,6 +52,7 @@ void Buffer::pushData(pcl::PointCloud<pcl::PointXYZRGB>::Ptr newData, int index)
 		printMessage(waitMSg.str());
 		//m_cloudBufferFree.wait(cloudBufferLock);
 		m_cloudBufferFree->wait(cloudBufferLock);
+		(*dataReady)();
 		if (!m_bufferingActive){
 			std::stringstream playbackFinishedMSG;
 			playbackFinishedMSG << "thread for index: " << index << " done because of stop " << std::endl;
@@ -63,6 +64,11 @@ void Buffer::pushData(pcl::PointCloud<pcl::PointXYZRGB>::Ptr newData, int index)
 	m_cloudBuffer[index] = newData;
 	m_bufferFillLevel++;
 	m_cloudBufferUpdated->notify_all();
+	cloudBufferLock.unlock();
+	if (m_bufferFillLevel == getBufferSize()){
+		(*dataReady)();
+	}
+	
 }
 
 bool Buffer::isDataAvailable()

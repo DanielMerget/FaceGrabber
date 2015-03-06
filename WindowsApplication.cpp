@@ -47,6 +47,8 @@ void WindowsApplication::initRecordDataModel()
 WindowsApplication::~WindowsApplication()
 {
 	SafeRelease(m_pD2DFactory);
+	m_bufferSynchronizer.stop();
+	m_bufferSynchronizerThread.join();
 }
 
 
@@ -275,9 +277,17 @@ void WindowsApplication::onCreate()
 
 	connectWriterAndViewerToKinect();
 	m_kinectFrameGrabber.statusChanged.connect(boost::bind(&WindowsApplication::setStatusMessage, this, _1, _2));
-
-	m_inputFileReader.push_back(std::shared_ptr<PCLInputReader>(new PCLInputReader(50)));
-	m_inputFileReader.push_back(std::shared_ptr<PCLInputReader>(new PCLInputReader(50)));
+	std::vector<std::shared_ptr<Buffer>> buffers;
+	for (int i = 0; i < 2; i++){
+		auto buffer = std::shared_ptr<Buffer>(new Buffer);
+		auto inputReader = std::shared_ptr<PCLInputReader>(new PCLInputReader());
+		inputReader->setBuffer(buffer);
+		m_inputFileReader.push_back(inputReader);
+		buffers.push_back(buffer);
+	}
+	m_bufferSynchronizer.playbackFinished.connect(boost::bind(&WindowsApplication::onPlaybackFinished, this));
+	m_bufferSynchronizerThread = std::thread(&BufferSynchronizer::updateThreadFunc, &m_bufferSynchronizer);
+	//m_bufferSynchronizer.setBuffer(buffers);
 }
 
 LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -332,11 +342,14 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 
 void WindowsApplication::connectInputReaderToViewer()
 {
-	for (int i = 0; i < 2; i++){
-		m_inputFileReader[i] = std::shared_ptr<PCLInputReader>(new PCLInputReader(50));
-		m_inputFileReader[i]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(i)));
-		m_inputFileReader[i]->playbackFinished.connect(boost::bind(&WindowsApplication::onPlaybackFinished, this));
-	}
+	m_bufferSynchronizer.cloudsUpdated.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
+	
+	//r (int i = 0; i < 2; i++){
+	///m_inputFileReader[i] = std::shared_ptr<PCLInputReader>(new PCLInputReader());
+	///m_inputFileReader[i]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(i)));
+	//
+	//_inputFileReader[i]->playbackFinished.connect(boost::bind(&WindowsApplication::onPlaybackFinished, this));
+	//
 	//m_inputFileReader[0]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(1)));
 }
 
@@ -344,7 +357,7 @@ void WindowsApplication::disconnectInputReaderFromViewer()
 {
 	for (int i = 0; i < 2; i++){
 		m_inputFileReader[i]->cloudUpdated.disconnect_all_slots();
-		m_inputFileReader[i]->playbackFinished.disconnect_all_slots();
+		//inputFileReader[i]->playbackFinished.disconnect_all_slots();
 	}
 }
 void WindowsApplication::onRecordTabSelected()
@@ -411,12 +424,19 @@ void WindowsApplication::startRecording(bool isColoredStream)
 void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfig)
 {
 	int enabledClouds = 0;
+	std::vector<std::shared_ptr<Buffer>> activeBuffers;
+	int numOfFilesToRead = 0;
 	for (int i = 0; i < 2; i++){
 		auto& currentConfig = playbackConfig[i];
+		
 		if (currentConfig->isEnabled()){
 			enabledClouds++;
+			numOfFilesToRead = currentConfig->getCloudFilesToPlay().size();
+			activeBuffers.push_back(m_inputFileReader[i]->getBuffer());
 		}
 	}
+	
+	m_bufferSynchronizer.setBuffer(activeBuffers, numOfFilesToRead);
 	m_pclFaceViewer->setNumOfClouds(enabledClouds);
 	for (int i = 0; i < 2; i++){
 		auto& currentConfig = playbackConfig[i];
