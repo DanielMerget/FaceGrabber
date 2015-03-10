@@ -23,7 +23,7 @@ void printMessage(std::string msg)
 {
 	auto msgCstring = CString(msg.c_str());
 	msgCstring += L"\n";
-	OutputDebugString(msgCstring);
+	//OutputDebugString(msgCstring);
 
 }
 HRESULT ColouredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize, 

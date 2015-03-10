@@ -166,7 +166,7 @@ int InsertTabItem(HWND hTab, LPTSTR pszText, int iid)
 
 void WindowsApplication::disconnectWriterAndViewerToKinect()
 {
-	for (int i = 0; i < 2; i++){
+	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		m_nonColoredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 		m_colouredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 	}
@@ -179,14 +179,18 @@ void WindowsApplication::disconnectWriterAndViewerToKinect()
 
 void WindowsApplication::connectWriterAndViewerToKinect()
 {
-	for (int i = 0; i < 2; i++){
+	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		auto nonColoredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>(new KinectCloudOutputWriter<pcl::PointXYZ>);
-		m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudThreated, nonColoredCloudWriter, _1));
 		m_nonColoredCloudOutputWriter.push_back(nonColoredCloudWriter);
 
 		auto coloredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
-		m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, coloredCloudWriter, _1));
 		m_colorCloudOutputWriter.push_back(coloredCloudWriter);
+		//we skip enabling the fulldepth raw
+		if (i == FullDepthRaw){
+			continue;
+		}
+		m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudThreated, nonColoredCloudWriter, _1));
+		m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, coloredCloudWriter, _1));
 	}
 	m_nonColoredOutputStreamUpdater->cloudsUpdated.connect(boost::bind(&PCLViewer::updateNonColoredClouds, m_pclFaceViewer, _1));
 	m_colouredOutputStreamUpdater->cloudsUpdated.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
@@ -280,7 +284,7 @@ void WindowsApplication::onCreate()
 	connectWriterAndViewerToKinect();
 	m_kinectFrameGrabber.statusChanged.connect(boost::bind(&WindowsApplication::setStatusMessage, this, _1, _2));
 	std::vector<std::shared_ptr<Buffer>> buffers;
-	for (int i = 0; i < 2; i++){
+	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		auto buffer = std::shared_ptr<Buffer>(new Buffer);
 		auto inputReader = std::shared_ptr<PCLInputReader>(new PCLInputReader());
 		inputReader->setBuffer(buffer);
@@ -357,7 +361,7 @@ void WindowsApplication::connectInputReaderToViewer()
 
 void WindowsApplication::disconnectInputReaderFromViewer()
 {
-	for (int i = 0; i < 2; i++){
+	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		m_inputFileReader[i]->cloudUpdated.disconnect_all_slots();
 		//inputFileReader[i]->playbackFinished.disconnect_all_slots();
 	}
@@ -389,34 +393,42 @@ void WindowsApplication::onPlaybackSelected()
 
 void WindowsApplication::startRecording(bool isColoredStream)
 {
+	
 	int numEnabledCloudWriters = 0;
-	for (int i = 0; i < 2; i++){
+	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		auto recordingConfig = m_recordingConfiguration[i];
 		if (recordingConfig->isEnabled()){
 			numEnabledCloudWriters++;
 		}
+		
 	}
 	int numOfThreadsToStartPerWriter = 5 / numEnabledCloudWriters;
 	numOfThreadsToStartPerWriter = std::max(numOfThreadsToStartPerWriter, 1);
 
 	if (isColoredStream){
 		
-		for (int i = 0; i < 2; i++){
+		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 			auto recordingConfig = m_recordingConfiguration[i];
 			auto cloudWriter = m_colorCloudOutputWriter[i];
 			cloudWriter->setRecordingConfiguration(recordingConfig);
 			if (recordingConfig->isEnabled()){
+				if (i == FullDepthRaw){
+					m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, cloudWriter, _1));
+				}
 				cloudWriter->startWritingClouds(numOfThreadsToStartPerWriter);
 			}
 		}
 	}
 	else{
 
-		for (int i = 0; i < 2; i++){
+		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 			auto recordingConfig = m_recordingConfiguration[i];
 			auto cloudWriter = m_nonColoredCloudOutputWriter[i];
 			cloudWriter->setRecordingConfiguration(recordingConfig);
 			if (recordingConfig->isEnabled()){
+				if (i == FullDepthRaw){
+					m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudThreated, cloudWriter, _1));
+				}
 				cloudWriter->startWritingClouds(numOfThreadsToStartPerWriter);
 			}
 		}
@@ -430,7 +442,7 @@ void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfi
 	int enabledClouds = 0;
 	std::vector<std::shared_ptr<Buffer>> activeBuffers;
 	int numOfFilesToRead = 0;
-	for (int i = 0; i < 2; i++){
+	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		auto& currentConfig = playbackConfig[i];
 		
 		if (currentConfig->isEnabled()){
@@ -442,7 +454,7 @@ void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfi
 	
 	m_bufferSynchronizer.setBuffer(activeBuffers, numOfFilesToRead);
 	m_pclFaceViewer->setNumOfClouds(enabledClouds);
-	for (int i = 0; i < 2; i++){
+	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		auto& currentConfig = playbackConfig[i];
 		auto cloudType = currentConfig->getRecordCloudType();
 		m_inputFileReader[cloudType]->setPlaybackConfiguration(playbackConfig[i]);
@@ -465,7 +477,7 @@ void WindowsApplication::stopPlayback()
 void WindowsApplication::stopRecording(bool isColoredStream)
 {
 	if (isColoredStream){
-		for (int i = 0; i < 2; i++){
+		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 			auto recordingConfig = m_recordingConfiguration[i];
 			auto cloudWriter = m_colorCloudOutputWriter[i];
 			if (recordingConfig->isEnabled()){
@@ -474,7 +486,7 @@ void WindowsApplication::stopRecording(bool isColoredStream)
 		}
 	}
 	else{
-		for (int i = 0; i < 2; i++){
+		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 			auto recordingConfig = m_recordingConfiguration[i];
 			auto cloudWriter = m_nonColoredCloudOutputWriter[i];
 			if (recordingConfig->isEnabled()){

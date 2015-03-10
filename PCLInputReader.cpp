@@ -1,8 +1,8 @@
 #include "PCLInputReader.h"
 #include <pcl/io/ply_io.h>
-#include <pcl/PCLPointCloud2.h>
 #include <pcl/io/pcd_io.h>
 #include <future>         // std::async
+#include "PCLInputReaderWorkerThread.h"
 
 PCLInputReader::PCLInputReader() :
 	m_readerThreads(),
@@ -52,13 +52,25 @@ void PCLInputReader::startCloudUpdateThread()
 	std::async(&PCLInputReader::startReaderThreads, this);
 }
 
+void PCLInputReader::createAndStartThreadForIndex(int index, int numOfThreads)
+{
+	auto recordingType = m_playbackConfiguration->getRecordFileFormat();
+	auto filesToPlay = m_playbackConfiguration->getCloudFilesToPlay();
+	std::shared_ptr<PCLInputReaderWorkerThread> reader(new PCLInputReaderWorkerThread);
+	reader->setBuffer(m_buffer);
+	m_inputReaderWorkerThreads.push_back(reader);
+	m_readerThreads.push_back(std::thread(&PCLInputReaderWorkerThread::readCloudData, reader, index, numOfThreads, filesToPlay, recordingType));
+	
+}
 void PCLInputReader::startReaderThreads()
 { 
 	m_playbackConfiguration->sortCloudFilesForPlayback();
 	m_isPlaybackRunning = true;
 	m_buffer->enableBuffer();
-	for (int i = 0; i < 5; i++){
-		m_readerThreads.push_back(std::thread(&PCLInputReader::readCloudData, this, i));
+	const int numOfThreadsToStart = 5;
+	for (int i = 0; i < numOfThreadsToStart; i++){
+		//m_readerThreads.push_back(std::thread(&PCLInputReader::readCloudData, this, i));
+		createAndStartThreadForIndex(i, numOfThreadsToStart);
 	}
 }
 
@@ -68,6 +80,10 @@ void PCLInputReader::stopReaderThreads()
 	//	return;
 	//}
 	m_isPlaybackRunning = false;
+	for (auto& reader : m_inputReaderWorkerThreads){
+		reader->stopReading();
+	}
+	
 	m_buffer->disableBuffer();
 }
 

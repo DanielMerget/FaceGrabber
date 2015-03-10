@@ -18,7 +18,7 @@ public:
 
 	boost::signal<void(std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr>)> cloudsUpdated;
 
-	boost::signal<void(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)> cloudUpdated[2];
+	boost::signal<void(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)> cloudUpdated[3];
 	//boost::signal<void(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)> cloudUpdated;
 	//boost::signal<void(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)> depthCloudUpdated;
 

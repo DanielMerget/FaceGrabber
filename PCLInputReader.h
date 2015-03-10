@@ -10,7 +10,7 @@
 #include <mutex>
 #include "PlaybackConfiguration.h"
 #include "Buffer.h"
-
+#include "PCLInputReaderWorkerThread.h"
 class PCLInputReader
 {
 public:
@@ -30,7 +30,7 @@ public:
 
 	void setPlaybackConfiguration(PlaybackConfigurationPtr playbackConfig);
 private:
-
+	void createAndStartThreadForIndex(int index, int numOfThreads);
 	void startReaderThreads();
 
 	bool isBufferAtIndexSet(const int index);
@@ -53,6 +53,8 @@ private:
 	std::shared_ptr<Buffer> m_buffer;
 
 	std::thread m_updateThread;
+	std::vector<std::shared_ptr<PCLInputReaderWorkerThread>> m_inputReaderWorkerThreads;
 	PlaybackConfigurationPtr m_playbackConfiguration;
 };
+
 
