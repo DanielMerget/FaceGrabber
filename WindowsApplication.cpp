@@ -47,7 +47,7 @@ void WindowsApplication::initRecordDataModel()
 WindowsApplication::~WindowsApplication()
 {
 	SafeRelease(m_pD2DFactory);
-	m_bufferSynchronizer.stop();
+	m_bufferSynchronizer.onApplicationQuit();
 	m_bufferSynchronizerThread.join();
 }
 

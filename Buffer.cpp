@@ -86,6 +86,9 @@ bool Buffer::isDataAvailable()
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr Buffer::pullData()
 {
 	std::unique_lock<std::mutex> cloudBufferLock(*m_cloudBufferMutex);
+	if (!m_bufferingActive){
+		return pcl::PointCloud<pcl::PointXYZRGB>::Ptr(nullptr);
+	}
 	 while (m_bufferFillLevel != m_cloudBuffer.size()){
 		if (m_producerFinished){
 			printMessage("break!");

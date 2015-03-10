@@ -11,15 +11,22 @@ BufferSynchronizer::BufferSynchronizer() :
 }
 BufferSynchronizer::~BufferSynchronizer()
 {
-
+	
 }
 
-void BufferSynchronizer::stop() 
+void BufferSynchronizer::onApplicationQuit()
 {
 	std::unique_lock<std::mutex> lock(m_updateBuffer);
 	m_isRunning = false;
 	m_isDataAvailableConditionVariable.notify_all();
 }
+
+//void BufferSynchronizer::stop() 
+//{
+//	std::unique_lock<std::mutex> lock(m_updateBuffer);
+//	m_isRunning = false;
+//	m_isDataAvailableConditionVariable.notify_all();
+//}
 
 void BufferSynchronizer::printMessage(std::string msg)
 {

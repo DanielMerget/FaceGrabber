@@ -13,8 +13,9 @@ public:
 
 	void updateThreadFunc();
 
+	void onApplicationQuit();
 	
-	void stop();
+	void stopPlayback();
 
 	void signalDataOfBufferWithIndexIsReady(int index);
 
@@ -37,6 +38,7 @@ private:
 	//std::shared_ptr<std::mutex> m_updateBuffer;
 	//std::shared_ptr<std::condition_variable> m_isDataAvailableConditionVariable;
 	bool m_isDataAvaiable;
+	bool m_playbackActive;
 	bool m_isRunning;
 };
 

@@ -132,7 +132,7 @@ void PlaybackTabHandler::setPlaybackStatus(bool enable)
 	}
 	else{
 		stopPlayback();
-		
+		playbackStopped();
 	}
 }
 void PlaybackTabHandler::playbackStopped()

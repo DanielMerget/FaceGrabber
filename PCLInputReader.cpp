@@ -56,6 +56,7 @@ void PCLInputReader::startReaderThreads()
 	}
 	m_playbackConfiguration->sortCloudFilesForPlayback();
 	m_isPlaybackRunning = true;
+	m_buffer->enableBuffer();
 	for (int i = 0; i < 5; i++){
 		m_readerThreads.push_back(std::thread(&PCLInputReader::readCloudData, this, i));
 	}
@@ -63,9 +64,9 @@ void PCLInputReader::startReaderThreads()
 
 void PCLInputReader::stopReaderThreads()
 { 
-	if (!m_isPlaybackRunning){
-		return;
-	}
+	//if (!m_isPlaybackRunning){
+	//	return;
+	//}
 	m_isPlaybackRunning = false;
 	m_buffer->disableBuffer();
 }
@@ -124,16 +125,16 @@ void PCLInputReader::readCloudData(const int index)
 	while (true)
 	{
 		//if (indexOfFileToRead > numberOfFilesToRead || !m_isPlaybackRunning){
-		if (indexOfFileToRead >= numberOfFilesToRead ){
+		if (indexOfFileToRead >= numberOfFilesToRead || !m_isPlaybackRunning){
 			//m_cloudBufferUpdated.notify_all();
 			//m_buffer.m_cloudBufferUpdated->notify_all();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			std::stringstream doneMsg;
 			doneMsg<< "thread for index: " << index << " done because of stop or size end" << std::endl;
 			printMessage(doneMsg.str());
 			m_buffer->setProducerFinished();
-			if (indexOfFileToRead == numberOfFilesToRead){
-				m_isPlaybackRunning = false;
-			}
+			//if (indexOfFileToRead == numberOfFilesToRead){
+			//	m_isPlaybackRunning = false;
+			//}
 			return;
 		}
 
