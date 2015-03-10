@@ -447,7 +447,6 @@ void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfi
 		auto cloudType = currentConfig->getRecordCloudType();
 		m_inputFileReader[cloudType]->setPlaybackConfiguration(playbackConfig[i]);
 		m_inputFileReader[cloudType]->startCloudUpdateThread();
-		m_inputFileReader[cloudType]->startReaderThreads();
 	}
 }
 

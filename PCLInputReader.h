@@ -17,7 +17,7 @@ public:
 	PCLInputReader();
 	~PCLInputReader();
 	void startCloudUpdateThread();
-	void startReaderThreads();
+	
 	void stopReaderThreads();
 
 	void join();
@@ -30,6 +30,8 @@ public:
 
 	void setPlaybackConfiguration(PlaybackConfigurationPtr playbackConfig);
 private:
+
+	void startReaderThreads();
 
 	bool isBufferAtIndexSet(const int index);
 	

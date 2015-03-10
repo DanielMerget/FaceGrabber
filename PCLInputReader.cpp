@@ -2,6 +2,7 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/io/pcd_io.h>
+#include <future>         // std::async
 
 PCLInputReader::PCLInputReader() :
 	m_readerThreads(),
@@ -47,13 +48,12 @@ void PCLInputReader::startCloudUpdateThread()
 	m_buffer->setBufferSize(numOfFilesToRead);
 
 	//m_updateThread = std::thread(&PCLInputReader::updateThreadFunc, this);
+
+	std::async(&PCLInputReader::startReaderThreads, this);
 }
 
 void PCLInputReader::startReaderThreads()
 { 
-	if (!m_playbackConfiguration->isEnabled() || m_isPlaybackRunning){
-		return;
-	}
 	m_playbackConfiguration->sortCloudFilesForPlayback();
 	m_isPlaybackRunning = true;
 	m_buffer->enableBuffer();
