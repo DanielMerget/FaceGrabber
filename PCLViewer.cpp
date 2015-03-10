@@ -139,14 +139,16 @@ void PCLViewer::updateLoop()
 		std::chrono::milliseconds dura(100);
 
 		while (!m_cloudUpdate.wait_for(lock, dura)){
+			if (viewer->wasStopped()){ return; }
 			viewer->spinOnce();
 		} 
 		if (!m_isRunning){
 			return;
 		}
-		matchPointCloudsToViewPorts(viewer);
+		//matchPointCloudsToViewPorts(viewer);
 
 	}
+	matchPointCloudsToViewPorts(viewer);
 	while (!viewer->wasStopped() && m_isRunning)
 	{
 		{
@@ -154,14 +156,16 @@ void PCLViewer::updateLoop()
 			
 			while (!m_cloudUpdate.wait_for(lock, dura)){
 				viewer->spinOnce();
+				if (!m_isRunning || viewer->wasStopped()){ return; }
 			}
+			std::unique_lock<std::mutex> viewPortConfigLock(m_viewPortConfigurationChangedMutex);
 			if (m_viewPortConfigurationChanged){
-				std::lock_guard<std::mutex> lock(m_viewPortConfigurationChangedMutex);
 				viewer.reset(new pcl::visualization::PCLVisualizer(m_viewerName));
 				createViewPortsForViewer(viewer);
 				matchPointCloudsToViewPorts(viewer);
 				m_viewPortConfigurationChanged = false;
 			}
+			viewPortConfigLock.unlock();
 			for (int i = 0; i < m_cloudCount; i++){
 				std::lock_guard<std::mutex> lock(m_useColoredCloudMutex);
 				updateCurrentCloudWithIndexAndIdentifier(i, m_cloudIDs[i], viewer);
@@ -179,6 +183,7 @@ void PCLViewer::setNumOfClouds(int numOfClouds)
 		m_cloudCount = numOfClouds;
 		m_coloredClouds.resize(numOfClouds);
 		m_cloudUpdated.resize(numOfClouds);
+		m_cloudIDs.resize(numOfClouds);
 		m_nonColoredClouds.resize(numOfClouds);
 		m_viewPortConfigurationChanged = true;
 	}

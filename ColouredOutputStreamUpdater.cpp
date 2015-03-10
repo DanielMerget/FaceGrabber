@@ -40,9 +40,12 @@ HRESULT ColouredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, 
 		pcl::transformPointCloud(*hdFaceCloud, *hdFaceCloud, m);
 		pcl::transformPointCloud(*hdFaceRawDepthCloud, *hdFaceRawDepthCloud, m);
 
-
-		cloudUpdated[0](hdFaceCloud);
-		cloudUpdated[1](hdFaceRawDepthCloud);
+		std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> updatedClouds;
+		updatedClouds.push_back(hdFaceCloud);
+		updatedClouds.push_back(hdFaceRawDepthCloud);
+		cloudsUpdated(updatedClouds);
+		//cloudUpdated[0](hdFaceCloud);
+		//cloudUpdated[1](hdFaceRawDepthCloud);
 		//depthCloudUpdated(hdFaceRawDepthCloud);
 	}
 	return hr;
