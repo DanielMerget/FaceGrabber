@@ -126,6 +126,12 @@ void PCLViewer::createViewPortsForViewer(pcl::visualization::PCLVisualizer::Ptr 
 		viewer->createViewPort(xMin, 0, xMax, 1.0, m_viewPorts[i]);
 		m_cloudIDs[i] = std::to_string(i);
 	}
+	for (int i = 0; i < m_cloudCount; i++){
+		double greyVal = 0.9;
+		viewer->setBackgroundColor(greyVal, greyVal, greyVal, i);
+		
+	}
+	
 }
 
 void PCLViewer::matchPointCloudsToViewPorts(pcl::visualization::PCLVisualizer::Ptr viewer)
@@ -136,7 +142,8 @@ void PCLViewer::matchPointCloudsToViewPorts(pcl::visualization::PCLVisualizer::P
 			viewer->addPointCloud(m_coloredClouds[i], m_cloudIDs[i], m_viewPorts[i]);
 		}
 		else{
-			viewer->addPointCloud(m_nonColoredClouds[i], m_cloudIDs[i], m_viewPorts[i]);
+			pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> blackPoints(m_nonColoredClouds[i], 0, 0, 0);
+			viewer->addPointCloud(m_nonColoredClouds[i], blackPoints, m_cloudIDs[i], m_viewPorts[i]);
 		}
 		viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, m_cloudIDs[i]);
 		viewer->createViewPortCamera(m_viewPorts[i]);
@@ -153,6 +160,7 @@ void PCLViewer::updateLoop()
 	pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer(m_viewerName));
 	//int viewPortID1;
 	//int viewPortID2;
+	
 	createViewPortsForViewer(viewer);
 
 	{
@@ -223,7 +231,9 @@ void PCLViewer::updateNonColoredCloud(int cloudIndex, std::string cloudID, pcl::
 {
 	auto& cloud = m_nonColoredClouds[cloudIndex];
 	if (cloud){
-		viewer->updatePointCloud(cloud, cloudID);
+		pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> blackPoints(cloud, 0, 0, 0);
+		viewer->updatePointCloud(cloud, blackPoints, cloudID);
+		//viewer->updatePointCloud(cloud, cloudID);
 	}
 }
 
