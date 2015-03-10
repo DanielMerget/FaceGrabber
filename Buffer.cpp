@@ -65,7 +65,14 @@ void Buffer::pushData(pcl::PointCloud<pcl::PointXYZRGB>::Ptr newData, int index)
 	m_bufferFillLevel++;
 	m_cloudBufferUpdated->notify_all();
 	cloudBufferLock.unlock();
+	if (dataReady->empty()){
+		printMessage("dont have a slot connected");
+	}
+	std::stringstream msg;
+	msg << "push data: FillLevel" << m_bufferFillLevel << "of "<< getBufferSize();
+	printMessage(msg.str());
 	if (m_bufferFillLevel == getBufferSize()){
+		printMessage("buffer: data ready");
 		(*dataReady)();
 	}
 	

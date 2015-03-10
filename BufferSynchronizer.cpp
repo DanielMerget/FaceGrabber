@@ -98,6 +98,7 @@ void BufferSynchronizer::setBuffer(std::vector<std::shared_ptr<Buffer>> buffers,
 
 void BufferSynchronizer::signalDataOfBufferWithIndexIsReady(int index)
 {
+	printMessage("signal: Data for index now availbel for synchronizer" + index);
 	std::unique_lock<std::mutex> lock(m_updateBuffer);
 	m_bufferWithReadyState[index].second = true;
 	for (auto bufferWithState : m_bufferWithReadyState){
@@ -105,6 +106,7 @@ void BufferSynchronizer::signalDataOfBufferWithIndexIsReady(int index)
 			return;
 		}
 	}
+	printMessage("signal: Data now available for synchronizer");
 	m_isDataAvaiable = true;
 	m_isDataAvailableConditionVariable.notify_all();
 }

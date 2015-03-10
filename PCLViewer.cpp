@@ -142,7 +142,7 @@ void PCLViewer::updateLoop()
 		std::unique_lock<std::mutex> lock(m_cloudMutex);
 		std::chrono::milliseconds dura(100);
 
-		while (!m_cloudUpdate.wait_for(lock, dura)){
+		while (!m_cloudUpdate.wait_for(lock, dura) && !m_cloudsUpdated){
 			if (viewer->wasStopped()){ return; }
 			viewer->spinOnce();
 		} 

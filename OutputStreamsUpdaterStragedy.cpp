@@ -1,7 +1,7 @@
 #include "OutputStreamsUpdaterStragedy.h"
 
 
-OutputStreamsUpdaterStragedy::OutputStreamsUpdaterStragedy()
+OutputStreamsUpdaterStragedy::OutputStreamsUpdaterStragedy() : m_pCoordinateMapper(nullptr)
 {
 }
 

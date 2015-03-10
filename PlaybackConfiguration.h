@@ -95,6 +95,11 @@ public:
 		return m_foundCloudFiles;
 	}
 
+	void sortCloudFilesForPlayback()
+	{
+		std::sort(m_foundCloudFiles.begin(), m_foundCloudFiles.end(), &PlaybackConfiguration::sortByIntegerEnding);
+	}
+
 	boost::signal<void(void)> playbackConfigurationChanged;
 private:
 
@@ -152,7 +157,6 @@ private:
 			//	m_foundCloudFiles.push_back(i->path().string());
 			//}
 		}
-		std::sort(m_foundCloudFiles.begin(), m_foundCloudFiles.end(), &PlaybackConfiguration::sortByIntegerEnding);
 	}
 	
 

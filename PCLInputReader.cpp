@@ -54,6 +54,7 @@ void PCLInputReader::startReaderThreads()
 	if (!m_playbackConfiguration->isEnabled() || m_isPlaybackRunning){
 		return;
 	}
+	m_playbackConfiguration->sortCloudFilesForPlayback();
 	m_isPlaybackRunning = true;
 	for (int i = 0; i < 5; i++){
 		m_readerThreads.push_back(std::thread(&PCLInputReader::readCloudData, this, i));
@@ -115,14 +116,15 @@ void PCLInputReader::readCloudData(const int index)
 	std::stringstream msg;
 	msg << "thread for index: " << index << "started. " << std::endl;
 	printMessage(msg.str());
-
+	
 	auto cloudFilesToPlay = m_playbackConfiguration->getCloudFilesToPlay();
 	auto numberOfFilesToRead = cloudFilesToPlay.size();
 	//pcl::PCDReader reader;
 
 	while (true)
 	{
-		if (indexOfFileToRead >= numberOfFilesToRead || !m_isPlaybackRunning){
+		//if (indexOfFileToRead > numberOfFilesToRead || !m_isPlaybackRunning){
+		if (indexOfFileToRead >= numberOfFilesToRead ){
 			//m_cloudBufferUpdated.notify_all();
 			//m_buffer.m_cloudBufferUpdated->notify_all();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			std::stringstream doneMsg;
