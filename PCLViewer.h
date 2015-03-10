@@ -54,6 +54,7 @@ private:
 
 	std::mutex m_useColoredCloudMutex;
 	bool m_useColoredCloud;
+	bool m_cloudsUpdated;
 	std::condition_variable m_cloudUpdate;
 };
 

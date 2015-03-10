@@ -10,7 +10,8 @@ PCLViewer::PCLViewer(int cloudCount, std::string viewerName) :
 	m_isRunning(false),
 	m_updateThread(&PCLViewer::updateLoop, this),
 	m_viewPortConfigurationChanged(false),
-	m_cloudUpdated()
+	m_cloudUpdated(),
+	m_cloudsUpdated(false)
 {
 	useColoredCloud(m_useColoredCloud);
 }
@@ -37,6 +38,7 @@ void PCLViewer::updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB
 		it++;
 	}
 	m_isRunning = true;
+	m_cloudsUpdated = true;
 	m_cloudUpdate.notify_all();
 }
 
@@ -67,6 +69,7 @@ void PCLViewer::pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::Co
 	if (notify){
 		OutputDebugString(index + L"pushNewColoredCloudAtIndex: notify \n");
 		m_isRunning = true;
+		m_cloudsUpdated = true;
 		m_cloudUpdate.notify_all();
 	}
 
@@ -90,6 +93,7 @@ void PCLViewer::pushNewNonColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZ>::Co
 	if (notify){
 		OutputDebugString(index + L"pushNewNonColoredCloudAtIndex: notify \n");
 		m_isRunning = true;
+		m_cloudsUpdated = true;
 		m_cloudUpdate.notify_all();
 	}
 
@@ -154,7 +158,7 @@ void PCLViewer::updateLoop()
 		{
 			std::unique_lock<std::mutex> lock(m_cloudMutex);
 			
-			while (!m_cloudUpdate.wait_for(lock, dura)){
+			while (!m_cloudUpdate.wait_for(lock, dura) && !m_cloudsUpdated){
 				viewer->spinOnce();
 				if (!m_isRunning || viewer->wasStopped()){ return; }
 			}
@@ -170,6 +174,7 @@ void PCLViewer::updateLoop()
 				std::lock_guard<std::mutex> lock(m_useColoredCloudMutex);
 				updateCurrentCloudWithIndexAndIdentifier(i, m_cloudIDs[i], viewer);
 			}
+			m_cloudsUpdated = false;
 		}
 		viewer->spinOnce(100);
 	}

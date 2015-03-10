@@ -168,9 +168,9 @@ void WindowsApplication::disconnectWriterAndViewerToKinect()
 {
 	for (int i = 0; i < 2; i++){
 		m_nonColoredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
-		//m_colouredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
-		m_colouredOutputStreamUpdater->cloudsUpdated.disconnect_all_slots();
+		m_colouredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 	}
+	m_colouredOutputStreamUpdater->cloudsUpdated.disconnect_all_slots();
 	m_colorCloudOutputWriter.clear();
 	m_nonColoredCloudOutputWriter.clear();
 }
@@ -185,11 +185,11 @@ void WindowsApplication::connectWriterAndViewerToKinect()
 		m_nonColoredCloudOutputWriter.push_back(nonColoredCloudWriter);
 
 		auto coloredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
-		//m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, coloredCloudWriter, _1));
+		m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, coloredCloudWriter, _1));
 		//m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, i));
-		m_colouredOutputStreamUpdater->cloudsUpdated.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
 		m_colorCloudOutputWriter.push_back(coloredCloudWriter);
 	}
+	m_colouredOutputStreamUpdater->cloudsUpdated.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
 }
 
 void WindowsApplication::onCreate()
