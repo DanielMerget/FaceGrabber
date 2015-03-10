@@ -170,6 +170,7 @@ void WindowsApplication::disconnectWriterAndViewerToKinect()
 		m_nonColoredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 		m_colouredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 	}
+	m_nonColoredOutputStreamUpdater->cloudsUpdated.disconnect_all_slots();
 	m_colouredOutputStreamUpdater->cloudsUpdated.disconnect_all_slots();
 	m_colorCloudOutputWriter.clear();
 	m_nonColoredCloudOutputWriter.clear();
@@ -181,14 +182,13 @@ void WindowsApplication::connectWriterAndViewerToKinect()
 	for (int i = 0; i < 2; i++){
 		auto nonColoredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>(new KinectCloudOutputWriter<pcl::PointXYZ>);
 		m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudThreated, nonColoredCloudWriter, _1));
-		m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&PCLViewer::updateNonColoredCloudThreated,	m_pclFaceViewer, _1, i));
 		m_nonColoredCloudOutputWriter.push_back(nonColoredCloudWriter);
 
 		auto coloredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
 		m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, coloredCloudWriter, _1));
-		//m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, i));
 		m_colorCloudOutputWriter.push_back(coloredCloudWriter);
 	}
+	m_nonColoredOutputStreamUpdater->cloudsUpdated.connect(boost::bind(&PCLViewer::updateNonColoredClouds, m_pclFaceViewer, _1));
 	m_colouredOutputStreamUpdater->cloudsUpdated.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
 }
 
@@ -367,6 +367,7 @@ void WindowsApplication::onRecordTabSelected()
 	m_plackBackTabHandler.playbackStopped();
 	disconnectInputReaderFromViewer();
 	connectWriterAndViewerToKinect();
+	m_pclFaceViewer->useColoredCloud(m_recordTabHandler.isColorEnabled());
 	m_pclFaceViewer->setNumOfClouds(2);
 	ShowWindow(m_liveViewWindow, SW_SHOW);
 	ShowWindow(m_recordTabHandle, SW_SHOW);
@@ -377,6 +378,7 @@ void WindowsApplication::onPlaybackSelected()
 {
 	disconnectWriterAndViewerToKinect();
 	connectInputReaderToViewer();
+	m_pclFaceViewer->useColoredCloud(true);
 	ShowWindow(m_liveViewWindow, SW_HIDE);
 	m_plackBackTabHandler.resetUIElements();
 	m_plackBackTabHandler.setSharedRecordingConfiguration(m_recordTabHandler.getRecordConfiguration());

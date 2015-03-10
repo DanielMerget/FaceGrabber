@@ -29,6 +29,7 @@ HRESULT ColouredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, 
 
 		auto hdFaceCloud = extractClolouredFaceHDPoinCloudAndBoundingBox(bufferSize, detectedHDFacePointsCamSpace, detectedHDFacePointsColorSpace,
 			boundingBoxPointTopLeft, boundingBoxPointBottomRight, hdFacePointsInCamSpaceOpenCV, colorBuffer);
+
 		auto hdFaceRawDepthCloud = extractColouredDepthCloudFromBoundingBox(boundingBoxPointTopLeft, boundingBoxPointBottomRight,
 			hdFacePointsInCamSpaceOpenCV, colorBuffer, depthBuffer);
 
@@ -40,10 +41,11 @@ HRESULT ColouredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, 
 		pcl::transformPointCloud(*hdFaceCloud, *hdFaceCloud, m);
 		pcl::transformPointCloud(*hdFaceRawDepthCloud, *hdFaceRawDepthCloud, m);
 
-		std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> updatedClouds;
-		updatedClouds.push_back(hdFaceCloud);
-		updatedClouds.push_back(hdFaceRawDepthCloud);
+		
 		if (!cloudsUpdated.empty()){
+			std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> updatedClouds;
+			updatedClouds.push_back(hdFaceCloud);
+			updatedClouds.push_back(hdFaceRawDepthCloud);
 			cloudsUpdated(updatedClouds);
 		}
 		if (!cloudUpdated[0].empty()){

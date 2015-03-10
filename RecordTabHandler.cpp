@@ -64,7 +64,10 @@ void RecordTabHandler::onCreate(WPARAM wParam, LPARAM)
 	}
 }
 
-
+bool RecordTabHandler::isColorEnabled()
+{
+	return m_colorEnabled;
+}
 LRESULT CALLBACK RecordTabHandler::DlgProcTab(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	UNREFERENCED_PARAMETER(wParam);

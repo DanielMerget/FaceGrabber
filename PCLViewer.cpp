@@ -29,6 +29,18 @@ void PCLViewer::stopViewer()
 	m_cloudUpdate.notify_all();
 }
 
+void PCLViewer::updateNonColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr> clouds)
+{
+	std::unique_lock<std::mutex> lock(m_cloudMutex);
+	auto it = m_nonColoredClouds.begin();
+	for (auto cloud : clouds){
+		*it = cloud;
+		it++;
+	}
+	m_isRunning = true;
+	m_cloudsUpdated = true;
+	m_cloudUpdate.notify_all();
+}
 void PCLViewer::updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> clouds)
 {
 	std::unique_lock<std::mutex> lock(m_cloudMutex);
@@ -120,7 +132,12 @@ void PCLViewer::matchPointCloudsToViewPorts(pcl::visualization::PCLVisualizer::P
 {
 
 	for (int i = 0; i < m_cloudCount; i++){
-		viewer->addPointCloud(m_coloredClouds[i], m_cloudIDs[i], m_viewPorts[i]);
+		if (m_useColoredCloud){
+			viewer->addPointCloud(m_coloredClouds[i], m_cloudIDs[i], m_viewPorts[i]);
+		}
+		else{
+			viewer->addPointCloud(m_nonColoredClouds[i], m_cloudIDs[i], m_viewPorts[i]);
+		}
 		viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, m_cloudIDs[i]);
 		viewer->createViewPortCamera(m_viewPorts[i]);
 	}
@@ -213,6 +230,8 @@ void PCLViewer::updateNonColoredCloud(int cloudIndex, std::string cloudID, pcl::
 void PCLViewer::useColoredCloud(bool useColored)
 {
 	std::lock_guard<std::mutex> lock(m_useColoredCloudMutex);
+	m_useColoredCloud = useColored;
+	updateCurrentCloudWithIndexAndIdentifier.disconnect_all_slots();
 	if (useColored){
 		updateCurrentCloudWithIndexAndIdentifier.connect(boost::bind(&PCLViewer::updateColoredCloud, this, _1, _2, _3));
 	}

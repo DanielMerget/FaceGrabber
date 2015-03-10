@@ -14,6 +14,8 @@ public:
 	~PCLViewer();
 	
 	void updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> clouds);
+	void updateNonColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr> clouds);
+
 
 	void updateColoredCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud, int index);
 	void updateNonColoredCloudThreated(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, int index);

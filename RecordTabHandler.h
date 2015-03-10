@@ -29,6 +29,8 @@ public:
 	boost::signal<void(bool)> colorConfigurationChanged;
 	boost::signal<void(bool)> startWriting;
 	boost::signal<void(bool)> stopWriting;
+
+	bool isColorEnabled();
 private:
 	void setupRecording();
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
