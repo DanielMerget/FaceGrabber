@@ -1,6 +1,6 @@
 #pragma once
 #include "OutputStreamsUpdaterStragedy.h"
-#include <boost/signals.hpp>
+#include <boost/signals2.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
@@ -16,9 +16,9 @@ public:
 		ColorSpacePoint* detectedHDFacePointsColorSpace, RGBQUAD* colorBuffer, UINT16* depthBuffer);
 
 
-	boost::signal<void(std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr>)> cloudsUpdated;
+	boost::signals2::signal<void(std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr>)> cloudsUpdated;
 
-	boost::signal<void(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)> cloudUpdated[3];
+	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)> cloudUpdated[3];
 	//boost::signal<void(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)> cloudUpdated;
 	//boost::signal<void(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)> depthCloudUpdated;
 

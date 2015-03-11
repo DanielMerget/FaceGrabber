@@ -10,7 +10,7 @@
 #include "ImageRenderer.h"
 #undef max
 #undef min
-#include <boost/signals.hpp>
+#include <boost/signals2.hpp>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
 #include <mutex>
@@ -38,12 +38,12 @@ public:
 	void setImageRenderer(ImageRenderer* renderer);
 	void setOutputStreamUpdater(std::shared_ptr<OutputStreamsUpdaterStragedy> outputStreamUpdater);
 
-	boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated;
-	boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> depthCloudUpdated;
+	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated;
+	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> depthCloudUpdated;
 
-	boost::signal<void(const unsigned char *data, unsigned width, unsigned height)> imageUpdated;
+	boost::signals2::signal<void(const unsigned char *data, unsigned width, unsigned height)> imageUpdated;
 
-	boost::signal<bool(std::wstring, bool)> statusChanged;
+	boost::signals2::signal<bool(std::wstring, bool)> statusChanged;
 	
 	void getColourAndDepthSize(int& depthWidth, int& depthHeight, int& colorWidth, int& colorHeight);
 private:

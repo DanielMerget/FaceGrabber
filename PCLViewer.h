@@ -30,7 +30,7 @@ private:
 	void updateColoredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer::Ptr viewer);
 	void updateNonColoredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer::Ptr viewer);
 	
-	boost::signal<void(int cloudIndex, std::string, pcl::visualization::PCLVisualizer::Ptr)> updateCurrentCloudWithIndexAndIdentifier;
+	boost::signals2::signal<void(int cloudIndex, std::string, pcl::visualization::PCLVisualizer::Ptr)> updateCurrentCloudWithIndexAndIdentifier;
 
 	void createViewPortsForViewer(pcl::visualization::PCLVisualizer::Ptr viewer);
 	void matchPointCloudsToViewPorts(pcl::visualization::PCLVisualizer::Ptr viewer);

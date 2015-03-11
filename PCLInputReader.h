@@ -2,7 +2,6 @@
 #include <string>
 #include <vector>
 #include <thread>
-#include <boost/signals.hpp>
 #include <boost/signals2.hpp>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
@@ -24,7 +23,7 @@ public:
 	std::shared_ptr<Buffer< pcl::PointCloud<pcl::PointXYZRGB>::Ptr> > getBuffer();
 	void setBuffer(std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> buffer);
 
-	boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated;
+	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated;
 
 	void setPlaybackConfiguration(PlaybackConfigurationPtr playbackConfig);
 

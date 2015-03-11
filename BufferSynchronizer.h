@@ -2,7 +2,6 @@
 #include "Buffer.h"
 
 #include <boost/signals2.hpp>
-#include <boost/signals.hpp>
 #include <thread>
 #include <condition_variable>
 #include <mutex>
@@ -26,9 +25,9 @@ public:
 	
 	boost::signals2::signal<void(std::wstring)> updateStatus;
 
-	boost::signal<void(void)> playbackFinished;
+	boost::signals2::signal<void(void)> playbackFinished;
 
-	boost::signal<void(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> cloud)> cloudsUpdated;
+	boost::signals2::signal<void(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> cloud)> cloudsUpdated;
 
 
 	
