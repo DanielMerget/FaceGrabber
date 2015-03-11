@@ -1,7 +1,8 @@
 #pragma once
 #include "Buffer.h"
 
-#include <boost/signal.hpp>
+#include <boost/signals2.hpp>
+#include <boost/signals.hpp>
 #include <thread>
 #include <condition_variable>
 #include <mutex>
@@ -23,6 +24,8 @@ public:
 
 	void setBuffer(std::vector<std::shared_ptr<Buffer<BufferDataType>>> buffers, int numOfFilesToRead);
 	
+	boost::signals2::signal<void(std::wstring)> updateStatus;
+
 	boost::signal<void(void)> playbackFinished;
 
 	boost::signal<void(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> cloud)> cloudsUpdated;
@@ -32,6 +35,7 @@ public:
 private:
 	void BufferSynchronizer::printMessage(std::string msg);
 	int m_numOfFilesToRead;
+	int m_numOfFilesRead;
 
 	std::vector<std::pair<std::shared_ptr<Buffer<BufferDataType>>, bool>> m_bufferWithReadyState;
 	std::mutex m_printMutex;

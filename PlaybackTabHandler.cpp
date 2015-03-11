@@ -58,6 +58,9 @@ void PlaybackTabHandler::setSharedRecordingConfiguration(SharedRecordingConfigur
 
 void PlaybackTabHandler::updateReaderStatus(RecordCloudType recordType, std::wstring status)
 {
+	if (!m_playbackConfiguration[recordType]->isEnabled()){
+		return;
+	}
 	_In_z_ WCHAR* newStatus = &status[0];
 	switch (recordType)
 	{
@@ -229,31 +232,43 @@ void PlaybackTabHandler::playbackConfigurationChanged()
 	if (auto playbackConfig = m_playbackConfiguration[HDFace]){
 		auto firstFile = playbackConfig->getFirstPlaybackFile();
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), firstFile);
-		//m_playbackConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
 		isValidConfiguration &= playbackConfig->isPlaybackConfigurationValid();
+
+		CString numOfFilesStatus;
+		numOfFilesStatus.Format(L"Files: %d", playbackConfig->getCloudFilesToPlayCount());
+		SetDlgItemText(m_hWnd, IDC_HDFACE_STATUS_READ, numOfFilesStatus);
 	}
 	else{
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), L"");
+		SetDlgItemText(m_hWnd, IDC_HDFACE_STATUS_READ, L"");
 		isValidConfiguration = false;
 	}
 	if (auto playbackConfig = m_playbackConfiguration[FaceRaw]){
 		auto firstFile = playbackConfig->getFirstPlaybackFile();
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), firstFile);
-		//m_playbackConfiguration[FaceRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_DEPTH_CHECKBOX));
 		isValidConfiguration &= playbackConfig->isPlaybackConfigurationValid();
+		CString numOfFilesStatus;
+		numOfFilesStatus.Format(L"Files: %d", playbackConfig->getCloudFilesToPlayCount());
+
+		SetDlgItemText(m_hWnd, IDC_FACE_RAW_EDIT_STATUS_READ, numOfFilesStatus);
 	}
 	else{
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), L"");
+		SetDlgItemText(m_hWnd, IDC_FACE_RAW_EDIT_STATUS_READ, L"");
 		isValidConfiguration = false;
 	}
 	if (auto playbackConfig = m_playbackConfiguration[FullDepthRaw]){
 		auto firstFile = playbackConfig->getFirstPlaybackFile();
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), firstFile);
-		//m_playbackConfiguration[FullDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
 		isValidConfiguration &= playbackConfig->isPlaybackConfigurationValid();
+		CString numOfFilesStatus;
+		numOfFilesStatus.Format(L"Files: %d", playbackConfig->getCloudFilesToPlayCount());
+
+		SetDlgItemText(m_hWnd, IDC_FULL_RAW_DEPTH_STATUS_READ, numOfFilesStatus);
 	}
 	else{
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), L"");
+		SetDlgItemText(m_hWnd, IDC_FULL_RAW_DEPTH_STATUS_READ, L"");
 		isValidConfiguration = false;
 	}
 	Button_Enable(GetDlgItem(m_hWnd, IDC_PLAY_STOP_BUTTON), isValidConfiguration);

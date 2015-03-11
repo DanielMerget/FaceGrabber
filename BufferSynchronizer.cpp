@@ -81,8 +81,11 @@ void BufferSynchronizer< BufferDataType >::updateThreadFunc()
 
 			if (readyPointClouds.size() > 0){
 				printMessage("synchronier updating");
-				m_numOfFilesToRead--;
+				m_numOfFilesRead++;
 				cloudsUpdated(readyPointClouds);
+				std::wstringstream message;
+				message << "play: " << m_numOfFilesRead << "/" << m_numOfFilesToRead;
+				updateStatus(message.str());
 			}
 
 			
@@ -93,7 +96,7 @@ void BufferSynchronizer< BufferDataType >::updateThreadFunc()
 			printMessage("synchronier woke up");
 		}
 		printMessage("synchronier stopping");
-		if (m_numOfFilesToRead == 0){
+		if (m_numOfFilesToRead == m_numOfFilesRead){
 			playbackFinished();
 		}
 	}
@@ -104,6 +107,7 @@ template < class BufferDataType >
 void BufferSynchronizer< BufferDataType >::setBuffer(std::vector<std::shared_ptr<Buffer<BufferDataType>>> buffers, int numOfFilesToRead)
 {
 	m_numOfFilesToRead = numOfFilesToRead;
+	m_numOfFilesRead = 0;
 	for (auto buffer : m_bufferWithReadyState){
 		buffer.first->dataReady->disconnect_all_slots();
 	}

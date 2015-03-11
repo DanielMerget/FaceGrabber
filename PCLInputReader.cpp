@@ -75,6 +75,7 @@ void PCLInputReader::readerFinishedReadingAFile()
 
 void PCLInputReader::startReaderThreads()
 { 
+	updateStatus(L"");
 	m_numOfFilesRead = 0;
 	m_playbackConfiguration->sortCloudFilesForPlayback();
 	m_isPlaybackRunning = true;

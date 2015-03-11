@@ -295,6 +295,9 @@ void WindowsApplication::onCreate()
 		auto inputReader = std::shared_ptr<PCLInputReader>(new PCLInputReader());
 		inputReader->updateStatus.connect(boost::bind(&PlaybackTabHandler::updateReaderStatus, &m_plackBackTabHandler, static_cast<RecordCloudType>(i), _1));
 		inputReader->setBuffer(buffer);
+
+		m_bufferSynchronizer.updateStatus.connect(boost::bind(&PlaybackTabHandler::updateReaderStatus, &m_plackBackTabHandler, static_cast<RecordCloudType>(i), _1));
+
 		m_inputFileReader.push_back(inputReader);
 		buffers.push_back(buffer);
 	}

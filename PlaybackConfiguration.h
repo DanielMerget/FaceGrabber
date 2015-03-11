@@ -90,6 +90,11 @@ public:
 		return result;
 	}
 
+	int getCloudFilesToPlayCount()
+	{
+		return m_foundCloudFiles.size();
+	}
+
 	std::vector<CloudFile> getCloudFilesToPlay()
 	{
 		return m_foundCloudFiles;
