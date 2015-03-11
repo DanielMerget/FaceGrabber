@@ -20,24 +20,18 @@ public:
 	void stopReaderThreads();
 
 	void join();
+
 	std::shared_ptr<Buffer< pcl::PointCloud<pcl::PointXYZRGB>::Ptr> > getBuffer();
 	void setBuffer(std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> buffer);
-
-	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated;
-
 	void setPlaybackConfiguration(PlaybackConfigurationPtr playbackConfig);
 
+	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated;
 	boost::signals2::signal<void(std::wstring)> updateStatus;
 private:
 	void createAndStartThreadForIndex(int index, int numOfThreads);
 	void startReaderThreads();
-
 	bool isBufferAtIndexSet(const int index);
-	
-	
 	void printMessage(std::string msg);
-	
-
 	void readerFinishedReadingAFile();
 
 	std::mutex m_printMutex;

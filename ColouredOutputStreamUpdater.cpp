@@ -5,6 +5,11 @@
 #include <pcl/filters/voxel_grid.h>
 #include <opencv2/imgproc/imgproc.hpp>
 
+
+#include "stdafx.h"
+#include <atlstr.h>
+
+
 ColouredOutputStreamUpdater::ColouredOutputStreamUpdater()
 {
 }
@@ -14,10 +19,6 @@ ColouredOutputStreamUpdater::~ColouredOutputStreamUpdater()
 {
 }
 
-
-#include <chrono>
-#include "stdafx.h"
-#include <atlstr.h>
 
 void printMessage(std::string msg)
 {
@@ -46,18 +47,9 @@ HRESULT ColouredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, 
 		auto hdFaceCloud = extractClolouredFaceHDPoinCloudAndBoundingBox(bufferSize, detectedHDFacePointsCamSpace, detectedHDFacePointsColorSpace,
 			boundingBoxPointTopLeft, boundingBoxPointBottomRight, hdFacePointsInCamSpaceOpenCV, colorBuffer);
 
-		std::chrono::high_resolution_clock::time_point t2 = std::chrono::high_resolution_clock::now();
-		auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-		printMessage("conversion lasted 1: " + std::to_string(duration));
-
-
+		
 		auto hdFaceRawDepthCloud = extractColouredDepthCloudFromBoundingBox(boundingBoxPointTopLeft, boundingBoxPointBottomRight,
 			hdFacePointsInCamSpaceOpenCV, colorBuffer, depthBuffer);
-
-
-		std::chrono::high_resolution_clock::time_point t3 = std::chrono::high_resolution_clock::now();
-		duration = std::chrono::duration_cast<std::chrono::milliseconds>(t3 - t2).count();
-		printMessage("conversion lasted: 2" + std::to_string(duration));
 
 		Eigen::Vector4f centroid;
 		pcl::compute3DCentroid(*hdFaceCloud, centroid);
@@ -67,15 +59,6 @@ HRESULT ColouredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, 
 		pcl::transformPointCloud(*hdFaceCloud, *hdFaceCloud, m);
 		pcl::transformPointCloud(*hdFaceRawDepthCloud, *hdFaceRawDepthCloud, m);
 
-		std::chrono::high_resolution_clock::time_point t4 = std::chrono::high_resolution_clock::now();
-		duration = std::chrono::duration_cast<std::chrono::milliseconds>(t4 - t3).count();
-		printMessage("conversion lasted: 3" + std::to_string(duration));
-
-		
-
-		std::chrono::high_resolution_clock::time_point t5 = std::chrono::high_resolution_clock::now();
-		duration = std::chrono::duration_cast<std::chrono::milliseconds>(t5 - t4).count();
-		printMessage("conversion lasted: 4" + std::to_string(duration));
 
 		if (!cloudsUpdated.empty()){
 			std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> updatedClouds;
@@ -95,7 +78,6 @@ HRESULT ColouredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, 
 			cloudUpdated[2](fullDepthCloud);
 		}
 
-		//depthCloudUpdated(hdFaceRawDepthCloud);
 	}
 	return hr;
 }
@@ -107,11 +89,11 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::extractClolo
 {
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
 	cloud->is_dense = false;
-	float bottom = FLT_MAX;
-	float top = -FLT_MAX;
-	float right = -FLT_MAX;
-	float left = FLT_MAX;
-	float back = -FLT_MAX;
+	float bottom	=	 FLT_MAX;
+	float top		= -	 FLT_MAX;
+	float right		= -	 FLT_MAX;
+	float left		=	 FLT_MAX;
+	float back		=  - FLT_MAX;
 	std::vector<cv::Point2f> ellipsePoints;
 	for (int i = 0; i < bufferSize; i++){
 		const auto& cameraSpacePoint = *cameraSpacePoints;
