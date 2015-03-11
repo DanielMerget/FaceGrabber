@@ -11,11 +11,11 @@ public:
 
 	void readCloudData(const int index, const int step, std::vector<CloudFile> cloudFilesToPlay, RecordingFileFormat format);
 	void stopReading();
-	void setBuffer(std::shared_ptr<Buffer> buffer);
+	void setBuffer(std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> buffer);
 
 private:
 	void printMessage(std::string msg);
 	bool m_isPlaybackRunning;
-	std::shared_ptr<Buffer> m_buffer;
+	std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> m_buffer;
 };
 

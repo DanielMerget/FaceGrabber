@@ -106,7 +106,7 @@ private:
 
 	KinectHDFaceGrabber			m_kinectFrameGrabber;
 	std::shared_ptr<PCLViewer>	m_pclFaceViewer;
-	std::vector<std::shared_ptr<PCLInputReader>>	m_inputFileReader;
+	std::vector<std::shared_ptr<PCLInputReader>>							m_inputFileReader;
 
 	//pcl::visualization::CloudViewer m_cloudViewer;
 
@@ -116,12 +116,12 @@ private:
 	//RecordingConfiguration	m_recordingConfiguration[RECORD_CLOUD_TYPE_COUNT];
 	SharedRecordingConfiguration	m_recordingConfiguration;
 	//std::shared_ptr<RecordingConfiguration>	m_recordingConfiguration;
-	BufferSynchronizer			m_bufferSynchronizer;
-	std::thread					m_bufferSynchronizerThread;
-	bool						m_isKinectRunning;
-	RecordTabHandler			m_recordTabHandler;
-	PlaybackTabHandler			m_plackBackTabHandler;
-	std::shared_ptr<ColouredOutputStreamUpdater> m_colouredOutputStreamUpdater;
-	std::shared_ptr<NonColouredOutputStreamsUpdater> m_nonColoredOutputStreamUpdater;
+	BufferSynchronizer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>				m_bufferSynchronizer;
+	std::thread																m_bufferSynchronizerThread;
+	bool																	m_isKinectRunning;
+	RecordTabHandler														m_recordTabHandler;
+	PlaybackTabHandler														m_plackBackTabHandler;
+	std::shared_ptr<ColouredOutputStreamUpdater>							m_colouredOutputStreamUpdater;
+	std::shared_ptr<NonColouredOutputStreamsUpdater>						m_nonColoredOutputStreamUpdater;
 };
 

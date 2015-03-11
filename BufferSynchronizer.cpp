@@ -1,7 +1,11 @@
 #include "BufferSynchronizer.h"
 #include <thread>
 #include <atlstr.h>
-BufferSynchronizer::BufferSynchronizer() : 
+
+template BufferSynchronizer < pcl::PointCloud< pcl::PointXYZRGB>::Ptr >;
+
+template < class BufferDataType >
+BufferSynchronizer< BufferDataType >::BufferSynchronizer() :
 	m_isDataAvaiable(false)
 	//m_printMutex(new std::mutex),
 	//m_updateBuffer(new std::mutex),
@@ -9,12 +13,16 @@ BufferSynchronizer::BufferSynchronizer() :
 {
 	
 }
-BufferSynchronizer::~BufferSynchronizer()
+
+
+template < class BufferDataType >
+BufferSynchronizer< BufferDataType >::~BufferSynchronizer()
 {
 	
 }
 
-void BufferSynchronizer::onApplicationQuit()
+template < class BufferDataType >
+void BufferSynchronizer< BufferDataType >::onApplicationQuit()
 {
 	std::unique_lock<std::mutex> lock(m_updateBuffer);
 	m_isRunning = false;
@@ -28,7 +36,9 @@ void BufferSynchronizer::onApplicationQuit()
 //	m_isDataAvailableConditionVariable.notify_all();
 //}
 
-void BufferSynchronizer::printMessage(std::string msg)
+
+template < class BufferDataType >
+void BufferSynchronizer< BufferDataType >::printMessage(std::string msg)
 {
 	std::lock_guard<std::mutex> lock(m_printMutex);
 
@@ -38,7 +48,8 @@ void BufferSynchronizer::printMessage(std::string msg)
 }
 
 
-void BufferSynchronizer::updateThreadFunc()
+template < class BufferDataType >
+void BufferSynchronizer< BufferDataType >::updateThreadFunc()
 {
 	m_isRunning = true;
 	std::chrono::milliseconds dura(80);
@@ -87,7 +98,10 @@ void BufferSynchronizer::updateThreadFunc()
 		}
 	}
 }
-void BufferSynchronizer::setBuffer(std::vector<std::shared_ptr<Buffer>> buffers, int numOfFilesToRead)
+
+
+template < class BufferDataType >
+void BufferSynchronizer< BufferDataType >::setBuffer(std::vector<std::shared_ptr<Buffer<BufferDataType>>> buffers, int numOfFilesToRead)
 {
 	m_numOfFilesToRead = numOfFilesToRead;
 	for (auto buffer : m_bufferWithReadyState){
@@ -97,13 +111,14 @@ void BufferSynchronizer::setBuffer(std::vector<std::shared_ptr<Buffer>> buffers,
 	int counter = 0;
 	for (int i = 0; i < buffers.size(); i++){
 		auto currentBuffer = buffers[i];
-		m_bufferWithReadyState.push_back(std::pair<std::shared_ptr<Buffer>, bool>(currentBuffer, false));
+		m_bufferWithReadyState.push_back(std::pair<std::shared_ptr<Buffer<BufferDataType>>, bool>(currentBuffer, false));
 		currentBuffer->dataReady->connect(boost::bind(&BufferSynchronizer::signalDataOfBufferWithIndexIsReady, this, i));
 	}
 }
 
 
-void BufferSynchronizer::signalDataOfBufferWithIndexIsReady(int index)
+template < class BufferDataType >
+void BufferSynchronizer< BufferDataType >::signalDataOfBufferWithIndexIsReady(int index)
 {
 	printMessage("signal: Data for index now availbel for synchronizer" + index);
 	std::unique_lock<std::mutex> lock(m_updateBuffer);

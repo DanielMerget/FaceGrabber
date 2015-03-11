@@ -285,16 +285,16 @@ void WindowsApplication::onCreate()
 
 	connectWriterAndViewerToKinect();
 	m_kinectFrameGrabber.statusChanged.connect(boost::bind(&WindowsApplication::setStatusMessage, this, _1, _2));
-	std::vector<std::shared_ptr<Buffer>> buffers;
+	std::vector<std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>>> buffers;
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		auto buffer = std::shared_ptr<Buffer>(new Buffer);
+		auto buffer = std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>>(new Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>);
 		auto inputReader = std::shared_ptr<PCLInputReader>(new PCLInputReader());
 		inputReader->setBuffer(buffer);
 		m_inputFileReader.push_back(inputReader);
 		buffers.push_back(buffer);
 	}
 	m_bufferSynchronizer.playbackFinished.connect(boost::bind(&WindowsApplication::onPlaybackFinished, this));
-	m_bufferSynchronizerThread = std::thread(&BufferSynchronizer::updateThreadFunc, &m_bufferSynchronizer);
+	m_bufferSynchronizerThread = std::thread(&BufferSynchronizer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>::updateThreadFunc, &m_bufferSynchronizer);
 	//m_bufferSynchronizer.setBuffer(buffers);
 }
 
@@ -444,7 +444,7 @@ void WindowsApplication::startRecording(bool isColoredStream)
 void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfig)
 {
 	int enabledClouds = 0;
-	std::vector<std::shared_ptr<Buffer>> activeBuffers;
+	std::vector<std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>>> activeBuffers;
 	int numOfFilesToRead = 0;
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		auto& currentConfig = playbackConfig[i];

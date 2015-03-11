@@ -28,7 +28,7 @@ void PCLInputReaderWorkerThread::stopReading()
 {
 	m_isPlaybackRunning = false;
 }
-void PCLInputReaderWorkerThread::setBuffer(std::shared_ptr<Buffer> buffer)
+void PCLInputReaderWorkerThread::setBuffer(std::shared_ptr<Buffer< pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> buffer)
 {
 	m_buffer = buffer;
 }

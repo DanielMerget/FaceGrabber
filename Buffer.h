@@ -5,6 +5,7 @@
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
 #include <boost/signals2.hpp>
+template < class DataType >
 class Buffer
 {
 public:
@@ -14,12 +15,12 @@ public:
 	void setBufferSize(int bufferSize);
 	int getBufferSize();
 	void resetBuffer();
-	void pushData(pcl::PointCloud<pcl::PointXYZRGB>::Ptr newData, int index);
+	void pushData(DataType newData, int index);
 	
 	bool isDataAvailable();
 	std::shared_ptr<boost::signals2::signal<void(void)>> dataReady;
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr pullData();
+	DataType pullData();
 
 	bool isBufferAtIndexSet(const int index);
 
@@ -38,7 +39,7 @@ private:
 
 	int m_bufferingActive;
 	int m_pullDataPosition;
-	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> m_cloudBuffer;
+	std::vector<DataType> m_cloudBuffer;
 	int	m_bufferFillLevel;
 	bool m_producerFinished;
 };

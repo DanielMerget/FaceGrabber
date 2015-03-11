@@ -1,7 +1,12 @@
 #include "Buffer.h"
 #include "stdafx.h"
 #include <atlstr.h>
-Buffer::Buffer():
+
+template Buffer < pcl::PointCloud< pcl::PointXYZRGB>::Ptr >;
+//template KinectCloudOutputWriter < pcl::PointXYZRGB >;
+
+template < class DataType >
+Buffer< DataType >::Buffer() :
 	m_cloudBufferMutex(new std::mutex),
 	m_printMutex(new std::mutex),
 	m_cloudBufferFree(new std::condition_variable),
@@ -14,7 +19,8 @@ Buffer::Buffer():
 {
 }
 
-void Buffer::printMessage(std::string msg)
+template < class DataType >
+void Buffer< DataType >::printMessage(std::string msg)
 {
 	std::lock_guard<std::mutex> lock(*m_printMutex);
 
@@ -23,11 +29,12 @@ void Buffer::printMessage(std::string msg)
 	OutputDebugString(msgCstring);
 }
 
-Buffer::~Buffer()
+template < class DataType >
+Buffer< DataType >::~Buffer()
 {
 }
-
-void Buffer::resetBuffer()
+template < class DataType >
+void Buffer< DataType >::resetBuffer()
 {
 	std::lock_guard<std::mutex> cloudBufferLock(*m_cloudBufferMutex);
 	m_bufferFillLevel = 0;
@@ -37,12 +44,14 @@ void Buffer::resetBuffer()
 	m_cloudBuffer.clear();
 }
 
-void Buffer::setBufferSize(int bufferSize)
+template < class DataType >
+void Buffer< DataType >::setBufferSize(int bufferSize)
 {
 	m_cloudBuffer.resize(bufferSize);
 }
 
-void Buffer::pushData(pcl::PointCloud<pcl::PointXYZRGB>::Ptr newData, int index)
+template < class DataType >
+void Buffer< DataType >::pushData(DataType newData, int index)
 {
 	std::unique_lock<std::mutex> cloudBufferLock(*m_cloudBufferMutex);
 	
@@ -78,16 +87,18 @@ void Buffer::pushData(pcl::PointCloud<pcl::PointXYZRGB>::Ptr newData, int index)
 	
 }
 
-bool Buffer::isDataAvailable()
+template < class DataType >
+bool Buffer< DataType >::isDataAvailable()
 {
 	return m_cloudBuffer[m_pullDataPosition];
 }
 
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr Buffer::pullData()
+template < class DataType >
+DataType Buffer< DataType >::pullData()
 {
 	std::unique_lock<std::mutex> cloudBufferLock(*m_cloudBufferMutex);
 	if (!m_bufferingActive){
-		return pcl::PointCloud<pcl::PointXYZRGB>::Ptr(nullptr);
+		return DataType(nullptr);
 	}
 	 while (m_bufferFillLevel != m_cloudBuffer.size()){
 		if (m_producerFinished){
@@ -104,7 +115,8 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr Buffer::pullData()
 	 return result;
 }
 
-bool Buffer::isBufferAtIndexSet(const int index)
+template < class DataType >
+bool Buffer< DataType >::isBufferAtIndexSet(const int index)
 {
 	if (index >= m_cloudBuffer.size()){
 		return false;
@@ -116,20 +128,27 @@ bool Buffer::isBufferAtIndexSet(const int index)
 		return false;
 	}
 }
-int Buffer::getBufferSize()
+
+template < class DataType >
+int Buffer< DataType >::getBufferSize()
 {
 	return m_cloudBuffer.size();
 }
-void Buffer::setProducerFinished()
+
+template < class DataType >
+void Buffer< DataType >::setProducerFinished()
 {
 	m_producerFinished = true;
 }
 
-void Buffer::enableBuffer()
+template < class DataType >
+void Buffer< DataType >::enableBuffer()
 {
 	m_bufferingActive = true;
 }
-void Buffer::disableBuffer()
+
+template < class DataType >
+void Buffer< DataType >::disableBuffer()
 {
 	m_bufferingActive = false;
 	m_cloudBufferUpdated->notify_all();

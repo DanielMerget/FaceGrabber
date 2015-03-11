@@ -10,7 +10,7 @@ PCLInputReader::PCLInputReader() :
 {
 
 }
-void PCLInputReader::setBuffer(std::shared_ptr<Buffer> buffer)
+void PCLInputReader::setBuffer(std::shared_ptr<Buffer< pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> buffer)
 {
 	m_buffer = buffer;
 }
@@ -201,7 +201,7 @@ void PCLInputReader::setPlaybackConfiguration(PlaybackConfigurationPtr playbackC
 	}
 }
 
-std::shared_ptr<Buffer> PCLInputReader::getBuffer()
+std::shared_ptr<Buffer< pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> PCLInputReader::getBuffer()
 {
 	return m_buffer;
 }

@@ -21,8 +21,8 @@ public:
 	void stopReaderThreads();
 
 	void join();
-	std::shared_ptr<Buffer> getBuffer();
-	void setBuffer(std::shared_ptr<Buffer> buffer);
+	std::shared_ptr<Buffer< pcl::PointCloud<pcl::PointXYZRGB>::Ptr> > getBuffer();
+	void setBuffer(std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> buffer);
 
 	
 
@@ -50,7 +50,7 @@ private:
 	
 	std::mutex m_readMutex;
 
-	std::shared_ptr<Buffer> m_buffer;
+	std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> m_buffer;
 
 	std::thread m_updateThread;
 	std::vector<std::shared_ptr<PCLInputReaderWorkerThread>> m_inputReaderWorkerThreads;
