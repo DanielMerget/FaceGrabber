@@ -35,7 +35,13 @@ void KinectCloudOutputWriter< PointCloudType >::startWritingClouds(int threadsTo
 	m_cloudCount = 0;
 	//5 threads => 17,71 secs
 	for (int i = 0; i < threadsToStart; i++){
-		m_writerThreads.push_back(std::thread(&KinectCloudOutputWriter::writeCloudToFile, this, i));
+		std::shared_ptr<KinectFileWriterThread< PointCloudType >> writer(new KinectFileWriterThread< PointCloudType >);
+		writer->setKinectCloudOutputWriter(this);
+		m_writers.push_back(writer);
+		m_writerThreads.push_back(std::thread(&KinectFileWriterThread< PointCloudType >::writeCloudToFile, writer, i, m_recordingConfiguration));
+
+		//std::thread writerThread(&KinectCloudOutputWriter::writeCloudToFile, this, i);
+		//m_writerThreads.push_back(writerThread);
 	}
 }
 template < typename PointCloudType >
@@ -50,6 +56,26 @@ void KinectCloudOutputWriter<PointCloudType>::stopWritingClouds()
 	//
 	//m_writerThreads.clear();
 	
+}
+template < typename PointCloudType >
+bool KinectCloudOutputWriter<PointCloudType>::pullData(PointCloudMeasurement<PointCloudType>& measurement)
+{
+	std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
+	while (m_clouds.empty()){
+		if (!m_checkCloud.wait_for(cloudLocker, std::chrono::milliseconds(100))){
+			if (m_clouds.empty() && !m_running){
+				return true;
+			}
+		}
+	}
+	if (m_clouds.empty()){
+		return true;
+	}
+
+	measurement = m_clouds.front();
+	m_clouds.pop();
+
+	return false;
 }
 
 template < typename PointCloudType >
@@ -110,7 +136,7 @@ void KinectCloudOutputWriter<PointCloudType>::pushCloud(boost::shared_ptr<const 
 		return;
 	}
 
-	PointCloudMeasurement cloudMeasurement;
+	PointCloudMeasurement<PointCloudType> cloudMeasurement;
 	cloudMeasurement.cloud = cloudToPush;
 	cloudMeasurement.index = m_cloudCount;
 	m_clouds.push(cloudMeasurement);

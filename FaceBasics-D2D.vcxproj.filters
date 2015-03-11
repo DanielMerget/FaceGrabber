@@ -46,6 +46,15 @@
     <ClCompile Include="PCLInputReaderWorkerThread.cpp">
       <Filter>InputReader</Filter>
     </ClCompile>
+    <ClCompile Include="KinectFileWriterThread.cpp">
+      <Filter>FileWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="SingleProducerBuffer.cpp">
+      <Filter>FileWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="CloudMeasurementSource.cpp">
+      <Filter>FileWriter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -101,6 +110,15 @@
     </ClInclude>
     <ClInclude Include="PCLInputReaderWorkerThread.h">
       <Filter>InputReader</Filter>
+    </ClInclude>
+    <ClInclude Include="KinectFileWriterThread.h">
+      <Filter>FileWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="SingleProducerBuffer.h">
+      <Filter>FileWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="CloudMeasurementSource.h">
+      <Filter>FileWriter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
