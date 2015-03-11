@@ -37,7 +37,7 @@ PCLInputReader::~PCLInputReader()
 
 void PCLInputReader::startCloudUpdateThread()
 {
-	if (!m_playbackConfiguration->isEnabled() || m_isPlaybackRunning){
+	if (!m_playbackConfiguration->isEnabled()){
 		return;
 	}
 	join();
@@ -46,7 +46,7 @@ void PCLInputReader::startCloudUpdateThread()
 	int numOfFilesToRead = m_playbackConfiguration->getCloudFilesToPlay().size();
 
 	m_buffer->setBufferSize(numOfFilesToRead);
-
+	m_isPlaybackRunning = true;
 	//m_updateThread = std::thread(&PCLInputReader::updateThreadFunc, this);
 
 	std::async(&PCLInputReader::startReaderThreads, this);

@@ -40,7 +40,7 @@ void PCLInputReaderWorkerThread::readCloudData(const int index, const int step, 
 	std::stringstream msg;
 	msg << "thread for index: " << index << "started. " << std::endl;
 	printMessage(msg.str());
-	pcl::io::loadPLYFile
+	
 	std::shared_ptr<pcl::FileReader> fileReader;
 	switch (format)
 	{

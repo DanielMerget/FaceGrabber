@@ -29,6 +29,7 @@
     <ClCompile Include="NonColouredOutputStreamsUpdater.cpp" />
     <ClCompile Include="OutputStreamsUpdaterStragedy.cpp" />
     <ClCompile Include="PCLInputReader.cpp" />
+    <ClCompile Include="PCLInputReaderWorkerThread.cpp" />
     <ClCompile Include="PCLViewer.cpp" />
     <ClCompile Include="PlaybackTabHandler.cpp" />
     <ClCompile Include="RecordTabHandler.cpp" />
@@ -50,6 +51,7 @@
     <ClInclude Include="NonColouredOutputStreamsUpdater.h" />
     <ClInclude Include="OutputStreamsUpdaterStragedy.h" />
     <ClInclude Include="PCLInputReader.h" />
+    <ClInclude Include="PCLInputReaderWorkerThread.h" />
     <ClInclude Include="PCLViewer.h" />
     <ClInclude Include="PlaybackConfiguration.h" />
     <ClInclude Include="PlaybackTabHandler.h" />

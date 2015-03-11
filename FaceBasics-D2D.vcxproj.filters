@@ -43,6 +43,9 @@
     <ClCompile Include="BufferSynchronizer.cpp">
       <Filter>InputReader</Filter>
     </ClCompile>
+    <ClCompile Include="PCLInputReaderWorkerThread.cpp">
+      <Filter>InputReader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -94,6 +97,9 @@
       <Filter>InputReader</Filter>
     </ClInclude>
     <ClInclude Include="BufferSynchronizer.h">
+      <Filter>InputReader</Filter>
+    </ClInclude>
+    <ClInclude Include="PCLInputReaderWorkerThread.h">
       <Filter>InputReader</Filter>
     </ClInclude>
   </ItemGroup>

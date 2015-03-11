@@ -214,6 +214,7 @@ void PCLViewer::setNumOfClouds(int numOfClouds)
 		m_coloredClouds.resize(numOfClouds);
 		m_cloudUpdated.resize(numOfClouds);
 		m_cloudIDs.resize(numOfClouds);
+		m_viewPorts.resize(numOfClouds);
 		m_nonColoredClouds.resize(numOfClouds);
 		m_viewPortConfigurationChanged = true;
 	}
