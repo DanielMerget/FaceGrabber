@@ -224,10 +224,13 @@ void PlaybackTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 void PlaybackTabHandler::playbackConfigurationChanged()
 {
 	bool isValidConfiguration = true;
+	bool anyPlaybackConfigurationEnabled = false;
 	if (auto playbackConfig = m_playbackConfiguration[HDFace]){
 		auto firstFile = playbackConfig->getFirstPlaybackFile();
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), firstFile);
+
 		isValidConfiguration &= playbackConfig->isPlaybackConfigurationValid();
+		anyPlaybackConfigurationEnabled |= playbackConfig->isEnabled();
 
 		CString numOfFilesStatus;
 		numOfFilesStatus.Format(L"Files: %d", playbackConfig->getCloudFilesToPlayCount());
@@ -241,7 +244,11 @@ void PlaybackTabHandler::playbackConfigurationChanged()
 	if (auto playbackConfig = m_playbackConfiguration[FaceRaw]){
 		auto firstFile = playbackConfig->getFirstPlaybackFile();
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), firstFile);
+
 		isValidConfiguration &= playbackConfig->isPlaybackConfigurationValid();
+		anyPlaybackConfigurationEnabled |= playbackConfig->isEnabled();
+		
+
 		CString numOfFilesStatus;
 		numOfFilesStatus.Format(L"Files: %d", playbackConfig->getCloudFilesToPlayCount());
 
@@ -255,7 +262,10 @@ void PlaybackTabHandler::playbackConfigurationChanged()
 	if (auto playbackConfig = m_playbackConfiguration[FullDepthRaw]){
 		auto firstFile = playbackConfig->getFirstPlaybackFile();
 		Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), firstFile);
+
 		isValidConfiguration &= playbackConfig->isPlaybackConfigurationValid();
+		anyPlaybackConfigurationEnabled |= playbackConfig->isEnabled();
+
 		CString numOfFilesStatus;
 		numOfFilesStatus.Format(L"Files: %d", playbackConfig->getCloudFilesToPlayCount());
 
@@ -266,7 +276,7 @@ void PlaybackTabHandler::playbackConfigurationChanged()
 		SetDlgItemText(m_hWnd, IDC_FULL_RAW_DEPTH_STATUS_READ, L"");
 		isValidConfiguration = false;
 	}
-	Button_Enable(GetDlgItem(m_hWnd, IDC_PLAY_STOP_BUTTON), isValidConfiguration);
+	Button_Enable(GetDlgItem(m_hWnd, IDC_PLAY_STOP_BUTTON), isValidConfiguration & anyPlaybackConfigurationEnabled);
 }
 
 LRESULT CALLBACK PlaybackTabHandler::MessageRouterTab(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

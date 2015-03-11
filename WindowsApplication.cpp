@@ -363,23 +363,15 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 void WindowsApplication::connectInputReaderToViewer()
 {
 	m_bufferSynchronizer.cloudsUpdated.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
-	
-	//r (int i = 0; i < 2; i++){
-	///m_inputFileReader[i] = std::shared_ptr<PCLInputReader>(new PCLInputReader());
-	///m_inputFileReader[i]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(i)));
-	//
-	//_inputFileReader[i]->playbackFinished.connect(boost::bind(&WindowsApplication::onPlaybackFinished, this));
-	//
-	//m_inputFileReader[0]->cloudUpdated.connect(boost::bind(&PCLViewer::updateColoredCloudThreated, m_pclFaceViewer, _1, static_cast<int>(1)));
 }
 
 void WindowsApplication::disconnectInputReaderFromViewer()
 {
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		m_inputFileReader[i]->cloudUpdated.disconnect_all_slots();
-		//inputFileReader[i]->playbackFinished.disconnect_all_slots();
 	}
 }
+
 void WindowsApplication::onRecordTabSelected()
 {
 	m_isKinectRunning = true;
