@@ -21,7 +21,6 @@
   <ItemGroup>
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="BufferSynchronizer.cpp" />
-    <ClCompile Include="CloudMeasurementSource.cpp" />
     <ClCompile Include="ColouredOutputStreamUpdater.cpp" />
     <ClCompile Include="KinectFileWriterThread.cpp" />
     <ClCompile Include="KinectHDFaceGrabber.cpp" />

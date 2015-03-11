@@ -33,6 +33,8 @@ void PCLInputReaderWorkerThread::setBuffer(std::shared_ptr<Buffer< pcl::PointClo
 	m_buffer = buffer;
 }
 
+
+
 void PCLInputReaderWorkerThread::readCloudData(const int index, const int step, std::vector<CloudFile> cloudFilesToPlay, RecordingFileFormat format)
 {
 	m_isPlaybackRunning = true;
@@ -86,8 +88,8 @@ void PCLInputReaderWorkerThread::readCloudData(const int index, const int step, 
 		auto filePath = cloudFilesToPlay[indexOfFileToRead].fullFilePath;
 		fileReader->read<pcl::PointXYZRGB>(filePath, *cloud);
 		//fileReader->read(filePath, *cloud);
+		finishedReadingAFile();
 		
-
 		const int cloudBufferIndex = indexOfFileToRead % m_buffer->getBufferSize();
 
 		m_buffer->pushData(cloud, cloudBufferIndex);

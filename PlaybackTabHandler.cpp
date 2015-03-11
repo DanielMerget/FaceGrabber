@@ -56,6 +56,26 @@ void PlaybackTabHandler::setSharedRecordingConfiguration(SharedRecordingConfigur
 }
 
 
+void PlaybackTabHandler::updateReaderStatus(RecordCloudType recordType, std::wstring status)
+{
+	_In_z_ WCHAR* newStatus = &status[0];
+	switch (recordType)
+	{
+	case HDFace:
+		SetDlgItemText(m_hWnd, IDC_HDFACE_STATUS_READ, newStatus);
+		break;
+	case FaceRaw:
+		SetDlgItemText(m_hWnd, IDC_FACE_RAW_EDIT_STATUS_READ, newStatus);
+		break;
+	case FullDepthRaw:
+		SetDlgItemText(m_hWnd, IDC_FULL_RAW_DEPTH_STATUS_READ, newStatus);
+		break;
+	case RECORD_CLOUD_TYPE_COUNT:
+		break;
+	default:
+		break;
+	}
+}
 
 void PlaybackTabHandler::onCreate(WPARAM wParam, LPARAM)
 {

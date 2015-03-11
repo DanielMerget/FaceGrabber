@@ -31,6 +31,8 @@ public:
 	boost::signal<void(bool)> stopWriting;
 
 	bool isColorEnabled();
+
+	void updateWriterStatus(RecordCloudType type, std::wstring status);
 private:
 	void setupRecording();
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);

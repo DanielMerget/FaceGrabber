@@ -28,6 +28,8 @@ public:
 
 	boost::signal<void(SharedPlaybackConfiguration)> startPlayback;
 	boost::signal<void(void)> stopPlayback;
+
+	void updateReaderStatus(RecordCloudType type, std::wstring status);
 private:
 	void setPlaybackStatus(bool enable);
 	void onCreate(WPARAM wParam, LPARAM);

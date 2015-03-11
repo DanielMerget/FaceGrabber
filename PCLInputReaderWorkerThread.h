@@ -2,7 +2,7 @@
 #include <memory>
 #include "Buffer.h"
 #include "PlaybackConfiguration.h"
-
+#include <boost/signals2.hpp>
 class PCLInputReaderWorkerThread 
 {
 public:
@@ -13,6 +13,7 @@ public:
 	void stopReading();
 	void setBuffer(std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> buffer);
 
+	boost::signals2::signal<void(void)> finishedReadingAFile;
 private:
 	void printMessage(std::string msg);
 	bool m_isPlaybackRunning;

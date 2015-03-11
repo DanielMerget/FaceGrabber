@@ -52,9 +52,6 @@
     <ClCompile Include="SingleProducerBuffer.cpp">
       <Filter>FileWriter</Filter>
     </ClCompile>
-    <ClCompile Include="CloudMeasurementSource.cpp">
-      <Filter>FileWriter</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">

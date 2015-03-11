@@ -128,7 +128,26 @@ void RecordTabHandler::processUIMessage(WPARAM wParam, LPARAM handle)
 	}
 }
 
-
+void RecordTabHandler::updateWriterStatus(RecordCloudType recordType, std::wstring status)
+{
+	_In_z_ WCHAR* newStatus = &status[0];
+	switch (recordType)
+	{
+	case HDFace:
+		SetDlgItemText(m_hWnd, IDC_HD_FACE_STATUS, newStatus);
+		break;
+	case FaceRaw:
+		SetDlgItemText(m_hWnd, IDC_FACE_RAW_DEPTH_STATUS, newStatus);
+		break;
+	case FullDepthRaw:
+		SetDlgItemText(m_hWnd, IDC_FULL_RAW_DEPTH_STATUS, newStatus);
+		break;
+	case RECORD_CLOUD_TYPE_COUNT:
+		break;
+	default:
+		break;
+	}
+}
 
 void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 {

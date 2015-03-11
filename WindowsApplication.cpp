@@ -183,10 +183,14 @@ void WindowsApplication::connectWriterAndViewerToKinect()
 {
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		auto nonColoredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>(new KinectCloudOutputWriter<pcl::PointXYZ>);
+		nonColoredCloudWriter->updateStatus.connect(boost::bind(&RecordTabHandler::updateWriterStatus, &m_recordTabHandler, static_cast<RecordCloudType>(i), _1));
 		m_nonColoredCloudOutputWriter.push_back(nonColoredCloudWriter);
 
 		auto coloredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
+		coloredCloudWriter->updateStatus.connect(boost::bind(&RecordTabHandler::updateWriterStatus, &m_recordTabHandler, static_cast<RecordCloudType>(i), _1));
 		m_colorCloudOutputWriter.push_back(coloredCloudWriter);
+
+
 		//we skip enabling the fulldepth raw
 		if (i == FullDepthRaw){
 			continue;
@@ -289,6 +293,7 @@ void WindowsApplication::onCreate()
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		auto buffer = std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>>(new Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>);
 		auto inputReader = std::shared_ptr<PCLInputReader>(new PCLInputReader());
+		inputReader->updateStatus.connect(boost::bind(&PlaybackTabHandler::updateReaderStatus, &m_plackBackTabHandler, static_cast<RecordCloudType>(i), _1));
 		inputReader->setBuffer(buffer);
 		m_inputFileReader.push_back(inputReader);
 		buffers.push_back(buffer);
@@ -383,6 +388,7 @@ void WindowsApplication::onRecordTabSelected()
 
 void WindowsApplication::onPlaybackSelected()
 {
+	setStatusMessage(L"", true);
 	m_isKinectRunning = false;
 	disconnectWriterAndViewerToKinect();
 	connectInputReaderToViewer();
@@ -487,6 +493,9 @@ void WindowsApplication::stopRecording(bool isColoredStream)
 			if (recordingConfig->isEnabled()){
 				cloudWriter->stopWritingClouds();
 			}
+			if (i == FullDepthRaw){
+				m_colouredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+			}
 		}
 	}
 	else{
@@ -495,6 +504,9 @@ void WindowsApplication::stopRecording(bool isColoredStream)
 			auto cloudWriter = m_nonColoredCloudOutputWriter[i];
 			if (recordingConfig->isEnabled()){
 				cloudWriter->stopWritingClouds();
+			}
+			if (i == FullDepthRaw){
+				m_nonColoredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 			}
 		}
 	}

@@ -8,11 +8,10 @@
 #include <vector>
 #include <future>
 #include "RecordingConfiguration.h"
-#include <boost/signals2.hpp>
 #include "SingleProducerBuffer.h"
 #include "KinectFileWriterThread.h"
 #include "CloudMeasurementSource.h"
-
+#include <boost/signals2.hpp>
 
 template < class PointCloudType >
 class KinectCloudOutputWriter : CloudMeasurementSource< PointCloudType >
@@ -32,12 +31,11 @@ public:
 
 
 	bool pullData(PointCloudMeasurement<PointCloudType>& measurement);
+
+	boost::signals2::signal<void(std::wstring)> updateStatus;
 private:
 	
-	boost::signals2::signal<void(std::string, const pcl::PointCloud<PointCloudType>&)> writeCloudToDisk;
-	//boost::signal2::signal<void<std::string, const pcl::PointCloud<PointCloudType>& >> writeCloudToDisk;
-	
-	void writeCloudToFile(int index);
+	void waitForWriterToFinish();
 
 	void pushCloud(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloud);
 
@@ -47,13 +45,10 @@ private:
 
 	std::queue<PointCloudMeasurement<PointCloudType>> m_clouds;
 
-	std::shared_ptr<SingleProducerBuffer<std::shared_ptr<PointCloudMeasurement<PointCloudType>>>> m_buffer;
-
 	std::condition_variable m_checkCloud;
 	std::mutex m_lockCloud;
 
 	RecordingConfigurationPtr m_recordingConfiguration;
-	
 
 	bool m_running;
 	int m_cloudCount;
