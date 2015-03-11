@@ -32,6 +32,8 @@ public:
 
 	bool isColorEnabled();
 
+	void recordingStopped();
+	
 	void updateWriterStatus(RecordCloudType type, std::wstring status);
 private:
 	void setupRecording();
@@ -39,8 +41,9 @@ private:
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
 	void setRecording(bool enable);
-	void setColorEnabled(bool enable);
 
+	void setColorEnabled(bool enable);
+	void updateFrameLimit();
 	SharedRecordingConfiguration m_recordingConfiguration;
 
 	bool m_colorEnabled;

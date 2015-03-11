@@ -3,7 +3,6 @@
 // Used by FaceBasics.rc
 //
 #define IDI_APP                         100
-#define IDD_APP                         100
 #define IDD_DIALOGBAR                   103
 #define IDC_TAB_1                       103
 #define IDC_TAB_RECORD                  103
@@ -58,6 +57,9 @@
 #define IDC_PLAY_STOP_BUTTON            1058
 #define IDC_HDFACE_STATUS_READ          1059
 #define IDC_FULL_RAW_DEPTH_STATUS_READ  1060
+#define IDC_EDIT2                       1061
+#define IDC_LIMIT_FRAMES_EDIT_BOX       1061
+#define IDC_LIMIT_FRAMES_CHECK          1062
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -67,7 +69,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1061
+#define _APS_NEXT_CONTROL_VALUE         1063
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

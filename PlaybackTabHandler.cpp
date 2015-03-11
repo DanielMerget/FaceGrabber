@@ -48,11 +48,6 @@ void PlaybackTabHandler::setSharedRecordingConfiguration(SharedRecordingConfigur
 	m_playbackConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
 	m_playbackConfiguration[FaceRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_DEPTH_CHECKBOX));
 	m_playbackConfiguration[FullDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
-	//DlgDirList(m_hWnd,
-	//	outputFolderPath.GetBuffer(),
-	//	IDC_RECODINGS_LIST_BOX,
-	//	IDC_FILE_PATH_EDIT_BOX,
-	//	DDL_EXCLUSIVE | DDL_READWRITE | DDL_DIRECTORY);
 }
 
 

@@ -216,19 +216,19 @@ void RecordTabHandler::setupRecording()
 	}
 	
 }
-//BOOL CALLBACK RecordTabHandler::EnumChildProc(HWND hwnd, LPARAM lParam)
-//{
-//	cout << "hwnd_Child = " << hwnd << endl;
-//	auto recordButton = GetDlgItem(m_hWnd, IDC_RECORD_BUTTON);
-//	if (hwnd != recordButton){
-//		EnableWindow(hwnd, m_isRecording);
-//	}
-//	
-//	return TRUE; // must return TRUE; If return is FALSE it stops the recursion
-//}
+
+void RecordTabHandler::recordingStopped()
+{
+	SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Record");
+	m_isRecording = false;
+}
 
 void RecordTabHandler::setRecording(bool enable)
 {
+	if (enable == m_isRecording){
+		return;
+	}
+
 	m_isRecording = enable;
 	if (enable){
 		setupRecording();
@@ -237,7 +237,6 @@ void RecordTabHandler::setRecording(bool enable)
 	}
 	else{
 		stopWriting(m_colorEnabled);
-		SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Record");
 	}	
 }
 
@@ -247,6 +246,23 @@ void RecordTabHandler::setColorEnabled(bool enable)
 	colorConfigurationChanged(enable);
 }
 
+void RecordTabHandler::updateFrameLimit()
+{
+	bool isLimited = IsDlgButtonChecked(m_hWnd, IDC_LIMIT_FRAMES_CHECK);
+	Edit_Enable(GetDlgItem(m_hWnd, IDC_LIMIT_FRAMES_EDIT_BOX), isLimited);
+
+	int limitAsInt = UNLIMITED_FRAMES;
+	if (isLimited){
+		auto editBoxHandle = GetDlgItem(m_hWnd, IDC_LIMIT_FRAMES_EDIT_BOX);
+		CString limit;
+		std::vector<wchar_t> buffer(MAX_PATH);
+		Edit_GetText(editBoxHandle, buffer.data(), buffer.size());
+		limitAsInt = _tstoi(buffer.data());
+	}
+	for (auto recordConfig : m_recordingConfiguration){
+		recordConfig->setMaxNumberOfFrames(limitAsInt);
+	}
+}
 void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 {
 	switch (LOWORD(wParam))
@@ -254,6 +270,11 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 	case IDC_RECORD_COLOR:
 		setColorEnabled(IsDlgButtonChecked(m_hWnd, IDC_RECORD_COLOR));
 		break;
+	case IDC_LIMIT_FRAMES_CHECK:
+	{
+		updateFrameLimit();
+		break;
+	}
 	case IDC_RECORD_BUTTON:
 	{
 		
@@ -335,6 +356,9 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 		break;
 	case IDC_FULL_RAW_DEPTH_EDIT_BOX:
 		m_recordingConfiguration[FullDepthRaw]->setFileName(buffer.data());
+		break;
+	case IDC_LIMIT_FRAMES_EDIT_BOX:
+		updateFrameLimit();
 		break;
 	case IDC_FILE_PATH_EDIT_BOX:
 	{

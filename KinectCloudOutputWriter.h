@@ -33,8 +33,11 @@ public:
 	bool pullData(PointCloudMeasurement<PointCloudType>& measurement);
 
 	boost::signals2::signal<void(std::wstring)> updateStatus;
+	boost::signals2::signal<void(void)> writingWasStopped;
 private:
 	
+	bool isMaximumFramesReached();
+
 	void waitForWriterToFinish();
 
 	void pushCloud(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloud);

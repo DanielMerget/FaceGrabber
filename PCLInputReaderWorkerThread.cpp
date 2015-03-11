@@ -33,8 +33,6 @@ void PCLInputReaderWorkerThread::setBuffer(std::shared_ptr<Buffer< pcl::PointClo
 	m_buffer = buffer;
 }
 
-
-
 void PCLInputReaderWorkerThread::readCloudData(const int index, const int step, std::vector<CloudFile> cloudFilesToPlay, RecordingFileFormat format)
 {
 	m_isPlaybackRunning = true;

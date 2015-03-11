@@ -24,19 +24,12 @@ enum RecordCloudType{
 };
 
 class RecordingConfiguration{
-	
+#define UNLIMITED_FRAMES -1;
+#define FRAMES_NOT_SET 0;
 public:
 	RecordingConfiguration() : m_outputFolder(), m_enabled(false)
 	{}
 
-	RecordingConfiguration(RecordingConfiguration&& recordConfiguration) :
-		m_outputFolder(recordConfiguration.getFilePathCString()),
-		m_cloudType(recordConfiguration.getRecordCloudType()),
-		m_enabled(false),
-		m_fileFormat(recordConfiguration.getRecordFileFormat()),
-		m_fileName(recordConfiguration.getFileName())
-	{
-	}
 
 	RecordingConfiguration(RecordCloudType cloudType, RecordingFileFormat format) : 
 		m_outputFolder(),
@@ -44,6 +37,7 @@ public:
 		m_cloudType(cloudType),
 		m_fileFormat(format)
 	{
+		m_maxNumberOfFrames = UNLIMITED_FRAMES;
 		setDefaultFileName(); 
 	}
 
@@ -118,7 +112,11 @@ public:
 		}
 		bool fileNameLengthExists = (wcslen(m_fileName) > 0);
 		bool filePathSet = !m_outputFolder.IsEmpty();
-		return fileNameLengthExists && filePathSet;
+		bool limitCorrect = true;
+		if (!isRecordingDurationUnLimited()){
+			limitCorrect &= (m_maxNumberOfFrames > 0);
+		}
+		return fileNameLengthExists && filePathSet && limitCorrect;
 	}
 
 	CString getFilePathCString()
@@ -152,6 +150,23 @@ public:
 		return m_fileName;
 	}
 
+	bool isRecordingDurationUnLimited()
+	{
+		return m_maxNumberOfFrames == UNLIMITED_FRAMES;
+	}
+
+	
+	void setMaxNumberOfFrames(int newMaxNumberOfFrames)
+	{
+		m_maxNumberOfFrames = newMaxNumberOfFrames;
+		recordPathOrFileNameChanged(m_cloudType);
+	}
+
+	int getMaxNumberOfFrames()
+	{
+		return m_maxNumberOfFrames;
+	}
+
 	std::string getFileNameString()
 	{
 		CT2CA pszConvertedAnsiString(m_fileName);
@@ -178,12 +193,6 @@ public:
 
 	void setFilePath(LPTSTR filePath)
 	{
-		//A std:string  using the char* constructor.
-		//char ch[MAX_PATH];
-		//char DefChar = ' ';
-		//WideCharToMultiByte(CP_ACP, 0, filePath, -1, ch, MAX_PATH, &DefChar, NULL);
-		//
-		//m_filePath = std::string(ch);
 		m_outputFolder = CString(filePath);
 		recordPathOrFileNameChanged(m_cloudType);
 	}
@@ -270,12 +279,13 @@ private:
 	std::vector<std::string> m_foundCloudFiles;
 
 	//outputfolder/timestamp/cloudtype/filename.fileformat
+
 	CString					m_outputFolder;
 	CString					m_timeStampFolderName;
 	CString					m_fileName;
 	RecordCloudType			m_cloudType;
 	RecordingFileFormat		m_fileFormat;
-	
+	int						m_maxNumberOfFrames;
 	bool					m_enabled;
 };
 typedef std::shared_ptr<RecordingConfiguration> RecordingConfigurationPtr;

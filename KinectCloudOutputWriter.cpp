@@ -14,6 +14,7 @@ KinectCloudOutputWriter< PointCloudType >::KinectCloudOutputWriter() :
 	m_writerThreads()
 {
 }
+
 template < typename PointCloudType >
 KinectCloudOutputWriter< PointCloudType >::~KinectCloudOutputWriter()
 {
@@ -56,7 +57,8 @@ void KinectCloudOutputWriter<PointCloudType>::stopWritingClouds()
 {
 	m_running = false;
 	m_cloudCount = 0;
-	m_checkCloud.notify_all();	
+	m_checkCloud.notify_all();
+	writingWasStopped();
 }
 
 template < typename PointCloudType >
@@ -80,6 +82,14 @@ bool KinectCloudOutputWriter<PointCloudType>::pullData(PointCloudMeasurement<Poi
 	return false;
 }
 
+template < typename PointCloudType >
+bool KinectCloudOutputWriter<PointCloudType>::isMaximumFramesReached()
+{
+	if (m_recordingConfiguration->isRecordingDurationUnLimited()){
+		return false;
+	}
+	return m_cloudCount == m_recordingConfiguration->getMaxNumberOfFrames();
+}
 
 template < typename PointCloudType >
 void KinectCloudOutputWriter<PointCloudType>::pushCloud(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloudToPush)
@@ -100,6 +110,11 @@ void KinectCloudOutputWriter<PointCloudType>::pushCloud(boost::shared_ptr<const 
 	m_clouds.push(cloudMeasurement);
 	m_cloudCount++;
 	m_checkCloud.notify_all();
+
+	if (isMaximumFramesReached()){
+		stopWritingClouds();
+		
+	}
 }
 
 template < typename PointCloudType >
