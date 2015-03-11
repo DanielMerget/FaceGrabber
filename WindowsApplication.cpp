@@ -9,7 +9,8 @@ WindowsApplication::WindowsApplication() :
 	m_fFreq(0),
 	m_nNextStatusTime(0),
 	m_isCloudWritingStarted(false),
-	m_recordingConfiguration(RECORD_CLOUD_TYPE_COUNT)
+	m_recordingConfiguration(RECORD_CLOUD_TYPE_COUNT),
+	m_isKinectRunning(true)
 {
 	LARGE_INTEGER qpf = { 0 };
 	if (QueryPerformanceFrequency(&qpf))
@@ -93,8 +94,9 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	// Main message loop
 	while (WM_QUIT != msg.message)
 	{
-		m_kinectFrameGrabber.update();
-		//m_kinectDepthGrabber.update();
+		if (m_isKinectRunning){
+			m_kinectFrameGrabber.update();
+		}
 		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			// If a dialog message will be taken care of by the dialog proc
@@ -368,6 +370,7 @@ void WindowsApplication::disconnectInputReaderFromViewer()
 }
 void WindowsApplication::onRecordTabSelected()
 {
+	m_isKinectRunning = true;
 	m_plackBackTabHandler.playbackStopped();
 	disconnectInputReaderFromViewer();
 	connectWriterAndViewerToKinect();
@@ -380,6 +383,7 @@ void WindowsApplication::onRecordTabSelected()
 
 void WindowsApplication::onPlaybackSelected()
 {
+	m_isKinectRunning = false;
 	disconnectWriterAndViewerToKinect();
 	connectInputReaderToViewer();
 	m_pclFaceViewer->useColoredCloud(true);

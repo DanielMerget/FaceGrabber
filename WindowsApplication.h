@@ -118,7 +118,7 @@ private:
 	//std::shared_ptr<RecordingConfiguration>	m_recordingConfiguration;
 	BufferSynchronizer			m_bufferSynchronizer;
 	std::thread					m_bufferSynchronizerThread;
-
+	bool						m_isKinectRunning;
 	RecordTabHandler			m_recordTabHandler;
 	PlaybackTabHandler			m_plackBackTabHandler;
 	std::shared_ptr<ColouredOutputStreamUpdater> m_colouredOutputStreamUpdater;
