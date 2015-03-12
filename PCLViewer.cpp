@@ -152,7 +152,6 @@ void PCLViewer::matchPointCloudsToViewPorts(pcl::visualization::PCLVisualizer::P
 }
 void PCLViewer::updateLoop()
 {
-	
 	//static std::mutex constructorLock;
 	//constructorLock.lock();
 	//pcl::visualization::PCLVisualizer viewer(m_viewerName);
@@ -178,6 +177,7 @@ void PCLViewer::updateLoop()
 
 	}
 	matchPointCloudsToViewPorts(viewer);
+	
 	while (!viewer->wasStopped() && m_isRunning)
 	{
 		{

@@ -343,10 +343,22 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 		case TCN_SELCHANGE:
 			int iPage = TabCtrl_GetCurSel(GetDlgItem(m_hWnd, IDC_TAB2));
 			if (iPage == 0){
-				onRecordTabSelected();
+				if (m_plackBackTabHandler.isPlaybackRunning()){
+					TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 1);
+				}
+				else{
+					onRecordTabSelected();
+				}
+				
 			}
 			else{
-				onPlaybackSelected();
+				if (m_recordTabHandler.isRecording()){
+					TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 0);
+				}
+				else{
+					onPlaybackSelected();
+				}
+				
 			}
 			break;
 		}

@@ -84,7 +84,14 @@ void PCLInputReaderWorkerThread::readCloudData(const int index, const int step, 
 
 
 		auto filePath = cloudFilesToPlay[indexOfFileToRead].fullFilePath;
-		fileReader->read<pcl::PointXYZRGB>(filePath, *cloud);
+
+		//sometimes the reading breaks; 
+		while ( (fileReader->read<pcl::PointXYZRGB>(filePath, *cloud) != 0)){
+			if (!m_isPlaybackRunning){
+				const int cloudBufferIndex = indexOfFileToRead % m_buffer->getBufferSize();
+				m_buffer->pushData(pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud <pcl::PointXYZRGB>()) , cloudBufferIndex);
+			}
+		}
 		//fileReader->read(filePath, *cloud);
 		finishedReadingAFile();
 		

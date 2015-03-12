@@ -82,6 +82,7 @@ void BufferSynchronizer< BufferDataType >::updateThreadFunc()
 			if (readyPointClouds.size() > 0){
 				printMessage("synchronier updating");
 				m_numOfFilesRead++;
+
 				cloudsUpdated(readyPointClouds);
 				std::wstringstream message;
 				message << "play: " << m_numOfFilesRead << "/" << m_numOfFilesToRead;

@@ -53,6 +53,7 @@ void Buffer< DataType >::setBufferSize(int bufferSize)
 	m_cloudBuffer.resize(bufferSize);
 }
 
+
 template < class DataType >
 void Buffer< DataType >::pushData(DataType newData, int index)
 {
@@ -87,7 +88,6 @@ void Buffer< DataType >::pushData(DataType newData, int index)
 		printMessage("buffer: data ready");
 		(*dataReady)();
 	}
-	
 }
 
 template < class DataType >

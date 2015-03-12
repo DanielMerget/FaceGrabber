@@ -153,6 +153,12 @@ void PlaybackTabHandler::setPlaybackStatus(bool enable)
 		playbackStopped();
 	}
 }
+
+bool PlaybackTabHandler::isPlaybackRunning()
+{
+	return m_isPlaybackRunning;
+}
+
 void PlaybackTabHandler::playbackStopped()
 {
 	SetDlgItemText(m_hWnd, IDC_PLAY_STOP_BUTTON, L"Play");

@@ -30,6 +30,8 @@ public:
 	boost::signal<void(void)> stopPlayback;
 
 	void updateReaderStatus(RecordCloudType type, std::wstring status);
+
+	bool isPlaybackRunning();
 private:
 	void setPlaybackStatus(bool enable);
 	void onCreate(WPARAM wParam, LPARAM);

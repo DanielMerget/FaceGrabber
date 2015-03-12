@@ -34,6 +34,8 @@ public:
 
 	void recordingStopped();
 	
+	bool isRecording();
+
 	void updateWriterStatus(RecordCloudType type, std::wstring status);
 private:
 	void setupRecording();

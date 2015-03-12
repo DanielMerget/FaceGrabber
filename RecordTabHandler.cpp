@@ -13,6 +13,11 @@ RecordTabHandler::~RecordTabHandler()
 {
 }
 
+bool RecordTabHandler::isRecording()
+{
+	return m_isRecording;
+}
+
 void RecordTabHandler::setSharedRecordingConfiguration(SharedRecordingConfiguration recordingConfiguration)
 {
 	m_recordingConfiguration = recordingConfiguration;
