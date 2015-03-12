@@ -132,10 +132,10 @@ bool NonColouredOutputStreamsUpdater::extractDepthCloudFromBoundingBox(CameraSpa
 	DepthSpacePoint depthBottomRightBack;
 	m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomRightBack, &depthBottomRightBack);
 
-	if (isFloatValueInfinity(depthTopLeftBack.X) || isFloatValueInfinity(depthTopLeftBack.Y) || isFloatValueInfinity(depthBottomRightBack.X) || isFloatValueInfinity(depthBottomRightBack.Y)){
-		//some points can not be mapped to deph space; then we skip that frame
+	if (!isValidDepthPoint(depthTopLeftBack) || !isValidDepthPoint(depthBottomRightBack)){
 		return false;
 	}
+	
 	cv::vector<cv::Point2f> hullPoints;
 	cv::convexHull(hdFacePointsInCamSpaceOpenCV, hullPoints);
 	for (int x = static_cast<int>(depthTopLeftBack.X); x < static_cast<int>(depthBottomRightBack.X); x++){

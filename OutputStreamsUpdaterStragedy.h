@@ -8,6 +8,10 @@ public:
 	OutputStreamsUpdaterStragedy();
 	~OutputStreamsUpdaterStragedy();
 
+
+	bool isValidDepthPoint(DepthSpacePoint depthPoint){
+		return (depthPoint.X > 0 && depthPoint.X < m_depthWidth) && (depthPoint.Y > 0 && depthPoint.Y < m_depthWidth);
+	}
 	bool isFloatValueInfinity(float value)
 	{
 		return std::numeric_limits < float >::infinity() == value;
