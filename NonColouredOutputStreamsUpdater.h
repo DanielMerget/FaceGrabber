@@ -23,9 +23,15 @@ public:
 	//boost::signal<void(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)> depthCloudUpdated;
 
 private:
-	pcl::PointCloud<pcl::PointXYZ>::Ptr extractDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack,
-		std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV, RGBQUAD* colorBuffer, UINT16* depthBuffer);
+
+	
+
+	bool extractDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack,
+		std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV, RGBQUAD* colorBuffer, UINT16* depthBuffer, pcl::PointCloud<pcl::PointXYZ>::Ptr);
+
 	pcl::PointCloud<pcl::PointXYZ>::Ptr extractFaceHDPoinCloudAndBoundingBox(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints,
 		CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV, RGBQUAD* colorBuffer);
+
+	pcl::PointCloud<pcl::PointXYZ>::Ptr convertDepthBufferToPointCloud(UINT16* depthBuffer);
 };
 

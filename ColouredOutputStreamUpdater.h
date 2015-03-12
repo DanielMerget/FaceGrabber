@@ -4,6 +4,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+#include <limits>
+
 
 class ColouredOutputStreamUpdater :
 	public OutputStreamsUpdaterStragedy
@@ -20,9 +22,16 @@ public:
 	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated[3];
 	//boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> depthCloudUpdated;
 
+
+	
+
 private:
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr extractColouredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack, 
-		std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV, RGBQUAD* colorBuffer, UINT16* depthBuffer);
+
+	bool extractColouredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack,
+		std::vector<cv::Point2f>& hdFacePointsInColorSpaceSpaceOpenCV, RGBQUAD* colorBuffer, UINT16* depthBuffer, pcl::PointCloud<pcl::PointXYZRGB>::Ptr depthCloud);
+
+	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr extractColouredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack, 
+	//	std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV, RGBQUAD* colorBuffer, UINT16* depthBuffer);
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr extractClolouredFaceHDPoinCloudAndBoundingBox(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, 
 		CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV, RGBQUAD* colorBuffer);
 

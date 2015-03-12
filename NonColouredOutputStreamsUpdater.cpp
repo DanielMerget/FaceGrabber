@@ -1,7 +1,6 @@
 #include "NonColouredOutputStreamsUpdater.h"
 #include <pcl/common/centroid.h>
 #include <pcl/common/transforms.h>
-
 NonColouredOutputStreamsUpdater::NonColouredOutputStreamsUpdater()
 {
 }
@@ -28,8 +27,14 @@ HRESULT NonColouredOutputStreamsUpdater::updateOutputStreams(IFaceModel* faceMod
 
 		auto hdFaceCloud = extractFaceHDPoinCloudAndBoundingBox(bufferSize, detectedHDFacePointsCamSpace, detectedHDFacePointsColorSpace,
 			boundingBoxPointTopLeft, boundingBoxPointBottomRight, hdFacePointsInCamSpaceOpenCV, colorBuffer);
-		auto hdFaceRawDepthCloud = extractDepthCloudFromBoundingBox(boundingBoxPointTopLeft, boundingBoxPointBottomRight,
-			hdFacePointsInCamSpaceOpenCV, colorBuffer, depthBuffer);
+
+		pcl::PointCloud<pcl::PointXYZ>::Ptr hdFaceRawDepthCloud(new pcl::PointCloud<pcl::PointXYZ>);
+
+		bool isCloudCorrect = extractDepthCloudFromBoundingBox(boundingBoxPointTopLeft, boundingBoxPointBottomRight,
+			hdFacePointsInCamSpaceOpenCV, colorBuffer, depthBuffer, hdFaceRawDepthCloud);
+		if (!isCloudCorrect){
+			return hr;
+		}
 
 		Eigen::Vector4f centroid;
 		pcl::compute3DCentroid(*hdFaceCloud, centroid);
@@ -51,6 +56,10 @@ HRESULT NonColouredOutputStreamsUpdater::updateOutputStreams(IFaceModel* faceMod
 
 		if (!cloudUpdated[1].empty()){
 			cloudUpdated[1](hdFaceRawDepthCloud);
+		}
+		if (!cloudUpdated[2].empty()){
+			auto fullDepthCloud = convertDepthBufferToPointCloud(depthBuffer);
+			cloudUpdated[2](fullDepthCloud);
 		}
 /*
 		cloudUpdated[0](hdFaceCloud);
@@ -114,8 +123,68 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr NonColouredOutputStreamsUpdater::extractFace
 	return cloud;
 }
 
+bool NonColouredOutputStreamsUpdater::extractDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack,
+	std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV, RGBQUAD* colorBuffer, UINT16* depthBuffer, pcl::PointCloud<pcl::PointXYZ>::Ptr faceDepthCloud)
+{
+	DepthSpacePoint depthTopLeftBack;
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camTopLeftBack, &depthTopLeftBack);
+
+	DepthSpacePoint depthBottomRightBack;
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomRightBack, &depthBottomRightBack);
+
+	if (isFloatValueInfinity(depthTopLeftBack.X) || isFloatValueInfinity(depthTopLeftBack.Y) || isFloatValueInfinity(depthBottomRightBack.X) || isFloatValueInfinity(depthBottomRightBack.Y)){
+		//some points can not be mapped to deph space; then we skip that frame
+		return false;
+	}
+	cv::vector<cv::Point2f> hullPoints;
+	cv::convexHull(hdFacePointsInCamSpaceOpenCV, hullPoints);
+	for (int x = static_cast<int>(depthTopLeftBack.X); x < static_cast<int>(depthBottomRightBack.X); x++){
+		for (int y = static_cast<int>(depthTopLeftBack.Y); y < static_cast<int>(depthBottomRightBack.Y); y++){
+
+			pcl::PointXYZ point;
+			DepthSpacePoint depthPoint;
+			depthPoint.X = static_cast<float>(x);
+			depthPoint.Y = static_cast<float>(y);
+
+			UINT16 depthOfCurrentPoint = depthBuffer[y * m_depthWidth + x];
+
+			ColorSpacePoint colorPoint;
+			HRESULT hr = m_pCoordinateMapper->MapDepthPointToColorSpace(depthPoint, depthOfCurrentPoint, &colorPoint);
+			if (FAILED(hr)){
+				continue;
+			}
+			int colorPixelMidX = static_cast<int>(std::floor(colorPoint.X + 0.5f));
+			int colorPixelMidY = static_cast<int>(std::floor(colorPoint.Y + 0.5f));
+			auto result = cv::pointPolygonTest(hullPoints, cv::Point2f(colorPoint.X, colorPoint.Y), false);
+			if (result < 0){
+				continue;
+			}
+
+			CameraSpacePoint camPoint;
+			hr = m_pCoordinateMapper->MapDepthPointToCameraSpace(depthPoint, depthOfCurrentPoint, &camPoint);
+
+			if (FAILED(hr)){
+				continue;
+			}
+
+			if ((0 <= colorPixelMidX) && (colorPixelMidX < m_colorWidth) && (0 <= colorPixelMidY) && (colorPixelMidY < m_colorHeight)){
+				point.x = camPoint.X;
+				point.y = camPoint.Y;
+				point.z = camPoint.Z;
+			}
+
+			if (point.x < camTopLeftBack.X || point.x > camBottomRightBack.X)
+				continue;
 
 
+			faceDepthCloud->push_back(point);
+
+		}
+	}
+
+	return true;
+}
+/*
 pcl::PointCloud<pcl::PointXYZ>::Ptr NonColouredOutputStreamsUpdater::extractDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack,
 	std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV, RGBQUAD* colorBuffer, UINT16* depthBuffer)
 {
@@ -174,5 +243,46 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr NonColouredOutputStreamsUpdater::extractDept
 	}
 
 	return depthCloud;
-}
+}*/
 
+pcl::PointCloud<pcl::PointXYZ>::Ptr NonColouredOutputStreamsUpdater::convertDepthBufferToPointCloud(UINT16* depthBuffer)
+{
+	
+	pcl::PointCloud<pcl::PointXYZ>::Ptr pointCloud(new pcl::PointCloud<pcl::PointXYZ>());
+	pointCloud->width = static_cast<uint32_t>(m_depthWidth);
+	pointCloud->height = static_cast<uint32_t>(m_depthHeight);
+	pointCloud->is_dense = false;
+	HRESULT hr;
+
+	for (int y = 0; y < m_depthHeight; y++){
+		for (int x = 0; x < m_depthWidth; x++){
+			pcl::PointXYZ point;
+			DepthSpacePoint depthPoint;
+			depthPoint.X = static_cast<float>(x);
+			depthPoint.Y = static_cast<float>(y);
+			UINT16 depthOfCurrentPoint = depthBuffer[y * m_depthWidth + x];
+	
+			ColorSpacePoint colorPoint;
+			hr = m_pCoordinateMapper->MapDepthPointToColorSpace(depthPoint, depthOfCurrentPoint, &colorPoint);
+			if (FAILED(hr)){
+				continue;
+			}
+
+			CameraSpacePoint camPoint;
+			hr = m_pCoordinateMapper->MapDepthPointToCameraSpace(depthPoint, depthOfCurrentPoint, &camPoint);
+	
+			if (FAILED(hr)){
+				continue;
+			}
+			
+			point.x = camPoint.X;
+			point.y = camPoint.Y;
+			point.z = camPoint.Z;
+				
+			pointCloud->push_back(point);
+			
+		}
+	}
+	
+	return pointCloud;
+}
