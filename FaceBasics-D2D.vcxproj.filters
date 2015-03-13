@@ -126,9 +126,6 @@
     <ClInclude Include="ConvertTabHandler.h">
       <Filter>WindowsApp\Tabs</Filter>
     </ClInclude>
-    <ClInclude Include="IRecordingConfiguration.h">
-      <Filter>WindowsApp\Model</Filter>
-    </ClInclude>
     <ClInclude Include="SimpleRecordingConfiguration.h">
       <Filter>WindowsApp\Model</Filter>
     </ClInclude>
@@ -137,6 +134,9 @@
     </ClInclude>
     <ClInclude Include="RecordingConfiguration.h">
       <Filter>WindowsApp\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="IRecordingConfiguration.h">
+      <Filter>WindowsApp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

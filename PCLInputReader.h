@@ -17,7 +17,7 @@ class PCLInputReader
 public:
 	PCLInputReader();
 	~PCLInputReader();
-	void startCloudUpdateThread();
+	void startCloudUpdateThread(bool isSingleThreatedReadingAndBlocking);
 	
 	void stopReaderThreads();
 
@@ -31,7 +31,7 @@ public:
 	boost::signals2::signal<void(std::wstring)> updateStatus;
 private:
 	void createAndStartThreadForIndex(int index, int numOfThreads);
-	void startReaderThreads();
+	void startReaderThreads(bool isSingleThreatedReadingAndBlocking);
 	bool isBufferAtIndexSet(const int index);
 	void printMessage(std::string msg);
 	void readerFinishedReadingAFile();

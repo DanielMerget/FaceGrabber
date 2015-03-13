@@ -91,10 +91,13 @@ void PCLInputReaderWorkerThread< PointType >::readCloudData(const int index, con
 
 
 		auto filePath = cloudFilesToPlay[indexOfFileToRead].fullFilePath;
-		
-		fileReader->read<PointType>(filePath, *cloud);
+		std::stringstream readingfileMessage;
+		readingfileMessage << "Reading file: " << filePath;
+		printMessage(readingfileMessage.str());
 
-		
+		fileReader->read<PointType>(filePath, *cloud);
+		readingfileMessage << " finished";
+		printMessage(readingfileMessage.str());
 		//fileReader->read(filePath, *cloud);
 		finishedReadingAFile();
 		

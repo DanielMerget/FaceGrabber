@@ -77,7 +77,9 @@ private:
 	void startRecording(bool isColoredStream);
 	void stopRecording(bool isColoredStream);
 
-	void startPlayback(SharedPlaybackConfiguration playbackConfig);
+	void startPlayback(SharedPlaybackConfiguration playbackConfig, bool isSingleThreatedReading);
+	void triggerReaderStart(SharedPlaybackConfiguration playbackConfig, bool isSingleThreatedReading);
+	void setupReaderAndBuffersForPlayback(SharedPlaybackConfiguration playbackConfig);
 	void stopPlayback();
 
 	void processUIMessage(WPARAM wParam, LPARAM);

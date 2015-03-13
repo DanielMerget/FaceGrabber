@@ -237,7 +237,7 @@ void WindowsApplication::onCreate()
 		(DLGPROC)PlaybackTabHandler::MessageRouterTab,
 		reinterpret_cast<LPARAM>(&m_plackBackTabHandler));
 	ShowWindow(m_playbackTabHandle, SW_HIDE);
-	m_plackBackTabHandler.startPlayback.connect(boost::bind(&WindowsApplication::startPlayback, this, _1));
+	m_plackBackTabHandler.startPlayback.connect(boost::bind(&WindowsApplication::startPlayback, this, _1, _2));
 	m_plackBackTabHandler.stopPlayback.connect(boost::bind(&WindowsApplication::stopPlayback, this));
 
 	m_convertTabHandle = CreateDialogParamW(
@@ -498,8 +498,16 @@ void WindowsApplication::startRecording(bool isColoredStream)
 }
 
 
-
-void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfig)
+void WindowsApplication::triggerReaderStart(SharedPlaybackConfiguration playbackConfig, bool isSingleThreatedReading)
+{
+	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+		auto& currentConfig = playbackConfig[i];
+		auto cloudType = currentConfig->getRecordCloudType();
+		m_inputFileReader[cloudType]->setPlaybackConfiguration(playbackConfig[i]);
+		m_inputFileReader[cloudType]->startCloudUpdateThread(isSingleThreatedReading);
+	}
+}
+void WindowsApplication::setupReaderAndBuffersForPlayback(SharedPlaybackConfiguration playbackConfig)
 {
 	int enabledClouds = 0;
 	std::vector<std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>>> activeBuffers;
@@ -512,14 +520,18 @@ void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfi
 			activeBuffers.push_back(m_inputFileReader[i]->getBuffer());
 		}
 	}
-	
+
 	m_bufferSynchronizer.setBuffer(activeBuffers, numOfFilesToRead);
 	m_pclFaceViewer->setNumOfClouds(enabledClouds);
-	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		auto& currentConfig = playbackConfig[i];
-		auto cloudType = currentConfig->getRecordCloudType();
-		m_inputFileReader[cloudType]->setPlaybackConfiguration(playbackConfig[i]);
-		m_inputFileReader[cloudType]->startCloudUpdateThread();
+}
+void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfig, bool isSingleThreatedReading)
+{
+	setupReaderAndBuffersForPlayback(playbackConfig);
+	if (isSingleThreatedReading){
+		std::async(std::launch::async, &WindowsApplication::triggerReaderStart, this, playbackConfig, isSingleThreatedReading);
+	}
+	else{
+		triggerReaderStart(playbackConfig, isSingleThreatedReading);
 	}
 }
 

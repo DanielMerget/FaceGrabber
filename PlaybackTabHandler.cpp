@@ -3,7 +3,8 @@
 
 PlaybackTabHandler::PlaybackTabHandler() :
 	m_playbackConfiguration(RECORD_CLOUD_TYPE_COUNT),
-	m_isPlaybackRunning(false)
+	m_isPlaybackRunning(false),
+	m_isSingleThreadedReading(true)
 {
 }
 
@@ -78,6 +79,7 @@ void PlaybackTabHandler::updateReaderStatus(RecordCloudType recordType, std::wst
 void PlaybackTabHandler::onCreate(WPARAM wParam, LPARAM)
 {
 	
+	Button_SetCheck(GetDlgItem(m_hWnd, IDC_CHECK_BOX_SINGLE_THREATED_READING), m_isSingleThreadedReading);
 	//if (!m_playbackConfiguration[0]){
 	//	return;
 	//}
@@ -145,7 +147,7 @@ void PlaybackTabHandler::setPlaybackStatus(bool enable)
 {
 	m_isPlaybackRunning = enable;
 	if (enable){
-		startPlayback(m_playbackConfiguration);
+		startPlayback(m_playbackConfiguration, m_isSingleThreadedReading);
 		SetDlgItemText(m_hWnd, IDC_PLAY_STOP_BUTTON, L"Stop");
 	}
 	else{
@@ -170,6 +172,9 @@ void PlaybackTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 
 	switch (LOWORD(wParam))
 	{
+	case IDC_CHECK_BOX_SINGLE_THREATED_READING:
+		m_isSingleThreadedReading = Button_GetCheck(GetDlgItem(m_hWnd, IDC_CHECK_BOX_SINGLE_THREATED_READING));
+		break;
 	case IDC_PLAY_STOP_BUTTON:
 		setPlaybackStatus(!m_isPlaybackRunning);
 		break;

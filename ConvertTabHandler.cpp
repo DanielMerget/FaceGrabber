@@ -215,7 +215,7 @@ void ConvertTabHandler::startFileConversion()
 		m_colorCloudReader->updateStatus.connect(boost::bind(&ConvertTabHandler::updateReaderStatus, this, _1));
 		
 		m_colorCloudReader->setBuffer(m_colorBuffer);
-		m_colorCloudReader->startCloudUpdateThread();
+		m_colorCloudReader->startCloudUpdateThread(false);
 		
 		m_colorWriter->startWritingClouds(4);
 		
@@ -244,7 +244,7 @@ void ConvertTabHandler::startFileConversion()
 		m_nonColorCloudReader->updateStatus.connect(boost::bind(&ConvertTabHandler::updateReaderStatus, this, _1));
 		
 		m_nonColorCloudReader->setBuffer(m_nonColorBuffer);
-		m_nonColorCloudReader->startCloudUpdateThread();
+		m_nonColorCloudReader->startCloudUpdateThread(false);
 
 		m_nonColorWriter->startWritingClouds(4);
 	}

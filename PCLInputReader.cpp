@@ -43,7 +43,7 @@ PCLInputReader< PointType >::~PCLInputReader()
 }
 
 template <typename PointType>
-void PCLInputReader< PointType >::startCloudUpdateThread()
+void PCLInputReader< PointType >::startCloudUpdateThread(bool isSingleThreatedReadingAndBlocking)
 {
 	if (!m_playbackConfiguration->isEnabled()){
 		return;
@@ -56,8 +56,12 @@ void PCLInputReader< PointType >::startCloudUpdateThread()
 	m_buffer->setBufferSize(numOfFilesToRead);
 	m_isPlaybackRunning = true;
 	//m_updateThread = std::thread(&PCLInputReader::updateThreadFunc, this);
-
-	std::async(&PCLInputReader::startReaderThreads, this);
+	if (isSingleThreatedReadingAndBlocking){
+		startReaderThreads(isSingleThreatedReadingAndBlocking);
+	}
+	else{
+		std::async(std::launch::async, &PCLInputReader::startReaderThreads, this, isSingleThreatedReadingAndBlocking);
+	}
 }
 
 template <typename PointType>
@@ -83,17 +87,25 @@ void PCLInputReader< PointType >::readerFinishedReadingAFile()
 }
 
 template <typename PointType>
-void PCLInputReader< PointType >::startReaderThreads()
+void PCLInputReader< PointType >::startReaderThreads(bool isSingleThreatedReadingAndBlocking)
 { 
 	updateStatus(L"");
 	m_numOfFilesRead = 0;
 	m_playbackConfiguration->sortCloudFilesForPlayback();
 	m_isPlaybackRunning = true;
 	m_buffer->enableBuffer();
-	const int numOfThreadsToStart = 1;
-	for (int i = 0; i < numOfThreadsToStart; i++){
-		//m_readerThreads.push_back(std::thread(&PCLInputReader::readCloudData, this, i));
-		createAndStartThreadForIndex(i, numOfThreadsToStart);
+	if (isSingleThreatedReadingAndBlocking){
+		createAndStartThreadForIndex(0, 1);
+		for (auto& thread : m_readerThreads){
+			thread.join();
+		}
+	}
+	else{
+		const int numOfThreadsToStart = 5;
+		for (int i = 0; i < numOfThreadsToStart; i++){
+			//m_readerThreads.push_back(std::thread(&PCLInputReader::readCloudData, this, i));
+			createAndStartThreadForIndex(i, numOfThreadsToStart);
+		}
 	}
 }
 

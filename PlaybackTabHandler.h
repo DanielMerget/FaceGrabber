@@ -26,7 +26,7 @@ public:
 	void resetUIElements();
 	void playbackStopped();
 
-	boost::signal<void(SharedPlaybackConfiguration)> startPlayback;
+	boost::signal<void(SharedPlaybackConfiguration,  bool)> startPlayback;
 	boost::signal<void(void)> stopPlayback;
 
 	void updateReaderStatus(RecordCloudType type, std::wstring status);
@@ -47,6 +47,7 @@ private:
 	//SharedRecordingConfiguration m_recordingConfiguration;
 	SharedPlaybackConfiguration m_playbackConfiguration;
 	bool m_isPlaybackRunning;
+	bool m_isSingleThreadedReading;
 	HWND m_hWnd;
 };
 
