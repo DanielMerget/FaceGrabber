@@ -74,6 +74,10 @@ public:
 
 	boost::signal<void(RecordCloudType, bool)> recordConfigurationStatusChanged;
 	boost::signal<void(RecordCloudType)>	recordPathOrFileNameChanged;
+
+	int getThreadCountToStart();
+
+	void setThreadCountToStart(int threadsCount);
 private:
 	std::vector<std::string> m_foundCloudFiles;
 
@@ -86,6 +90,7 @@ private:
 	RecordingFileFormat		m_fileFormat;
 	int						m_maxNumberOfFrames;
 	bool					m_enabled;
+	int						m_threadsCount;
 };
 typedef std::shared_ptr<RecordingConfiguration> RecordingConfigurationPtr;
 typedef std::vector<RecordingConfigurationPtr> SharedRecordingConfiguration;

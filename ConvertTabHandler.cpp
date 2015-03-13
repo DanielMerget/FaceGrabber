@@ -217,7 +217,7 @@ void ConvertTabHandler::startFileConversion()
 		m_colorCloudReader->setBuffer(m_colorBuffer);
 		m_colorCloudReader->startCloudUpdateThread(false);
 		
-		m_colorWriter->startWritingClouds(4);
+		m_colorWriter->startWritingClouds();
 		
 	}
 	else{
@@ -246,7 +246,7 @@ void ConvertTabHandler::startFileConversion()
 		m_nonColorCloudReader->setBuffer(m_nonColorBuffer);
 		m_nonColorCloudReader->startCloudUpdateThread(false);
 
-		m_nonColorWriter->startWritingClouds(4);
+		m_nonColorWriter->startWritingClouds();
 	}
 	Button_Enable(GetDlgItem(m_hWnd, IDC_BUTTON_CONVERT), false);
 }

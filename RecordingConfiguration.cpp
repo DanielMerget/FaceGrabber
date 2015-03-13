@@ -171,6 +171,15 @@ void RecordingConfiguration::setFilePath(LPTSTR filePath)
 	recordPathOrFileNameChanged(m_cloudType);
 }
 
+int RecordingConfiguration::getThreadCountToStart()
+{
+	return m_threadsCount;
+}
+
+void RecordingConfiguration::setThreadCountToStart(int threadsCount)
+{
+	m_threadsCount = threadsCount;
+}
 
 void RecordingConfiguration::setEnabled(bool enabled)
 {

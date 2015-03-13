@@ -136,7 +136,7 @@
       <Filter>WindowsApp\Model</Filter>
     </ClInclude>
     <ClInclude Include="IRecordingConfiguration.h">
-      <Filter>WindowsApp</Filter>
+      <Filter>WindowsApp\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

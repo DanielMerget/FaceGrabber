@@ -25,6 +25,7 @@ public:
 	virtual std::string getFileNameString() = 0;
 	virtual bool isRecordingDurationUnLimited() = 0;
 	virtual int getMaxNumberOfFrames() = 0;
+	virtual int getThreadCountToStart() = 0;
 };
 
 typedef std::shared_ptr<IRecordingConfiguration> IRecordingConfigurationPtr;

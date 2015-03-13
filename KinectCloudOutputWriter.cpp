@@ -38,12 +38,13 @@ void KinectCloudOutputWriter< PointCloudType >::waitForWriterToFinish()
 }
 
 template < typename PointCloudType >
-void KinectCloudOutputWriter< PointCloudType >::startWritingClouds(int threadsToStart)
+void KinectCloudOutputWriter< PointCloudType >::startWritingClouds()
 {
 	m_running = true;
 	m_cloudCount = 0;
+	auto threadsToStartCount = m_recordingConfiguration->getThreadCountToStart();
 	//5 threads => 17,71 secs
-	for (int i = 0; i < threadsToStart; i++){
+	for (int i = 0; i < threadsToStartCount; i++){
 		std::shared_ptr<KinectFileWriterThread< PointCloudType >> writer(new KinectFileWriterThread< PointCloudType >);
 		writer->setKinectCloudOutputWriter(this);
 		m_writers.push_back(writer);

@@ -26,22 +26,8 @@ void WindowsApplication::initRecordDataModel()
 		m_recordingConfiguration[i] = std::shared_ptr<RecordingConfiguration>(new RecordingConfiguration(static_cast<RecordCloudType>(i), PLY));
 		m_recordingConfiguration[i]->recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
 		m_recordingConfiguration[i]->recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));
+		m_recordingConfiguration[i]->setThreadCountToStart(2);
 	}
-	
-	
-	//m_recordingConfiguration[	HDFace	 ]->recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
-	//m_recordingConfiguration[	FaceRaw	 ]->recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
-	//m_recordingConfiguration[FullDepthRaw]->recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
-	//
-	//
-	//m_recordingConfiguration[	HDFace	 ]->recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));
-	//m_recordingConfiguration[	FaceRaw	 ]->recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));	
-	//m_recordingConfiguration[FullDepthRaw]->recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));
-
-	
-	
-
-	
 }
 
 
@@ -446,16 +432,16 @@ void WindowsApplication::onPlaybackSelected()
 void WindowsApplication::startRecording(bool isColoredStream)
 {
 	
-	int numEnabledCloudWriters = 0;
-	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		auto recordingConfig = m_recordingConfiguration[i];
-		if (recordingConfig->isEnabled()){
-			numEnabledCloudWriters++;
-		}
-		
-	}
-	int numOfThreadsToStartPerWriter = 5 / numEnabledCloudWriters;
-	numOfThreadsToStartPerWriter = std::max(numOfThreadsToStartPerWriter, 1);
+	//int numEnabledCloudWriters = 0;
+	//for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+	//	auto recordingConfig = m_recordingConfiguration[i];
+	//	if (recordingConfig->isEnabled()){
+	//		numEnabledCloudWriters++;
+	//	}
+	//	
+	//}
+	//int numOfThreadsToStartPerWriter = 5 / numEnabledCloudWriters;
+	//numOfThreadsToStartPerWriter = std::max(numOfThreadsToStartPerWriter, 1);
 
 	if (isColoredStream){
 		
@@ -473,7 +459,7 @@ void WindowsApplication::startRecording(bool isColoredStream)
 				if (i == FullDepthRaw){
 					m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, cloudWriter, _1));
 				}
-				cloudWriter->startWritingClouds(numOfThreadsToStartPerWriter);
+				cloudWriter->startWritingClouds();
 			}
 		}
 	}
@@ -491,7 +477,7 @@ void WindowsApplication::startRecording(bool isColoredStream)
 				if (i == FullDepthRaw){
 					m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudThreated, cloudWriter, _1));
 				}
-				cloudWriter->startWritingClouds(numOfThreadsToStartPerWriter);
+				cloudWriter->startWritingClouds();
 			}
 		}
 	}

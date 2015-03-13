@@ -20,11 +20,15 @@ public:
 	bool isRecordingDurationUnLimited();
 	int getMaxNumberOfFrames();
 	void setMaxNumberOfFrames(int newMaxNumberOfFrames);
+
+	int getThreadCountToStart();
+	void setThreadCountToStart(int);
 private:
 	std::string			m_fileName;
 	std::string			m_fullRecordingPath;
 	RecordingFileFormat m_recordingFileFormat;
 	int					m_maximumNumberOfFrames;
+	int					m_threadsCount;
 };
 typedef std::shared_ptr<SimpleRecordingConfiguration> SimpleRecordingConfigurationPtr;
 

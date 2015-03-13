@@ -61,3 +61,13 @@ bool SimpleRecordingConfiguration::isRecordConfigurationValid()
 {
 	return !m_fullRecordingPath.empty() && !m_fileName.empty();
 }
+
+int SimpleRecordingConfiguration::getThreadCountToStart()
+{
+	return m_threadsCount;
+}
+
+void SimpleRecordingConfiguration::setThreadCountToStart(int threadsCount)
+{
+	m_threadsCount = threadsCount;
+}

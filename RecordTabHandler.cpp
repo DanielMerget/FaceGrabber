@@ -1,6 +1,7 @@
 #include "RecordTabHandler.h"
 #include "WindowsApplication.h"
-
+#define MAX_DATE 20
+#include <time.h>
 
 RecordTabHandler::RecordTabHandler() : 
 	m_colorEnabled(true),
@@ -67,6 +68,20 @@ void RecordTabHandler::onCreate(WPARAM wParam, LPARAM)
 			ComboBox_SetCurSel(fullRawDepthCombobox, i);
 		}
 	}
+
+	HWND hdFaceComboBoxThreads			= GetDlgItem(m_hWnd, IDC_HD_FACE_COMBO_BOX_THREADS);
+	HWND facerawDepthComboBoxThreads	= GetDlgItem(m_hWnd, IDC_FACE_RAW_DEPTH_COMBO_BOX_THREADS);
+	HWND fullRawDepthComboboxThreads	= GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_COMBO_BOX_THREADS);
+	for (int i = 1; i < 5; i++){
+		CString counter;
+		counter.Format(L"%d", i);
+		ComboBox_AddString(hdFaceComboBoxThreads, counter);
+		ComboBox_AddString(facerawDepthComboBoxThreads, counter);
+		ComboBox_AddString(fullRawDepthComboboxThreads, counter);
+	}
+	ComboBox_SetCurSel(hdFaceComboBoxThreads,		m_recordingConfiguration[HDFace]->getThreadCountToStart() - 1);
+	ComboBox_SetCurSel(facerawDepthComboBoxThreads, m_recordingConfiguration[FaceRaw]->getThreadCountToStart() - 1);
+	ComboBox_SetCurSel(fullRawDepthComboboxThreads, m_recordingConfiguration[FullDepthRaw]->getThreadCountToStart() - 1);
 }
 
 bool RecordTabHandler::isColorEnabled()
@@ -170,6 +185,15 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 	case IDC_HD_FACE_COMBO_BOX:
 		m_recordingConfiguration[HDFace]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
 		break;
+	case IDC_HD_FACE_COMBO_BOX_THREADS:
+		m_recordingConfiguration[HDFace]->setThreadCountToStart(currentSelection+1);
+		break;
+	case IDC_FULL_RAW_DEPTH_COMBO_BOX_THREADS:
+		m_recordingConfiguration[FullDepthRaw]->setThreadCountToStart(currentSelection+1);
+		break;
+	case IDC_FACE_RAW_DEPTH_COMBO_BOX_THREADS:
+		m_recordingConfiguration[FaceRaw]->setThreadCountToStart(currentSelection+1);
+		break;
 	}
 }
 
@@ -190,8 +214,7 @@ void RecordTabHandler::checkRecordingConfigurationPossible()
 	}
 
 }
-#define MAX_DATE 20
-#include <time.h>
+
 CString getRecordTimeStamp()
 {
 	time_t now;
@@ -282,18 +305,7 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 	}
 	case IDC_RECORD_BUTTON:
 	{
-		
 		setRecording(!m_isRecording);
-		//if (!m_isCloudWritingStarted)
-		//{
-		//	m_cloudOutputWriter->startWritingClouds();
-		//	SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Stop");
-		//}
-		//else{
-		//	SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Record");
-		//	m_cloudOutputWriter->stopWritingClouds();
-		//}
-		//m_isCloudWritingStarted = !m_isCloudWritingStarted;
 		break;
 	}
 	case IDC_HD_FACE_CHECKBOX:
@@ -315,28 +327,6 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 				m_recordingConfiguration[i]->setFilePath(szDir);
 			}
 		}
-		//WCHAR szDir[MAX_PATH];
-		//BROWSEINFO bInfo;
-		//bInfo.hwndOwner = m_hWnd;
-		//bInfo.pidlRoot = NULL;
-		//bInfo.pszDisplayName = szDir; // Address of a buffer to receive the display name of the folder selected by the user
-		//bInfo.lpszTitle = L"Please, select a output folder"; // Title of the dialog
-		//bInfo.ulFlags = 0;
-		//bInfo.lpfn = NULL;
-		//bInfo.lParam = 0;
-		//bInfo.iImage = -1;
-
-		//LPITEMIDLIST lpItem = SHBrowseForFolder(&bInfo);
-		//if (lpItem != NULL)
-		//{
-		//	if (SHGetPathFromIDList(lpItem, szDir)){
-		//		OutputDebugString(szDir);
-		//		SetDlgItemText(m_hWnd, IDC_FILE_PATH_EDIT_BOX, szDir);
-		//		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		//			m_recordingConfiguration->at(i).setFilePath(szDir);
-		//		}
-		//	}
-		//}
 		break;
 	}
 	default:
@@ -384,14 +374,17 @@ void RecordTabHandler::recordConfigurationStatusChanged(RecordCloudType type, bo
 	case HDFace:
 		Edit_Enable(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX), newState);
 		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_HD_FACE_COMBO_BOX), newState);
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_HD_FACE_COMBO_BOX_THREADS), newState);
 		break;
 	case FaceRaw:
 		Edit_Enable(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX), newState);
 		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_FACE_RAW_DEPTH_COMBO_BOX), newState);
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_FACE_RAW_DEPTH_COMBO_BOX_THREADS), newState);
 		break;
 	case FullDepthRaw:
 		Edit_Enable(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX), newState);
 		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_COMBO_BOX), newState);
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_COMBO_BOX_THREADS), newState);
 		break;
 	case RECORD_CLOUD_TYPE_COUNT:
 		break;

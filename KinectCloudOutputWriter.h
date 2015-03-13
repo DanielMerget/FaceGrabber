@@ -25,7 +25,7 @@ public:
 
 	void updateCloudsThreated(std::vector<boost::shared_ptr<pcl::PointCloud<PointCloudType>>> clouds);
 		
-	void startWritingClouds(int threadsToStart);
+	void startWritingClouds();
 	void stopWritingClouds();
 
 	void setRecordingConfiguration(IRecordingConfigurationPtr recordingConfiguration);
