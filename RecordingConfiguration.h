@@ -18,6 +18,7 @@ public:
 	RecordingConfiguration();
 	RecordingConfiguration(RecordCloudType cloudType, RecordingFileFormat format);
 
+	RecordingConfiguration(RecordingConfiguration& recordingConfiguration);
 
 	std::string getFileFormatFileExtension();
 	static LPTSTR getFileFormatAsString(RecordingFileFormat fileFormat);

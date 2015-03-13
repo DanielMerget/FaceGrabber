@@ -45,13 +45,24 @@ PCLInputReader< PointType >::~PCLInputReader()
 template <typename PointType>
 void PCLInputReader< PointType >::startCloudUpdateThread(bool isSingleThreatedReadingAndBlocking)
 {
-	if (!m_playbackConfiguration->isEnabled()){
+	if (!m_playbackConfiguration.isEnabled()){
 		return;
 	}
 	join();
+
+	//check for ability to reuse our buffer
+	if (!m_buffer->isResetDataAfterPullEnabled() && m_previousPlaybackConfiguration.isEnabled() && m_previousPlaybackConfiguration.wasFullPlayed()){
+		if (m_playbackConfiguration == m_previousPlaybackConfiguration){
+			m_buffer->resetPullCounterAndPullAndNotifyConsumer();
+			printMessage("detected previous playbackconfiguration was the same! => reuse it; InputReader finished reading..");
+			return;
+		}
+	}
+	
+
 	m_buffer->resetBuffer();
 
-	int numOfFilesToRead = m_playbackConfiguration->getCloudFilesToPlay().size();
+	int numOfFilesToRead = m_playbackConfiguration.getCloudFilesToPlay().size();
 
 	m_buffer->setBufferSize(numOfFilesToRead);
 	m_isPlaybackRunning = true;
@@ -67,8 +78,8 @@ void PCLInputReader< PointType >::startCloudUpdateThread(bool isSingleThreatedRe
 template <typename PointType>
 void PCLInputReader< PointType >::createAndStartThreadForIndex(int index, int numOfThreads)
 {
-	auto recordingType = m_playbackConfiguration->getRecordFileFormat();
-	auto filesToPlay = m_playbackConfiguration->getCloudFilesToPlay();
+	auto recordingType = m_playbackConfiguration.getRecordFileFormat();
+	auto filesToPlay = m_playbackConfiguration.getCloudFilesToPlay();
 	std::shared_ptr<PCLInputReaderWorkerThread<PointType>> reader(new PCLInputReaderWorkerThread<PointType>);
 	reader->setBuffer(m_buffer);
 	reader->finishedReadingAFile.connect(boost::bind(&PCLInputReader<PointType>::readerFinishedReadingAFile, this));
@@ -82,8 +93,11 @@ void PCLInputReader< PointType >::readerFinishedReadingAFile()
 	std::lock_guard<std::mutex> lock(m_numOfFilesReadMutex);
 	m_numOfFilesRead++;
 	std::wstringstream statusMessage;
-	statusMessage << "read: " <<  m_numOfFilesRead << "/" << m_playbackConfiguration->getCloudFilesToPlay().size();
+	statusMessage << "read: " <<  m_numOfFilesRead << "/" << m_playbackConfiguration.getCloudFilesToPlay().size();
 	updateStatus(statusMessage.str());
+	if (m_numOfFilesRead == m_playbackConfiguration.getCloudFilesToPlay().size()){
+		m_playbackConfiguration.setWasFullPlayed();
+	}
 }
 
 template <typename PointType>
@@ -91,7 +105,7 @@ void PCLInputReader< PointType >::startReaderThreads(bool isSingleThreatedReadin
 { 
 	updateStatus(L"");
 	m_numOfFilesRead = 0;
-	m_playbackConfiguration->sortCloudFilesForPlayback();
+	m_playbackConfiguration.sortCloudFilesForPlayback();
 	m_isPlaybackRunning = true;
 	m_buffer->enableBuffer();
 	if (isSingleThreatedReadingAndBlocking){
@@ -103,7 +117,6 @@ void PCLInputReader< PointType >::startReaderThreads(bool isSingleThreatedReadin
 	else{
 		const int numOfThreadsToStart = 5;
 		for (int i = 0; i < numOfThreadsToStart; i++){
-			//m_readerThreads.push_back(std::thread(&PCLInputReader::readCloudData, this, i));
 			createAndStartThreadForIndex(i, numOfThreadsToStart);
 		}
 	}
@@ -136,7 +149,10 @@ void PCLInputReader< PointType >::printMessage(std::string msg)
 template <typename PointType>
 void PCLInputReader< PointType >::setPlaybackConfiguration(PlaybackConfigurationPtr playbackConfig)
 {
-	m_playbackConfiguration = playbackConfig;
+	if (m_playbackConfiguration.isEnabled()){
+		m_previousPlaybackConfiguration = m_playbackConfiguration;
+	}
+	m_playbackConfiguration = *playbackConfig;
 }
 
 template <typename PointType>

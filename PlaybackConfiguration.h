@@ -23,6 +23,12 @@ public:
 
 	PlaybackConfiguration(RecordingConfiguration& recordConfiguration);
 
+	PlaybackConfiguration(PlaybackConfiguration& playbackConfigurationToCopy);
+
+	PlaybackConfiguration& operator=(const PlaybackConfiguration& rhs);
+
+	bool operator==(PlaybackConfiguration& playbackToCompareWith);
+
 	bool isPlaybackConfigurationValid();
 
 	CString getFilePathCString();
@@ -48,6 +54,9 @@ public:
 	void sortCloudFilesForPlayback();
 
 	boost::signal<void(void)> playbackConfigurationChanged;
+
+	void setWasFullPlayed();
+	bool wasFullPlayed();
 private:
 
 	std::string getFilePath();
@@ -59,14 +68,13 @@ private:
 
 	static bool sortByIntegerEnding(const CloudFile& cloudFile1, const CloudFile cloudFile2);
 
-	//std::vector<std::string>	m_foundCloudFiles;
 	std::vector<CloudFile>	m_foundCloudFiles;
 	CString						m_filePath;
 	RecordingFileFormat			m_fileFormat;
 	RecordCloudType				m_cloudType;
 	CString						m_fileName;
 	bool						m_enabled;
-
+	bool						m_wasFullPlayed;
 
 };
 

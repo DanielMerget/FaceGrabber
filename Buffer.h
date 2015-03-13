@@ -13,22 +13,32 @@ public:
 	~Buffer();
 
 	void setBufferSize(int bufferSize);
+
 	int getBufferSize();
+
 	void resetBuffer();
+	
 	void pushData(DataType newData, int index);
 	
 	bool isDataAvailable();
+	
 	std::shared_ptr<boost::signals2::signal<void(void)>> dataReady;
 
 	DataType pullData();
 
 	bool isBufferAtIndexSet(const int index);
-
 	
 	void enableBuffer();
+
 	void disableBuffer();
 
 	void setProducerFinished();
+
+	void setResetDataAfterPull(bool enable);
+
+	bool isResetDataAfterPullEnabled();
+
+	void resetPullCounterAndPullAndNotifyConsumer();
 private:
 
 	void printMessage(std::string msg);
@@ -42,5 +52,6 @@ private:
 	std::vector<DataType> m_cloudBuffer;
 	int	m_bufferFillLevel;
 	bool m_producerFinished;
+	bool m_resetDataAfterPull;
 };
 

@@ -18,6 +18,7 @@ Buffer< DataType >::Buffer() :
 	m_pullDataPosition(0),
 	m_producerFinished(false),
 	m_bufferingActive(true),
+	m_resetDataAfterPull(false),
 	m_bufferFillLevel(0)
 {
 }
@@ -35,7 +36,28 @@ void Buffer< DataType >::printMessage(std::string msg)
 template < class DataType >
 Buffer< DataType >::~Buffer()
 {
+
 }
+
+template < class DataType >
+void Buffer< DataType >::resetPullCounterAndPullAndNotifyConsumer()
+{
+	std::unique_lock<std::mutex> cloudBufferLock(*m_cloudBufferMutex);
+	
+	m_bufferFillLevel = m_cloudBuffer.size();
+	m_pullDataPosition = 0;
+	m_producerFinished = true;
+	m_bufferingActive = true;
+	(*dataReady)();
+	m_cloudBufferUpdated->notify_all();
+}
+
+template < class DataType >
+bool Buffer< DataType >::isResetDataAfterPullEnabled()
+{
+	return m_resetDataAfterPull;
+}
+
 template < class DataType >
 void Buffer< DataType >::resetBuffer()
 {
@@ -97,10 +119,16 @@ bool Buffer< DataType >::isDataAvailable()
 }
 
 template < class DataType >
+void Buffer< DataType >::setResetDataAfterPull(bool enable)
+{
+	m_resetDataAfterPull = enable;
+}
+
+template < class DataType >
 DataType Buffer< DataType >::pullData()
 {
 	std::unique_lock<std::mutex> cloudBufferLock(*m_cloudBufferMutex);
-	if (!m_bufferingActive){
+	if (!m_bufferingActive || m_bufferFillLevel == 0){
 		return DataType(nullptr);
 	}
 	 while (m_bufferFillLevel != m_cloudBuffer.size()){
@@ -112,7 +140,9 @@ DataType Buffer< DataType >::pullData()
 	}
 	 auto result = m_cloudBuffer[m_pullDataPosition];
 	 m_bufferFillLevel--;
-	 m_cloudBuffer[m_pullDataPosition].reset();
+	 if (m_resetDataAfterPull){
+		 m_cloudBuffer[m_pullDataPosition].reset();
+	 }
 	 m_pullDataPosition = (m_pullDataPosition + 1) % m_cloudBuffer.size();
 	 m_cloudBufferFree->notify_all();
 	 return result;
@@ -122,6 +152,11 @@ template < class DataType >
 bool Buffer< DataType >::isBufferAtIndexSet(const int index)
 {
 	if (index >= m_cloudBuffer.size()){
+		return false;
+	}
+	if (!m_resetDataAfterPull){
+		//we never clear the data after pulling => buffer is always filled
+		//new pushed data is just overrides the old data in the buffer
 		return false;
 	}
 	if (m_cloudBuffer[index]){

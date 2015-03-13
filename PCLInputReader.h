@@ -53,7 +53,9 @@ private:
 
 	std::thread m_updateThread;
 	std::vector<std::shared_ptr<PCLInputReaderWorkerThread<PointType>>> m_inputReaderWorkerThreads;
-	PlaybackConfigurationPtr m_playbackConfiguration;
+	PlaybackConfiguration m_playbackConfiguration;
+
+	PlaybackConfiguration m_previousPlaybackConfiguration;
 };
 
 

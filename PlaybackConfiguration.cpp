@@ -1,17 +1,50 @@
 #include "PlaybackConfiguration.h"
 
 
-PlaybackConfiguration::PlaybackConfiguration() : m_filePath(), m_enabled(false)
+PlaybackConfiguration::PlaybackConfiguration() : m_filePath(), m_enabled(false), m_wasFullPlayed(false)
 {}
+
+PlaybackConfiguration::PlaybackConfiguration(PlaybackConfiguration& playbackConfigurationToCopy)
+{
+	this->m_cloudType = playbackConfigurationToCopy.m_cloudType;
+	this->m_enabled = playbackConfigurationToCopy.m_enabled;
+	this->m_fileFormat = playbackConfigurationToCopy.m_fileFormat;
+	this->m_fileName = playbackConfigurationToCopy.m_fileName;
+	this->m_filePath = playbackConfigurationToCopy.m_filePath;
+	this->m_foundCloudFiles = playbackConfigurationToCopy.m_foundCloudFiles;
+
+}
+
+PlaybackConfiguration& PlaybackConfiguration::operator= (const PlaybackConfiguration& rhs)
+{
+	this->m_cloudType	= rhs.m_cloudType;
+	this->m_enabled		= rhs.m_enabled;
+	this->m_fileFormat	= rhs.m_fileFormat;
+	this->m_fileName	= rhs.m_fileName;
+	this->m_filePath	= rhs.m_filePath;
+	this->m_foundCloudFiles = rhs.m_foundCloudFiles;
+	this->m_wasFullPlayed = rhs.m_wasFullPlayed;
+	return *this;
+}
 
 PlaybackConfiguration::PlaybackConfiguration(RecordingConfiguration& recordConfiguration) :
 m_enabled(false),
 m_fileFormat(recordConfiguration.getRecordFileFormat()),
 m_fileName(recordConfiguration.getFileName()),
-m_cloudType(recordConfiguration.getRecordCloudType())
+m_cloudType(recordConfiguration.getRecordCloudType()),
+m_wasFullPlayed(false)
 {
 	auto fullFilePath = recordConfiguration.getFullRecordingPath();
 	setFullFilePath(fullFilePath);
+}
+
+void PlaybackConfiguration::setWasFullPlayed()
+{
+	m_wasFullPlayed = true;
+}
+bool PlaybackConfiguration::wasFullPlayed()
+{
+	return m_wasFullPlayed;
 }
 
 bool PlaybackConfiguration::isPlaybackConfigurationValid()
@@ -20,6 +53,20 @@ bool PlaybackConfiguration::isPlaybackConfigurationValid()
 		return true;
 	}
 	return m_foundCloudFiles.size() > 0;
+}
+
+bool PlaybackConfiguration::operator == (PlaybackConfiguration& playbackToCompareWith)
+{
+	auto fullPathOfFirstPlaybackFile = playbackToCompareWith.getFirstPlaybackFile();
+	auto cloudCoundOfFilesInDirectoryToPlay = playbackToCompareWith.getCloudFilesToPlayCount();
+	int sameStartPlaybackFile = fullPathOfFirstPlaybackFile.Compare(getFirstPlaybackFile());
+	bool sameCloudCoundOfFilesInDirectoryToPlay = cloudCoundOfFilesInDirectoryToPlay == getCloudFilesToPlayCount();
+	if (sameStartPlaybackFile == 0 && sameCloudCoundOfFilesInDirectoryToPlay){
+		return true;
+	}
+	else{
+		return false;
+	}
 }
 
 CString PlaybackConfiguration::getFilePathCString()

@@ -432,17 +432,6 @@ void WindowsApplication::onPlaybackSelected()
 void WindowsApplication::startRecording(bool isColoredStream)
 {
 	
-	//int numEnabledCloudWriters = 0;
-	//for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-	//	auto recordingConfig = m_recordingConfiguration[i];
-	//	if (recordingConfig->isEnabled()){
-	//		numEnabledCloudWriters++;
-	//	}
-	//	
-	//}
-	//int numOfThreadsToStartPerWriter = 5 / numEnabledCloudWriters;
-	//numOfThreadsToStartPerWriter = std::max(numOfThreadsToStartPerWriter, 1);
-
 	if (isColoredStream){
 		
 		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
