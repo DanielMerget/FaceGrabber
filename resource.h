@@ -55,7 +55,6 @@
 #define IDC_HDFACE_EDIT_BOX             1053
 #define IDC_FACE_RAW_DEPTH_BUTTON_CHOOSE_INPUT 1054
 #define IDC_FULL_RAW_DEPTH_BUTTON_CHOOSE_INPUT 1055
-#define IDC_HD_FACE_COMBO_BOX4          1055
 #define IDC_FULL_RAW_DEPTH_COMBO_BOX_THREADS 1055
 #define IDC_OUTPUT_FOLDER_LABEL         1057
 #define IDC_PLAY_STOP_BUTTON            1058
@@ -78,6 +77,8 @@
 #define IDC_OUTPUT_FOLDER_LABEL2        1073
 #define IDC_COMBO_OUTPUT_FORMAT         1074
 #define IDC_EDIT_BOX_FILE_NAME          1075
+#define IDC_COMBO_OUTPUT_FORMAT2        1076
+#define IDC_COMBO_BOX_CONVERT_THREADS   1076
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

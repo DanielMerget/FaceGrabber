@@ -65,6 +65,16 @@ void ConvertTabHandler::onCreate(WPARAM wParam, LPARAM)
 	
 	Button_SetCheck(GetDlgItem(m_hWnd, IDC_CHECKBOX_COLOR), m_enableColor);
 
+	HWND numOfThreadsToStartHWND = GetDlgItem(m_hWnd, IDC_COMBO_BOX_CONVERT_THREADS);
+	
+	for (int i = 1; i <= 5; i++){
+		CString counter;
+		counter.Format(L"%d", i);
+		ComboBox_AddString(numOfThreadsToStartHWND, counter);
+	}
+	m_recordingConfiguration->setThreadCountToStart(5);
+	ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_COMBO_BOX_CONVERT_THREADS), m_recordingConfiguration->getThreadCountToStart()-1);
+
 	m_playbackConfiguration->playbackConfigurationChanged.connect(boost::bind(&ConvertTabHandler::playbackConfigurationChanged, this));
 	//m_recordingConfiguration->recordConfigurationStatusChanged.connect(boost::bind(&ConvertTabHandler::recordingConfigurationChanged, this));
 
@@ -159,15 +169,15 @@ void ConvertTabHandler::processUIMessage(WPARAM wParam, LPARAM handle)
 
 void ConvertTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 {
-	
+	int currentSelection = ComboBox_GetCurSel(GetDlgItem(m_hWnd, LOWORD(wParam)));
 	switch (LOWORD(wParam))
 	{
 	case IDC_COMBO_OUTPUT_FORMAT:
-	{
-		int currentSelection = ComboBox_GetCurSel(GetDlgItem(m_hWnd, LOWORD(wParam)));
 		m_recordingConfiguration->setRecordFileFormat(static_cast<RecordingFileFormat>(currentSelection));
 		break;
-	}
+	case IDC_COMBO_BOX_CONVERT_THREADS:
+		m_recordingConfiguration->setThreadCountToStart(currentSelection + 1);
+		break;
 	default:
 		break;
 	}
@@ -215,8 +225,9 @@ void ConvertTabHandler::startFileConversion()
 		m_colorCloudReader->updateStatus.connect(boost::bind(&ConvertTabHandler::updateReaderStatus, this, _1));
 		
 		m_colorCloudReader->setBuffer(m_colorBuffer);
-		m_colorCloudReader->startCloudUpdateThread(false);
+		//m_colorCloudReader->startCloudUpdateThread(true);
 		
+		std::async(std::launch::async, &ColoredCloudInputReader::startCloudUpdateThread, m_colorCloudReader, true);
 		m_colorWriter->startWritingClouds();
 		
 	}
@@ -244,8 +255,8 @@ void ConvertTabHandler::startFileConversion()
 		m_nonColorCloudReader->updateStatus.connect(boost::bind(&ConvertTabHandler::updateReaderStatus, this, _1));
 		
 		m_nonColorCloudReader->setBuffer(m_nonColorBuffer);
-		m_nonColorCloudReader->startCloudUpdateThread(false);
-
+		//m_nonColorCloudReader->startCloudUpdateThread(true);
+		std::async(std::launch::async, &NonColoredCloudInputReader::startCloudUpdateThread, m_nonColorCloudReader, true);
 		m_nonColorWriter->startWritingClouds();
 	}
 	Button_Enable(GetDlgItem(m_hWnd, IDC_BUTTON_CONVERT), false);

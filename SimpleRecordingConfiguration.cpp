@@ -1,7 +1,7 @@
 #include "SimpleRecordingConfiguration.h"
 
 
-SimpleRecordingConfiguration::SimpleRecordingConfiguration()
+SimpleRecordingConfiguration::SimpleRecordingConfiguration() : m_threadsCount(4)
 {
 }
 
