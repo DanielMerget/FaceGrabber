@@ -54,6 +54,7 @@ void PCLInputReader< PointType >::startCloudUpdateThread(bool isSingleThreatedRe
 	if (!m_buffer->isResetDataAfterPullEnabled() && m_previousPlaybackConfiguration.isEnabled() && m_previousPlaybackConfiguration.wasFullPlayed()){
 		if (m_playbackConfiguration == m_previousPlaybackConfiguration){
 			m_buffer->resetPullCounterAndPullAndNotifyConsumer();
+			m_playbackConfiguration.setWasFullPlayed();
 			printMessage("detected previous playbackconfiguration was the same! => reuse it; InputReader finished reading..");
 			return;
 		}

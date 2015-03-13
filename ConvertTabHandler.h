@@ -51,6 +51,8 @@ private:
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
 	
+	void initColoredConversionPipeline();
+	void nonColoredConversionPipeline();
 	
 	PCLInputReader<pcl::PointXYZ>		reader;
 	PlaybackConfigurationPtr			m_playbackConfiguration;

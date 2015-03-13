@@ -200,62 +200,74 @@ void ConvertTabHandler::notifyWriterFinished()
 	SetDlgItemText(m_hWnd, IDC_TEXT_LABEL_STATUS_READER, L"");
 }
 
+void ConvertTabHandler::initColoredConversionPipeline()
+{
+	m_colorCloudReader = std::shared_ptr<ColoredCloudInputReader>(new ColoredCloudInputReader);
+	m_colorBuffer = std::shared_ptr<ColorBuffer>(new ColorBuffer);
+
+	m_colorWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
+
+	std::vector< std::shared_ptr<ColorBuffer>> buffers;
+	buffers.push_back(m_colorBuffer);
+
+	m_colorBufferSynchronizer->setBuffer(buffers, m_playbackConfiguration->getCloudFilesToPlayCount());
+
+
+	m_colorBufferSynchronizer->cloudsUpdated.connect(
+		boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudsThreated, m_colorWriter, _1));
+	m_colorWriter->updateStatus.connect(boost::bind(&ConvertTabHandler::updateWriterStatus, this, _1));
+
+	m_colorWriter->writingWasStopped.connect(boost::bind(&ConvertTabHandler::notifyWriterFinished, this));
+
+	m_colorCloudReader->updateStatus.connect(boost::bind(&ConvertTabHandler::updateReaderStatus, this, _1));
+
+	m_colorCloudReader->setBuffer(m_colorBuffer);
+}
+
+void ConvertTabHandler::nonColoredConversionPipeline()
+{
+	m_nonColorCloudReader = std::shared_ptr<NonColoredCloudInputReader>(new NonColoredCloudInputReader);
+	m_nonColorBuffer = std::shared_ptr<NonColorBuffer>(new NonColorBuffer);
+
+	m_nonColorWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>(new KinectCloudOutputWriter<pcl::PointXYZ>);
+	m_nonColorWriter->updateStatus.connect(boost::bind(&ConvertTabHandler::updateWriterStatus, this, _1));
+	m_nonColorWriter->writingWasStopped.connect(boost::bind(&ConvertTabHandler::notifyWriterFinished, this));
+
+	std::vector< std::shared_ptr<NonColorBuffer>> buffers;
+	buffers.push_back(m_nonColorBuffer);
+
+	m_nonColorBufferSynchronizer->setBuffer(buffers, m_playbackConfiguration->getCloudFilesToPlayCount());
+
+	m_nonColorBufferSynchronizer->cloudsUpdated.connect(
+		boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudsThreated, m_nonColorWriter, _1));
+
+	
+
+	m_nonColorCloudReader->updateStatus.connect(boost::bind(&ConvertTabHandler::updateReaderStatus, this, _1));
+
+	m_nonColorCloudReader->setBuffer(m_nonColorBuffer);
+}
+
 void ConvertTabHandler::startFileConversion()
 {
 	if (m_enableColor){
-		m_colorCloudReader = std::shared_ptr<ColoredCloudInputReader>(new ColoredCloudInputReader);
-		m_colorBuffer = std::shared_ptr<ColorBuffer>(new ColorBuffer);
+		if (!m_colorCloudReader){
+			initColoredConversionPipeline();
+		}
 		
-		m_colorWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
-
-		std::vector< std::shared_ptr<ColorBuffer>> buffers;
-		buffers.push_back(m_colorBuffer);
-
-		m_colorBufferSynchronizer->setBuffer(buffers, m_playbackConfiguration->getCloudFilesToPlayCount());
-		
-		
-		m_colorBufferSynchronizer->cloudsUpdated.connect(
-			boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudsThreated, m_colorWriter, _1));
-		m_colorWriter->updateStatus.connect(boost::bind(&ConvertTabHandler::updateWriterStatus, this, _1));
-
-		m_colorWriter->writingWasStopped.connect(boost::bind(&ConvertTabHandler::notifyWriterFinished, this));
 		m_colorWriter->setRecordingConfiguration(m_recordingConfiguration);
 		m_colorCloudReader->setPlaybackConfiguration(m_playbackConfiguration);
 		
-		m_colorCloudReader->updateStatus.connect(boost::bind(&ConvertTabHandler::updateReaderStatus, this, _1));
-		
-		m_colorCloudReader->setBuffer(m_colorBuffer);
-		//m_colorCloudReader->startCloudUpdateThread(true);
-		
 		std::async(std::launch::async, &ColoredCloudInputReader::startCloudUpdateThread, m_colorCloudReader, true);
+
 		m_colorWriter->startWritingClouds();
-		
 	}
 	else{
-		m_nonColorCloudReader = std::shared_ptr<NonColoredCloudInputReader>(new NonColoredCloudInputReader);
-		m_nonColorBuffer = std::shared_ptr<NonColorBuffer>(new NonColorBuffer);
-
-		m_nonColorWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>(new KinectCloudOutputWriter<pcl::PointXYZ>);
-		m_nonColorWriter->updateStatus.connect(boost::bind(&ConvertTabHandler::updateWriterStatus, this, _1));
-		m_nonColorWriter->writingWasStopped.connect(boost::bind(&ConvertTabHandler::notifyWriterFinished, this));
-
-		std::vector< std::shared_ptr<NonColorBuffer>> buffers;
-		buffers.push_back(m_nonColorBuffer);
-
-		m_nonColorBufferSynchronizer->setBuffer(buffers, m_playbackConfiguration->getCloudFilesToPlayCount());
-
-		m_nonColorBufferSynchronizer->cloudsUpdated.connect(
-			boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudsThreated, m_nonColorWriter, _1));
-
-		
-
-		m_nonColorWriter->setRecordingConfiguration(m_recordingConfiguration);
+		if (!m_nonColorCloudReader){
+		}
 		m_nonColorCloudReader->setPlaybackConfiguration(m_playbackConfiguration);
+		m_nonColorWriter->setRecordingConfiguration(m_recordingConfiguration);
 
-		m_nonColorCloudReader->updateStatus.connect(boost::bind(&ConvertTabHandler::updateReaderStatus, this, _1));
-		
-		m_nonColorCloudReader->setBuffer(m_nonColorBuffer);
-		//m_nonColorCloudReader->startCloudUpdateThread(true);
 		std::async(std::launch::async, &NonColoredCloudInputReader::startCloudUpdateThread, m_nonColorCloudReader, true);
 		m_nonColorWriter->startWritingClouds();
 	}
