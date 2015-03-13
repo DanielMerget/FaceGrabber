@@ -335,7 +335,7 @@ void KinectHDFaceGrabber::update()
 	
     if (SUCCEEDED(hr)){
         ColorImageFormat imageFormat = ColorImageFormat_None;
-       
+		
         if (SUCCEEDED(hr)){
             hr = pColorFrame->get_RawColorImageFormat(&imageFormat);
         }

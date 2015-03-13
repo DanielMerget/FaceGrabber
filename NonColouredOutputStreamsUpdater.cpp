@@ -176,7 +176,7 @@ bool NonColouredOutputStreamsUpdater::extractDepthCloudFromBoundingBox(CameraSpa
 			if (point.x < camTopLeftBack.X || point.x > camBottomRightBack.X)
 				continue;
 
-
+			
 			faceDepthCloud->push_back(point);
 
 		}

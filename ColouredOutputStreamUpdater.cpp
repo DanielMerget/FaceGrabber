@@ -231,6 +231,8 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::convertDepth
 	pointCloud->is_dense = false;
 	HRESULT hr;
 
+
+
 	for (int y = 0; y < m_depthHeight; y++){
 		for (int x = 0; x < m_depthWidth; x++){
 			pcl::PointXYZRGB point;
@@ -262,6 +264,8 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::convertDepth
 			if (FAILED(hr)){
 				continue;
 			}
+
+
 			bool isInDepth = false;
 			if ((0 <= colorPixelMidX) && (colorPixelMidX < m_colorWidth) && (0 <= colorPixelMidY) && (colorPixelMidY < m_colorHeight)){
 				point.x = camPoint.X;
