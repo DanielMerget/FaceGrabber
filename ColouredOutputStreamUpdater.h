@@ -11,6 +11,7 @@ class ColouredOutputStreamUpdater :
 	public OutputStreamsUpdaterStragedy
 {
 public:
+	
 	ColouredOutputStreamUpdater();
 	~ColouredOutputStreamUpdater();
 	
@@ -23,7 +24,7 @@ public:
 	//boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> depthCloudUpdated;
 
 
-	
+	void initialize(ICoordinateMapper* m_pCoordinateMapper, int depthWidth, int depthHeight, int colorWidth, int colorHeight);
 
 private:
 
@@ -36,5 +37,10 @@ private:
 		CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV, RGBQUAD* colorBuffer);
 
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertDepthBufferToPointCloud(RGBQUAD* colorBuffer, UINT16* depthBuffer);
+
+	
+	
+	std::vector<UINT16>				m_pDepthVisibilityTestMap;
+	std::vector<ColorSpacePoint>	m_pColorCoordinates;
 };
 

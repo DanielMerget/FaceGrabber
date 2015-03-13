@@ -14,11 +14,18 @@ ColouredOutputStreamUpdater::ColouredOutputStreamUpdater()
 {
 }
 
-
+static const int            PATCHDIVISIONSHIFT = 2 ;
+static const UINT16         VISIBILITY_MAX_THRESHHOLD = 50;
 ColouredOutputStreamUpdater::~ColouredOutputStreamUpdater()
 {
 }
 
+void ColouredOutputStreamUpdater::initialize(ICoordinateMapper* m_pCoordinateMapper, int depthWidth, int depthHeight, int colorWidth, int colorHeight)
+{
+	OutputStreamsUpdaterStragedy::initialize(m_pCoordinateMapper, depthWidth, depthHeight, colorWidth, colorHeight);
+	m_pDepthVisibilityTestMap = std::vector<UINT16>((colorWidth >> PATCHDIVISIONSHIFT) * (colorHeight >> PATCHDIVISIONSHIFT));
+	m_pColorCoordinates = std::vector<ColorSpacePoint>(depthWidth * depthHeight);
+}
 
 void printMessage(std::string msg)
 {
@@ -150,6 +157,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::extractClolo
 bool ColouredOutputStreamUpdater::extractColouredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack, 
 	std::vector<cv::Point2f>& hdFacePointsInColorSpaceSpaceOpenCV, RGBQUAD* colorBuffer, UINT16* depthBuffer, pcl::PointCloud<pcl::PointXYZRGB>::Ptr depthCloud)
 {
+
 	DepthSpacePoint depthTopLeftBack;
 	m_pCoordinateMapper->MapCameraPointToDepthSpace(camTopLeftBack, &depthTopLeftBack);
 
@@ -222,62 +230,103 @@ bool ColouredOutputStreamUpdater::extractColouredDepthCloudFromBoundingBox(Camer
 }
 
 
+
 pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::convertDepthBufferToPointCloud(RGBQUAD* colorBuffer, UINT16* depthBuffer)
 {
 	
+	if (m_pDepthVisibilityTestMap.size() == 0 || m_pColorCoordinates.size() == 0){
+		return nullptr;
+	}
+
+	HRESULT hr;
+	auto depthBufferSize = m_depthWidth * m_depthHeight;
+	hr = m_pCoordinateMapper->MapDepthFrameToColorSpace(depthBufferSize, depthBuffer,
+		depthBufferSize, m_pColorCoordinates.data());
+
+	if (FAILED(hr))
+	{
+		return nullptr;
+	}
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr pointCloud(new pcl::PointCloud<pcl::PointXYZRGB>());
 	pointCloud->width = static_cast<uint32_t>(m_depthWidth);
 	pointCloud->height = static_cast<uint32_t>(m_depthHeight);
 	pointCloud->is_dense = false;
-	HRESULT hr;
 
+	// construct dense depth points visibility test map so we can test for depth points that are invisible in color space
+	const UINT16* const pDepthEnd = depthBuffer + depthBufferSize;
+	auto pColorPoint = m_pColorCoordinates.begin();
 
+	const UINT testMapWidth = UINT(m_colorWidth >> PATCHDIVISIONSHIFT);
+	const UINT testMapHeight = UINT(m_colorHeight >> PATCHDIVISIONSHIFT);
 
-	for (int y = 0; y < m_depthHeight; y++){
-		for (int x = 0; x < m_depthWidth; x++){
-			pcl::PointXYZRGB point;
-			DepthSpacePoint depthPoint;
-			depthPoint.X = static_cast<float>(x);
-			depthPoint.Y = static_cast<float>(y);
-			UINT16 depthOfCurrentPoint = depthBuffer[y * m_depthWidth + x];
-			
-			ColorSpacePoint colorPoint;
-			hr = m_pCoordinateMapper->MapDepthPointToColorSpace(depthPoint, depthOfCurrentPoint, &colorPoint);
-			if (FAILED(hr)){
-				continue;
-			}
-			int colorPixelMidX = static_cast<int>(std::floor(colorPoint.X + 0.5f));
-			int colorPixelMidY = static_cast<int>(std::floor(colorPoint.Y + 0.5f));
-			bool isInColor = false;
-			
-			if ((0 <= colorPixelMidX) && (colorPixelMidX < m_colorWidth) && (0 <= colorPixelMidY) && (colorPixelMidY < m_colorHeight)){
-				RGBQUAD color = colorBuffer[colorPixelMidY * m_colorWidth + colorPixelMidX];
-				point.b = color.rgbBlue;
-				point.g = color.rgbGreen;
-				point.r = color.rgbRed;
-				isInColor = true;
-			}
-	
-			CameraSpacePoint camPoint;
-			hr = m_pCoordinateMapper->MapDepthPointToCameraSpace(depthPoint, depthOfCurrentPoint, &camPoint);
-	
-			if (FAILED(hr)){
-				continue;
-			}
+	ZeroMemory(m_pDepthVisibilityTestMap.data(), testMapWidth * testMapHeight * sizeof(UINT16));
 
-
-			bool isInDepth = false;
-			if ((0 <= colorPixelMidX) && (colorPixelMidX < m_colorWidth) && (0 <= colorPixelMidY) && (colorPixelMidY < m_colorHeight)){
-				point.x = camPoint.X;
-				point.y = camPoint.Y;
-				point.z = camPoint.Z;
-				isInDepth = true;
-			}
-			if (isInColor && isInDepth){
-				pointCloud->push_back(point);
+	for (const UINT16* pDepth = depthBuffer; pDepth < pDepthEnd; pDepth++, pColorPoint++)
+	{
+		const UINT patchColorX = UINT(pColorPoint->X + 0.5f) >> PATCHDIVISIONSHIFT;
+		const UINT patchColorY = UINT(pColorPoint->Y + 0.5f) >> PATCHDIVISIONSHIFT;
+		if (patchColorX < testMapWidth && patchColorY < testMapHeight)
+		{
+			const UINT currentPatchIndex = patchColorY * testMapWidth + patchColorX;
+			const UINT16 oldDepth = m_pDepthVisibilityTestMap[currentPatchIndex];
+			const UINT16 newDepth = *pDepth;
+			if (!oldDepth || oldDepth > newDepth)
+			{
+				m_pDepthVisibilityTestMap[currentPatchIndex] = newDepth;
 			}
 		}
 	}
+
+	for (int yDepthHeight = 0; yDepthHeight < m_depthHeight; yDepthHeight++)
+	{
+		const UINT testMapWidth = UINT(m_colorWidth >> PATCHDIVISIONSHIFT);
+
+		UINT destIndex = yDepthHeight * m_depthWidth;
+		for (UINT xDepthWidth = 0; xDepthWidth < m_depthWidth; ++xDepthWidth, ++destIndex)
+		{
+			const ColorSpacePoint colorPoint = m_pColorCoordinates[destIndex];
+			const UINT colorX = (UINT)(colorPoint.X + 0.5f);
+			const UINT colorY = (UINT)(colorPoint.Y + 0.5f);
+			if (colorX < m_colorWidth && colorY < m_colorHeight)
+			{
+				const UINT16 depthValue = depthBuffer[destIndex];
+				const UINT testX = colorX >> PATCHDIVISIONSHIFT;
+				const UINT testY = colorY >> PATCHDIVISIONSHIFT;
+				const UINT testIdx = testY * testMapWidth + testX;
+				const UINT16 depthTestValue = m_pDepthVisibilityTestMap[testIdx];
+				
+				auto testDiff = std::abs(depthValue - depthTestValue);
+				if (testDiff < VISIBILITY_MAX_THRESHHOLD)
+				{
+					// calculate index into color array
+					const UINT colorIndex = colorX + (colorY * m_colorWidth);
+					auto pixelColor = colorBuffer[colorIndex];
+
+					DepthSpacePoint depthPoint;
+					depthPoint.X = static_cast<float>(xDepthWidth);
+					depthPoint.Y = static_cast<float>(yDepthHeight);
+
+					CameraSpacePoint camPoint;
+					hr = m_pCoordinateMapper->MapDepthPointToCameraSpace(depthPoint, depthValue, &camPoint);
+
+					if (FAILED(hr)){
+						continue;
+					}
+
+					pcl::PointXYZRGB point;
+					point.x = camPoint.X;
+					point.y = camPoint.Y;
+					point.z = camPoint.Z;
+					
+					point.b = pixelColor.rgbBlue;
+					point.g = pixelColor.rgbGreen;
+					point.r = pixelColor.rgbRed;
+
+					pointCloud->push_back(point);
+				}
+			}	
+		}
+	};
 	
 	return pointCloud;
 }
