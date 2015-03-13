@@ -29,7 +29,7 @@ void PCLViewer::stopViewer()
 	m_cloudUpdate.notify_all();
 }
 
-void PCLViewer::updateNonColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr> clouds)
+void PCLViewer::updateNonColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clouds)
 {
 	std::unique_lock<std::mutex> lock(m_cloudMutex);
 	auto it = m_nonColoredClouds.begin();
@@ -41,7 +41,7 @@ void PCLViewer::updateNonColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ
 	m_cloudsUpdated = true;
 	m_cloudUpdate.notify_all();
 }
-void PCLViewer::updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> clouds)
+void PCLViewer::updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clouds)
 {
 	std::unique_lock<std::mutex> lock(m_cloudMutex);
 	auto it = m_coloredClouds.begin();
@@ -54,16 +54,16 @@ void PCLViewer::updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB
 	m_cloudUpdate.notify_all();
 }
 
-void PCLViewer::updateNonColoredCloudThreated(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, int index)
+void PCLViewer::updateNonColoredCloudThreated(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int index)
 {
 	std::async(std::launch::async, &PCLViewer::pushNewNonColoredCloudAtIndex, this, cloud, index);
 }
-void PCLViewer::updateColoredCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud, int index)
+void PCLViewer::updateColoredCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, int index)
 {
 	std::async(std::launch::async, &PCLViewer::pushNewColoredCloudAtIndex, this, cloud, index);
 }
 #include <Windows.h>
-void PCLViewer::pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud, int index)
+void PCLViewer::pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, int index)
 {
 	if (!cloud){
 		OutputDebugString(L"pushed point cloud is null");
@@ -87,7 +87,7 @@ void PCLViewer::pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::Co
 
 }
 
-void PCLViewer::pushNewNonColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, int index)
+void PCLViewer::pushNewNonColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int index)
 {
 	//if (index >= m_cloudCount){
 	//	return;

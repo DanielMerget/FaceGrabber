@@ -1,5 +1,5 @@
 #pragma once
-#include "SingleProducerBuffer.h"
+
 #include <memory>
 #include "RecordingConfiguration.h"
 #include "CloudMeasurementSource.h"
@@ -12,7 +12,7 @@ public:
 	KinectFileWriterThread();
 	~KinectFileWriterThread();
 
-	void writeCloudToFile(int index, RecordingConfigurationPtr recordingConfiguration);
+	void writeCloudToFile(int index, IRecordingConfigurationPtr recordingConfiguration);
 
 	void setKinectCloudOutputWriter(CloudMeasurementSource<PointCloudType>* source);
 

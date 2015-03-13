@@ -16,12 +16,6 @@
     <ClCompile Include="PCLInputReader.cpp">
       <Filter>InputReader</Filter>
     </ClCompile>
-    <ClCompile Include="RecordTabHandler.cpp">
-      <Filter>WindowsApp</Filter>
-    </ClCompile>
-    <ClCompile Include="PlaybackTabHandler.cpp">
-      <Filter>WindowsApp</Filter>
-    </ClCompile>
     <ClCompile Include="OutputStreamsUpdaterStragedy.cpp">
       <Filter>Kinect</Filter>
     </ClCompile>
@@ -52,6 +46,24 @@
     <ClCompile Include="SingleProducerBuffer.cpp">
       <Filter>FileWriter</Filter>
     </ClCompile>
+    <ClCompile Include="PlaybackTabHandler.cpp">
+      <Filter>WindowsApp\Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="RecordTabHandler.cpp">
+      <Filter>WindowsApp\Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="ConvertTabHandler.cpp">
+      <Filter>WindowsApp\Tabs</Filter>
+    </ClCompile>
+    <ClCompile Include="PlaybackConfiguration.cpp">
+      <Filter>WindowsApp\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="RecordingConfiguration.cpp">
+      <Filter>WindowsApp\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="SimpleRecordingConfiguration.cpp">
+      <Filter>WindowsApp\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -74,18 +86,6 @@
     </ClInclude>
     <ClInclude Include="PCLInputReader.h">
       <Filter>InputReader</Filter>
-    </ClInclude>
-    <ClInclude Include="RecordingConfiguration.h">
-      <Filter>WindowsApp</Filter>
-    </ClInclude>
-    <ClInclude Include="RecordTabHandler.h">
-      <Filter>WindowsApp</Filter>
-    </ClInclude>
-    <ClInclude Include="PlaybackTabHandler.h">
-      <Filter>WindowsApp</Filter>
-    </ClInclude>
-    <ClInclude Include="PlaybackConfiguration.h">
-      <Filter>WindowsApp</Filter>
     </ClInclude>
     <ClInclude Include="OutputStreamsUpdaterStragedy.h">
       <Filter>Kinect</Filter>
@@ -117,6 +117,27 @@
     <ClInclude Include="CloudMeasurementSource.h">
       <Filter>FileWriter</Filter>
     </ClInclude>
+    <ClInclude Include="PlaybackTabHandler.h">
+      <Filter>WindowsApp\Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="RecordTabHandler.h">
+      <Filter>WindowsApp\Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="ConvertTabHandler.h">
+      <Filter>WindowsApp\Tabs</Filter>
+    </ClInclude>
+    <ClInclude Include="IRecordingConfiguration.h">
+      <Filter>WindowsApp\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="SimpleRecordingConfiguration.h">
+      <Filter>WindowsApp\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaybackConfiguration.h">
+      <Filter>WindowsApp\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="RecordingConfiguration.h">
+      <Filter>WindowsApp\Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Kinect">
@@ -133,6 +154,12 @@
     </Filter>
     <Filter Include="FileWriter">
       <UniqueIdentifier>{32d72b10-368d-4e5b-af47-a9c5c1f79aca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WindowsApp\Tabs">
+      <UniqueIdentifier>{a149b04d-9fb8-469f-9ba9-6b11baf710d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="WindowsApp\Model">
+      <UniqueIdentifier>{4af2f27f-993d-4b67-8178-6f6e1e61b62e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

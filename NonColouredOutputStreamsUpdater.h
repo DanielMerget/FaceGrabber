@@ -16,9 +16,9 @@ public:
 		ColorSpacePoint* detectedHDFacePointsColorSpace, RGBQUAD* colorBuffer, UINT16* depthBuffer);
 
 
-	boost::signals2::signal<void(std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr>)> cloudsUpdated;
+	boost::signals2::signal<void(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>)> cloudsUpdated;
 
-	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)> cloudUpdated[3];
+	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)> cloudUpdated[3];
 	//boost::signal<void(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)> cloudUpdated;
 	//boost::signal<void(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud)> depthCloudUpdated;
 

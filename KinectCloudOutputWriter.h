@@ -8,7 +8,6 @@
 #include <vector>
 #include <future>
 #include "RecordingConfiguration.h"
-#include "SingleProducerBuffer.h"
 #include "KinectFileWriterThread.h"
 #include "CloudMeasurementSource.h"
 #include <boost/signals2.hpp>
@@ -22,12 +21,14 @@ public:
 	
 	~KinectCloudOutputWriter();
 	
-	void updateCloudThreated(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloud);
+	void updateCloudThreated(boost::shared_ptr<pcl::PointCloud<PointCloudType>> cloud);
+
+	void updateCloudsThreated(std::vector<boost::shared_ptr<pcl::PointCloud<PointCloudType>>> clouds);
 		
 	void startWritingClouds(int threadsToStart);
 	void stopWritingClouds();
 
-	void setRecordingConfiguration(RecordingConfigurationPtr recordingConfiguration);
+	void setRecordingConfiguration(IRecordingConfigurationPtr recordingConfiguration);
 
 
 	bool pullData(PointCloudMeasurement<PointCloudType>& measurement);
@@ -51,7 +52,7 @@ private:
 	std::condition_variable m_checkCloud;
 	std::mutex m_lockCloud;
 
-	RecordingConfigurationPtr m_recordingConfiguration;
+	IRecordingConfigurationPtr m_recordingConfiguration;
 
 	bool m_running;
 	int m_cloudCount;

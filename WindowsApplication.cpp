@@ -240,6 +240,14 @@ void WindowsApplication::onCreate()
 	m_plackBackTabHandler.startPlayback.connect(boost::bind(&WindowsApplication::startPlayback, this, _1));
 	m_plackBackTabHandler.stopPlayback.connect(boost::bind(&WindowsApplication::stopPlayback, this));
 
+	m_convertTabHandle = CreateDialogParamW(
+		NULL,
+		MAKEINTRESOURCE(IDC_TAB_CONVERT),
+		m_hWnd,
+		(DLGPROC)ConvertTabHandler::MessageRouterTab,
+		reinterpret_cast<LPARAM>(&m_convertTabHandler));
+	ShowWindow(m_convertTabHandle, SW_HIDE);
+
 	RECT windowRect;
 
 	GetClientRect(m_hWnd, &windowRect);
@@ -247,7 +255,7 @@ void WindowsApplication::onCreate()
 
 	InsertTabItem(tabControlHandle, L"Record", 0);
 	InsertTabItem(tabControlHandle, L"Playback", 1);
-
+	InsertTabItem(tabControlHandle, L"Convert", 2);
 	//TabCtrl_InsertItem(m_hWnd, 0, &tab1Data);
 
 	TabCtrl_SetCurSel(tabControlHandle, 0);
@@ -296,7 +304,7 @@ void WindowsApplication::onCreate()
 	std::vector<std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>>> buffers;
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		auto buffer = std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>>(new Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>);
-		auto inputReader = std::shared_ptr<PCLInputReader>(new PCLInputReader());
+		auto inputReader = std::shared_ptr<PCLInputReader<pcl::PointXYZRGB>>(new PCLInputReader<pcl::PointXYZRGB>());
 		inputReader->updateStatus.connect(boost::bind(&PlaybackTabHandler::updateReaderStatus, &m_plackBackTabHandler, static_cast<RecordCloudType>(i), _1));
 		inputReader->setBuffer(buffer);
 
@@ -351,7 +359,7 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 				}
 				
 			}
-			else{
+			else if(iPage == 1){
 				if (m_recordTabHandler.isRecording()){
 					TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 0);
 				}
@@ -359,7 +367,18 @@ LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wPa
 					onPlaybackSelected();
 				}
 				
+			}else if (iPage == 2){
+				if (m_recordTabHandler.isRecording()){
+					TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 0);
+				}
+				else if (m_plackBackTabHandler.isPlaybackRunning()){
+					TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 1);
+				}
+				else{
+					onConvertTabSelected();
+				}
 			}
+
 			break;
 		}
 	
@@ -395,6 +414,17 @@ void WindowsApplication::onRecordTabSelected()
 	ShowWindow(m_liveViewWindow, SW_SHOW);
 	ShowWindow(m_recordTabHandle, SW_SHOW);
 	ShowWindow(m_playbackTabHandle, SW_HIDE);
+	ShowWindow(m_convertTabHandle, SW_HIDE);
+}
+
+
+//new
+void WindowsApplication::onConvertTabSelected()
+{
+	ShowWindow(m_liveViewWindow, SW_HIDE);
+	ShowWindow(m_recordTabHandle, SW_HIDE);
+	ShowWindow(m_playbackTabHandle, SW_HIDE);
+	ShowWindow(m_convertTabHandle, SW_SHOW);
 }
 
 void WindowsApplication::onPlaybackSelected()
@@ -409,6 +439,7 @@ void WindowsApplication::onPlaybackSelected()
 	m_plackBackTabHandler.setSharedRecordingConfiguration(m_recordTabHandler.getRecordConfiguration());
 	ShowWindow(m_recordTabHandle, SW_HIDE);
 	ShowWindow(m_playbackTabHandle, SW_SHOW);
+	ShowWindow(m_convertTabHandle, SW_HIDE);
 }
 
 

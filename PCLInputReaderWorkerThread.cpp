@@ -7,33 +7,40 @@
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/io/pcd_io.h>
 
-PCLInputReaderWorkerThread::PCLInputReaderWorkerThread()
+template PCLInputReaderWorkerThread < pcl::PointXYZRGB> ;
+template PCLInputReaderWorkerThread < pcl::PointXYZ>;
+template < typename PointType >
+PCLInputReaderWorkerThread< PointType >::PCLInputReaderWorkerThread()
 {
 }
 
-
-PCLInputReaderWorkerThread::~PCLInputReaderWorkerThread()
+template < typename PointType >
+PCLInputReaderWorkerThread< PointType >::~PCLInputReaderWorkerThread()
 {
 }
 
-
-void PCLInputReaderWorkerThread::printMessage(std::string msg)
+template < typename PointType >
+void PCLInputReaderWorkerThread< PointType >::printMessage(std::string msg)
 {
 	auto msgCstring = CString(msg.c_str());
 	msgCstring += L"\n";
 	OutputDebugString(msgCstring);
 }
 
-void PCLInputReaderWorkerThread::stopReading()
+template < typename PointType >
+void PCLInputReaderWorkerThread< PointType >::stopReading()
 {
 	m_isPlaybackRunning = false;
 }
-void PCLInputReaderWorkerThread::setBuffer(std::shared_ptr<Buffer< pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> buffer)
+
+template < typename PointType >
+void PCLInputReaderWorkerThread< PointType >::setBuffer(std::shared_ptr<Buffer< boost::shared_ptr<pcl::PointCloud<PointType>>>> buffer)
 {
 	m_buffer = buffer;
 }
 
-void PCLInputReaderWorkerThread::readCloudData(const int index, const int step, std::vector<CloudFile> cloudFilesToPlay, RecordingFileFormat format)
+template < typename PointType >
+void PCLInputReaderWorkerThread< PointType >::readCloudData(const int index, const int step, std::vector<CloudFile> cloudFilesToPlay, RecordingFileFormat format)
 {
 	m_isPlaybackRunning = true;
 	int indexOfFileToRead = index;
@@ -80,18 +87,14 @@ void PCLInputReaderWorkerThread::readCloudData(const int index, const int step, 
 			return;
 		}
 
-		pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud(new pcl::PointCloud <pcl::PointXYZRGB>());
+		pcl::PointCloud<PointType>::Ptr cloud(new pcl::PointCloud <PointType>());
 
 
 		auto filePath = cloudFilesToPlay[indexOfFileToRead].fullFilePath;
+		
+		fileReader->read<PointType>(filePath, *cloud);
 
-		//sometimes the reading breaks; 
-		while ( (fileReader->read<pcl::PointXYZRGB>(filePath, *cloud) != 0)){
-			if (!m_isPlaybackRunning){
-				const int cloudBufferIndex = indexOfFileToRead % m_buffer->getBufferSize();
-				m_buffer->pushData(pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud <pcl::PointXYZRGB>()) , cloudBufferIndex);
-			}
-		}
+		
 		//fileReader->read(filePath, *cloud);
 		finishedReadingAFile();
 		

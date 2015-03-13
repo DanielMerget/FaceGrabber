@@ -109,16 +109,24 @@ void KinectCloudOutputWriter<PointCloudType>::pushCloud(boost::shared_ptr<const 
 	cloudMeasurement.index = m_cloudCount;
 	m_clouds.push(cloudMeasurement);
 	m_cloudCount++;
-	m_checkCloud.notify_all();
+	
 
 	if (isMaximumFramesReached()){
 		stopWritingClouds();
-		
+	}
+	else{
+		m_checkCloud.notify_all();
 	}
 }
-
 template < typename PointCloudType >
-void KinectCloudOutputWriter< PointCloudType >::updateCloudThreated(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloud)
+void KinectCloudOutputWriter< PointCloudType >::updateCloudsThreated(std::vector<boost::shared_ptr<pcl::PointCloud<PointCloudType>>> clouds)
+{
+	for (auto cloud : clouds){
+		updateCloudThreated(cloud);
+	}
+}
+template < typename PointCloudType >
+void KinectCloudOutputWriter< PointCloudType >::updateCloudThreated(boost::shared_ptr<pcl::PointCloud<PointCloudType>> cloud)
 {
 	if (!m_running){
 		return;
@@ -127,7 +135,7 @@ void KinectCloudOutputWriter< PointCloudType >::updateCloudThreated(boost::share
 }
 
 template < typename PointCloudType >
-void KinectCloudOutputWriter<PointCloudType>::setRecordingConfiguration(RecordingConfigurationPtr recordingConfiguration)
+void KinectCloudOutputWriter<PointCloudType>::setRecordingConfiguration(IRecordingConfigurationPtr recordingConfiguration)
 {
 	m_recordingConfiguration = recordingConfiguration;
 }

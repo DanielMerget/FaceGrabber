@@ -369,3 +369,4 @@ x64/
 Debug/
 *.ply
 *.pcd
+*.opensdf

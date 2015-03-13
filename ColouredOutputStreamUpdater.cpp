@@ -64,7 +64,7 @@ HRESULT ColouredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, 
 
 
 		if (!cloudsUpdated.empty()){
-			std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> updatedClouds;
+			std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> updatedClouds;
 			updatedClouds.push_back(hdFaceCloud);
 			auto fullDepthCloud = convertDepthBufferToPointCloud(colorBuffer, depthBuffer);
 			updatedClouds.push_back(fullDepthCloud);

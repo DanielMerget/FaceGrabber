@@ -59,7 +59,23 @@
 #define IDC_FULL_RAW_DEPTH_STATUS_READ  1060
 #define IDC_EDIT2                       1061
 #define IDC_LIMIT_FRAMES_EDIT_BOX       1061
-#define IDC_LIMIT_FRAMES_CHECK          1062
+#define IDC_EDIT_BOX_OUTPUT_FOLDER_CONVERT          1062
+#define IDC_TAB_CONVERT          1063
+#define IDC_BUTTON_CONVERT          1064
+#define IDC_EDIT_BOX_INPUT_FOLDER_CONVERT          1065
+#define IDC_BUTTON_INPUT_FOLDER_CONVERT          1066
+#define IDC_TEXT_LABEL_FOUND_FILES          1067
+#define IDC_CHECKBOX_COLOR          1068
+#define IDC_TEXT_LABEL_STATUS_READER          1069
+#define IDC_TEXT_LABEL_STATUS_WRITER          1070
+#define IDC_LIMIT_FRAMES_CHECK          1071
+#define IDC_BUTTON_OUTPUT_FOLDER_CONVERT          1072
+#define IDC_OUTPUT_FOLDER_LABEL2          1073
+#define IDC_COMBO_OUTPUT_FORMAT          1074
+#define IDC_EDIT_BOX_FILE_NAME          1075
+
+
+
 #define IDC_STATIC                      -1
 
 // Next default values for new objects

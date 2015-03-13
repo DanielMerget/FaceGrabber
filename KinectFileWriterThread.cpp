@@ -1,4 +1,6 @@
 #include "KinectFileWriterThread.h"
+#undef max
+#undef min
 #include <pcl/io/file_io.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/io/pcd_io.h>
@@ -23,7 +25,7 @@ KinectFileWriterThread< PointCloudType >::~KinectFileWriterThread()
 //
 template < typename PointCloudType >
 //void KinectFileWriterThread<PointCloudType>::writeCloudToFile(int index, RecordingFileFormat recordingFileFormat, std::string filePath, std::string fileName)
-void KinectFileWriterThread<PointCloudType>::writeCloudToFile(int index, RecordingConfigurationPtr recordingConfiguration)
+void KinectFileWriterThread<PointCloudType>::writeCloudToFile(int index, IRecordingConfigurationPtr recordingConfiguration)
 {
 	auto recordingFileFormat =	recordingConfiguration->getRecordFileFormat();
 	auto filePath =				recordingConfiguration->getFullRecordingPathString();

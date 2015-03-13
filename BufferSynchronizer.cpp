@@ -3,6 +3,7 @@
 #include <atlstr.h>
 
 template BufferSynchronizer < pcl::PointCloud< pcl::PointXYZRGB>::Ptr >;
+template BufferSynchronizer < pcl::PointCloud< pcl::PointXYZ>::Ptr >;
 
 template < class BufferDataType >
 BufferSynchronizer< BufferDataType >::BufferSynchronizer() :
@@ -65,7 +66,7 @@ void BufferSynchronizer< BufferDataType >::updateThreadFunc()
 		lock.unlock();
 		while (m_isDataAvaiable){
 			
-			std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> readyPointClouds;
+			std::vector<BufferDataType> readyPointClouds;
 			for (auto bufferWithState : m_bufferWithReadyState){
 				printMessage("synchronier pulling data");
 				auto cloud = bufferWithState.first->pullData();

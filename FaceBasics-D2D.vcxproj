@@ -22,6 +22,7 @@
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="BufferSynchronizer.cpp" />
     <ClCompile Include="ColouredOutputStreamUpdater.cpp" />
+    <ClCompile Include="ConvertTabHandler.cpp" />
     <ClCompile Include="KinectFileWriterThread.cpp" />
     <ClCompile Include="KinectHDFaceGrabber.cpp" />
     <ClCompile Include="ImageRenderer.cpp" />
@@ -32,8 +33,11 @@
     <ClCompile Include="PCLInputReader.cpp" />
     <ClCompile Include="PCLInputReaderWorkerThread.cpp" />
     <ClCompile Include="PCLViewer.cpp" />
+    <ClCompile Include="PlaybackConfiguration.cpp" />
     <ClCompile Include="PlaybackTabHandler.cpp" />
+    <ClCompile Include="RecordingConfiguration.cpp" />
     <ClCompile Include="RecordTabHandler.cpp" />
+    <ClCompile Include="SimpleRecordingConfiguration.cpp" />
     <ClCompile Include="SingleProducerBuffer.cpp" />
     <ClCompile Include="WindowsApplication.cpp" />
   </ItemGroup>
@@ -48,6 +52,8 @@
     <ClInclude Include="BufferSynchronizer.h" />
     <ClInclude Include="CloudMeasurementSource.h" />
     <ClInclude Include="ColouredOutputStreamUpdater.h" />
+    <ClInclude Include="ConvertTabHandler.h" />
+    <ClInclude Include="IRecordingConfiguration.h" />
     <ClInclude Include="KinectFileWriterThread.h" />
     <ClInclude Include="KinectHDFaceGrabber.h" />
     <ClInclude Include="ImageRenderer.h" />
@@ -62,6 +68,7 @@
     <ClInclude Include="RecordingConfiguration.h" />
     <ClInclude Include="RecordTabHandler.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="SimpleRecordingConfiguration.h" />
     <ClInclude Include="SingleProducerBuffer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="WindowsApplication.h" />

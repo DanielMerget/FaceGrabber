@@ -13,18 +13,18 @@ public:
 	PCLViewer(int cloudCount, std::string viewerName = "PCLViewer");
 	~PCLViewer();
 	
-	void updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> clouds);
-	void updateNonColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr> clouds);
+	void updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clouds);
+	void updateNonColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clouds);
 
 
-	void updateColoredCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud, int index);
-	void updateNonColoredCloudThreated(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, int index);
+	void updateColoredCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, int index);
+	void updateNonColoredCloudThreated(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int index);
 	void stopViewer();
 	void useColoredCloud(bool useColored);
 	void setNumOfClouds(int numOfClouds);
 private:
-	void pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud, int index);
-	void pushNewNonColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZ>::ConstPtr cloud, int index);
+	void pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, int index);
+	void pushNewNonColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int index);
 
 	void updateLoop();
 	void updateColoredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer::Ptr viewer);
@@ -37,8 +37,8 @@ private:
 
 	bool m_isRunning;
 	std::string m_viewerName;
-	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr>	m_coloredClouds;
-	std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr>		m_nonColoredClouds;
+	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>	m_coloredClouds;
+	std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>		m_nonColoredClouds;
 
 	//pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr m_currentCloud1;
 	//pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr m_currentCloud2;

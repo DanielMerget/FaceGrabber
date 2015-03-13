@@ -26,8 +26,8 @@ public:
 	boost::signals2::signal<void(std::wstring)> updateStatus;
 
 	boost::signals2::signal<void(void)> playbackFinished;
-
-	boost::signals2::signal<void(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr> cloud)> cloudsUpdated;
+	
+	boost::signals2::signal<void(std::vector<BufferDataType> cloud)> cloudsUpdated;
 
 
 	

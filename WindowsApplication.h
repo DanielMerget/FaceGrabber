@@ -16,7 +16,9 @@
 #include "NonColouredOutputStreamsUpdater.h"
 #include "PCLInputReader.h"
 #include "BufferSynchronizer.h"
+#include "ConvertTabHandler.h"
 #include <thread>
+
 class WindowsApplication
 {
 public:
@@ -91,6 +93,8 @@ private:
 	HWND					m_hWnd;
 	HWND					m_recordTabHandle;
 	HWND					m_playbackTabHandle;
+	HWND					m_convertTabHandle;
+
 
 	HWND					m_liveViewWindow;
 	INT64					m_nStartTime;
@@ -106,7 +110,7 @@ private:
 
 	KinectHDFaceGrabber			m_kinectFrameGrabber;
 	std::shared_ptr<PCLViewer>	m_pclFaceViewer;
-	std::vector<std::shared_ptr<PCLInputReader>>							m_inputFileReader;
+	std::vector<std::shared_ptr<PCLInputReader<pcl::PointXYZRGB>>>			m_inputFileReader;
 
 	//pcl::visualization::CloudViewer m_cloudViewer;
 
@@ -121,7 +125,13 @@ private:
 	bool																	m_isKinectRunning;
 	RecordTabHandler														m_recordTabHandler;
 	PlaybackTabHandler														m_plackBackTabHandler;
+	ConvertTabHandler														m_convertTabHandler;
 	std::shared_ptr<ColouredOutputStreamUpdater>							m_colouredOutputStreamUpdater;
 	std::shared_ptr<NonColouredOutputStreamsUpdater>						m_nonColoredOutputStreamUpdater;
+
+
+	void onConvertTabSelected();
+	
+	
 };
 

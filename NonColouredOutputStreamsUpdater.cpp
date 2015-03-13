@@ -45,7 +45,7 @@ HRESULT NonColouredOutputStreamsUpdater::updateOutputStreams(IFaceModel* faceMod
 		pcl::transformPointCloud(*hdFaceRawDepthCloud, *hdFaceRawDepthCloud, m);
 
 		if (!cloudsUpdated.empty()){
-			std::vector<pcl::PointCloud<pcl::PointXYZ>::ConstPtr> updatedClouds;
+			std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> updatedClouds;
 			updatedClouds.push_back(hdFaceCloud);
 			updatedClouds.push_back(hdFaceRawDepthCloud);
 			cloudsUpdated(updatedClouds);

@@ -10,6 +10,8 @@
 #include "PlaybackConfiguration.h"
 #include "Buffer.h"
 #include "PCLInputReaderWorkerThread.h"
+
+template <typename PointType>
 class PCLInputReader
 {
 public:
@@ -21,11 +23,11 @@ public:
 
 	void join();
 
-	std::shared_ptr<Buffer< pcl::PointCloud<pcl::PointXYZRGB>::Ptr> > getBuffer();
-	void setBuffer(std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> buffer);
+	std::shared_ptr<Buffer< boost::shared_ptr<pcl::PointCloud<PointType>>> > getBuffer();
+	void setBuffer(std::shared_ptr<Buffer<boost::shared_ptr<pcl::PointCloud<PointType>>>> buffer);
 	void setPlaybackConfiguration(PlaybackConfigurationPtr playbackConfig);
-
-	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> cloudUpdated;
+	
+	boost::signals2::signal<void(boost::shared_ptr<pcl::PointCloud<PointType> const> cloud)> cloudUpdated;
 	boost::signals2::signal<void(std::wstring)> updateStatus;
 private:
 	void createAndStartThreadForIndex(int index, int numOfThreads);
@@ -44,13 +46,13 @@ private:
 	
 	std::mutex m_readMutex;
 
-	std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> m_buffer;
+	std::shared_ptr<Buffer<boost::shared_ptr<pcl::PointCloud<PointType>>>> m_buffer;
 
 	int m_numOfFilesRead;
 	std::mutex m_numOfFilesReadMutex;
 
 	std::thread m_updateThread;
-	std::vector<std::shared_ptr<PCLInputReaderWorkerThread>> m_inputReaderWorkerThreads;
+	std::vector<std::shared_ptr<PCLInputReaderWorkerThread<PointType>>> m_inputReaderWorkerThreads;
 	PlaybackConfigurationPtr m_playbackConfiguration;
 };
 

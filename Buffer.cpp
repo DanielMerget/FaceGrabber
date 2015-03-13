@@ -1,9 +1,9 @@
 #include "Buffer.h"
 #include "stdafx.h"
 #include <atlstr.h>
-#include "KinectFileWriterThread.h"
-
+#include "CloudMeasurementSource.h"
 template Buffer < pcl::PointCloud< pcl::PointXYZRGB>::Ptr >;
+template Buffer < pcl::PointCloud< pcl::PointXYZ>::Ptr >;
 template Buffer < std::shared_ptr<PointCloudMeasurement<pcl::PointXYZRGB>> > ;
 template Buffer < std::shared_ptr<PointCloudMeasurement<pcl::PointXYZ>> > ;
 //template KinectCloudOutputWriter < pcl::PointXYZRGB >;

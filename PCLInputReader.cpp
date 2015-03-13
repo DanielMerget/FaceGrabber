@@ -4,18 +4,23 @@
 #include <future>         // std::async
 #include "PCLInputReaderWorkerThread.h"
 
-PCLInputReader::PCLInputReader() :
+template PCLInputReader < pcl::PointXYZRGB> ;
+template PCLInputReader < pcl::PointXYZ>;
+template <typename PointType>
+PCLInputReader< PointType >::PCLInputReader() :
 	m_readerThreads(),
 	m_isPlaybackRunning(false),
 	m_numOfFilesRead(0)
 {
 }
 
-void PCLInputReader::setBuffer(std::shared_ptr<Buffer< pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> buffer)
+template <typename PointType>
+void PCLInputReader< PointType >::setBuffer(std::shared_ptr<Buffer< boost::shared_ptr<pcl::PointCloud<PointType>>>> buffer)
 {
 	m_buffer = buffer;
 }
-void PCLInputReader::join()
+template <typename PointType>
+void PCLInputReader< PointType >::join()
 {
 	if (m_updateThread.joinable()){
 		m_updateThread.join();
@@ -31,12 +36,14 @@ void PCLInputReader::join()
 	m_readerThreads.clear();
 }
 
-PCLInputReader::~PCLInputReader()
+template <typename PointType>
+PCLInputReader< PointType >::~PCLInputReader()
 {
 	join();
 }
 
-void PCLInputReader::startCloudUpdateThread()
+template <typename PointType>
+void PCLInputReader< PointType >::startCloudUpdateThread()
 {
 	if (!m_playbackConfiguration->isEnabled()){
 		return;
@@ -53,18 +60,20 @@ void PCLInputReader::startCloudUpdateThread()
 	std::async(&PCLInputReader::startReaderThreads, this);
 }
 
-void PCLInputReader::createAndStartThreadForIndex(int index, int numOfThreads)
+template <typename PointType>
+void PCLInputReader< PointType >::createAndStartThreadForIndex(int index, int numOfThreads)
 {
 	auto recordingType = m_playbackConfiguration->getRecordFileFormat();
 	auto filesToPlay = m_playbackConfiguration->getCloudFilesToPlay();
-	std::shared_ptr<PCLInputReaderWorkerThread> reader(new PCLInputReaderWorkerThread);
+	std::shared_ptr<PCLInputReaderWorkerThread<PointType>> reader(new PCLInputReaderWorkerThread<PointType>);
 	reader->setBuffer(m_buffer);
-	reader->finishedReadingAFile.connect(boost::bind(&PCLInputReader::readerFinishedReadingAFile, this));
+	reader->finishedReadingAFile.connect(boost::bind(&PCLInputReader<PointType>::readerFinishedReadingAFile, this));
 	m_inputReaderWorkerThreads.push_back(reader);
-	m_readerThreads.push_back(std::thread(&PCLInputReaderWorkerThread::readCloudData, reader, index, numOfThreads, filesToPlay, recordingType));
+	m_readerThreads.push_back(std::thread(&PCLInputReaderWorkerThread<PointType>::readCloudData, reader, index, numOfThreads, filesToPlay, recordingType));
 }
 
-void PCLInputReader::readerFinishedReadingAFile()
+template <typename PointType>
+void PCLInputReader< PointType >::readerFinishedReadingAFile()
 {
 	std::lock_guard<std::mutex> lock(m_numOfFilesReadMutex);
 	m_numOfFilesRead++;
@@ -73,21 +82,23 @@ void PCLInputReader::readerFinishedReadingAFile()
 	updateStatus(statusMessage.str());
 }
 
-void PCLInputReader::startReaderThreads()
+template <typename PointType>
+void PCLInputReader< PointType >::startReaderThreads()
 { 
 	updateStatus(L"");
 	m_numOfFilesRead = 0;
 	m_playbackConfiguration->sortCloudFilesForPlayback();
 	m_isPlaybackRunning = true;
 	m_buffer->enableBuffer();
-	const int numOfThreadsToStart = 5;
+	const int numOfThreadsToStart = 1;
 	for (int i = 0; i < numOfThreadsToStart; i++){
 		//m_readerThreads.push_back(std::thread(&PCLInputReader::readCloudData, this, i));
 		createAndStartThreadForIndex(i, numOfThreadsToStart);
 	}
 }
 
-void PCLInputReader::stopReaderThreads()
+template <typename PointType>
+void PCLInputReader< PointType >::stopReaderThreads()
 { 
 	//if (!m_isPlaybackRunning){
 	//	return;
@@ -100,8 +111,8 @@ void PCLInputReader::stopReaderThreads()
 }
 
 
-
-void PCLInputReader::printMessage(std::string msg)
+template <typename PointType>
+void PCLInputReader< PointType >::printMessage(std::string msg)
 {
 	std::lock_guard<std::mutex> lock(m_printMutex);
 	
@@ -110,12 +121,14 @@ void PCLInputReader::printMessage(std::string msg)
 	OutputDebugString(msgCstring);
 }
 
-void PCLInputReader::setPlaybackConfiguration(PlaybackConfigurationPtr playbackConfig)
+template <typename PointType>
+void PCLInputReader< PointType >::setPlaybackConfiguration(PlaybackConfigurationPtr playbackConfig)
 {
 	m_playbackConfiguration = playbackConfig;
 }
 
-std::shared_ptr<Buffer< pcl::PointCloud<pcl::PointXYZRGB>::Ptr>> PCLInputReader::getBuffer()
+template <typename PointType>
+std::shared_ptr<Buffer< boost::shared_ptr<pcl::PointCloud<PointType>>>> PCLInputReader< PointType >::getBuffer()
 {
 	return m_buffer;
 }
