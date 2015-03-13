@@ -252,7 +252,6 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::convertDepth
 	pointCloud->height = static_cast<uint32_t>(m_depthHeight);
 	pointCloud->is_dense = false;
 
-	// construct dense depth points visibility test map so we can test for depth points that are invisible in color space
 	const UINT16* const pDepthEnd = depthBuffer + depthBufferSize;
 	auto pColorPoint = m_pColorCoordinates.begin();
 
@@ -298,7 +297,6 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::convertDepth
 				auto testDiff = std::abs(depthValue - depthTestValue);
 				if (testDiff < VISIBILITY_MAX_THRESHHOLD)
 				{
-					// calculate index into color array
 					const UINT colorIndex = colorX + (colorY * m_colorWidth);
 					auto pixelColor = colorBuffer[colorIndex];
 
