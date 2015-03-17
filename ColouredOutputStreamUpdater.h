@@ -16,31 +16,38 @@ public:
 	~ColouredOutputStreamUpdater();
 	
 	HRESULT updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize, CameraSpacePoint* detectedHDFacePointsCamSpace, 
-		ColorSpacePoint* detectedHDFacePointsColorSpace, RGBQUAD* colorBuffer, UINT16* depthBuffer);
+		ColorSpacePoint* detectedHDFacePointsColorSpace);
 
 	boost::signals2::signal<void(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>)> cloudsUpdated;
 
 	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud)> cloudUpdated[3];
 	//boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> depthCloudUpdated;
 
+	void startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer);
+	void stopFaceCollection();
 
 	void initialize(ICoordinateMapper* m_pCoordinateMapper, int depthWidth, int depthHeight, int colorWidth, int colorHeight);
 
 private:
 
-	bool extractColouredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack,
-		std::vector<cv::Point2f>& hdFacePointsInColorSpaceSpaceOpenCV, RGBQUAD* colorBuffer, UINT16* depthBuffer, pcl::PointCloud<pcl::PointXYZRGB>::Ptr depthCloud);
+	bool extractColoredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack,
+		std::vector<cv::Point2f>& hdFacePointsInColorSpaceSpaceOpenCV);
 
-	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr extractColouredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack, 
-	//	std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV, RGBQUAD* colorBuffer, UINT16* depthBuffer);
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr extractClolouredFaceHDPoinCloudAndBoundingBox(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, 
-		CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV, RGBQUAD* colorBuffer);
+	void extractColoredFaceHDPoinCloudAndBoundingBox(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, 
+		CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV);
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertDepthBufferToPointCloud(RGBQUAD* colorBuffer, UINT16* depthBuffer);
+	void convertDepthBufferToPointCloud();
 
 	
-	
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_HDFacePointCloud;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_FaceRawPointCloud;
+
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_fullRawPointCloud;
 	std::vector<UINT16>				m_pDepthVisibilityTestMap;
 	std::vector<ColorSpacePoint>	m_pColorCoordinates;
+	bool							m_isValidFaceFrame;
+
+	RGBQUAD* m_colorBuffer;
+	UINT16*	m_depthBuffer;
 };
 

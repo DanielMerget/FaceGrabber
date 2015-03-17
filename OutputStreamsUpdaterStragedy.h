@@ -18,10 +18,12 @@ public:
 	}
 
 	virtual HRESULT updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize, CameraSpacePoint* detectedHDFacePointsCamSpace,
-		ColorSpacePoint* detectedHDFacePointsColorSpace, RGBQUAD* colorBuffer, UINT16* depthBuffer) = 0;
+		ColorSpacePoint* detectedHDFacePointsColorSpace) = 0;
 
 	virtual void initialize(ICoordinateMapper* m_pCoordinateMapper, int depthWidth, int depthHeight, int colorWidth, int colorHeight);
 
+	virtual void startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer) = 0;
+	virtual void stopFaceCollection() = 0;
 protected:
 	// Coordinate mapper
 	ICoordinateMapper*			m_pCoordinateMapper;

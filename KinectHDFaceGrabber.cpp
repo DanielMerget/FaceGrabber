@@ -566,7 +566,8 @@ void KinectHDFaceGrabber::processFaces()
     bool bHaveBodyData = SUCCEEDED( updateBodyData(ppBodies) );
 	if (!bHaveBodyData)
 		return;
-
+	m_outputStreamUpdater->startFaceCollection(m_colorBuffer.data(), m_depthBuffer.data());
+	bool updatedOneFace = false;
 	UINT32 vertex = 0;
 	hr = GetFaceModelVertexCount(&vertex); // 1347
     // iterate through each face reader
@@ -576,7 +577,7 @@ void KinectHDFaceGrabber::processFaces()
 
 		IHighDefinitionFaceFrame* pHDFaceFrame = nullptr;
 		hr = m_pHDFaceReader[iFace]->AcquireLatestFrame(&pHDFaceFrame);
-
+		
 		BOOLEAN bFaceTracked = false;
 		if (SUCCEEDED(hr) && pHDFaceFrame != nullptr){
 			hr = pHDFaceFrame->get_IsFaceTracked(&bFaceTracked);
@@ -594,15 +595,17 @@ void KinectHDFaceGrabber::processFaces()
 		if (m_outputStreamUpdater){
 			hr = m_outputStreamUpdater->updateOutputStreams(m_pFaceModel[iFace], m_pFaceAlignment[iFace], 
 				std::min(m_HDFaceDetectedPointsCamSpace[iFace].size(), m_HDFaceDetectedPointsColorSpace[iFace].size()), 
-				m_HDFaceDetectedPointsCamSpace[iFace].data(), m_HDFaceDetectedPointsColorSpace[iFace].data(),
-				m_colorBuffer.data(), m_depthBuffer.data());
+				m_HDFaceDetectedPointsCamSpace[iFace].data(), m_HDFaceDetectedPointsColorSpace[iFace].data());
+			updatedOneFace = true;
 		}
 			
 		if (SUCCEEDED(hr)){
 			m_pDrawDataStreams->drawPoints(m_HDFaceDetectedPointsColorSpace[iFace]);
 		}		
     }
-
+	if (updatedOneFace){
+		m_outputStreamUpdater->stopFaceCollection();
+	}
     if (bHaveBodyData)
     {
         for (int i = 0; i < _countof(ppBodies); ++i)
