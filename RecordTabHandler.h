@@ -1,7 +1,8 @@
 #pragma once
+#include "stdafx.h"
+
 #include "MessageRouterHelper.h"
 #include <windowsx.h>
-#include "stdafx.h"
 #include "resource.h"
 #include "RecordingConfiguration.h"
 #include <memory>
@@ -24,8 +25,8 @@ public:
 	void recordConfigurationStatusChanged(RecordCloudType type, bool newState);
 
 	boost::signal<void(bool)> colorConfigurationChanged;
-	boost::signal<void(bool)> startWriting;
-	boost::signal<void(bool)> stopWriting;
+	boost::signal<void(bool, SharedRecordingConfiguration)> startWriting;
+	boost::signal<void(bool, SharedRecordingConfiguration)> stopWriting;
 
 	bool isColorEnabled();
 

@@ -1,5 +1,5 @@
 #pragma once
-
+#include "stdafx.h"
 #include <memory>
 #include "RecordingConfiguration.h"
 #include "CloudMeasurementSource.h"

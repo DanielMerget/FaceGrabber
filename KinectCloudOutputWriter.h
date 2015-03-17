@@ -1,9 +1,9 @@
 #pragma once
+#include "stdafx.h"
 #include <queue>
 #include <condition_variable>
 #include <mutex>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
+
 #include <thread>
 #include <vector>
 #include <future>

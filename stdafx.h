@@ -50,3 +50,12 @@ inline void SafeRelease(Interface *& pInterfaceToRelease)
         pInterfaceToRelease = nullptr;
     }
 }
+
+#include <memory>
+#undef max
+#undef min
+#include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
+#include <boost/signal.hpp>
+#include <boost/signals2.hpp>
+#include <boost/bind.hpp>

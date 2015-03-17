@@ -1,10 +1,11 @@
+#include "stdafx.h"
 #include "KinectFileWriterThread.h"
 #undef max
 #undef min
 #include <pcl/io/file_io.h>
 #include <pcl/io/ply_io.h>
 #include <pcl/io/pcd_io.h>
-#include "stdafx.h"
+
 
 template KinectFileWriterThread < pcl::PointXYZRGB >;
 template KinectFileWriterThread < pcl::PointXYZ >;

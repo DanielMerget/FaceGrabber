@@ -1,4 +1,5 @@
 #pragma once
+#include "stdafx.h"
 #include <mutex>
 #include <condition_variable>
 #include <vector>

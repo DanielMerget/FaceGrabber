@@ -1,6 +1,8 @@
+#include "stdafx.h"
 #include "NonColouredOutputStreamsUpdater.h"
 #include <pcl/common/centroid.h>
 #include <pcl/common/transforms.h>
+
 NonColouredOutputStreamsUpdater::NonColouredOutputStreamsUpdater()
 {
 }

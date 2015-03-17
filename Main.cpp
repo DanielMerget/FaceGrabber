@@ -1,14 +1,14 @@
-
-#include "WindowsApplication.h"
 #include "stdafx.h"
+#include "WindowsApplication.h"
+
 
 #include "resource.h"
-#include "KinectHDFaceGrabber.h"
+//#include "KinectHDFaceGrabber.h"
 
 #include <strsafe.h>
-#include "PCLInputReader.h"
-#include "PCLViewer.h"
-#include <pcl/io/ply_io.h>
+//#include "PCLInputReader.h"
+//#include "PCLViewer.h"
+//#include <pcl/io/ply_io.h>
 
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR lpCmdLine, _In_ int nCmdShow)
@@ -22,12 +22,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 }
 
 
-#include "stdafx.h"
-#include <Windows.h>
-#include <Kinect.h>
-//#include <pcl/visualization/cloud_viewer.h>
-
-#include <regex>
+//#include "stdafx.h"
+//#include <Windows.h>
+//#include <Kinect.h>
+////#include <pcl/visualization/cloud_viewer.h>
+//
+//#include <regex>
 
 //#include <pcl/io/pcd_grabber.h>
 //#include <pcl/console/parse.h>

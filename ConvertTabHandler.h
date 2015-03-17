@@ -1,7 +1,8 @@
 #pragma once
+#include "stdafx.h"
+
 #include "MessageRouterHelper.h"
 #include <windowsx.h>
-#include "stdafx.h"
 #include <thread>
 #include "resource.h"
 #include "PlaybackConfiguration.h"

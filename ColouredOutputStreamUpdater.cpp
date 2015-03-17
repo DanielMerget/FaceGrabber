@@ -1,11 +1,10 @@
+#include "stdafx.h"
 #include "ColouredOutputStreamUpdater.h"
 #include <pcl/common/centroid.h>
 #include <pcl/common/transforms.h>
 #include <future>
 #include <pcl/filters/voxel_grid.h>
 #include <opencv2/imgproc/imgproc.hpp>
-
-
 #include "stdafx.h"
 #include <atlstr.h>
 #include <cmath>

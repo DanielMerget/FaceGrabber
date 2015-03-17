@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "SingleProducerBuffer.h"
 
 template < class DataType >

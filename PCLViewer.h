@@ -1,4 +1,6 @@
 #pragma once
+#include "stdafx.h"
+
 #undef max
 #undef min
 #include <pcl/visualization/cloud_viewer.h>

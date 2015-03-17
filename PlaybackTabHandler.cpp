@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "PlaybackTabHandler.h"
 #include "WindowsAppDialogHelper.h"
 
@@ -25,6 +26,7 @@ void PlaybackTabHandler::resetUIElements()
 		IDC_FILE_PATH_EDIT_BOX,
 		DDL_EXCLUSIVE | DDL_READWRITE | DDL_DIRECTORY);
 }
+
 void PlaybackTabHandler::setSharedRecordingConfiguration(SharedRecordingConfiguration recordingConfiguration)
 {
 	
@@ -34,7 +36,6 @@ void PlaybackTabHandler::setSharedRecordingConfiguration(SharedRecordingConfigur
 	}
 	auto outputFolderPath = recordingConfiguration[HDFace]->getFilePathCString();
 	
-
 	DlgDirList(m_hWnd,
 		outputFolderPath.GetBuffer(),
 		IDC_RECODINGS_LIST_BOX,
@@ -80,11 +81,6 @@ void PlaybackTabHandler::onCreate()
 {
 	
 	Button_SetCheck(GetDlgItem(m_hWnd, IDC_CHECK_BOX_SINGLE_THREATED_READING), m_isSingleThreadedReading);
-}
-
-void PlaybackTabHandler::checkPlayBackPossible()
-{
-
 }
 
 void PlaybackTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)

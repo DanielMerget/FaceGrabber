@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "BufferSynchronizer.h"
 #include <thread>
 #include <atlstr.h>

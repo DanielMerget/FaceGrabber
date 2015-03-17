@@ -70,6 +70,7 @@
     <ClCompile Include="WindowsAppDialogHelper.cpp">
       <Filter>WindowsApp</Filter>
     </ClCompile>
+    <ClCompile Include="stdafx.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">

@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "RecordingConfiguration.h"
 
 RecordingConfiguration::RecordingConfiguration() : m_outputFolder(), m_enabled(false)

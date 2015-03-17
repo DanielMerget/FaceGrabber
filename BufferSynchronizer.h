@@ -1,4 +1,5 @@
 #pragma once
+#include "stdafx.h"
 #include "Buffer.h"
 
 #include <boost/signals2.hpp>

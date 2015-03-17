@@ -1,4 +1,6 @@
 #pragma once
+#include "stdafx.h"
+
 #include <Kinect.h>
 #include <Kinect.Face.h>
 #include <limits>

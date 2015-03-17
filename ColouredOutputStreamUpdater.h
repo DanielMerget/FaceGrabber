@@ -1,4 +1,6 @@
 #pragma once
+#include "stdafx.h"
+
 #include "OutputStreamsUpdaterStragedy.h"
 #include <boost/signals2.hpp>
 #include <opencv2/imgproc/imgproc.hpp>

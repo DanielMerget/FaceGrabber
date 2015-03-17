@@ -21,27 +21,60 @@
   <ItemGroup>
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="BufferSynchronizer.cpp" />
-    <ClCompile Include="ColouredOutputStreamUpdater.cpp" />
-    <ClCompile Include="ConvertTabHandler.cpp" />
-    <ClCompile Include="KinectFileWriterThread.cpp" />
-    <ClCompile Include="KinectHDFaceGrabber.cpp" />
-    <ClCompile Include="ImageRenderer.cpp" />
-    <ClCompile Include="KinectCloudOutputWriter.cpp" />
+    <ClCompile Include="ColouredOutputStreamUpdater.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ConvertTabHandler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="KinectFileWriterThread.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="KinectHDFaceGrabber.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ImageRenderer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="KinectCloudOutputWriter.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="MessageRouterHelper.cpp" />
-    <ClCompile Include="NonColouredOutputStreamsUpdater.cpp" />
-    <ClCompile Include="OutputStreamsUpdaterStragedy.cpp" />
+    <ClCompile Include="MessageRouterHelper.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="NonColouredOutputStreamsUpdater.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="OutputStreamsUpdaterStragedy.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="PCLInputReader.cpp" />
     <ClCompile Include="PCLInputReaderWorkerThread.cpp" />
-    <ClCompile Include="PCLViewer.cpp" />
+    <ClCompile Include="PCLViewer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="PlaybackConfiguration.cpp" />
-    <ClCompile Include="PlaybackTabHandler.cpp" />
+    <ClCompile Include="PlaybackTabHandler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="RecordingConfiguration.cpp" />
-    <ClCompile Include="RecordTabHandler.cpp" />
+    <ClCompile Include="RecordTabHandler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="SimpleRecordingConfiguration.cpp" />
-    <ClCompile Include="SingleProducerBuffer.cpp" />
-    <ClCompile Include="WindowsAppDialogHelper.cpp" />
-    <ClCompile Include="WindowsApplication.cpp" />
+    <ClCompile Include="SingleProducerBuffer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WindowsAppDialogHelper.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="WindowsApplication.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="app.ico" />
@@ -169,6 +202,9 @@
 xcopy "$(KINECTSDK20_DIR)Redist\Face\x64\Kinect20.Face.dll" "$(TargetDir)" /c /y
       </Command>
     </PostBuildEvent>
+    <Bscmake>
+      <PreserveSbr>true</PreserveSbr>
+    </Bscmake>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>

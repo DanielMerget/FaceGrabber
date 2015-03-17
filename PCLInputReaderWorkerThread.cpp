@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "PCLInputReaderWorkerThread.h"
 #include <iostream>
 #include <atlstr.h>

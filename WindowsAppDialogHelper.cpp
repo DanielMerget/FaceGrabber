@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "WindowsAppDialogHelper.h"
 #include <Commdlg.h>
 

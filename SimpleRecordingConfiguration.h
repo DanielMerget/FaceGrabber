@@ -1,4 +1,6 @@
 #pragma once
+#include "stdafx.h"
+
 #include "IRecordingConfiguration.h"
 #include <memory>
 class SimpleRecordingConfiguration : public IRecordingConfiguration

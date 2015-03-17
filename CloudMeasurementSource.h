@@ -1,7 +1,6 @@
 #pragma once
+#include "stdafx.h"
 
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
 
 template < typename MeasurementCloudType >
 class PointCloudMeasurement{

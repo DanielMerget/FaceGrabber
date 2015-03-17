@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "KinectCloudOutputWriter.h"
 #include <pcl/io/ply_io.h>
 

@@ -7,6 +7,7 @@
 // Manages the drawing of image data
 
 #pragma once
+#include "stdafx.h"
 
 #include <d2d1.h>
 #include <Dwrite.h>

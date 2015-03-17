@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "PCLInputReader.h"
 #include <pcl/io/ply_io.h>
 #include <pcl/io/pcd_io.h>

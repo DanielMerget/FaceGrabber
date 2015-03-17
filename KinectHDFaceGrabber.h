@@ -5,11 +5,11 @@
 //------------------------------------------------------------------------------
 
 #pragma once
+#include "stdafx.h"
 
 #include "resource.h"
 #include "ImageRenderer.h"
-#undef max
-#undef min
+
 #include <boost/signals2.hpp>
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>

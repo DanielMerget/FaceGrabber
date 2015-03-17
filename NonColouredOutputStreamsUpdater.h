@@ -1,9 +1,11 @@
 #pragma once
+#include "stdafx.h"
+
 #include "OutputStreamsUpdaterStragedy.h"
 #include <boost/signals2.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
-#include <pcl/point_types.h>
-#include <pcl/point_cloud.h>
+//#include <pcl/point_types.h>
+//#include <pcl/point_cloud.h>
 class NonColouredOutputStreamsUpdater :
 	public OutputStreamsUpdaterStragedy
 {

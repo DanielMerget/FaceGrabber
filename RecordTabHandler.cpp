@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "RecordTabHandler.h"
 #include "WindowsAppDialogHelper.h"
 
@@ -181,11 +182,11 @@ void RecordTabHandler::setRecording(bool enable)
 	m_isRecording = enable;
 	if (enable){
 		setupRecording();
-		startWriting(m_colorEnabled);
+		startWriting(m_colorEnabled, m_recordingConfiguration);
 		SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Stop");
 	}
 	else{
-		stopWriting(m_colorEnabled);
+		stopWriting(m_colorEnabled, m_recordingConfiguration);
 	}	
 }
 

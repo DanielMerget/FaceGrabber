@@ -1,9 +1,7 @@
 #pragma once
+#include "stdafx.h"
 
 #include <string>
-#include "stdafx.h"
-#include <boost/signal.hpp>
-#include <boost/bind.hpp>
 #include <atlstr.h>
 #include "RecordingConfiguration.h"
 #include <regex>

@@ -1,5 +1,6 @@
-#include "Buffer.h"
 #include "stdafx.h"
+#include "Buffer.h"
+
 #include <atlstr.h>
 #include "CloudMeasurementSource.h"
 template Buffer < pcl::PointCloud< pcl::PointXYZRGB>::Ptr >;

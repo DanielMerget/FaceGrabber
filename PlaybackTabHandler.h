@@ -1,6 +1,7 @@
 #pragma once
-#include "resource.h"
 #include "stdafx.h"
+
+#include "resource.h"
 #include <atlstr.h>
 #include <Windowsx.h>
 #include "MessageRouterHelper.h"
@@ -30,7 +31,6 @@ public:
 private:
 	void setPlaybackStatus(bool enable);
 	void onCreate();
-	void checkPlayBackPossible();
 	void updateUIConfiguration();
 
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
