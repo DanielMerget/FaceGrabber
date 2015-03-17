@@ -1,14 +1,12 @@
 #include "ConvertTabHandler.h"
-#include "WindowsApplication.h"
+#include "WindowsAppDialogHelper.h"
 
 ConvertTabHandler::ConvertTabHandler():
 	m_playbackConfiguration(new PlaybackConfiguration),
 	m_enableColor(true),
 	m_recordingConfiguration(new SimpleRecordingConfiguration)
-	//m_recordingConfiguration(new RecordingConfiguration)
 {
 	m_playbackConfiguration->setEnabled(true);
-	//m_recordingConfiguration->setEnabled(true);
 }
 
 
@@ -23,30 +21,7 @@ ConvertTabHandler::~ConvertTabHandler()
 		m_nonColorBufferSynchronizerThread.join();
 	}
 }
-
-LRESULT CALLBACK ConvertTabHandler::MessageRouterTab(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	ConvertTabHandler* pThis = nullptr;
-
-	if (WM_INITDIALOG == uMsg)
-	{
-		pThis = reinterpret_cast<ConvertTabHandler*>(lParam);
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
-	}
-	else
-	{
-		pThis = reinterpret_cast<ConvertTabHandler*>(::GetWindowLongPtr(hWnd, GWLP_USERDATA));
-	}
-
-	if (pThis)
-	{
-		return pThis->DlgProcTab(hWnd, uMsg, wParam, lParam);
-	}
-
-	return 0;
-}
-
-void ConvertTabHandler::onCreate(WPARAM wParam, LPARAM)
+void ConvertTabHandler::onCreate()
 {
 
 	HWND outputFormatHandle = GetDlgItem(m_hWnd, IDC_COMBO_OUTPUT_FORMAT);
@@ -86,41 +61,6 @@ void ConvertTabHandler::onCreate(WPARAM wParam, LPARAM)
 }
 
 
-LRESULT CALLBACK ConvertTabHandler::DlgProcTab(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(wParam);
-	UNREFERENCED_PARAMETER(lParam);
-
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		m_hWnd = hWnd;
-		onCreate(wParam, lParam);
-		break;
-
-	case WM_CLOSE:
-		DestroyWindow(hWnd);
-		break;
-
-	case WM_DESTROY:
-		PostQuitMessage(0);
-		break;
-	case WM_COMMAND:
-	{
-		processUIMessage(wParam, lParam);
-		break;
-	}
-	case WM_SIZE:
-		break;
-	case WM_NOTIFY:
-		break;
-
-	}
-
-	return FALSE;
-}
-
-
 void ConvertTabHandler::playbackConfigurationChanged()
 {
 	CString foundFiles;
@@ -145,26 +85,6 @@ void ConvertTabHandler::recordingConfigurationChanged()
 		Button_Enable(GetDlgItem(m_hWnd, IDC_BUTTON_CONVERT), false);
 	}
 }
-
-
-void ConvertTabHandler::processUIMessage(WPARAM wParam, LPARAM handle)
-{
-
-	switch (HIWORD(wParam))
-	{
-	case CBN_SELCHANGE:
-		onSelectionChanged(wParam, handle);
-		break;
-	case BN_CLICKED:
-		onButtonClicked(wParam, handle);
-		break;
-	case EN_CHANGE:
-		onEditBoxeChanged(wParam, handle);
-	default:
-		break;
-	}
-}
-
 
 
 void ConvertTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
@@ -281,14 +201,14 @@ void ConvertTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 	case IDC_BUTTON_OUTPUT_FOLDER_CONVERT:
 	{
 		WCHAR szDir[MAX_PATH];
-		if (WindowsApplication::openDirectoryDialog(szDir, m_hWnd)){
+		if (WindowsAppDialogHelper::openDirectoryDialog(szDir, m_hWnd)){
 			SetDlgItemText(m_hWnd, IDC_EDIT_BOX_OUTPUT_FOLDER_CONVERT, szDir);
 		}
 		break;
 	}
 	case IDC_BUTTON_INPUT_FOLDER_CONVERT:
 		WCHAR szDir[MAX_PATH];
-		if (WindowsApplication::openDirectoryDialog(szDir, m_hWnd)){
+		if (WindowsAppDialogHelper::openDirectoryDialog(szDir, m_hWnd)){
 			SetDlgItemText(m_hWnd, IDC_EDIT_BOX_INPUT_FOLDER_CONVERT, szDir);
 		}
 		break;

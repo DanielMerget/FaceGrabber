@@ -1,4 +1,5 @@
 #pragma once
+#include "MessageRouterHelper.h"
 #include <windowsx.h>
 #include "stdafx.h"
 #include <thread>
@@ -21,23 +22,16 @@ typedef pcl::PointCloud<pcl::PointXYZ>::Ptr		PointXYZCloud;
 typedef Buffer<PointXYZCloud>					NonColorBuffer;
 typedef BufferSynchronizer<PointXYZCloud>		NonColorBufferSynchronizer;
 
-class ConvertTabHandler
+class ConvertTabHandler : public MessageRouterHelper
 {
 public:
 	ConvertTabHandler();
 	~ConvertTabHandler();
-
-	
-	LRESULT CALLBACK	DlgProcTab(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-	static LRESULT CALLBACK	MessageRouterTab(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);;
-
-	void onCreate(WPARAM wParam, LPARAM);
-	
-	void processUIMessage(WPARAM wParam, LPARAM);
-
 	
 private:
-	
+
+	void onCreate();
+
 	void startFileConversion();
 	void playbackConfigurationChanged();
 	void recordingConfigurationChanged();
@@ -72,5 +66,4 @@ private:
 
 	std::thread									m_colorBufferSynchronizerThread;
 	std::thread									m_nonColorBufferSynchronizerThread;
-	HWND										m_hWnd;
 };

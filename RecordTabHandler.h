@@ -1,4 +1,5 @@
 #pragma once
+#include "MessageRouterHelper.h"
 #include <windowsx.h>
 #include "stdafx.h"
 #include "resource.h"
@@ -7,20 +8,16 @@
 #include <boost/signals.hpp>
 
 
-class RecordTabHandler
+class RecordTabHandler : public MessageRouterHelper
 {
 public:
 	RecordTabHandler();
 	~RecordTabHandler();
 
 	void setSharedRecordingConfiguration(SharedRecordingConfiguration recordingConfiguration);
-	//BOOL CALLBACK EnumChildProc(HWND hwnd, LPARAM lParam);
-		   LRESULT CALLBACK	DlgProcTab(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam);
-	static LRESULT CALLBACK	MessageRouterTab(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);;
 
-	void onCreate(WPARAM wParam, LPARAM);
+	void onCreate();
 	void checkRecordingConfigurationPossible();
-	void processUIMessage(WPARAM wParam, LPARAM);
 
 	SharedRecordingConfiguration getRecordConfiguration();
 	void recordPathChanged(RecordCloudType type);
@@ -37,7 +34,9 @@ public:
 	bool isRecording();
 
 	void updateWriterStatus(RecordCloudType type, std::wstring status);
+
 private:
+
 	void setupRecording();
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
@@ -50,6 +49,5 @@ private:
 
 	bool m_colorEnabled;
 	bool m_isRecording;
-	HWND m_hWnd;
 };
 

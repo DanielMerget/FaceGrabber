@@ -1,5 +1,6 @@
 #include "RecordTabHandler.h"
-#include "WindowsApplication.h"
+#include "WindowsAppDialogHelper.h"
+
 #define MAX_DATE 20
 #include <time.h>
 
@@ -24,29 +25,8 @@ void RecordTabHandler::setSharedRecordingConfiguration(SharedRecordingConfigurat
 	m_recordingConfiguration = recordingConfiguration;
 }
 
-LRESULT CALLBACK RecordTabHandler::MessageRouterTab(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	RecordTabHandler* pThis = nullptr;
 
-	if (WM_INITDIALOG == uMsg)
-	{
-		pThis = reinterpret_cast<RecordTabHandler*>(lParam);
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
-	}
-	else
-	{
-		pThis = reinterpret_cast<RecordTabHandler*>(::GetWindowLongPtr(hWnd, GWLP_USERDATA));
-	}
-
-	if (pThis)
-	{
-		return pThis->DlgProcTab(hWnd, uMsg, wParam, lParam);
-	}
-
-	return 0;
-}
-
-void RecordTabHandler::onCreate(WPARAM wParam, LPARAM)
+void RecordTabHandler::onCreate()
 {
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_recordingConfiguration[   HDFace	 ]->getFileName());
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_recordingConfiguration[  FaceRaw	 ]->getFileName());
@@ -87,65 +67,6 @@ void RecordTabHandler::onCreate(WPARAM wParam, LPARAM)
 bool RecordTabHandler::isColorEnabled()
 {
 	return m_colorEnabled;
-}
-LRESULT CALLBACK RecordTabHandler::DlgProcTab(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	UNREFERENCED_PARAMETER(wParam);
-	UNREFERENCED_PARAMETER(lParam);
-
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		m_hWnd = hWnd;
-		onCreate(wParam, lParam);
-		break;
-
-		// If the titlebar X is clicked, destroy app
-	case WM_CLOSE:
-		DestroyWindow(hWnd);
-		//m_pclFaceRawViewer->stopViewer();
-		//m_pclFaceViewer->stopViewer();
-		break;
-
-	case WM_DESTROY:
-		// Quit the main message pump
-		//m_listView.OnDestroy(m_hWnd);
-		PostQuitMessage(0);
-		break;
-	case WM_COMMAND:
-	{
-		processUIMessage(wParam, lParam);
-		break;
-	}
-	case WM_SIZE:
-		//m_listView.OnSize(m_hWnd, LOWORD(lParam), HIWORD(lParam), static_cast<UINT>(wParam));
-		//m_listView.OnSize(m_hWnd, LOWORD(lParam), HIWORD(lParam), static_cast<UINT>(wParam));
-		break;
-	case WM_NOTIFY:
-		break;
-
-	}
-
-	return FALSE;
-}
-
-
-void RecordTabHandler::processUIMessage(WPARAM wParam, LPARAM handle)
-{
-
-	switch (HIWORD(wParam))
-	{
-	case CBN_SELCHANGE:
-		onSelectionChanged(wParam, handle);
-		break;
-	case BN_CLICKED:
-		onButtonClicked(wParam, handle);
-		break;
-	case EN_CHANGE:
-		onEditBoxeChanged(wParam, handle);
-	default:
-		break;
-	}
 }
 
 void RecordTabHandler::updateWriterStatus(RecordCloudType recordType, std::wstring status)
@@ -321,7 +242,7 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 	{
 
 		WCHAR szDir[MAX_PATH];
-		if (WindowsApplication::openDirectoryDialog(szDir, m_hWnd)){
+		if (WindowsAppDialogHelper::openDirectoryDialog(szDir, m_hWnd)){
 			SetDlgItemText(m_hWnd, IDC_FILE_PATH_EDIT_BOX, szDir);
 			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 				m_recordingConfiguration[i]->setFilePath(szDir);

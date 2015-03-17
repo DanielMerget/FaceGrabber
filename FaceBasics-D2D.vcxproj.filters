@@ -10,9 +10,6 @@
     <ClCompile Include="PCLViewer.cpp">
       <Filter>PCL Viewer</Filter>
     </ClCompile>
-    <ClCompile Include="WindowsApplication.cpp">
-      <Filter>WindowsApp</Filter>
-    </ClCompile>
     <ClCompile Include="PCLInputReader.cpp">
       <Filter>InputReader</Filter>
     </ClCompile>
@@ -64,6 +61,15 @@
     <ClCompile Include="SimpleRecordingConfiguration.cpp">
       <Filter>WindowsApp\Model</Filter>
     </ClCompile>
+    <ClCompile Include="MessageRouterHelper.cpp">
+      <Filter>WindowsApp</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsApplication.cpp">
+      <Filter>WindowsApp</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowsAppDialogHelper.cpp">
+      <Filter>WindowsApp</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -74,9 +80,6 @@
     </ClInclude>
     <ClInclude Include="PCLViewer.h">
       <Filter>PCL Viewer</Filter>
-    </ClInclude>
-    <ClInclude Include="WindowsApplication.h">
-      <Filter>WindowsApp</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>WindowsApp</Filter>
@@ -137,6 +140,15 @@
     </ClInclude>
     <ClInclude Include="IRecordingConfiguration.h">
       <Filter>WindowsApp\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageRouterHelper.h">
+      <Filter>WindowsApp</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowsApplication.h">
+      <Filter>WindowsApp</Filter>
+    </ClInclude>
+    <ClInclude Include="WindowsAppDialogHelper.h">
+      <Filter>WindowsApp</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

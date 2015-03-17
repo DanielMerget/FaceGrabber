@@ -1,8 +1,7 @@
 #include "WindowsApplication.h"
-#include <Commdlg.h>
+
 
 WindowsApplication::WindowsApplication() :
-	m_hWnd(NULL),
 	m_nStartTime(0),
 	m_nLastCounter(0),
 	m_nFramesSinceUpdate(0),
@@ -71,7 +70,7 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 		NULL,
 		MAKEINTRESOURCE(IDD_APP_TAB),
 		NULL,
-		(DLGPROC)WindowsApplication::MessageRouter,
+		(DLGPROC)MessageRouterHelper::MessageRouter,
 		reinterpret_cast<LPARAM>(this));
 
 	// Show window
@@ -100,36 +99,6 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	return static_cast<int>(msg.wParam);
 }
 
-
-/// <summary>
-/// Handles window messages, passes most to the class instance to handle
-/// </summary>
-/// <param name="hWnd">window message is for</param>
-/// <param name="uMsg">message</param>
-/// <param name="wParam">message data</param>
-/// <param name="lParam">additional message data</param>
-/// <returns>result of message processing</returns>
-LRESULT CALLBACK WindowsApplication::MessageRouter(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-	WindowsApplication* pThis = nullptr;
-
-	if (WM_INITDIALOG == uMsg)
-	{
-		pThis = reinterpret_cast<WindowsApplication*>(lParam);
-		SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pThis));
-	}
-	else
-	{
-		pThis = reinterpret_cast<WindowsApplication*>(::GetWindowLongPtr(hWnd, GWLP_USERDATA));
-	}
-
-	if (pThis)
-	{
-		return pThis->DlgProc(hWnd, uMsg, wParam, lParam);
-	}
-
-	return 0;
-}
 
 void WindowsApplication::imageUpdated(const unsigned char *data, unsigned width, unsigned height)
 {
@@ -208,7 +177,7 @@ void WindowsApplication::onCreate()
 		NULL,
 		MAKEINTRESOURCE(IDC_TAB_RECORD),
 		m_hWnd,
-		(DLGPROC)RecordTabHandler::MessageRouterTab,
+		(DLGPROC)MessageRouterHelper::MessageRouter,
 		reinterpret_cast<LPARAM>(&m_recordTabHandler));
 	m_recordTabHandler.colorConfigurationChanged.connect(boost::bind(&WindowsApplication::colorStreamingChangedTo, this, _1));
 	m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1));
@@ -220,7 +189,7 @@ void WindowsApplication::onCreate()
 		NULL,
 		MAKEINTRESOURCE(IDC_TAB_PLAYBACK),
 		m_hWnd,
-		(DLGPROC)PlaybackTabHandler::MessageRouterTab,
+		(DLGPROC)MessageRouterHelper::MessageRouter,
 		reinterpret_cast<LPARAM>(&m_plackBackTabHandler));
 	ShowWindow(m_playbackTabHandle, SW_HIDE);
 	m_plackBackTabHandler.startPlayback.connect(boost::bind(&WindowsApplication::startPlayback, this, _1, _2));
@@ -230,7 +199,7 @@ void WindowsApplication::onCreate()
 		NULL,
 		MAKEINTRESOURCE(IDC_TAB_CONVERT),
 		m_hWnd,
-		(DLGPROC)ConvertTabHandler::MessageRouterTab,
+		(DLGPROC)MessageRouterHelper::MessageRouter,
 		reinterpret_cast<LPARAM>(&m_convertTabHandler));
 	ShowWindow(m_convertTabHandle, SW_HIDE);
 
@@ -304,79 +273,39 @@ void WindowsApplication::onCreate()
 	//m_bufferSynchronizer.setBuffer(buffers);
 }
 
-LRESULT CALLBACK WindowsApplication::DlgProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+void WindowsApplication::onTabSelected(int page)
 {
-	UNREFERENCED_PARAMETER(wParam);
-	UNREFERENCED_PARAMETER(lParam);
-
-	switch (message)
-	{
-	case WM_INITDIALOG:
-		// Bind application window handle
-		m_hWnd = hWnd;
-		onCreate();
-		break;
-
-		// If the titlebar X is clicked, destroy app
-	case WM_CLOSE:
-		DestroyWindow(hWnd);
-		m_pclFaceViewer->stopViewer();
-		break;
-
-	case WM_DESTROY:
-		// Quit the main message pump
-		//m_listView.OnDestroy(m_hWnd);
-		PostQuitMessage(0);
-		break;
-	case WM_COMMAND:
-		processUIMessage(wParam, lParam);
-		break;
-	case WM_NOTIFY:
-		switch (((LPNMHDR)lParam)->code)
-		{
-		case TCN_SELCHANGE:
-			int iPage = TabCtrl_GetCurSel(GetDlgItem(m_hWnd, IDC_TAB2));
-			if (iPage == 0){
-				if (m_plackBackTabHandler.isPlaybackRunning()){
-					TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 1);
-				}
-				else{
-					onRecordTabSelected();
-				}
-				
-			}
-			else if(iPage == 1){
-				if (m_recordTabHandler.isRecording()){
-					TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 0);
-				}
-				else{
-					onPlaybackSelected();
-				}
-				
-			}else if (iPage == 2){
-				if (m_recordTabHandler.isRecording()){
-					TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 0);
-				}
-				else if (m_plackBackTabHandler.isPlaybackRunning()){
-					TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 1);
-				}
-				else{
-					onConvertTabSelected();
-				}
-			}
-
-			break;
+	int iPage = TabCtrl_GetCurSel(GetDlgItem(m_hWnd, IDC_TAB2));
+	if (iPage == 0){
+		if (m_plackBackTabHandler.isPlaybackRunning()){
+			TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 1);
 		}
-	
-		default:
-			break;
-		
-		break;
+		else{
+			onRecordTabSelected();
+		}
 
 	}
-	return FALSE;
-}
+	else if (iPage == 1){
+		if (m_recordTabHandler.isRecording()){
+			TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 0);
+		}
+		else{
+			onPlaybackSelected();
+		}
 
+	}
+	else if (iPage == 2){
+		if (m_recordTabHandler.isRecording()){
+			TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 0);
+		}
+		else if (m_plackBackTabHandler.isPlaybackRunning()){
+			TabCtrl_SetCurSel(GetDlgItem(m_hWnd, IDC_TAB2), 1);
+		}
+		else{
+			onConvertTabSelected();
+		}
+	}
+}
 void WindowsApplication::connectInputReaderToViewer()
 {
 	m_bufferSynchronizer.cloudsUpdated.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
@@ -564,50 +493,6 @@ void WindowsApplication::colorStreamingChangedTo(bool enable)
 
 
 
-void WindowsApplication::onSelectionChanged(WPARAM wParam, LPARAM handle)
-{
-
-	switch (LOWORD(wParam))
-	{
-	default:
-		break;
-	}
-}
-void WindowsApplication::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
-{
-
-	switch (LOWORD(wParam))
-	{
-	default:
-		break;
-	}
-}
-
-void WindowsApplication::onButtonClicked(WPARAM wParam, LPARAM handle)
-{
-	switch (LOWORD(wParam))
-	{
-	default:
-		break;
-	}
-}
-void WindowsApplication::processUIMessage(WPARAM wParam, LPARAM handle)
-{
-
-	switch (HIWORD(wParam))
-	{
-	case CBN_SELCHANGE:
-		onSelectionChanged(wParam, handle);
-		break;
-	case BN_CLICKED:
-		onButtonClicked(wParam, handle);
-		break;
-	case EN_CHANGE:
-		onEditBoxeChanged(wParam, handle);
-	default:
-		break;
-	}
-}
 
 bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce)
 {
@@ -626,67 +511,3 @@ bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce
 }
 
 
-void WindowsApplication::recordPathChanged(RecordCloudType type)
-{
-
-}
-
-void WindowsApplication::recordConfigurationStatusChanged(RecordCloudType type, bool newState)
-{
-	
-}
-
-
-
-
-bool WindowsApplication::openFileDialog(WCHAR* szDir, HWND handle)
-{
-	OPENFILENAME ofn;
-	ZeroMemory(&ofn, sizeof(ofn));
-
-	// Initialize OPENFILENAME
-	ZeroMemory(&ofn, sizeof(ofn));
-	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = handle;
-	ofn.lpstrFile = szDir;
-
-	// Set lpstrFile[0] to '\0' so that GetOpenFileName does not
-	// use the contents of szFile to initialize itself.
-	ofn.lpstrFile[0] = '\0';
-	ofn.nMaxFile = MAX_PATH;
-	ofn.lpstrFilter = L"ply\0*.ply\0pcd\0*.pcd\0";
-	ofn.nFilterIndex = 1;
-	ofn.lpstrFileTitle = NULL;
-	ofn.nMaxFileTitle = 0;
-	ofn.lpstrInitialDir = NULL;
-	ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
-
-	if (GetOpenFileName(&ofn))
-	{
-		// Do something usefull with the filename stored in szFileName 
-		return true;
-	}
-	return false;
-}
-
-bool WindowsApplication::openDirectoryDialog(WCHAR* szDir, HWND handle)
-{
-	BROWSEINFO bInfo;
-	bInfo.hwndOwner = handle;
-	bInfo.pidlRoot = NULL;
-	bInfo.pszDisplayName = szDir; // Address of a buffer to receive the display name of the folder selected by the user
-	bInfo.lpszTitle = L"Please, select a output folder"; // Title of the dialog
-	bInfo.ulFlags = BIF_USENEWUI;
-	bInfo.lpfn = NULL;
-	bInfo.lParam = 0;
-	bInfo.iImage = -1;
-
-	LPITEMIDLIST lpItem = SHBrowseForFolder(&bInfo);
-	if (lpItem != NULL)
-	{
-		if (SHGetPathFromIDList(lpItem, szDir)){
-			return true;
-		}
-	}
-	return false;
-}

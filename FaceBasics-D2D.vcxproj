@@ -28,6 +28,7 @@
     <ClCompile Include="ImageRenderer.cpp" />
     <ClCompile Include="KinectCloudOutputWriter.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="MessageRouterHelper.cpp" />
     <ClCompile Include="NonColouredOutputStreamsUpdater.cpp" />
     <ClCompile Include="OutputStreamsUpdaterStragedy.cpp" />
     <ClCompile Include="PCLInputReader.cpp" />
@@ -39,6 +40,7 @@
     <ClCompile Include="RecordTabHandler.cpp" />
     <ClCompile Include="SimpleRecordingConfiguration.cpp" />
     <ClCompile Include="SingleProducerBuffer.cpp" />
+    <ClCompile Include="WindowsAppDialogHelper.cpp" />
     <ClCompile Include="WindowsApplication.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +60,7 @@
     <ClInclude Include="KinectHDFaceGrabber.h" />
     <ClInclude Include="ImageRenderer.h" />
     <ClInclude Include="KinectCloudOutputWriter.h" />
+    <ClInclude Include="MessageRouterHelper.h" />
     <ClInclude Include="NonColouredOutputStreamsUpdater.h" />
     <ClInclude Include="OutputStreamsUpdaterStragedy.h" />
     <ClInclude Include="PCLInputReader.h" />
@@ -71,6 +74,7 @@
     <ClInclude Include="SimpleRecordingConfiguration.h" />
     <ClInclude Include="SingleProducerBuffer.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="WindowsAppDialogHelper.h" />
     <ClInclude Include="WindowsApplication.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
