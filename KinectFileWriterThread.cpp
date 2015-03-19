@@ -22,11 +22,8 @@ KinectFileWriterThread< PointCloudType >::~KinectFileWriterThread()
 {
 }
 
-
-//
 template < typename PointCloudType >
-//void KinectFileWriterThread<PointCloudType>::writeCloudToFile(int index, RecordingFileFormat recordingFileFormat, std::string filePath, std::string fileName)
-void KinectFileWriterThread<PointCloudType>::writeCloudToFile(int index, IRecordingConfigurationPtr recordingConfiguration)
+void KinectFileWriterThread<PointCloudType>::writeCloudToFile(IRecordingConfigurationPtr recordingConfiguration)
 {
 	auto recordingFileFormat =	recordingConfiguration->getRecordFileFormat();
 	auto filePath =				recordingConfiguration->getFullRecordingPathString();

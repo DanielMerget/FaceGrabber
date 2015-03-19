@@ -19,6 +19,12 @@
 #include "ConvertTabHandler.h"
 #include <thread>
 
+/**
+ * \class	WindowsApplication for the UI, user inputs and management of the model classes
+ *
+ * \brief	The windows application holds the KinectHDFaceGrabber, FileReader and Writer and processes
+ * 			the users input.
+ */
 
 class WindowsApplication : public MessageRouterHelper
 {
@@ -32,13 +38,36 @@ public:
 	int	run(HINSTANCE hInstance, int nCmdShow);
 
 private:
+
+	/**
+	 * \fn	void WindowsApplication::onCreate();
+	 *
+	 * \brief	Creates the entire UI, model objects and connects them via signals.
+	 */
+
 	void onCreate();
 
-	
+	/**
+	 * \fn	void WindowsApplication::onTabSelected(int page);
+	 *
+	 * \brief	shows and/or hides the the tabs and reconnects the signals.
+	 *
+	 * \param	page	The page.
+	 */
+
 	void onTabSelected(int page);
-	
+
+	/**
+	 * \fn	SharedRecordingConfiguration WindowsApplication::initRecordDataModel();
+	 *
+	 * \brief	Initialises the RecordingConfiguration for the RecordTabHandler class.
+	 *
+	 * \return	A SharedRecordingConfiguration.
+	 */
+
 	SharedRecordingConfiguration initRecordDataModel();
 
+	
 	void onPlaybackFinished();
 	void onPlaybackSelected();
 	void onConvertTabSelected();

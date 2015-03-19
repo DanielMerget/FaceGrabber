@@ -370,3 +370,4 @@ Debug/
 *.ply
 *.pcd
 *.opensdf
+*.ipch

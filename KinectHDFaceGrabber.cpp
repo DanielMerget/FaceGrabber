@@ -38,17 +38,13 @@ static const DWORD c_FaceFrameFeatures =
     | FaceFrameFeatures::FaceFrameFeatures_FaceEngagement;
 
 
-/// <summary>
-/// Constructor
-/// </summary>
 KinectHDFaceGrabber::KinectHDFaceGrabber() :
     m_pKinectSensor(nullptr),
     m_pCoordinateMapper(nullptr),
 	m_pColorFrameReader(nullptr),
     m_pDrawDataStreams(nullptr),
     m_pBodyFrameReader(nullptr),
-	m_pDepthFrameReader(nullptr),
-	m_depthImageProcessed(true)
+	m_pDepthFrameReader(nullptr)
 {
     for (int i = 0; i < BODY_COUNT; i++)
     {
@@ -57,11 +53,6 @@ KinectHDFaceGrabber::KinectHDFaceGrabber() :
     }
 }
 
-//// Direct2D
-ImageRenderer*				m_pDrawDataStreams;
-/// <summary>
-/// Destructor
-/// </summary>
 KinectHDFaceGrabber::~KinectHDFaceGrabber()
 {
     // clean up Direct2D renderer
@@ -240,17 +231,9 @@ HRESULT KinectHDFaceGrabber::initHDFaceReader()
 		SafeRelease(pBodyFrameSource);
 	}
 
-	
-	if (SUCCEEDED(hr)){
-		//std::thread updateThread(&KinectHDFaceGrabber::updateDepthCloud, this);
-		//updateThread.detach();
-	}
 	return hr;
 }
-/// <summary>
-/// Initializes the default Kinect sensor
-/// </summary>
-/// <returns>S_OK on success else the failure code</returns>
+
 HRESULT KinectHDFaceGrabber::initializeDefaultSensor()
 {
     HRESULT hr;
@@ -262,10 +245,7 @@ HRESULT KinectHDFaceGrabber::initializeDefaultSensor()
     }
 	
     if (m_pKinectSensor)
-    {
-        // Initialize Kinect and get color, body and face readers
-        
-        
+    {        
 		IMultiSourceFrameReader* reader;
 		
         hr = m_pKinectSensor->Open();
@@ -297,34 +277,14 @@ HRESULT KinectHDFaceGrabber::initializeDefaultSensor()
     return hr;
 }
 
-/// <summary>
-/// Main processing function
-/// </summary>
 void KinectHDFaceGrabber::update()
 {
 	if (!m_pColorFrameReader || !m_pBodyFrameReader){
 		return;
 	}
 
-	//m_depthImageProcessedLock.lock();
-	//if (!m_depthImageProcessed){
-	//	OutputDebugString(L"discarding\n");
-	//	m_depthImageProcessedLock.unlock();
-	//	return;
-	//}
-	//m_depthImageProcessedLock.unlock();
-	//OutputDebugString(L"got the lock\n");
-
 	bool produce[BODY_COUNT] = { false };
-	
-	//std::unique_lock<std::mutex> lock(m_depthBufferMutex);
-	//if (!m_depthBufferMutex.try_lock()){
-	//	//conversion is done on a seperate thread => conversion thread still working on old buffer
-	//	//discard this frame and try with next one
-	//	OutputDebugString(L"discarding\n");
-	//	return;
-	//}
-	
+
     IColorFrame* pColorFrame = nullptr;
     HRESULT hr = m_pColorFrameReader->AcquireLatestFrame(&pColorFrame);
 
@@ -351,140 +311,16 @@ void KinectHDFaceGrabber::update()
 		}
 		if (SUCCEEDED(hr)){
 			updateHDFaceAndColor();
-			//const unsigned *data, unsigned width, unsigned height)
-			//imageUpdated(reinterpret_cast<unsigned char*>(m_colorBuffer.data()), m_colorWidth, m_colorHeight);
 		}
-		
-		
-        //if (SUCCEEDED(hr)){
-		//	std::lock_guard<std::mutex> lock(m_depthBufferMutex);
-			
-		//	updateDepthCloud();
-		//	//std::async(std::launch::async, &KinectHDFaceGrabber::updateDepthCloud, this);
-		//	
-		//	//std::async
-		//	std::thread depthThread(&KinectHDFaceGrabber::updateDepthCloud, this);
-		//	depthThread.detach();
-        //}
-		
+				
 	}
 	
-	//m_depthBufferMutex.unlock();
-	//m_bufferCondVariable.notify_all();
 	SafeRelease(depthFrame);
 	SafeRelease(pColorFrame);  
 }
 
 
 
-void KinectHDFaceGrabber::updateDepthCloud()
-{
-	while (true){
-		std::unique_lock<std::mutex> lock(m_depthBufferMutex);
-		m_bufferCondVariable.wait(lock);
-		
-		m_depthImageProcessedLock.lock();
-		m_depthImageProcessed = false;
-		m_depthImageProcessedLock.unlock();
-
-		LARGE_INTEGER before = { 0 };
-		QueryPerformanceCounter(&before);
-	
-
-		
-		//std::vector<CameraSpacePoint> depthPointsInCameraSpace(m_depthBuffer.size());
-		//std::vector<ColorSpacePoint> renderPoints(vertex);
-		//m_pCoordinateMapper->MapDepthFrameToCameraSpace(m_depthBuffer.size(), m_depthBuffer.data(), depthPointsInCameraSpace.size(), depthPointsInCameraSpace.data());
-		auto cloud = convertDepthBufferToPointCloud();
-
-		LARGE_INTEGER afterCopy = { 0 };
-		QueryPerformanceCounter(&afterCopy);
-		double time1 = afterCopy.QuadPart - before.QuadPart;
-		//618452
-		//759616
-		m_depthImageProcessedLock.lock();
-		m_depthImageProcessed = true;
-		m_depthImageProcessedLock.unlock();
-
-		depthCloudUpdated(cloud);
-
-		LARGE_INTEGER last = { 0 };
-		QueryPerformanceCounter(&last);
-
-		double time2 = last.QuadPart - afterCopy.QuadPart;
-		std::cout << "time1" << time1 << "time: " << time2 << std::endl;
-		std::wstring result = L"time1: ";
-		result += time1;
-		result += L"\ntime2:";
-		result += time2;
-		result += L"\n";
-		_In_z_ WCHAR* szMessage = &result[0];
-		OutputDebugString(szMessage);	
-	}
-}
-
-
-pcl::PointCloud<pcl::PointXYZRGB>::Ptr KinectHDFaceGrabber::convertDepthBufferToPointCloud()
-{
-
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr pointCloud(new pcl::PointCloud<pcl::PointXYZRGB>());
-	pointCloud->width = static_cast<uint32_t>(m_depthWidth);
-	pointCloud->height = static_cast<uint32_t>(m_depthHeight);
-	pointCloud->is_dense = false;
-	HRESULT hr;
-	for (int y = 0; y < m_depthHeight; y++){
-		for (int x = 0; x < m_depthWidth; x++){
-			pcl::PointXYZRGB point;
-			DepthSpacePoint depthPoint;
-			depthPoint.X = static_cast<float>(x);
-			depthPoint.Y = static_cast<float>(y);
-			UINT16 depthOfCurrentPoint = m_depthBuffer[y * m_depthWidth + x];
-
-			ColorSpacePoint colorPoint;
-			hr = m_pCoordinateMapper->MapDepthPointToColorSpace(depthPoint, depthOfCurrentPoint, &colorPoint);
-			if (FAILED(hr)){
-				continue;
-			}
-			int colorPixelMidX = static_cast<int>(std::floor(colorPoint.X + 0.5f));
-			int colorPixelMidY = static_cast<int>(std::floor(colorPoint.Y + 0.5f));
-			bool isInColor = false;
-			if ((0 <= colorPixelMidX) && (colorPixelMidX < m_colorWidth) && (0 <= colorPixelMidY) && (colorPixelMidY < m_colorHeight)){
-				RGBQUAD color = m_colorBuffer[colorPixelMidY * m_colorWidth + colorPixelMidX];
-				point.b = color.rgbBlue;
-				point.g = color.rgbGreen;
-				point.r = color.rgbRed;
-				isInColor = true;
-			}
-			
-			CameraSpacePoint camPoint;
-			hr = m_pCoordinateMapper->MapDepthPointToCameraSpace(depthPoint, depthOfCurrentPoint, &camPoint);
-
-			if (FAILED(hr)){
-				continue;
-			}
-			bool isInDepth = false;
-			if ((0 <= colorPixelMidX) && (colorPixelMidX < m_colorWidth) && (0 <= colorPixelMidY) && (colorPixelMidY < m_colorHeight)){
-				point.x = camPoint.X;
-				point.y = camPoint.Y;
-				point.z = camPoint.Z;
-				isInDepth = true;
-			}
-			if (isInColor && isInDepth){
-				pointCloud->push_back(point);
-			}
-		}
-	}
-	return pointCloud;
-}
-
-
-/// <summary>
-/// Renders the color and face streams
-/// </summary>
-/// <param name="nTime">timestamp of frame</param>
-/// <param name="pBuffer">pointer to frame data</param>
-/// <param name="nWidth">width (in pixels) of input image data</param>
-/// <param name="nHeight">height (in pixels) of input image data</param>
 void KinectHDFaceGrabber::updateHDFaceAndColor()
 {
 
@@ -556,9 +392,6 @@ void KinectHDFaceGrabber::updateFaceModelStatusOfFaceModelBuilder(IFaceModelBuil
 	}
 }
 
-/// <summary>
-/// Processes new face frames
-/// </summary>
 void KinectHDFaceGrabber::processFaces()
 {
     HRESULT hr;
@@ -616,12 +449,7 @@ ICoordinateMapper* KinectHDFaceGrabber::getCoordinateMapper()
 	return m_pCoordinateMapper;
 }
 
-/// <summary>
-/// Updates body data
-/// </summary>
-/// <param name="ppBodies">pointer to the body data storage</param>
-/// <returns>indicates success or failure</returns>
-HRESULT KinectHDFaceGrabber::updateBodyData(IBody** ppBodies)
+HRESULT KinectHDFaceGrabber::updateBodyData(IBody** body)
 {
     HRESULT hr = E_FAIL;
 
@@ -631,7 +459,7 @@ HRESULT KinectHDFaceGrabber::updateBodyData(IBody** ppBodies)
         hr = m_pBodyFrameReader->AcquireLatestFrame(&pBodyFrame);
         if (SUCCEEDED(hr))
         {
-            hr = pBodyFrame->GetAndRefreshBodyData(BODY_COUNT, ppBodies);
+			hr = pBodyFrame->GetAndRefreshBodyData(BODY_COUNT, body);
         }
         SafeRelease(pBodyFrame);    
     }

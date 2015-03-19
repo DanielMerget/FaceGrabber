@@ -54,10 +54,10 @@ void ConvertTabHandler::onCreate()
 	m_playbackConfiguration->playbackConfigurationChanged.connect(boost::bind(&ConvertTabHandler::playbackConfigurationChanged, this));
 	//m_recordingConfiguration->recordConfigurationStatusChanged.connect(boost::bind(&ConvertTabHandler::recordingConfigurationChanged, this));
 
-	m_colorBufferSynchronizer = std::shared_ptr<ColorBufferSynchronizer>(new ColorBufferSynchronizer);
+	m_colorBufferSynchronizer = std::shared_ptr<ColorBufferSynchronizer>(new ColorBufferSynchronizer(false));
 	m_colorBufferSynchronizerThread = std::thread(&ColorBufferSynchronizer::updateThreadFunc, m_colorBufferSynchronizer);
 
-	m_nonColorBufferSynchronizer = std::shared_ptr<NonColorBufferSynchronizer>(new NonColorBufferSynchronizer);
+	m_nonColorBufferSynchronizer = std::shared_ptr<NonColorBufferSynchronizer>(new NonColorBufferSynchronizer(false));
 	m_nonColorBufferSynchronizerThread = std::thread(&NonColorBufferSynchronizer::updateThreadFunc, m_nonColorBufferSynchronizer);
 }
 
@@ -134,8 +134,8 @@ void ConvertTabHandler::initColoredConversionPipeline()
 	m_colorBufferSynchronizer->setBuffer(buffers, m_playbackConfiguration->getCloudFilesToPlayCount());
 
 
-	m_colorBufferSynchronizer->cloudsUpdated.connect(
-		boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudsThreated, m_colorWriter, _1));
+	m_colorBufferSynchronizer->publishSynchronizedData.connect(
+		boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::pushCloudsThreated, m_colorWriter, _1));
 	m_colorWriter->updateStatus.connect(boost::bind(&ConvertTabHandler::updateWriterStatus, this, _1));
 
 	m_colorWriter->writingWasStopped.connect(boost::bind(&ConvertTabHandler::notifyWriterFinished, this));
@@ -159,8 +159,8 @@ void ConvertTabHandler::nonColoredConversionPipeline()
 
 	m_nonColorBufferSynchronizer->setBuffer(buffers, m_playbackConfiguration->getCloudFilesToPlayCount());
 
-	m_nonColorBufferSynchronizer->cloudsUpdated.connect(
-		boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudsThreated, m_nonColorWriter, _1));
+	m_nonColorBufferSynchronizer->publishSynchronizedData.connect(
+		boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::pushCloudsThreated, m_nonColorWriter, _1));
 
 	
 

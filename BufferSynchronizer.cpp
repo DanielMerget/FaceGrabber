@@ -7,8 +7,9 @@ template BufferSynchronizer < pcl::PointCloud< pcl::PointXYZRGB>::Ptr >;
 template BufferSynchronizer < pcl::PointCloud< pcl::PointXYZ>::Ptr >;
 
 template < class BufferDataType >
-BufferSynchronizer< BufferDataType >::BufferSynchronizer() :
-	m_isDataAvaiable(false)
+BufferSynchronizer< BufferDataType >::BufferSynchronizer(bool simulatePlaybackByWaitingEachFrame) :
+	m_isDataAvaiable(false),
+	m_waitEachFrame(simulatePlaybackByWaitingEachFrame)
 	//m_printMutex(new std::mutex),
 	//m_updateBuffer(new std::mutex),
 	//m_isDataAvailableConditionVariable(new std::condition_variable)
@@ -30,14 +31,6 @@ void BufferSynchronizer< BufferDataType >::onApplicationQuit()
 	m_isRunning = false;
 	m_isDataAvailableConditionVariable.notify_all();
 }
-
-//void BufferSynchronizer::stop() 
-//{
-//	std::unique_lock<std::mutex> lock(m_updateBuffer);
-//	m_isRunning = false;
-//	m_isDataAvailableConditionVariable.notify_all();
-//}
-
 
 template < class BufferDataType >
 void BufferSynchronizer< BufferDataType >::printMessage(std::string msg)
@@ -85,18 +78,20 @@ void BufferSynchronizer< BufferDataType >::updateThreadFunc()
 				printMessage("synchronier updating");
 				m_numOfFilesRead++;
 
-				cloudsUpdated(readyPointClouds);
+				publishSynchronizedData(readyPointClouds);
 				std::wstringstream message;
 				message << "play: " << m_numOfFilesRead << "/" << m_numOfFilesToRead;
 				updateStatus(message.str());
 			}
 
 			
+			if (m_waitEachFrame){
+				printMessage("synchronier sleepig");
+				std::chrono::milliseconds dura(80);
+				std::this_thread::sleep_for(dura);
+				printMessage("synchronier woke up");
+			}
 			
-			printMessage("synchronier sleepig");
-			std::chrono::milliseconds dura(80);
-			std::this_thread::sleep_for(dura);
-			printMessage("synchronier woke up");
 		}
 		printMessage("synchronier stopping");
 		if (m_numOfFilesToRead == m_numOfFilesRead){

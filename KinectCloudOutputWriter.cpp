@@ -9,7 +9,6 @@ template KinectCloudOutputWriter < pcl::PointXYZ >;
 template < class PointCloudType >
 KinectCloudOutputWriter< PointCloudType >::KinectCloudOutputWriter() :
 	m_running(false),
-	m_notified(false),
 	m_cloudCount(0),
 	m_clouds(),
 	m_writerThreads()
@@ -49,7 +48,7 @@ void KinectCloudOutputWriter< PointCloudType >::startWritingClouds()
 		std::shared_ptr<KinectFileWriterThread< PointCloudType >> writer(new KinectFileWriterThread< PointCloudType >);
 		writer->setKinectCloudOutputWriter(this);
 		m_writers.push_back(writer);
-		m_writerThreads.push_back(std::thread(&KinectFileWriterThread< PointCloudType >::writeCloudToFile, writer, i, m_recordingConfiguration));
+		m_writerThreads.push_back(std::thread(&KinectFileWriterThread< PointCloudType >::writeCloudToFile, writer, m_recordingConfiguration));
 	}
 
 	std::async(std::launch::async, &KinectCloudOutputWriter::waitForWriterToFinish, this);
@@ -121,14 +120,14 @@ void KinectCloudOutputWriter<PointCloudType>::pushCloud(boost::shared_ptr<const 
 	}
 }
 template < typename PointCloudType >
-void KinectCloudOutputWriter< PointCloudType >::updateCloudsThreated(std::vector<boost::shared_ptr<pcl::PointCloud<PointCloudType>>> clouds)
+void KinectCloudOutputWriter< PointCloudType >::pushCloudsThreated(std::vector<boost::shared_ptr<pcl::PointCloud<PointCloudType>>> clouds)
 {
 	for (auto cloud : clouds){
-		updateCloudThreated(cloud);
+		pushCloudThreated(cloud);
 	}
 }
 template < typename PointCloudType >
-void KinectCloudOutputWriter< PointCloudType >::updateCloudThreated(boost::shared_ptr<pcl::PointCloud<PointCloudType>> cloud)
+void KinectCloudOutputWriter< PointCloudType >::pushCloudThreated(boost::shared_ptr<pcl::PointCloud<PointCloudType>> cloud)
 {
 	if (!m_running){
 		return;

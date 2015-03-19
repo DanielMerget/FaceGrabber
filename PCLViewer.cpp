@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "PCLViewer.h"
 #include <future>
+#include <Windows.h>
 
 PCLViewer::PCLViewer(int cloudCount, std::string viewerName) :
 	m_cloudCount(cloudCount),
@@ -55,15 +56,7 @@ void PCLViewer::updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB
 	m_cloudUpdate.notify_all();
 }
 
-void PCLViewer::updateNonColoredCloudThreated(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int index)
-{
-	std::async(std::launch::async, &PCLViewer::pushNewNonColoredCloudAtIndex, this, cloud, index);
-}
-void PCLViewer::updateColoredCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, int index)
-{
-	std::async(std::launch::async, &PCLViewer::pushNewColoredCloudAtIndex, this, cloud, index);
-}
-#include <Windows.h>
+
 void PCLViewer::pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, int index)
 {
 	if (!cloud){
@@ -153,14 +146,10 @@ void PCLViewer::matchPointCloudsToViewPorts(pcl::visualization::PCLVisualizer::P
 }
 void PCLViewer::updateLoop()
 {
-	//static std::mutex constructorLock;
-	//constructorLock.lock();
-	//pcl::visualization::PCLVisualizer viewer(m_viewerName);
+
 	std::chrono::milliseconds dura(100);
 	pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer(m_viewerName));
-	//int viewPortID1;
-	//int viewPortID2;
-	
+
 	createViewPortsForViewer(viewer);
 
 	{
@@ -174,8 +163,6 @@ void PCLViewer::updateLoop()
 		if (!m_isRunning){
 			return;
 		}
-		//matchPointCloudsToViewPorts(viewer);
-
 	}
 	matchPointCloudsToViewPorts(viewer);
 	

@@ -7,7 +7,6 @@ template Buffer < pcl::PointCloud< pcl::PointXYZRGB>::Ptr >;
 template Buffer < pcl::PointCloud< pcl::PointXYZ>::Ptr >;
 template Buffer < std::shared_ptr<PointCloudMeasurement<pcl::PointXYZRGB>> > ;
 template Buffer < std::shared_ptr<PointCloudMeasurement<pcl::PointXYZ>> > ;
-//template KinectCloudOutputWriter < pcl::PointXYZRGB >;
 
 template < class DataType >
 Buffer< DataType >::Buffer() :
@@ -19,7 +18,7 @@ Buffer< DataType >::Buffer() :
 	m_pullDataPosition(0),
 	m_producerFinished(false),
 	m_bufferingActive(true),
-	m_resetDataAfterPull(false),
+	m_releaseDataAfterPull(false),
 	m_bufferFillLevel(0)
 {
 }
@@ -54,9 +53,9 @@ void Buffer< DataType >::resetPullCounterAndPullAndNotifyConsumer()
 }
 
 template < class DataType >
-bool Buffer< DataType >::isResetDataAfterPullEnabled()
+bool Buffer< DataType >::isDataReleasedAfterPull()
 {
-	return m_resetDataAfterPull;
+	return m_releaseDataAfterPull;
 }
 
 template < class DataType >
@@ -120,9 +119,9 @@ bool Buffer< DataType >::isDataAvailable()
 }
 
 template < class DataType >
-void Buffer< DataType >::setResetDataAfterPull(bool enable)
+void Buffer< DataType >::setReleaseDataAfterPull(bool enable)
 {
-	m_resetDataAfterPull = enable;
+	m_releaseDataAfterPull = enable;
 }
 
 template < class DataType >
@@ -141,7 +140,7 @@ DataType Buffer< DataType >::pullData()
 	}
 	 auto result = m_cloudBuffer[m_pullDataPosition];
 	 m_bufferFillLevel--;
-	 if (m_resetDataAfterPull){
+	 if (m_releaseDataAfterPull){
 		 m_cloudBuffer[m_pullDataPosition].reset();
 	 }
 	 m_pullDataPosition = (m_pullDataPosition + 1) % m_cloudBuffer.size();
@@ -155,7 +154,7 @@ bool Buffer< DataType >::isBufferAtIndexSet(const int index)
 	if (index >= m_cloudBuffer.size()){
 		return false;
 	}
-	if (!m_resetDataAfterPull){
+	if (!m_releaseDataAfterPull){
 		//we never clear the data after pulling => buffer is always filled
 		//new pushed data is just overrides the old data in the buffer
 		return false;

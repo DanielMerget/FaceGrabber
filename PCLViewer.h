@@ -1,6 +1,5 @@
 #pragma once
 #include "stdafx.h"
-
 #undef max
 #undef min
 #include <pcl/visualization/cloud_viewer.h>
@@ -16,16 +15,17 @@ public:
 	~PCLViewer();
 	
 	void updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clouds);
+
 	void updateNonColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clouds);
 
-
-	void updateColoredCloudThreated(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, int index);
-	void updateNonColoredCloudThreated(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int index);
 	void stopViewer();
+
 	void useColoredCloud(bool useColored);
+
 	void setNumOfClouds(int numOfClouds);
 private:
 	void pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, int index);
+
 	void pushNewNonColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int index);
 
 	void updateLoop();
@@ -39,18 +39,14 @@ private:
 
 	bool m_isRunning;
 	std::string m_viewerName;
-	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>	m_coloredClouds;
+	std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>		m_coloredClouds;
 	std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr>		m_nonColoredClouds;
 
-	//pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr m_currentCloud1;
-	//pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr m_currentCloud2;
 	bool m_viewPortConfigurationChanged;
 	std::mutex m_viewPortConfigurationChangedMutex;
 	std::vector<bool> m_cloudUpdated;
 	std::vector<int> m_viewPorts;
 	std::vector<std::string> m_cloudIDs;
-
-	
 
 	std::thread m_updateThread;
 	std::mutex m_cloudMutex;

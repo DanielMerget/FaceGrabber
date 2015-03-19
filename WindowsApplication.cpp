@@ -5,7 +5,8 @@
 WindowsApplication::WindowsApplication() :
 	m_nNextStatusTime(0),
 	m_isCloudWritingStarted(false),
-	m_isKinectRunning(true)
+	m_isKinectRunning(true),
+	m_bufferSynchronizer(true)
 {
 	
 }
@@ -89,6 +90,14 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	return static_cast<int>(msg.wParam);
 }
 
+/**
+ * \fn	void WindowsApplication::onCreate()
+ *
+ * \brief	Executes the create action.
+ *
+ * \author	Martin
+ * \date	17.03.2015
+ */
 
 void WindowsApplication::onCreate()
 {
@@ -162,8 +171,8 @@ void WindowsApplication::connectStreamUpdaterToViewer()
 		if (i == FullDepthRaw){
 			continue;
 		}
-		m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudThreated, m_nonColoredCloudOutputWriter[i], _1));
-		m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, m_colorCloudOutputWriter[i], _1));
+		m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::pushCloudThreated, m_nonColoredCloudOutputWriter[i], _1));
+		m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::pushCloudThreated, m_colorCloudOutputWriter[i], _1));
 	}
 	m_nonColoredOutputStreamUpdater->cloudsUpdated.connect(boost::bind(&PCLViewer::updateNonColoredClouds, m_pclFaceViewer, _1));
 	m_colouredOutputStreamUpdater->cloudsUpdated.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
@@ -302,14 +311,12 @@ void WindowsApplication::onTabSelected(int page)
 }
 void WindowsApplication::connectInputReaderToViewer()
 {
-	m_bufferSynchronizer.cloudsUpdated.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
+	m_bufferSynchronizer.publishSynchronizedData.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
 }
 
 void WindowsApplication::disconnectInputReaderFromViewer()
 {
-	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		m_inputFileReader[i]->cloudUpdated.disconnect_all_slots();
-	}
+	m_bufferSynchronizer.publishSynchronizedData.disconnect_all_slots();
 }
 
 void WindowsApplication::onRecordTabSelected()
@@ -365,7 +372,7 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 			cloudWriter->setRecordingConfiguration(recordingConfig);
 			if (recordingConfig->isEnabled()){
 				if (i == FullDepthRaw){
-					m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::updateCloudThreated, cloudWriter, _1));
+					m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::pushCloudThreated, cloudWriter, _1));
 				}
 				cloudWriter->startWritingClouds();
 			}
@@ -382,7 +389,7 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 			}
 			if (recordingConfig->isEnabled()){
 				if (i == FullDepthRaw){
-					m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::updateCloudThreated, cloudWriter, _1));
+					m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::pushCloudThreated, cloudWriter, _1));
 				}
 				cloudWriter->startWritingClouds();
 			}

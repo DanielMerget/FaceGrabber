@@ -10,7 +10,6 @@ template PCLInputReader < pcl::PointXYZ>;
 template <typename PointType>
 PCLInputReader< PointType >::PCLInputReader() :
 	m_readerThreads(),
-	m_isPlaybackRunning(false),
 	m_numOfFilesRead(0)
 {
 }
@@ -23,9 +22,6 @@ void PCLInputReader< PointType >::setBuffer(std::shared_ptr<Buffer< boost::share
 template <typename PointType>
 void PCLInputReader< PointType >::join()
 {
-	if (m_updateThread.joinable()){
-		m_updateThread.join();
-	}
 	for (auto& thread : m_readerThreads)
 	{
 		if (thread.joinable()){
@@ -52,7 +48,7 @@ void PCLInputReader< PointType >::startCloudUpdateThread(bool isSingleThreatedRe
 	join();
 
 	//check for ability to reuse our buffer
-	if (!m_buffer->isResetDataAfterPullEnabled() && m_previousPlaybackConfiguration.isEnabled() && m_previousPlaybackConfiguration.wasFullPlayed()){
+	if (!m_buffer->isDataReleasedAfterPull() && m_previousPlaybackConfiguration.isEnabled() && m_previousPlaybackConfiguration.wasFullPlayed()){
 		if (m_playbackConfiguration == m_previousPlaybackConfiguration){
 			m_buffer->resetPullCounterAndPullAndNotifyConsumer();
 			m_playbackConfiguration.setWasFullPlayed();
@@ -67,8 +63,6 @@ void PCLInputReader< PointType >::startCloudUpdateThread(bool isSingleThreatedRe
 	int numOfFilesToRead = m_playbackConfiguration.getCloudFilesToPlay().size();
 
 	m_buffer->setBufferSize(numOfFilesToRead);
-	m_isPlaybackRunning = true;
-	//m_updateThread = std::thread(&PCLInputReader::updateThreadFunc, this);
 	if (isSingleThreatedReadingAndBlocking){
 		startReaderThreads(isSingleThreatedReadingAndBlocking);
 	}
@@ -108,7 +102,6 @@ void PCLInputReader< PointType >::startReaderThreads(bool isSingleThreatedReadin
 	updateStatus(L"");
 	m_numOfFilesRead = 0;
 	m_playbackConfiguration.sortCloudFilesForPlayback();
-	m_isPlaybackRunning = true;
 	m_buffer->enableBuffer();
 	if (isSingleThreatedReadingAndBlocking){
 		createAndStartThreadForIndex(0, 1);
@@ -127,10 +120,6 @@ void PCLInputReader< PointType >::startReaderThreads(bool isSingleThreatedReadin
 template <typename PointType>
 void PCLInputReader< PointType >::stopReaderThreads()
 { 
-	//if (!m_isPlaybackRunning){
-	//	return;
-	//}
-	m_isPlaybackRunning = false;
 	for (auto& reader : m_inputReaderWorkerThreads){
 		reader->stopReading();
 	}
