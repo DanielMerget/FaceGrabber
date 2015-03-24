@@ -105,6 +105,14 @@ void WindowsApplication::onCreate()
 	m_pDrawDataStreams = new ImageRenderer();
 	m_pclFaceViewer = std::shared_ptr<PCLViewer>(new PCLViewer(2, "Face-Viewer"));
 
+	
+	initKinectFrameGrabber();
+	initTabs();
+	initCloudWriter();
+	connectStreamUpdaterToViewer();
+
+	initInputReaderBufferAndSynchronizer();
+
 	HRESULT hr = m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
 
 	if (FAILED(hr))
@@ -112,12 +120,6 @@ void WindowsApplication::onCreate()
 		setStatusMessage(L"Failed to initialize the Direct2D draw device.", true);
 	}
 
-	initKinectFrameGrabber();
-	initTabs();
-	initCloudWriter();
-	connectStreamUpdaterToViewer();
-
-	initInputReaderBufferAndSynchronizer();
 }
 
 int WindowsApplication::insertTabItem(HWND tab, LPTSTR text, int tabid)

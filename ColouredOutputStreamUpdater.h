@@ -26,25 +26,10 @@ public:
 	ColouredOutputStreamUpdater();
 	~ColouredOutputStreamUpdater();
 
-	/**
-	 * \fn	HRESULT ColouredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize, CameraSpacePoint* detectedHDFacePointsCamSpace, ColorSpacePoint* detectedHDFacePointsColorSpace, RGBQUAD* colorBuffer, UINT16* depthBuffer);
-	 *
-	 * \brief	Updates the output streams.
-	 *
-	 * \param [in]	faceModel					  	The face model accociated with the detectedHDFacePointsCamSpace.
-	 * \param [in]	faceAlignment				  	The current faceAlignement of the face model.
-	 * \param	hdFacePointCamSpaceBufferSize	  	Size of the detectedHDFacePointsCamSpace buffer.
-	 * \param [out]	detectedHDFacePointsCamSpace  	the detected HD face points in Cam space to be fil.ed.
-	 *  camera space.
-	 * \param [out]	detectedHDFacePointsColorSpace	the detected HD face points in Color space to be filled.
-	 *  color space.
-	 * \param [in]	colorBuffer					  	The current color buffer.
-	 * \param [in]	depthBuffer					  	The current depth buffer.
-	 *
-	 * \return	A hResult.
-	 */
-	HRESULT updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int hdFacePointCamSpaceBufferSize, CameraSpacePoint* detectedHDFacePointsCamSpace, 
-		ColorSpacePoint* detectedHDFacePointsColorSpace, RGBQUAD* colorBuffer, UINT16* depthBuffer);
+	
+	HRESULT updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize, CameraSpacePoint* detectedHDFacePointsCamSpace, 
+		ColorSpacePoint* detectedHDFacePointsColorSpace);
+
 
 
 	/** \brief	The signal providing HDFace and FaceRaw point clouds if consumer is connected*/
@@ -62,6 +47,10 @@ public:
 	 */
 	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud)> cloudUpdated[3];
 
+	void startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer);
+	void stopFaceCollection();
+
+
 	/**
 	 * \fn	void ColouredOutputStreamUpdater::initialize(ICoordinateMapper* m_pCoordinateMapper, int depthWidth, int depthHeight, int colorWidth, int colorHeight);
 	 *
@@ -77,15 +66,25 @@ public:
 
 private:
 
-	bool extractColouredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack,
-		std::vector<cv::Point2f>& hdFacePointsInColorSpaceSpaceOpenCV, RGBQUAD* colorBuffer, UINT16* depthBuffer, pcl::PointCloud<pcl::PointXYZRGB>::Ptr depthCloud);
+	bool extractColoredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack,
+		std::vector<cv::Point2f>& hdFacePointsInColorSpaceSpaceOpenCV);
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr extractClolouredFaceHDPoinCloudAndBoundingBox(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, 
-		CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV, RGBQUAD* colorBuffer);
+	void extractColoredFaceHDPoinCloudAndBoundingBox(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints, 
+		CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV);
 
-	pcl::PointCloud<pcl::PointXYZRGB>::Ptr convertDepthBufferToPointCloud(RGBQUAD* colorBuffer, UINT16* depthBuffer);
+	void convertDepthBufferToPointCloud();
+
 	
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_HDFacePointCloud;
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_FaceRawPointCloud;
+
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_fullRawPointCloud;
+
 	std::vector<UINT16>				m_pDepthVisibilityTestMap;
 	std::vector<ColorSpacePoint>	m_pColorCoordinates;
+	bool							m_isValidFaceFrame;
+
+	RGBQUAD* m_colorBuffer;
+	UINT16*	m_depthBuffer;
 };
 
