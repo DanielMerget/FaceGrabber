@@ -11,6 +11,14 @@
 #include "PlaybackConfiguration.h"
 #include <boost/signal.hpp>
 
+/**
+ * \class	PlaybackTabHandler
+ *
+ * \brief	The Class handling all events of the user to configure the PlaybackConfiguration.
+ * 			If requested by the user, the playback is triggered by fireing the startPlayback,
+ * 			stopPlayback signals etc.
+ */
+
 class PlaybackTabHandler : public MessageRouterHelper
 {
 public:

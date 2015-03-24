@@ -23,10 +23,32 @@ typedef pcl::PointCloud<pcl::PointXYZ>::Ptr		PointXYZCloud;
 typedef Buffer<PointXYZCloud>					NonColorBuffer;
 typedef BufferSynchronizer<PointXYZCloud>		NonColorBufferSynchronizer;
 
+/**
+ * \class	ConvertTabHandler
+ *
+ * \brief	The class handling user inputs of the conversion tab. Conversion configuration is saved in the
+ * 			PlaybackConfiguration and SimpleRecordingConfiguration data structure. On Request of the user
+ * 			the ConvertTabHandler runs the conversion of files by using an independent dataflow of PCLFileInputReader,
+ * 			Buffer, BufferSynchronizer and KinectCloudFileWriter.
+ * 			
+ */
+
 class ConvertTabHandler : public MessageRouterHelper
 {
 public:
+
+	/**
+	 * \fn	ConvertTabHandler::ConvertTabHandler();
+	 *
+	 * \brief	Default constructor.
+	 */
 	ConvertTabHandler();
+
+	/**
+	 * \fn	ConvertTabHandler::~ConvertTabHandler();
+	 *
+	 * \brief	Destructor.
+	 */
 	~ConvertTabHandler();
 	
 private:

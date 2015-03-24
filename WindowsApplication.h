@@ -23,7 +23,8 @@
  * \class	WindowsApplication for the UI, user inputs and management of the model classes
  *
  * \brief	The windows application holds the KinectHDFaceGrabber, FileReader and Writer and processes
- * 			the users input.
+ * 			the users input. It constructs the Dataflows neccessary for recording and playing the point cloud
+ * 			files.
  */
 class WindowsApplication : public MessageRouterHelper
 {

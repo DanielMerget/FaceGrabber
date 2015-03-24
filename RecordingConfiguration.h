@@ -154,48 +154,162 @@ public:
 	 */
 	std::string getFileNameString();
 
+	/**
+	 * \fn	void RecordingConfiguration::setFileName(CString fileName);
+	 *
+	 * \brief	Sets file name.
+	 *
+	 * \param	fileName	Filename of the file.
+	 */
 	void setFileName(CString fileName);
 
+	/**
+	 * \fn	void RecordingConfiguration::setFilePath(CString filePath);
+	 *
+	 * \brief	Sets file path.
+	 *
+	 * \param	filePath	Full pathname of the file.
+	 */
 	void setFilePath(CString filePath);
 
+	/**
+	 * \fn	void RecordingConfiguration::setEnabled(bool enabled);
+	 *
+	 * \brief	Sets an enabled.
+	 *
+	 * \param	enabled	true to enable, false to disable.
+	 */
 	void setEnabled(bool enabled);
 
+	/**
+	 * \fn	void RecordingConfiguration::setFileFormat(RecordingFileFormat fileFormat);
+	 *
+	 * \brief	Sets file format.
+	 *
+	 * \param	fileFormat	The file format in which to record.
+	 */
 	void setFileFormat(RecordingFileFormat fileFormat);
 
+	/**
+	 * \fn	void RecordingConfiguration::setTimeStampFolderName(CString folderName);
+	 *
+	 * \brief	Sets time stamp folder name.
+	 *
+	 * \param	folderName	Name of the time stamp folder
+	 */
 	void setTimeStampFolderName(CString folderName);
 
+	/**
+	 * \fn	CString RecordingConfiguration::getTimeStampFolderName();
+	 *
+	 * \brief	Gets time stamp folder name.
+	 *
+	 * \return	The time stamp folder name.
+	 */
 	CString getTimeStampFolderName();
 
+	/**
+	 * \fn	CString RecordingConfiguration::getFullRecordingPath();
+	 *
+	 * \brief	Gets full recording path.
+	 *
+	 * \return	The full recording path.
+	 */
 	CString getFullRecordingPath();
 
+	/**
+	 * \fn	std::string RecordingConfiguration::getFullRecordingPathString();
+	 *
+	 * \brief	Gets full recording path as std::string.
+	 *
+	 * \return	The full recording path string.
+	 */
 	std::string getFullRecordingPathString();
-	
+
+	/**
+	 * \fn	static CString RecordingConfiguration::getSubFolderNameForCloudType(RecordCloudType cloudType);
+	 *
+	 * \brief	Gets sub folder name for cloud type.
+	 *
+	 * \param	cloudType	Type of the cloud.
+	 *
+	 * \return	The sub folder name for cloud type.
+	 */
 	static CString getSubFolderNameForCloudType(RecordCloudType cloudType);
 
+	/**
+	 * \fn	static CString RecordingConfiguration::getFullRecordingPathForCloudType(RecordCloudType cloudType, CString outputFolder, CString timeStampFolderName);
+	 *
+	 * \brief	Gets full recording path for the given parameters.
+	 *
+	 * \param	cloudType		   	Type of the cloud.
+	 * \param	outputFolder	   	Path of the output folder.
+	 * \param	timeStampFolderName	the time stamp.
+	 *
+	 * \return	The full recording path for the cloud recording parameters.
+	 */
 	static CString getFullRecordingPathForCloudType(RecordCloudType cloudType, CString outputFolder, CString timeStampFolderName);
 
+	/**
+	 * \fn	int RecordingConfiguration::getThreadCountToStart();
+	 *
+	 * \brief	Gets amount of threads to start.
+	 *
+	 * \return	amount of threads to start
+	 */
 	int getThreadCountToStart();
 
+	/**
+	 * \fn	void RecordingConfiguration::setThreadCountToStart(int threadsCount);
+	 *
+	 * \brief	Sets amount of threads to start.
+	 *
+	 * \param	threadsCount	Number of threads.
+	 */
 	void setThreadCountToStart(int threadsCount);
 
 	boost::signal<void(RecordCloudType, bool)> recordConfigurationStatusChanged;
 	boost::signal<void(RecordCloudType)>	recordPathOrFileNameChanged;
 private:
+
+	/**
+	 * \fn	CString RecordingConfiguration::getDefauldFileName();
+	 *
+	 * \brief	Gets defauld file name of the set cloudtype
+	 *
+	 * \return	The defauld file name.
+	 */
 	CString getDefauldFileName();
 
+	/**
+	 * \fn	void RecordingConfiguration::setDefaultFileName();
+	 *
+	 * \brief	Sets default file name for the set cloudtype.
+	 */
 	void setDefaultFileName();
 
-	std::vector<std::string> m_foundCloudFiles;
-
-	//outputfolder/timestamp/cloudtype/filename.fileformat
-
+	/** \brief	outputfolder/timestamp/cloudtype/filename.fileformat. */
 	CString					m_outputFolder;
+
+	/** \brief	Pathname of the time stamp folder. */
 	CString					m_timeStampFolderName;
+
+	/** \brief	name of the fileprefix. */
 	CString					m_fileName;
+	
+	/** \brief	Type of the cloud to record. */
 	RecordCloudType			m_cloudType;
+
+	/** \brief	The file format. */
 	RecordingFileFormat		m_fileFormat;
+
+	/** \brief	The maximum number of frames to record. can be UNLIMITED_FRAMES (-1). */
 	int						m_maxNumberOfFrames;
+
+	/** \brief	true to enable recording, false to disable. */
 	bool					m_enabled;
+
+	/** \brief	Number of threads to start for recording. */
 	int						m_threadsCount;
 };
 typedef std::shared_ptr<RecordingConfiguration> RecordingConfigurationPtr;
