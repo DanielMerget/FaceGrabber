@@ -52,7 +52,7 @@ public:
 	void updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clouds);
 
 	/**
-	 * \fn	void PCLViewer::updateNonColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clouds);
+	 * \fn	void PCLViewer::updateUncoloredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clouds);
 	 *
 	 * \brief	Updates the rendered cloud with the provided non-colored clouds. The indices of the list are matched
 	 * 			to the created viewports. The number of clouds in the list must be specified with setNumOfClouds
@@ -60,7 +60,7 @@ public:
 	 * 			
 	 * \param	clouds	The clouds.
 	 */
-	void updateNonColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clouds);
+	void updateUncoloredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clouds);
 
 	/**
 	 * \fn	void PCLViewer::stopViewer();
@@ -112,16 +112,16 @@ private:
 	void updateColoredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer::Ptr viewer);
 
 	/**
-	 * \fn	void PCLViewer::updateNonColoredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer::Ptr viewer);
+	 * \fn	void PCLViewer::updateUncoloredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer::Ptr viewer);
 	 *
-	 * \brief	Updates the non-colored cloud. Used to dynamically switching between colored and non-colored clouds
+	 * \brief	Updates the un-colored cloud. Used to dynamically switching between colored and non-colored clouds
 	 * 			by using the signal/slot pattern.
 	 *
 	 * \param	cloudIndex	Zero-based index of the cloud to be updated.
 	 * \param	cloudID   	Identifier for the cloud.
 	 * \param	viewer	  	The viewer in which the cloud should be updated.
 	 */
-	void updateNonColoredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer::Ptr viewer);
+	void updateUncoloredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer::Ptr viewer);
 
 	/**
 	 * \fn	void PCLViewer::createViewPortsForViewer(pcl::visualization::PCLVisualizer::Ptr viewer);

@@ -51,31 +51,110 @@ public:
 	
 	static CString getFileFormatAsString(RecordingFileFormat fileFormat);
 
-
+	/**
+	 * \fn	bool RecordingConfiguration::isRecordConfigurationValid();
+	 *
+	 * \brief	Query if record configuration is valid: Valid only if we have a 
+	 * 			valid path, name and number of frames to captures are set.
+	 *
+	 * \return	true if record configuration valid, false if not.
+	 */
 	bool isRecordConfigurationValid();
 
+	/**
+	 * \fn	CString RecordingConfiguration::getFilePathCString();
+	 *
+	 * \brief	Gets file path as c-string. (for WinApi)
+	 *
+	 * \return	The file path c string.
+	 */
 	CString getFilePathCString();
 
+	/**
+	 * \fn	std::string RecordingConfiguration::getFilePath();
+	 *
+	 * \brief	Gets file path as std::string (for pcl)
+	 *
+	 * \return	The file path.
+	 */
 	std::string getFilePath();
 
+	/**
+	 * \fn	bool RecordingConfiguration::isEnabled();
+	 *
+	 * \brief	Query if Recording is enabled.
+	 *
+	 * \return	true if enabled, false if not.
+	 */
 	bool isEnabled();
 
+	/**
+	 * \fn	RecordCloudType RecordingConfiguration::getRecordCloudType();
+	 *
+	 * \brief	Gets cloud type to record
+	 *
+	 * \return	The record cloud type.
+	 */
 	RecordCloudType getRecordCloudType();
 
+	/**
+	 * \fn	RecordingFileFormat RecordingConfiguration::getRecordFileFormat();
+	 *
+	 * \brief	Gets fileformat to record
+	 *
+	 * \return	The record file format.
+	 */
 	RecordingFileFormat getRecordFileFormat();
 
+	/**
+	 * \fn	CString RecordingConfiguration::getFileNameCString();
+	 *
+	 * \brief	Gets file name  as c-string. (for WinApi)
+	 * 			e.g. HD_Face_Cloud_*.ply
+	 *
+	 * \return	The file name c string.
+	 */
 	CString getFileNameCString();
 
+	/**
+	 * \fn	bool RecordingConfiguration::isRecordingDurationUnLimited();
+	 *
+	 * \brief	Query if recording duration is unlimited.
+	 *
+	 * \return	true if recording duration un limited, false if number of frames to record
+	 * 			was set.
+	 */
 	bool isRecordingDurationUnLimited();
 
+	/**
+	 * \fn	void RecordingConfiguration::setMaxNumberOfFrames(int newMaxNumberOfFrames);
+	 *
+	 * \brief	Sets maximum number of frames to record.
+	 *
+	 * \param	newMaxNumberOfFrames	The new maximum number of frames.
+	 */
 	void setMaxNumberOfFrames(int newMaxNumberOfFrames);
 
+	/**
+	 * \fn	int RecordingConfiguration::getMaxNumberOfFrames();
+	 *
+	 * \brief	Gets the maximum number of frames to record. 
+	 * 			IF: UNLIMITED_FRAMES: recording is not limited
+	 *
+	 * \return	The maximum number of frames.
+	 */
 	int getMaxNumberOfFrames();
 
+	/**
+	 * \fn	std::string RecordingConfiguration::getFileNameString();
+	 *
+	 * \brief	Gets file name string.
+	 *
+	 * \return	The file name string.
+	 */
 	std::string getFileNameString();
 
-	LPTSTR getFileName();
-
+	
 	void setFileName(LPTSTR fileName);
 	void setFilePath(std::string filePath);
 

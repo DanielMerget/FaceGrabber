@@ -12,8 +12,8 @@
 #include "RecordingConfiguration.h"
 #include "RecordTabHandler.h"
 #include "PlaybackTabHandler.h"
-#include "ColouredOutputStreamUpdater.h"
-#include "NonColouredOutputStreamsUpdater.h"
+#include "ColoredOutputStreamUpdater.h"
+#include "UncoloredOutputStreamsUpdater.h"
 #include "PCLInputReader.h"
 #include "BufferSynchronizer.h"
 #include "ConvertTabHandler.h"
@@ -296,7 +296,7 @@ private:
 	std::vector<std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZRGB>>> m_colorCloudOutputWriter;
 
 	/** \brief	The non colored cloud writer. */
-	std::vector<std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZ>>> m_nonColoredCloudOutputWriter;
+	std::vector<std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZ>>> m_uncoloredCloudOutputWriter;
 	
 	/** \brief	The buffer synchronizer for reading files. */
 	BufferSynchronizer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> m_bufferSynchronizer;
@@ -317,9 +317,9 @@ private:
 	ConvertTabHandler m_convertTabHandler;
 
 	/** \brief	The coloured output stream updater. */
-	std::shared_ptr<ColouredOutputStreamUpdater> m_colouredOutputStreamUpdater;
+	std::shared_ptr<ColoredOutputStreamUpdater> m_coloredOutputStreamUpdater;
 
 	/** \brief	The non colored output stream updater. */
-	std::shared_ptr<NonColouredOutputStreamsUpdater> m_nonColoredOutputStreamUpdater;	
+	std::shared_ptr<UncoloredOutputStreamsUpdater> m_uncoloredOutputStreamUpdater;	
 };
 

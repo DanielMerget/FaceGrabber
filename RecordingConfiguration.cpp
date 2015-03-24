@@ -125,11 +125,6 @@ std::string RecordingConfiguration::getFileNameString()
 	return strStd;
 }
 
-LPTSTR RecordingConfiguration::getFileName()
-{
-	return m_fileName.GetBuffer(0);
-}
-
 void RecordingConfiguration::setFileName(LPTSTR fileName)
 {
 	m_fileName = fileName;

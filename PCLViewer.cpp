@@ -30,7 +30,7 @@ void PCLViewer::stopViewer()
 	m_cloudUpdate.notify_all();
 }
 
-void PCLViewer::updateNonColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clouds)
+void PCLViewer::updateUncoloredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clouds)
 {
 	std::unique_lock<std::mutex> lock(m_cloudMutex);
 	auto it = m_nonColoredClouds.begin();
@@ -165,7 +165,7 @@ void PCLViewer::updateColoredCloud(int cloudIndex, std::string cloudID, pcl::vis
 	}
 }
 
-void PCLViewer::updateNonColoredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer::Ptr viewer)
+void PCLViewer::updateUncoloredCloud(int cloudIndex, std::string cloudID, pcl::visualization::PCLVisualizer::Ptr viewer)
 {
 	auto& cloud = m_nonColoredClouds[cloudIndex];
 	if (cloud){
@@ -184,7 +184,7 @@ void PCLViewer::useColoredCloud(bool useColored)
 		updateCurrentCloudWithIndexAndIdentifier.connect(boost::bind(&PCLViewer::updateColoredCloud, this, _1, _2, _3));
 	}
 	else{
-		updateCurrentCloudWithIndexAndIdentifier.connect(boost::bind(&PCLViewer::updateNonColoredCloud, this, _1, _2, _3));
+		updateCurrentCloudWithIndexAndIdentifier.connect(boost::bind(&PCLViewer::updateUncoloredCloud, this, _1, _2, _3));
 	}
 }
 
