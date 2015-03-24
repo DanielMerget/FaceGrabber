@@ -163,13 +163,14 @@ private:
 	void updateFaceModelStatusOfFaceModelBuilder(IFaceModelBuilder** faceModelBuilder, IFaceModel* faceModel);
 
     /**
-     * \fn	void KinectHDFaceGrabber::updateHDFaceAndColor();
+     * \fn	void KinectHDFaceGrabber::renderColorFrameAndProcessFaces();
      *
-     * \brief	processes the HDFace, depth and color streams by triggering the OutputStreamStragedy
+     * \brief	renders the current color image and
+     * 			processes the HDFace, depth and color streams by triggering the OutputStreamStragedy
      * 			and ImageRenderer.
      */
 
-    void updateHDFaceAndColor();
+	void renderColorFrameAndProcessFaces();
 
 	/**
 	 * \fn	void KinectHDFaceGrabber::processFaces();

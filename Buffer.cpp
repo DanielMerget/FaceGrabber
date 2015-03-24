@@ -42,6 +42,8 @@ Buffer< DataType >::~Buffer()
 template < class DataType >
 void Buffer< DataType >::resetPullCounterAndPullAndNotifyConsumer()
 {
+	//the buffer is filled with the correct data; just notify the observer
+	//that we are ready for pulling 
 	std::unique_lock<std::mutex> cloudBufferLock(*m_cloudBufferMutex);
 	
 	m_bufferFillLevel = m_cloudBuffer.size();
@@ -80,12 +82,10 @@ template < class DataType >
 void Buffer< DataType >::pushData(DataType newData, int index)
 {
 	std::unique_lock<std::mutex> cloudBufferLock(*m_cloudBufferMutex);
-	
+
+	//writing to that buffer is possible at that index?
 	while (isBufferAtIndexSet(index)){
-		std::stringstream waitMSg;
-		waitMSg << "thread for index: " << index << " waiting for updater thread for slot " << index << std::endl;
-		printMessage(waitMSg.str());
-		//m_cloudBufferFree.wait(cloudBufferLock);
+		//we have to wait until the buffer index gets freed
 		m_cloudBufferFree->wait(cloudBufferLock);
 		(*dataReady)();
 		if (!m_bufferingActive){
@@ -95,17 +95,15 @@ void Buffer< DataType >::pushData(DataType newData, int index)
 			return;
 		}
 	}
-
+	//store the data inside the buffer
 	m_cloudBuffer[index] = newData;
 	m_bufferFillLevel++;
+
+	//notify the updater that new data is available
 	m_cloudBufferUpdated->notify_all();
 	cloudBufferLock.unlock();
-	if (dataReady->empty()){
-		printMessage("dont have a slot connected");
-	}
-	std::stringstream msg;
-	msg << "push data: FillLevel" << m_bufferFillLevel << "of "<< getBufferSize();
-	printMessage(msg.str());
+	
+	//buffer fill level reached?
 	if (m_bufferFillLevel == getBufferSize()){
 		printMessage("buffer: data ready");
 		(*dataReady)();
@@ -127,22 +125,33 @@ void Buffer< DataType >::setReleaseDataAfterPull(bool enable)
 template < class DataType >
 DataType Buffer< DataType >::pullData()
 {
+
 	std::unique_lock<std::mutex> cloudBufferLock(*m_cloudBufferMutex);
+	
 	if (!m_bufferingActive || m_bufferFillLevel == 0){
+		//we do not have any data ready?
 		return DataType(nullptr);
 	}
+	//wait until buffer is filled
 	 while (m_bufferFillLevel != m_cloudBuffer.size()){
 		if (m_producerFinished){
+			//producer have finished => so we can just
+			// take the left data out
 			printMessage("break!");
 			break;
 		}
 		m_cloudBufferUpdated->wait(cloudBufferLock);
 	}
+	 //retrieve data
 	 auto result = m_cloudBuffer[m_pullDataPosition];
 	 m_bufferFillLevel--;
+
+	 //do we want to clear the data retrieved from the buffer?
 	 if (m_releaseDataAfterPull){
 		 m_cloudBuffer[m_pullDataPosition].reset();
 	 }
+
+	 //calc next pull index
 	 m_pullDataPosition = (m_pullDataPosition + 1) % m_cloudBuffer.size();
 	 m_cloudBufferFree->notify_all();
 	 return result;

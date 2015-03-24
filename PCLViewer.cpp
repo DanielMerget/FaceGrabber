@@ -32,6 +32,7 @@ void PCLViewer::stopViewer()
 
 void PCLViewer::updateUncoloredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> clouds)
 {
+	//store the uncolored clouds and notify the updater
 	std::unique_lock<std::mutex> lock(m_cloudMutex);
 	auto it = m_nonColoredClouds.begin();
 	for (auto cloud : clouds){
@@ -45,6 +46,7 @@ void PCLViewer::updateUncoloredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ>
 
 void PCLViewer::updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clouds)
 {
+	//store the colored clouds and notify the updater
 	std::unique_lock<std::mutex> lock(m_cloudMutex);
 	auto it = m_coloredClouds.begin();
 	for (auto cloud : clouds){
@@ -59,10 +61,13 @@ void PCLViewer::updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB
 
 void PCLViewer::createViewPortsForViewer(pcl::visualization::PCLVisualizer::Ptr viewer)
 {
+	//reset all stored IDs 
 	m_viewPorts.clear();
 	m_cloudIDs.clear();
 	m_viewPorts.resize(m_cloudCount);
 	m_cloudIDs.resize(m_cloudCount);
+
+	//create the space we have for each of the viewports
 	float horizontalSplitPlaneWidth = 1.0f / m_cloudCount;
 	for (int i = 0; i < m_cloudCount; i++){
 		float xMin = horizontalSplitPlaneWidth * i;
@@ -70,22 +75,23 @@ void PCLViewer::createViewPortsForViewer(pcl::visualization::PCLVisualizer::Ptr 
 		viewer->createViewPort(xMin, 0, xMax, 1.0, m_viewPorts[i]);
 		m_cloudIDs[i] = std::to_string(i);
 	}
+	//set the background to grey so we are able to se uncolored points clouds, too
 	for (int i = 0; i < m_cloudCount; i++){
 		double greyVal = 0.9;
 		viewer->setBackgroundColor(greyVal, greyVal, greyVal, i);
-		
 	}
 	
 }
 
 void PCLViewer::matchPointCloudsToViewPorts(pcl::visualization::PCLVisualizer::Ptr viewer)
 {
-
+	//first time we have to add points clouds to be able to update them later
 	for (int i = 0; i < m_cloudCount; i++){
 		if (m_useColoredCloud){
 			viewer->addPointCloud(m_coloredClouds[i], m_cloudIDs[i], m_viewPorts[i]);
 		}
 		else{
+			//uncolored clouds are rendered with black color
 			pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> blackPoints(m_nonColoredClouds[i], 0, 0, 0);
 			viewer->addPointCloud(m_nonColoredClouds[i], blackPoints, m_cloudIDs[i], m_viewPorts[i]);
 		}
@@ -99,9 +105,8 @@ void PCLViewer::updateLoop()
 
 	std::chrono::milliseconds dura(100);
 	pcl::visualization::PCLVisualizer::Ptr viewer(new pcl::visualization::PCLVisualizer(m_viewerName));
-
+	//init phase; wait until we have any clouds to add
 	createViewPortsForViewer(viewer);
-
 	{
 		std::unique_lock<std::mutex> lock(m_cloudMutex);
 		std::chrono::milliseconds dura(100);
@@ -114,8 +119,10 @@ void PCLViewer::updateLoop()
 			return;
 		}
 	}
+	//match the stored clouds to the viewports
 	matchPointCloudsToViewPorts(viewer);
-	
+
+	//begin updating until we are stopped
 	while (!viewer->wasStopped() && m_isRunning)
 	{
 		{
@@ -125,6 +132,7 @@ void PCLViewer::updateLoop()
 				viewer->spinOnce();
 				if (!m_isRunning || viewer->wasStopped()){ return; }
 			}
+			//do we have to render a different number of clouds now?
 			std::unique_lock<std::mutex> viewPortConfigLock(m_viewPortConfigurationChangedMutex);
 			if (m_viewPortConfigurationChanged){
 				viewer.reset(new pcl::visualization::PCLVisualizer(m_viewerName));
@@ -133,6 +141,9 @@ void PCLViewer::updateLoop()
 				m_viewPortConfigurationChanged = false;
 			}
 			viewPortConfigLock.unlock();
+
+			//update the correct cloud using the set signal (updater does not know which one 
+			//to update; this way, we do not have to check if(coloredToRender) etc.
 			for (int i = 0; i < m_cloudCount; i++){
 				std::lock_guard<std::mutex> lock(m_useColoredCloudMutex);
 				updateCurrentCloudWithIndexAndIdentifier(i, m_cloudIDs[i], viewer);
@@ -145,6 +156,7 @@ void PCLViewer::updateLoop()
 
 void PCLViewer::setNumOfClouds(int numOfClouds)
 {
+	//adjust our id buffer sizes
 	std::unique_lock<std::mutex> cloudLock(m_cloudMutex);
 	std::lock_guard<std::mutex> viePortConfigLock(m_viewPortConfigurationChangedMutex);
 	if (m_cloudCount != numOfClouds){
@@ -171,7 +183,6 @@ void PCLViewer::updateUncoloredCloud(int cloudIndex, std::string cloudID, pcl::v
 	if (cloud){
 		pcl::visualization::PointCloudColorHandlerCustom<pcl::PointXYZ> blackPoints(cloud, 0, 0, 0);
 		viewer->updatePointCloud(cloud, blackPoints, cloudID);
-		//viewer->updatePointCloud(cloud, cloudID);
 	}
 }
 

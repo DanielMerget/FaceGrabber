@@ -44,7 +44,7 @@ void KinectCloudFileWriter< PointCloudType >::startWritingClouds()
 	m_running = true;
 	m_cloudCount = 0;
 	auto threadsToStartCount = m_recordingConfiguration->getThreadCountToStart();
-
+	//create the writer objects and threads
 	for (int i = 0; i < threadsToStartCount; i++){
 		std::shared_ptr<KinectFileWriterThread< PointCloudType >> writer(new KinectFileWriterThread< PointCloudType >);
 		writer->setKinectCloudOutputWriter(this);
@@ -66,6 +66,7 @@ void KinectCloudFileWriter<PointCloudType>::stopWritingClouds()
 template < typename PointCloudType >
 bool KinectCloudFileWriter<PointCloudType>::pullData(PointCloudMeasurement<PointCloudType>& measurement)
 {
+	//threads pulling the data from the buffer
 	std::unique_lock<std::mutex> cloudLocker(m_lockCloud);
 	while (m_clouds.empty()){
 		if (!m_checkCloud.wait_for(cloudLocker, std::chrono::milliseconds(100))){
@@ -75,6 +76,7 @@ bool KinectCloudFileWriter<PointCloudType>::pullData(PointCloudMeasurement<Point
 		}
 	}
 	if (m_clouds.empty() && !m_running){
+		//buffer is empty or we were stopped
 		return true;
 	}
 
@@ -103,14 +105,14 @@ void KinectCloudFileWriter<PointCloudType>::pushCloud(boost::shared_ptr<const pc
 		m_checkCloud.notify_all();
 		return;
 	}
-
+	//construct the measurement
 	PointCloudMeasurement<PointCloudType> cloudMeasurement;
 	cloudMeasurement.cloud = cloudToPush;
 	cloudMeasurement.index = m_cloudCount;
 	m_clouds.push(cloudMeasurement);
 	m_cloudCount++;
 	
-
+	//check whether we captured enough frames
 	if (isMaximumFramesReached()){
 		stopWritingClouds();
 	}

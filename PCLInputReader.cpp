@@ -26,7 +26,6 @@ void PCLInputReader< PointType >::join()
 	{
 		if (thread.joinable()){
 			thread.join();
-			std::cout << "main joining thread" << std::endl;
 		}
 	}
 	
@@ -50,19 +49,23 @@ void PCLInputReader< PointType >::startReading(bool isSingleThreatedReadingAndBl
 	//check for ability to reuse our buffer
 	if (!m_buffer->isDataReleasedAfterPull() && m_previousPlaybackConfiguration.isEnabled() && m_previousPlaybackConfiguration.wasFullPlayed()){
 		if (m_playbackConfiguration == m_previousPlaybackConfiguration){
+			//set the correct state of the buffer
 			m_buffer->resetPullCounterAndPullAndNotifyConsumer();
+
+			//remember that we have the data of the current playbackfonfiguration in our buffer
 			m_playbackConfiguration.setWasFullPlayed();
 			printMessage("detected previous playbackconfiguration was the same! => reuse it; InputReader finished reading..");
 			return;
 		}
 	}
 	
-
+	//configure the buffer
 	m_buffer->resetBuffer();
 
 	int numOfFilesToRead = m_playbackConfiguration.getCloudFilesToPlay().size();
-
 	m_buffer->setBufferSize(numOfFilesToRead);
+
+	//start the threads
 	if (isSingleThreatedReadingAndBlocking){
 		startReaderThreads(isSingleThreatedReadingAndBlocking);
 	}
@@ -86,12 +89,14 @@ void PCLInputReader< PointType >::createAndStartThreadForIndex(int index, int nu
 template <typename PointType>
 void PCLInputReader< PointType >::readerFinishedReadingAFile()
 {
+	//notify our listeners
 	std::lock_guard<std::mutex> lock(m_numOfFilesReadMutex);
 	m_numOfFilesRead++;
 	std::wstringstream statusMessage;
 	statusMessage << "read: " <<  m_numOfFilesRead << "/" << m_playbackConfiguration.getCloudFilesToPlay().size();
 	updateStatus(statusMessage.str());
 	if (m_numOfFilesRead == m_playbackConfiguration.getCloudFilesToPlay().size()){
+		//remember that we have played/cached all frames inside the buffer
 		m_playbackConfiguration.setWasFullPlayed();
 	}
 }
@@ -105,6 +110,7 @@ void PCLInputReader< PointType >::startReaderThreads(bool isSingleThreatedReadin
 	m_buffer->enableBuffer();
 	if (isSingleThreatedReadingAndBlocking){
 		createAndStartThreadForIndex(0, 1);
+		//block until the reading was done
 		for (auto& thread : m_readerThreads){
 			thread.join();
 		}

@@ -50,6 +50,7 @@ void PCLInputReaderWorkerThread< PointType >::readCloudData(const int index, con
 	msg << "thread for index: " << index << "started. " << std::endl;
 	printMessage(msg.str());
 	
+	//select the correct file reader with respect to the file extension
 	std::shared_ptr<pcl::FileReader> fileReader;
 	switch (format)
 	{
@@ -71,44 +72,43 @@ void PCLInputReaderWorkerThread< PointType >::readCloudData(const int index, con
 		break;
 	}
 	auto numberOfFilesToRead = cloudFilesToPlay.size();
-	//pcl::PCDReader reader;
+	
 
 	while (true)
 	{
-		//if (indexOfFileToRead > numberOfFilesToRead || !m_isPlaybackRunning){
+		//are we done`with reading or has the user stopped us?
 		if (indexOfFileToRead >= numberOfFilesToRead || !m_isPlaybackRunning){
-			//m_cloudBufferUpdated.notify_all();
-			//m_buffer.m_cloudBufferUpdated->notify_all();!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			std::stringstream doneMsg;
 			doneMsg << "thread for index: " << index << " done because of stop or size end" << std::endl;
 			printMessage(doneMsg.str());
 			m_buffer->setProducerFinished();
-			//if (indexOfFileToRead == numberOfFilesToRead){
-			//	m_isPlaybackRunning = false;
-			//}
 			return;
 		}
 
 		pcl::PointCloud<PointType>::Ptr cloud(new pcl::PointCloud <PointType>());
 
-
 		auto filePath = cloudFilesToPlay[indexOfFileToRead].fullFilePath;
+
 		std::stringstream readingfileMessage;
 		readingfileMessage << "Reading file: " << filePath;
 		printMessage(readingfileMessage.str());
 
+		//read the file
 		fileReader->read<PointType>(filePath, *cloud);
+
 		readingfileMessage << " finished";
 		printMessage(readingfileMessage.str());
-		//fileReader->read(filePath, *cloud);
+		
+		//notify that we have read the file
 		finishedReadingAFile();
 		
+		//calculate the index where to save the read cloud
 		const int cloudBufferIndex = indexOfFileToRead % m_buffer->getBufferSize();
 
 		m_buffer->pushData(cloud, cloudBufferIndex);
 
 		std::stringstream msg;
-		//calc new buffer index
+		//calc new index of file to read
 		int newIndexOfFileToRead = indexOfFileToRead + step;
 		msg << "thread for index: " << index << " updated:" << cloudBufferIndex << " with: oldIndex: " << indexOfFileToRead << " new Index: " << newIndexOfFileToRead << std::endl;
 		printMessage(msg.str());

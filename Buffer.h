@@ -21,8 +21,18 @@ class Buffer
 {
 public:
 
+	/**
+	 * \fn	Buffer::Buffer();
+	 *
+	 * \brief	Default constructor.
+	 */
 	Buffer();
 
+	/**
+	 * \fn	Buffer::~Buffer();
+	 *
+	 * \brief	Destructor.
+	 */
 	~Buffer();
 
 	/**

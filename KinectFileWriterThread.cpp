@@ -25,9 +25,12 @@ KinectFileWriterThread< PointCloudType >::~KinectFileWriterThread()
 template < typename PointCloudType >
 void KinectFileWriterThread<PointCloudType>::writeCloudsToFile(IRecordingConfigurationPtr recordingConfiguration)
 {
+	//collect important writing information
 	auto recordingFileFormat =	recordingConfiguration->getRecordFileFormat();
 	auto filePath =				recordingConfiguration->getFullRecordingPathString();
 	auto fileName =				recordingConfiguration->getFileNameString();
+
+	//select the correct filewriter
 	std::shared_ptr<pcl::FileWriter> writer;
 	std::string fileFormatExtension;
 	bool isBinary = false;
@@ -60,7 +63,7 @@ void KinectFileWriterThread<PointCloudType>::writeCloudsToFile(IRecordingConfigu
 	}
 	
 	while(true){
-
+		//pull data
 		PointCloudMeasurement< PointCloudType > measurement;
 		measurement.cloud = nullptr;
 		measurement.index = 0;
@@ -69,9 +72,8 @@ void KinectFileWriterThread<PointCloudType>::writeCloudsToFile(IRecordingConfigu
 			OutputDebugString(L"writer finished cloud null");
 			return;
 		}
-		
+		//write data to constructed path
 		std::stringstream outputFileWithPath;
-
 		outputFileWithPath << filePath << "\\" << fileName << measurement.index << fileFormatExtension;
 
 		writer->write(outputFileWithPath.str(), *measurement.cloud, isBinary);

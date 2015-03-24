@@ -52,15 +52,18 @@ void BufferSynchronizer< BufferDataType >::updateThreadFunc()
 	
 	while (m_isRunning)
 	{
+		//wait until we have data ready
 		std::unique_lock<std::mutex> lock(m_updateBuffer);
 		while (!m_isDataAvaiable && m_isRunning){
 			printMessage("synchronier waiting");
 			m_isDataAvailableConditionVariable.wait(lock);
 		}
 		lock.unlock();
+
 		while (m_isDataAvaiable){
 			
 			std::vector<BufferDataType> readyPointClouds;
+			//pull data from each buffer and store it
 			for (auto bufferWithState : m_bufferWithReadyState){
 				printMessage("synchronier pulling data");
 				auto cloud = bufferWithState.first->pullData();
@@ -71,9 +74,11 @@ void BufferSynchronizer< BufferDataType >::updateThreadFunc()
 					break;
 				}
 				bufferWithState.second = false;
+				//store it
 				readyPointClouds.push_back(cloud);
 			}
 
+			//publish the data
 			if (readyPointClouds.size() > 0){
 				printMessage("synchronier updating");
 				m_numOfFilesRead++;
@@ -84,15 +89,17 @@ void BufferSynchronizer< BufferDataType >::updateThreadFunc()
 				updateStatus(message.str());
 			}
 
-			
+			//do we want to simpulate the live frame grabbing? 
 			if (m_waitEachFrame){
 				printMessage("synchronier sleepig");
+				//wait for a few miliseconds to get delay between frames
 				std::this_thread::sleep_for(dura);
 				printMessage("synchronier woke up");
 			}
 			
 		}
 		printMessage("synchronier stopping");
+		//all files we read => notify our observers about that
 		if (m_numOfFilesToRead == m_numOfFilesRead){
 			playbackFinished();
 		}

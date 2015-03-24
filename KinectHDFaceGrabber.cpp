@@ -321,7 +321,7 @@ void KinectHDFaceGrabber::update()
 
 
 
-void KinectHDFaceGrabber::updateHDFaceAndColor()
+void KinectHDFaceGrabber::renderColorFrameAndProcessFaces()
 {
 
     HRESULT hr;
@@ -394,18 +394,23 @@ void KinectHDFaceGrabber::updateFaceModelStatusOfFaceModelBuilder(IFaceModelBuil
 
 void KinectHDFaceGrabber::processFaces()
 {
-    HRESULT hr;
+    //update the tracked bodys
+	HRESULT hr;
     IBody* ppBodies[BODY_COUNT] = {0};
     bool bHaveBodyData = SUCCEEDED( updateBodyData(ppBodies) );
 	if (!bHaveBodyData)
 		return;
+
+	//indicate the start of data providing
 	m_outputStreamUpdater->startFaceCollection(m_colorBuffer.data(), m_depthBuffer.data());
 	bool updatedOneFace = false;
 	UINT32 vertex = 0;
 	hr = GetFaceModelVertexCount(&vertex); // 1347
+
     // iterate through each face reader
     for (int iFace = 0; iFace < BODY_COUNT; ++iFace)
     {
+		//asociate the faces with the bodies
 		updateHDFaceTrackingID(m_pHDFaceSource[iFace], ppBodies[iFace]);
 
 		IHighDefinitionFaceFrame* pHDFaceFrame = nullptr;
@@ -415,12 +420,15 @@ void KinectHDFaceGrabber::processFaces()
 		if (SUCCEEDED(hr) && pHDFaceFrame != nullptr){
 			hr = pHDFaceFrame->get_IsFaceTracked(&bFaceTracked);
 		}
+		//update face aligment
 		if (SUCCEEDED(hr) && bFaceTracked){
 			hr = pHDFaceFrame->GetAndRefreshFaceAlignmentResult(m_pFaceAlignment[iFace]);
 		}
+		
 		if (FAILED(hr) || m_pFaceAlignment[iFace] == nullptr){
 			continue;
 		}
+		//have we finished building our model?
 		if (m_pFaceModelBuilder[iFace] != nullptr){
 			updateFaceModelStatusOfFaceModelBuilder(&m_pFaceModelBuilder[iFace], m_pFaceModel[iFace]);
 		}
