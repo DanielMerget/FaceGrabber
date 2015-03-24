@@ -32,7 +32,6 @@ public:
 	boost::signals2::signal<void(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>)> cloudsUpdated;
 
 	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud)> cloudUpdated[3];
-	//boost::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::ConstPtr cloud)> depthCloudUpdated;
 
 	void startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer);
 	void stopFaceCollection();
@@ -53,7 +52,6 @@ private:
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_HDFacePointCloud;
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_FaceRawPointCloud;
 
-	//pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_fullRawPointCloud;
 	std::vector<UINT16>				m_pDepthVisibilityTestMap;
 	std::vector<ColorSpacePoint>	m_pColorCoordinates;
 	bool							m_isValidFaceFrame;
