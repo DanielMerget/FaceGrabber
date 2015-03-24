@@ -8,6 +8,13 @@
 #include <memory>
 #include <boost/signals.hpp>
 
+/**
+ * \class	RecordTabHandler
+ *
+ * \brief	RecordTabHandle handles all user inputs and configures the RecordingConfiguration used to record
+ * 			point cloud files. If requested by the user, the RecordTabHandler fires the startWriting and stopWriting
+ * 			signals providing the RecordingConfiguration.
+ */
 
 class RecordTabHandler : public MessageRouterHelper
 {

@@ -110,6 +110,7 @@ void PCLInputReader< PointType >::startReaderThreads(bool isSingleThreatedReadin
 	m_buffer->enableBuffer();
 	if (isSingleThreatedReadingAndBlocking){
 		createAndStartThreadForIndex(0, 1);
+
 		//block until the reading was done
 		for (auto& thread : m_readerThreads){
 			thread.join();
