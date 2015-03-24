@@ -125,19 +125,13 @@ std::string RecordingConfiguration::getFileNameString()
 	return strStd;
 }
 
-void RecordingConfiguration::setFileName(LPTSTR fileName)
+void RecordingConfiguration::setFileName(CString fileName)
 {
 	m_fileName = fileName;
 	recordPathOrFileNameChanged(m_cloudType);
 }
 
-void RecordingConfiguration::setFilePath(std::string filePath)
-{
-	m_outputFolder = CString(filePath.c_str());
-	recordPathOrFileNameChanged(m_cloudType);
-}
-
-void RecordingConfiguration::setFilePath(LPTSTR filePath)
+void RecordingConfiguration::setFilePath(CString filePath)
 {
 	m_outputFolder = CString(filePath);
 	recordPathOrFileNameChanged(m_cloudType);

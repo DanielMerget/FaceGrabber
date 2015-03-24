@@ -29,9 +29,9 @@ void RecordTabHandler::setSharedRecordingConfiguration(SharedRecordingConfigurat
 
 void RecordTabHandler::onCreate()
 {
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_recordingConfiguration[   HDFace	 ]->getFileName());
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_recordingConfiguration[  FaceRaw	 ]->getFileName());
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX),	m_recordingConfiguration[FullDepthRaw]->getFileName());
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_recordingConfiguration[   HDFace	 ]->getFileNameCString());
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_recordingConfiguration[  FaceRaw	 ]->getFileNameCString());
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX),	m_recordingConfiguration[FullDepthRaw]->getFileNameCString());
 	CheckDlgButton(m_hWnd, IDC_RECORD_COLOR, m_colorEnabled);
 	HWND hdFaceComboBox = GetDlgItem(m_hWnd, IDC_HD_FACE_COMBO_BOX);
 	HWND facerawDepthComboBox = GetDlgItem(m_hWnd, IDC_FACE_RAW_DEPTH_COMBO_BOX);
@@ -262,17 +262,19 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 	HWND editBoxHandle = GetDlgItem(m_hWnd, LOWORD(wParam));
 
 	//std::vector<wchar_t> buffer(Edit_GetTextLength(editBoxHandle));
-	std::vector<wchar_t> buffer(MAX_PATH);
-	Edit_GetText(editBoxHandle, buffer.data(), buffer.size());
+
+	CString editBoxText;
+	
+	Edit_GetText(editBoxHandle, editBoxText.GetBuffer(MAX_PATH), MAX_PATH);
 	switch (LOWORD(wParam)){
 	case IDC_FACE_RAW_EDIT_BOX:
-		m_recordingConfiguration[FaceRaw]->setFileName(buffer.data());
+		m_recordingConfiguration[FaceRaw]->setFileName(editBoxText);
 		break;
 	case IDC_HDFACE_EDIT_BOX:
-		m_recordingConfiguration[HDFace]->setFileName(buffer.data());
+		m_recordingConfiguration[HDFace]->setFileName(editBoxText);
 		break;
 	case IDC_FULL_RAW_DEPTH_EDIT_BOX:
-		m_recordingConfiguration[FullDepthRaw]->setFileName(buffer.data());
+		m_recordingConfiguration[FullDepthRaw]->setFileName(editBoxText);
 		break;
 	case IDC_LIMIT_FRAMES_EDIT_BOX:
 		updateFrameLimit();
@@ -280,7 +282,7 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 	case IDC_FILE_PATH_EDIT_BOX:
 	{
 		for (auto recordConfig : m_recordingConfiguration){
-			recordConfig->setFilePath(buffer.data());
+			recordConfig->setFilePath(editBoxText);
 		}
 		break;
 	}

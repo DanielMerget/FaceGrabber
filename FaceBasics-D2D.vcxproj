@@ -21,9 +21,7 @@
   <ItemGroup>
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="BufferSynchronizer.cpp" />
-    <ClCompile Include="ColouredOutputStreamUpdater.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-    </ClCompile>
+    <ClCompile Include="ColoredOutputStreamUpdater.cpp" />
     <ClCompile Include="ConvertTabHandler.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
@@ -41,9 +39,6 @@
     </ClCompile>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MessageRouterHelper.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="NonColouredOutputStreamsUpdater.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="OutputStreamsUpdaterStragedy.cpp">
@@ -66,6 +61,7 @@
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="UncoloredOutputStreamsUpdater.cpp" />
     <ClCompile Include="WindowsAppDialogHelper.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
@@ -83,7 +79,7 @@
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="BufferSynchronizer.h" />
     <ClInclude Include="CloudMeasurementSource.h" />
-    <ClInclude Include="ColouredOutputStreamUpdater.h" />
+    <ClInclude Include="ColoredOutputStreamUpdater.h" />
     <ClInclude Include="ConvertTabHandler.h" />
     <ClInclude Include="IRecordingConfiguration.h" />
     <ClInclude Include="KinectFileWriterThread.h" />
@@ -91,7 +87,6 @@
     <ClInclude Include="ImageRenderer.h" />
     <ClInclude Include="KinectCloudFileWriter.h" />
     <ClInclude Include="MessageRouterHelper.h" />
-    <ClInclude Include="NonColouredOutputStreamsUpdater.h" />
     <ClInclude Include="OutputStreamsUpdaterStragedy.h" />
     <ClInclude Include="PCLInputReader.h" />
     <ClInclude Include="PCLInputReaderWorkerThread.h" />
@@ -103,6 +98,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="SimpleRecordingConfiguration.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="UncoloredOutputStreamsUpdater.h" />
     <ClInclude Include="WindowsAppDialogHelper.h" />
     <ClInclude Include="WindowsApplication.h" />
   </ItemGroup>

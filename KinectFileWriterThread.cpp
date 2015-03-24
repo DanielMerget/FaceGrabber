@@ -72,7 +72,7 @@ void KinectFileWriterThread<PointCloudType>::writeCloudsToFile(IRecordingConfigu
 		
 		std::stringstream outputFileWithPath;
 
-		outputFileWithPath << filePath << "\\" << fileName << "_Cloud_" << measurement.index << fileFormatExtension;
+		outputFileWithPath << filePath << "\\" << fileName << measurement.index << fileFormatExtension;
 
 		writer->write(outputFileWithPath.str(), *measurement.cloud, isBinary);
 

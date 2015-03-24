@@ -237,7 +237,7 @@ bool ColoredOutputStreamUpdater::extractColoredDepthCloudFromBoundingBox(CameraS
 			}
 
 			//map the depth point to cam space for 3D coordinates
-			CameraSpacePoint camPoint
+			CameraSpacePoint camPoint;
 			hr = m_pCoordinateMapper->MapDepthPointToCameraSpace(depthPoint, depthOfCurrentPoint, &camPoint);
 
 			if (FAILED(hr)){

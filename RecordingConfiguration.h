@@ -154,11 +154,9 @@ public:
 	 */
 	std::string getFileNameString();
 
-	
-	void setFileName(LPTSTR fileName);
-	void setFilePath(std::string filePath);
+	void setFileName(CString fileName);
 
-	void setFilePath(LPTSTR filePath);
+	void setFilePath(CString filePath);
 
 	void setEnabled(bool enabled);
 
