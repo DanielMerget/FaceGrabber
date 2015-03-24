@@ -24,9 +24,9 @@ ConvertTabHandler::~ConvertTabHandler()
 }
 void ConvertTabHandler::onCreate()
 {
-
+	
 	HWND outputFormatHandle = GetDlgItem(m_hWnd, IDC_COMBO_OUTPUT_FORMAT);
-
+	//create the combo box values; pcd, ply etc. and set default
 	for (int i = 0; i < RECORD_FILE_FORMAT_COUNT; i++){
 		auto fileFormatName = RecordingConfiguration::getFileFormatAsString(static_cast<RecordingFileFormat>(i));
 		ComboBox_AddString(outputFormatHandle, fileFormatName);
@@ -34,15 +34,15 @@ void ConvertTabHandler::onCreate()
 	m_recordingConfiguration->setRecordFileFormat(PCD);
 	ComboBox_SetCurSel(outputFormatHandle, m_recordingConfiguration->getRecordFileFormat());
 
+	//default output file prefix
 	m_recordingConfiguration->setFileNameString("Converted_Cloud_Name");
 	CString fileName(m_recordingConfiguration->getFileNameString().c_str());
-	
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_EDIT_BOX_FILE_NAME), fileName.GetBuffer());
 	
 	Button_SetCheck(GetDlgItem(m_hWnd, IDC_CHECKBOX_COLOR), m_enableColor);
 
+	//create combo box for select amount of threads an preset default
 	HWND numOfThreadsToStartHWND = GetDlgItem(m_hWnd, IDC_COMBO_BOX_CONVERT_THREADS);
-	
 	for (int i = 1; i <= 5; i++){
 		CString counter;
 		counter.Format(L"%d", i);
@@ -51,9 +51,10 @@ void ConvertTabHandler::onCreate()
 	m_recordingConfiguration->setThreadCountToStart(5);
 	ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_COMBO_BOX_CONVERT_THREADS), m_recordingConfiguration->getThreadCountToStart()-1);
 
+	//register for changes (for validity check)
 	m_playbackConfiguration->playbackConfigurationChanged.connect(boost::bind(&ConvertTabHandler::playbackConfigurationChanged, this));
-	//m_recordingConfiguration->recordConfigurationStatusChanged.connect(boost::bind(&ConvertTabHandler::recordingConfigurationChanged, this));
 
+	//create and start synchronizer used multi-threaded writing; they will sleep until data available
 	m_colorBufferSynchronizer = std::shared_ptr<ColorBufferSynchronizer>(new ColorBufferSynchronizer(false));
 	m_colorBufferSynchronizerThread = std::thread(&ColorBufferSynchronizer::updateThreadFunc, m_colorBufferSynchronizer);
 
@@ -64,6 +65,7 @@ void ConvertTabHandler::onCreate()
 
 void ConvertTabHandler::playbackConfigurationChanged()
 {
+	//check if configurations are valid and enable/disable convert button
 	CString foundFiles;
 	foundFiles.Format(L"%d", m_playbackConfiguration->getCloudFilesToPlayCount());
 	m_recordingConfiguration->setMaxNumberOfFrames(m_playbackConfiguration->getCloudFilesToPlayCount());
@@ -78,7 +80,7 @@ void ConvertTabHandler::playbackConfigurationChanged()
 
 void ConvertTabHandler::recordingConfigurationChanged()
 {
-	
+	//check if configurations are valid and enable/disable convert button
 	if (m_playbackConfiguration->isPlaybackConfigurationValid() && m_recordingConfiguration->isRecordConfigurationValid()){
 		Button_Enable(GetDlgItem(m_hWnd, IDC_BUTTON_CONVERT), true);
 	}
@@ -121,8 +123,9 @@ void ConvertTabHandler::notifyWriterFinished()
 	SetDlgItemText(m_hWnd, IDC_TEXT_LABEL_STATUS_READER, L"");
 }
 
-void ConvertTabHandler::initColoredConversionPipeline()
+void ConvertTabHandler::initColoredConversionDataflow()
 {
+	//setup writer and buffer dataflow
 	m_colorCloudReader = std::shared_ptr<ColoredCloudInputReader>(new ColoredCloudInputReader);
 	m_colorBuffer = std::shared_ptr<ColorBuffer>(new ColorBuffer);
 
@@ -133,7 +136,7 @@ void ConvertTabHandler::initColoredConversionPipeline()
 
 	m_colorBufferSynchronizer->setBuffer(buffers, m_playbackConfiguration->getCloudFilesToPlayCount());
 
-
+	//register for events to update the respective labels
 	m_colorBufferSynchronizer->publishSynchronizedData.connect(
 		boost::bind(&KinectCloudFileWriter<pcl::PointXYZRGB>::pushCloudsAsync, m_colorWriter, _1));
 	m_colorWriter->updateStatus.connect(boost::bind(&ConvertTabHandler::updateWriterStatus, this, _1));
@@ -145,8 +148,9 @@ void ConvertTabHandler::initColoredConversionPipeline()
 	m_colorCloudReader->setBuffer(m_colorBuffer);
 }
 
-void ConvertTabHandler::initNonColoredConversionPipeline()
+void ConvertTabHandler::initUncoloredConversionDataflow()
 {
+	//create the reader and buffer 
 	m_nonColorCloudReader = std::shared_ptr<NonColoredCloudInputReader>(new NonColoredCloudInputReader);
 	m_nonColorBuffer = std::shared_ptr<NonColorBuffer>(new NonColorBuffer);
 
@@ -163,34 +167,41 @@ void ConvertTabHandler::initNonColoredConversionPipeline()
 		boost::bind(&KinectCloudFileWriter<pcl::PointXYZ>::pushCloudsAsync, m_nonColorWriter, _1));
 
 	
-
+	//register for events
 	m_nonColorCloudReader->updateStatus.connect(boost::bind(&ConvertTabHandler::updateReaderStatus, this, _1));
+	m_colorWriter->writingFinished.connect(boost::bind(&ConvertTabHandler::notifyWriterFinished, this));
 
 	m_nonColorCloudReader->setBuffer(m_nonColorBuffer);
 }
 
 void ConvertTabHandler::startFileConversion()
 {
+	//start correct dataflow
 	if (m_enableColor){
 		if (!m_colorCloudReader){
-			initColoredConversionPipeline();
+			initColoredConversionDataflow();
 		}
 		
 		m_colorWriter->setRecordingConfiguration(m_recordingConfiguration);
 		m_colorCloudReader->setPlaybackConfiguration(m_playbackConfiguration);
 		
+		//trigger reader to start with one thread
 		std::async(std::launch::async, &ColoredCloudInputReader::startReading, m_colorCloudReader, true);
 
+		//trigger writer to start
 		m_colorWriter->startWritingClouds();
 	}
 	else{
 		if (!m_nonColorCloudReader){
-			initNonColoredConversionPipeline();
+			initUncoloredConversionDataflow();
 		}
 		m_nonColorCloudReader->setPlaybackConfiguration(m_playbackConfiguration);
 		m_nonColorWriter->setRecordingConfiguration(m_recordingConfiguration);
 
+		//trigger reader to start with one thread
 		std::async(std::launch::async, &NonColoredCloudInputReader::startReading, m_nonColorCloudReader, true);
+
+		//trigger writer to start
 		m_nonColorWriter->startWritingClouds();
 	}
 	Button_Enable(GetDlgItem(m_hWnd, IDC_BUTTON_CONVERT), false);

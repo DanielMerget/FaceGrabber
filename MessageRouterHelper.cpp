@@ -44,21 +44,17 @@ LRESULT CALLBACK MessageRouterHelper::DlgProc(HWND hWnd, UINT message, WPARAM wP
 	switch (message)
 	{
 	case WM_INITDIALOG:
-		// Bind application window handle
+		// store window handle
 		m_hWnd = hWnd;
 		onCreate();
 		break;
 
-		// If the titlebar X is clicked, destroy app
 	case WM_CLOSE:
 		DestroyWindow(hWnd);
-		//m_pclFaceViewer->stopViewer();
 		onDestroy();
 		break;
 
 	case WM_DESTROY:
-		// Quit the main message pump
-		//m_listView.OnDestroy(m_hWnd);
 		PostQuitMessage(0);
 		break;
 	case WM_COMMAND:

@@ -188,6 +188,8 @@ void PCLViewer::updateUncoloredCloud(int cloudIndex, std::string cloudID, pcl::v
 
 void PCLViewer::useColoredCloud(bool useColored)
 {
+	//connect our signal with the correct method which is called when the updater thread wants to update
+	//the updated clouds
 	std::lock_guard<std::mutex> lock(m_useColoredCloudMutex);
 	m_useColoredCloud = useColored;
 	updateCurrentCloudWithIndexAndIdentifier.disconnect_all_slots();

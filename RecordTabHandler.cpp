@@ -29,15 +29,16 @@ void RecordTabHandler::setSharedRecordingConfiguration(SharedRecordingConfigurat
 
 void RecordTabHandler::onCreate()
 {
+	//preset the edit boxes with the values of the model objects
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_recordingConfiguration[   HDFace	 ]->getFileNameCString());
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_recordingConfiguration[  FaceRaw	 ]->getFileNameCString());
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX),	m_recordingConfiguration[FullDepthRaw]->getFileNameCString());
 	CheckDlgButton(m_hWnd, IDC_RECORD_COLOR, m_colorEnabled);
+
+	//create combo box items for the recording file formats (ply, pcd, binary etc.)
 	HWND hdFaceComboBox = GetDlgItem(m_hWnd, IDC_HD_FACE_COMBO_BOX);
 	HWND facerawDepthComboBox = GetDlgItem(m_hWnd, IDC_FACE_RAW_DEPTH_COMBO_BOX);
 	HWND fullRawDepthCombobox = GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_COMBO_BOX);
-
-	//for (int i = RECORD_FILE_FORMAT_COUNT-1; i >= 0; --i){
 	for (int i = 0; i < RECORD_FILE_FORMAT_COUNT; i++){
 		CString fileFormatName = RecordingConfiguration::getFileFormatAsString(static_cast<RecordingFileFormat>(i));
 		ComboBox_AddString(hdFaceComboBox, fileFormatName);
@@ -50,6 +51,7 @@ void RecordTabHandler::onCreate()
 		}
 	}
 
+	//create combo box items for the amount of threads to start
 	HWND hdFaceComboBoxThreads			= GetDlgItem(m_hWnd, IDC_HD_FACE_COMBO_BOX_THREADS);
 	HWND facerawDepthComboBoxThreads	= GetDlgItem(m_hWnd, IDC_FACE_RAW_DEPTH_COMBO_BOX_THREADS);
 	HWND fullRawDepthComboboxThreads	= GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_COMBO_BOX_THREADS);
@@ -139,6 +141,7 @@ void RecordTabHandler::checkRecordingConfigurationPossible()
 
 CString getRecordTimeStamp()
 {
+	//create the current timestamp for folder naming
 	time_t now;
 	char the_date[MAX_DATE];
 
@@ -156,6 +159,7 @@ CString getRecordTimeStamp()
 
 void RecordTabHandler::setupRecording()
 {
+	//set the full recording path & timestamp
 	auto timeStamp = getRecordTimeStamp();
 	for (auto& recordConfig : m_recordingConfiguration){
 		recordConfig->setTimeStampFolderName(timeStamp);
@@ -180,6 +184,7 @@ void RecordTabHandler::setRecording(bool enable)
 	}
 
 	m_isRecording = enable;
+	
 	if (enable){
 		setupRecording();
 		startWriting(m_colorEnabled, m_recordingConfiguration);
@@ -200,15 +205,18 @@ void RecordTabHandler::updateFrameLimit()
 {
 	bool isLimited = IsDlgButtonChecked(m_hWnd, IDC_LIMIT_FRAMES_CHECK);
 	Edit_Enable(GetDlgItem(m_hWnd, IDC_LIMIT_FRAMES_EDIT_BOX), isLimited);
-
+	
 	int limitAsInt = UNLIMITED_FRAMES;
+
+	//if the user has set an limit it is now parsed and overridden
 	if (isLimited){
 		auto editBoxHandle = GetDlgItem(m_hWnd, IDC_LIMIT_FRAMES_EDIT_BOX);
-		CString limit;
 		std::vector<wchar_t> buffer(MAX_PATH);
 		Edit_GetText(editBoxHandle, buffer.data(), buffer.size());
 		limitAsInt = _tstoi(buffer.data());
 	}
+
+	//store the limit in each config
 	for (auto recordConfig : m_recordingConfiguration){
 		recordConfig->setMaxNumberOfFrames(limitAsInt);
 	}
@@ -260,9 +268,6 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 {
 	HWND editBoxHandle = GetDlgItem(m_hWnd, LOWORD(wParam));
-
-	//std::vector<wchar_t> buffer(Edit_GetTextLength(editBoxHandle));
-
 	CString editBoxText;
 	
 	Edit_GetText(editBoxHandle, editBoxText.GetBuffer(MAX_PATH), MAX_PATH);

@@ -117,18 +117,18 @@ private:
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
 
 	/**
-	 * \fn	void ConvertTabHandler::initColoredConversionPipeline();
+	 * \fn	void ConvertTabHandler::initColoredConversionDataflow();
 	 *
-	 * \brief	Initialises the colored conversion pipeline.
+	 * \brief	Initialises the colored conversion dataflow.
 	 */
-	void initColoredConversionPipeline();
+	void initColoredConversionDataflow();
 
 	/**
-	 * \fn	void ConvertTabHandler::initNonColoredConversionPipeline();
+	 * \fn	void ConvertTabHandler::initUncoloredConversionDataflow();
 	 *
-	 * \brief	Initialises the non colored conversion pipeline.
+	 * \brief	Initialises the un colored conversion pipeline.
 	 */
-	void initNonColoredConversionPipeline();
+	void initUncoloredConversionDataflow();
 
 	/** \brief	The playback configuration. */
 	PlaybackConfigurationPtr			m_playbackConfiguration;

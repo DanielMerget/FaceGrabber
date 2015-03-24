@@ -29,24 +29,26 @@ void PlaybackTabHandler::resetUIElements()
 
 void PlaybackTabHandler::setSharedRecordingConfiguration(SharedRecordingConfiguration recordingConfiguration)
 {
-	
+	//init playbackconfiguration with recording configuration of recording tab
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		m_playbackConfiguration[i] = std::shared_ptr<PlaybackConfiguration>(new PlaybackConfiguration(*recordingConfiguration[i]));
 		m_playbackConfiguration[i]->playbackConfigurationChanged.connect(boost::bind(&PlaybackTabHandler::playbackConfigurationChanged, this));
 	}
+	//init file path
 	auto outputFolderPath = recordingConfiguration[HDFace]->getFilePathCString();
-	
 	DlgDirList(m_hWnd,
 		outputFolderPath.GetBuffer(),
 		IDC_RECODINGS_LIST_BOX,
 		IDC_FILE_PATH_EDIT_BOX,
 		DDL_EXCLUSIVE | DDL_READWRITE | DDL_DIRECTORY);
+
 	auto timeStampFolder = recordingConfiguration[HDFace]->getTimeStampFolderName();
 	if (!timeStampFolder.IsEmpty()){
 		
 		SendMessage(GetDlgItem(m_hWnd, IDC_RECODINGS_LIST_BOX), LB_SELECTSTRING,
 			1, (LPARAM)timeStampFolder.GetBuffer());
 	}
+	//set enable/disable according to state of the buttons
 	m_playbackConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
 	m_playbackConfiguration[FaceRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_DEPTH_CHECKBOX));
 	m_playbackConfiguration[FullDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
@@ -197,6 +199,10 @@ void PlaybackTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 
 void PlaybackTabHandler::playbackConfigurationChanged()
 {
+	//check if we have valid playback configurations
+	//and if any if them is at least enabled
+	//set the filename of the first playbackfile and the count of found cloud files
+	//as text of the respective label
 	bool isValidConfiguration = true;
 	bool anyPlaybackConfigurationEnabled = false;
 	if (auto playbackConfig = m_playbackConfiguration[HDFace]){
