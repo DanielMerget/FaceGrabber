@@ -89,7 +89,7 @@ public:
 
 private:
 
-	void BufferSynchronizer::printMessage(std::string msg);
+	void printMessage(std::string msg);
 	std::mutex m_printMutex;
 
 	/** \brief	Number of files to read from the current Buffers. */

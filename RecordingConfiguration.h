@@ -11,6 +11,14 @@
 
 #include "IRecordingConfiguration.h"
 
+/**
+ * \class	RecordingConfiguration
+ *
+ * \brief	The Recording Configuration stores all information neccessary to the KinectCloudFileWriter to save
+ * 			ply and pcd files to the directory. It allows to specify the directory for the files and automatically
+ * 			searches for the files. It constructs the directory path to save the point clouds in the following way:
+ *			//outputfolder/timestamp/cloudtype/filename.fileformat.
+ */
 
 class RecordingConfiguration : public IRecordingConfiguration{
 #define UNLIMITED_FRAMES -1;
@@ -18,16 +26,31 @@ class RecordingConfiguration : public IRecordingConfiguration{
 
 public:
 	RecordingConfiguration();
+
+	/**
+	 * \fn	RecordingConfiguration::RecordingConfiguration(RecordCloudType cloudType, RecordingFileFormat format);
+	 *
+	 * \brief	Constructor.
+	 *
+	 * \param	cloudType	Type of the cloud to record..
+	 * \param	format   	Describes the format to use.
+	 */
+
 	RecordingConfiguration(RecordCloudType cloudType, RecordingFileFormat format);
+
+	/**
+	 * \fn	RecordingConfiguration::RecordingConfiguration(RecordingConfiguration& recordingConfiguration);
+	 *
+	 * \brief	Copy constructor.
+	 *
+	 * \param [in]	recordingConfiguration	The recording configuration.
+	 */
 
 	RecordingConfiguration(RecordingConfiguration& recordingConfiguration);
 
-	std::string getFileFormatFileExtension();
-	static LPTSTR getFileFormatAsString(RecordingFileFormat fileFormat);
+	
+	static CString getFileFormatAsString(RecordingFileFormat fileFormat);
 
-	void setDefaultFileName();
-
-	LPTSTR getDefauldFileName();
 
 	bool isRecordConfigurationValid();
 
@@ -50,6 +73,7 @@ public:
 	int getMaxNumberOfFrames();
 
 	std::string getFileNameString();
+
 	LPTSTR getFileName();
 
 	void setFileName(LPTSTR fileName);
@@ -65,23 +89,25 @@ public:
 
 	CString getTimeStampFolderName();
 
-
-	static CString getSubFolderNameForCloudType(RecordCloudType cloudType);
-
-
 	CString getFullRecordingPath();
 
 	std::string getFullRecordingPathString();
+	
+	static CString getSubFolderNameForCloudType(RecordCloudType cloudType);
 
 	static CString getFullRecordingPathForCloudType(RecordCloudType cloudType, CString outputFolder, CString timeStampFolderName);
-
-	boost::signal<void(RecordCloudType, bool)> recordConfigurationStatusChanged;
-	boost::signal<void(RecordCloudType)>	recordPathOrFileNameChanged;
 
 	int getThreadCountToStart();
 
 	void setThreadCountToStart(int threadsCount);
+
+	boost::signal<void(RecordCloudType, bool)> recordConfigurationStatusChanged;
+	boost::signal<void(RecordCloudType)>	recordPathOrFileNameChanged;
 private:
+	CString getDefauldFileName();
+
+	void setDefaultFileName();
+
 	std::vector<std::string> m_foundCloudFiles;
 
 	//outputfolder/timestamp/cloudtype/filename.fileformat

@@ -4,9 +4,10 @@
 
 WindowsApplication::WindowsApplication() :
 	m_nNextStatusTime(0),
-	m_isCloudWritingStarted(false),
 	m_isKinectRunning(true),
-	m_bufferSynchronizer(true)
+	m_bufferSynchronizer(true),
+	m_pDrawDataStreams(nullptr),
+	m_pD2DFactory(nullptr)
 {
 	
 }
@@ -31,12 +32,6 @@ WindowsApplication::~WindowsApplication()
 	m_bufferSynchronizerThread.join();
 }
 
-
-/// <summary>
-/// Creates the main window and begins processing
-/// </summary>
-/// <param name="hInstance">handle to the application instance</param>
-/// <param name="nCmdShow">whether to display minimized, maximized, or normally</param>
 int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 {
 
@@ -150,13 +145,13 @@ void WindowsApplication::disconnectStreamUpdaterFromViewer()
 void WindowsApplication::initCloudWriter()
 {
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		auto nonColoredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>(new KinectCloudOutputWriter<pcl::PointXYZ>);
+		auto nonColoredCloudWriter = std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZ>>(new KinectCloudFileWriter<pcl::PointXYZ>);
 		nonColoredCloudWriter->updateStatus.connect(boost::bind(&RecordTabHandler::updateWriterStatus, &m_recordTabHandler, static_cast<RecordCloudType>(i), _1));
 		nonColoredCloudWriter->writingWasStopped.connect(boost::bind(&RecordTabHandler::recordingStopped, &m_recordTabHandler));
 
 		m_nonColoredCloudOutputWriter.push_back(nonColoredCloudWriter);
 
-		auto coloredCloudWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
+		auto coloredCloudWriter = std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZRGB>>(new KinectCloudFileWriter<pcl::PointXYZRGB>);
 		coloredCloudWriter->updateStatus.connect(boost::bind(&RecordTabHandler::updateWriterStatus, &m_recordTabHandler, static_cast<RecordCloudType>(i), _1));
 
 		coloredCloudWriter->writingWasStopped.connect(boost::bind(&RecordTabHandler::recordingStopped, &m_recordTabHandler));
@@ -171,8 +166,8 @@ void WindowsApplication::connectStreamUpdaterToViewer()
 		if (i == FullDepthRaw){
 			continue;
 		}
-		m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::pushCloudThreated, m_nonColoredCloudOutputWriter[i], _1));
-		m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::pushCloudThreated, m_colorCloudOutputWriter[i], _1));
+		m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZ>::pushCloudAsync, m_nonColoredCloudOutputWriter[i], _1));
+		m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZRGB>::pushCloudAsync, m_colorCloudOutputWriter[i], _1));
 	}
 	m_nonColoredOutputStreamUpdater->cloudsUpdated.connect(boost::bind(&PCLViewer::updateNonColoredClouds, m_pclFaceViewer, _1));
 	m_colouredOutputStreamUpdater->cloudsUpdated.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
@@ -333,7 +328,6 @@ void WindowsApplication::onRecordTabSelected()
 	ShowWindow(m_convertTabHandle, SW_HIDE);
 }
 
-
 void WindowsApplication::onConvertTabSelected()
 {
 	ShowWindow(m_liveViewWindow, SW_HIDE);
@@ -372,7 +366,7 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 			cloudWriter->setRecordingConfiguration(recordingConfig);
 			if (recordingConfig->isEnabled()){
 				if (i == FullDepthRaw){
-					m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::pushCloudThreated, cloudWriter, _1));
+					m_colouredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZRGB>::pushCloudAsync, cloudWriter, _1));
 				}
 				cloudWriter->startWritingClouds();
 			}
@@ -389,7 +383,7 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 			}
 			if (recordingConfig->isEnabled()){
 				if (i == FullDepthRaw){
-					m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::pushCloudThreated, cloudWriter, _1));
+					m_nonColoredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZ>::pushCloudAsync, cloudWriter, _1));
 				}
 				cloudWriter->startWritingClouds();
 			}
@@ -404,7 +398,7 @@ void WindowsApplication::triggerReaderStart(SharedPlaybackConfiguration playback
 		auto& currentConfig = playbackConfig[i];
 		auto cloudType = currentConfig->getRecordCloudType();
 		m_inputFileReader[cloudType]->setPlaybackConfiguration(playbackConfig[i]);
-		m_inputFileReader[cloudType]->startCloudUpdateThread(isSingleThreatedReading);
+		m_inputFileReader[cloudType]->startReading(isSingleThreatedReading);
 	}
 }
 void WindowsApplication::setupReaderAndBuffersForPlayback(SharedPlaybackConfiguration playbackConfig)
@@ -443,7 +437,7 @@ void WindowsApplication::onPlaybackFinished()
 void WindowsApplication::stopPlayback()
 {
 	for (auto& inputReader : m_inputFileReader){
-		inputReader->stopReaderThreads();
+		inputReader->stopReading();
 	}
 }
 

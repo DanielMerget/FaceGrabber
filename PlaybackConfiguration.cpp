@@ -10,7 +10,6 @@ PlaybackConfiguration::PlaybackConfiguration(PlaybackConfiguration& playbackConf
 	this->m_cloudType = playbackConfigurationToCopy.m_cloudType;
 	this->m_enabled = playbackConfigurationToCopy.m_enabled;
 	this->m_fileFormat = playbackConfigurationToCopy.m_fileFormat;
-	this->m_fileName = playbackConfigurationToCopy.m_fileName;
 	this->m_filePath = playbackConfigurationToCopy.m_filePath;
 	this->m_foundCloudFiles = playbackConfigurationToCopy.m_foundCloudFiles;
 
@@ -21,7 +20,6 @@ PlaybackConfiguration& PlaybackConfiguration::operator= (const PlaybackConfigura
 	this->m_cloudType	= rhs.m_cloudType;
 	this->m_enabled		= rhs.m_enabled;
 	this->m_fileFormat	= rhs.m_fileFormat;
-	this->m_fileName	= rhs.m_fileName;
 	this->m_filePath	= rhs.m_filePath;
 	this->m_foundCloudFiles = rhs.m_foundCloudFiles;
 	this->m_wasFullPlayed = rhs.m_wasFullPlayed;
@@ -31,8 +29,6 @@ PlaybackConfiguration& PlaybackConfiguration::operator= (const PlaybackConfigura
 PlaybackConfiguration::PlaybackConfiguration(RecordingConfiguration& recordConfiguration) :
 m_enabled(false),
 m_fileFormat(recordConfiguration.getRecordFileFormat()),
-m_fileName(recordConfiguration.getFileName()),
-m_cloudType(recordConfiguration.getRecordCloudType()),
 m_wasFullPlayed(false)
 {
 	auto fullFilePath = recordConfiguration.getFullRecordingPath();
@@ -70,10 +66,6 @@ bool PlaybackConfiguration::operator == (PlaybackConfiguration& playbackToCompar
 	}
 }
 
-CString PlaybackConfiguration::getFilePathCString()
-{
-	return m_filePath;
-}
 
 bool PlaybackConfiguration::isEnabled()
 {
@@ -83,11 +75,6 @@ bool PlaybackConfiguration::isEnabled()
 RecordingFileFormat PlaybackConfiguration::getRecordFileFormat()
 {
 	return m_fileFormat;
-}
-
-LPTSTR PlaybackConfiguration::getFileName()
-{
-	return m_fileName.GetBuffer(0);
 }
 
 void PlaybackConfiguration::setFullFilePath(CString filePath)
@@ -194,7 +181,7 @@ int PlaybackConfiguration::extractCloudCountFromString(std::string input)
 	return -1;
 }
 
-bool PlaybackConfiguration::sortByIntegerEnding(const CloudFile& cloudFile1, const CloudFile cloudFile2)
+bool PlaybackConfiguration::sortByIntegerEnding(const CloudFile& cloudFile1, const CloudFile& cloudFile2)
 {
 	return extractCloudCountFromString(cloudFile1.fileName) < extractCloudCountFromString(cloudFile2.fileName);
 }

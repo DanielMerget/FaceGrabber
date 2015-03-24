@@ -39,7 +39,7 @@ void RecordTabHandler::onCreate()
 
 	//for (int i = RECORD_FILE_FORMAT_COUNT-1; i >= 0; --i){
 	for (int i = 0; i < RECORD_FILE_FORMAT_COUNT; i++){
-		LPTSTR fileFormatName = RecordingConfiguration::getFileFormatAsString(static_cast<RecordingFileFormat>(i));
+		CString fileFormatName = RecordingConfiguration::getFileFormatAsString(static_cast<RecordingFileFormat>(i));
 		ComboBox_AddString(hdFaceComboBox, fileFormatName);
 		ComboBox_AddString(facerawDepthComboBox, fileFormatName);
 		ComboBox_AddString(fullRawDepthCombobox, fileFormatName);

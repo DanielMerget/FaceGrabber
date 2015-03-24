@@ -23,13 +23,11 @@ KinectFileWriterThread< PointCloudType >::~KinectFileWriterThread()
 }
 
 template < typename PointCloudType >
-void KinectFileWriterThread<PointCloudType>::writeCloudToFile(IRecordingConfigurationPtr recordingConfiguration)
+void KinectFileWriterThread<PointCloudType>::writeCloudsToFile(IRecordingConfigurationPtr recordingConfiguration)
 {
 	auto recordingFileFormat =	recordingConfiguration->getRecordFileFormat();
 	auto filePath =				recordingConfiguration->getFullRecordingPathString();
 	auto fileName =				recordingConfiguration->getFileNameString();
-
-	bool cloudIsEmpty = false;
 	std::shared_ptr<pcl::FileWriter> writer;
 	std::string fileFormatExtension;
 	bool isBinary = false;

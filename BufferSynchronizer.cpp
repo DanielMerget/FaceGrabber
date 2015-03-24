@@ -87,7 +87,6 @@ void BufferSynchronizer< BufferDataType >::updateThreadFunc()
 			
 			if (m_waitEachFrame){
 				printMessage("synchronier sleepig");
-				std::chrono::milliseconds dura(80);
 				std::this_thread::sleep_for(dura);
 				printMessage("synchronier woke up");
 			}
@@ -110,7 +109,6 @@ void BufferSynchronizer< BufferDataType >::setBuffer(std::vector<std::shared_ptr
 		buffer.first->dataReady->disconnect_all_slots();
 	}
 	m_bufferWithReadyState.clear();
-	int counter = 0;
 	for (int i = 0; i < buffers.size(); i++){
 		auto currentBuffer = buffers[i];
 		m_bufferWithReadyState.push_back(std::pair<std::shared_ptr<Buffer<BufferDataType>>, bool>(currentBuffer, false));

@@ -44,11 +44,7 @@ HRESULT ColouredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, 
 	if (SUCCEEDED(hr)){
 		CameraSpacePoint boundingBoxPointTopLeft;
 		CameraSpacePoint boundingBoxPointBottomRight;
-		std::vector<cv::Point2f> hdFacePointsInColorSpaceSpaceOpenCV;
-
-		std::chrono::high_resolution_clock::time_point t1 = std::chrono::high_resolution_clock::now();
-
-		
+		std::vector<cv::Point2f> hdFacePointsInColorSpaceSpaceOpenCV;		
 
 		auto hdFaceCloud = extractClolouredFaceHDPoinCloudAndBoundingBox(bufferSize, detectedHDFacePointsCamSpace, detectedHDFacePointsColorSpace,
 			boundingBoxPointTopLeft, boundingBoxPointBottomRight, hdFacePointsInColorSpaceSpaceOpenCV, colorBuffer);
@@ -104,7 +100,6 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::extractClolo
 	float right		= -	 FLT_MAX;
 	float left		=	 FLT_MAX;
 	float back		=  - FLT_MAX;
-	std::vector<cv::Point2f> ellipsePoints;
 	for (int i = 0; i < bufferSize; i++){
 		const auto& cameraSpacePoint = *cameraSpacePoints;
 		const auto& colorSpacePoint = *colorSpacePoints;
@@ -236,9 +231,10 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::convertDepth
 	if (m_pDepthVisibilityTestMap.size() == 0 || m_pColorCoordinates.size() == 0){
 		return nullptr;
 	}
-
+	//Transform Depth Points into Color Space
 	HRESULT hr;
 	auto depthBufferSize = m_depthWidth * m_depthHeight;
+
 	hr = m_pCoordinateMapper->MapDepthFrameToColorSpace(depthBufferSize, depthBuffer,
 		depthBufferSize, m_pColorCoordinates.data());
 
@@ -246,6 +242,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::convertDepth
 	{
 		return nullptr;
 	}
+
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr pointCloud(new pcl::PointCloud<pcl::PointXYZRGB>());
 	pointCloud->width = static_cast<uint32_t>(m_depthWidth);
 	pointCloud->height = static_cast<uint32_t>(m_depthHeight);
@@ -259,12 +256,18 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::convertDepth
 
 	ZeroMemory(m_pDepthVisibilityTestMap.data(), testMapWidth * testMapHeight * sizeof(UINT16));
 
+	//iterate through color buffer 
 	for (const UINT16* pDepth = depthBuffer; pDepth < pDepthEnd; pDepth++, pColorPoint++)
 	{
 		const UINT patchColorX = UINT(pColorPoint->X + 0.5f) >> PATCHDIVISIONSHIFT;
 		const UINT patchColorY = UINT(pColorPoint->Y + 0.5f) >> PATCHDIVISIONSHIFT;
+		//check whether inside the color buffer
 		if (patchColorX < testMapWidth && patchColorY < testMapHeight)
 		{
+			//calculate index by color space points => more than one color space point is mapped
+			//to the same index, as PATCHDIVISIONSHIFT divides the color space from 1920x1080 
+			//into a 480x270 grid  (depth 512×424)
+			//take only the smallest depth value
 			const UINT currentPatchIndex = patchColorY * testMapWidth + patchColorX;
 			const UINT16 oldDepth = m_pDepthVisibilityTestMap[currentPatchIndex];
 			const UINT16 newDepth = *pDepth;
@@ -275,6 +278,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::convertDepth
 		}
 	}
 
+	//iterate throught the deph array again
 	for (int yDepthHeight = 0; yDepthHeight < m_depthHeight; yDepthHeight++)
 	{
 		const UINT testMapWidth = UINT(m_colorWidth >> PATCHDIVISIONSHIFT);
@@ -285,15 +289,22 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::convertDepth
 			const ColorSpacePoint colorPoint = m_pColorCoordinates[destIndex];
 			const UINT colorX = (UINT)(colorPoint.X + 0.5f);
 			const UINT colorY = (UINT)(colorPoint.Y + 0.5f);
+			//check vor valid color index
 			if (colorX < m_colorWidth && colorY < m_colorHeight)
 			{
 				const UINT16 depthValue = depthBuffer[destIndex];
+
+				//calculate corresponding patch index
 				const UINT testX = colorX >> PATCHDIVISIONSHIFT;
 				const UINT testY = colorY >> PATCHDIVISIONSHIFT;
+
 				const UINT testIdx = testY * testMapWidth + testX;
+
 				const UINT16 depthTestValue = m_pDepthVisibilityTestMap[testIdx];
-				
+
+				//compare measured depth with depth in color space 
 				auto testDiff = std::abs(depthValue - depthTestValue);
+				//check whether depth point is in sight of color camera 
 				if (testDiff < VISIBILITY_MAX_THRESHHOLD)
 				{
 					const UINT colorIndex = colorX + (colorY * m_colorWidth);
@@ -303,6 +314,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColouredOutputStreamUpdater::convertDepth
 					depthPoint.X = static_cast<float>(xDepthWidth);
 					depthPoint.Y = static_cast<float>(yDepthHeight);
 
+					//map color space point into camera space instead?
 					CameraSpacePoint camPoint;
 					hr = m_pCoordinateMapper->MapDepthPointToCameraSpace(depthPoint, depthValue, &camPoint);
 

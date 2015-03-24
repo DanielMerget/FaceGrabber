@@ -16,46 +16,22 @@ m_fileFormat(format)
 }
 
 
-std::string RecordingConfiguration::getFileFormatFileExtension()
-{
-	switch (m_fileFormat)
-	{
-	case PLY:
-		return ".ply";
-		break;
-	case PLY_BINARY:
-		return ".ply";
-		break;
-	case PCD:
-		return ".pcd";
-		break;
-	case PCD_BINARY:
-		return ".pcd";
-		break;
-	case RECORD_FILE_FORMAT_COUNT:
-		break;
-	default:
-		break;
-	}
-	return ".UNKNOWN_FILE_FORMAT";
-}
-
-LPTSTR RecordingConfiguration::getFileFormatAsString(RecordingFileFormat fileFormat)
+CString RecordingConfiguration::getFileFormatAsString(RecordingFileFormat fileFormat)
 {
 	switch (fileFormat)
 	{
 	case PLY:
-		return L"ply";
+		return CString(L"ply");
 	case PLY_BINARY:
-		return L"ply binary";
+		return CString(L"ply binary");
 	case PCD:
 		return L"pcd";
 	case PCD_BINARY:
-		return L"pcd binary";
+		return CString(L"pcd binary");
 	case RECORD_FILE_FORMAT_COUNT:
-		return L"ERROR";
+		return CString(L"ERROR");
 	default:
-		return L"UNKNOWN_FILE FORMAT";
+		return CString(L"UNKNOWN_FILE FORMAT");
 		break;
 	}
 }
@@ -65,19 +41,19 @@ void RecordingConfiguration::setDefaultFileName()
 	m_fileName = getDefauldFileName();
 }
 
-LPTSTR RecordingConfiguration::getDefauldFileName()
+CString RecordingConfiguration::getDefauldFileName()
 {
 	switch (m_cloudType){
 	case HDFace:
-		return L"HD_Face";
+		return CString(L"HD_Face");
 	case FaceRaw:
-		return L"Face_Raw";
+		return CString(L"Face_Raw");
 	case FullDepthRaw:
-		return L"Full_Raw_Depth";
+		return CString(L"Full_Raw_Depth");
 	default:
-		return L"Cloud";
+		return CString(L"Cloud");
 	}
-	return L"";
+	return CString(L"");
 }
 
 bool RecordingConfiguration::isRecordConfigurationValid()

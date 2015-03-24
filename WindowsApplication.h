@@ -8,7 +8,7 @@
 #include "ImageRenderer.h"
 #include "PCLViewer.h"
 
-#include "KinectCloudOutputWriter.h"
+#include "KinectCloudFileWriter.h"
 #include "RecordingConfiguration.h"
 #include "RecordTabHandler.h"
 #include "PlaybackTabHandler.h"
@@ -25,7 +25,6 @@
  * \brief	The windows application holds the KinectHDFaceGrabber, FileReader and Writer and processes
  * 			the users input.
  */
-
 class WindowsApplication : public MessageRouterHelper
 {
 public:
@@ -35,8 +34,18 @@ public:
 	WindowsApplication();
 	~WindowsApplication();
 
-	int	run(HINSTANCE hInstance, int nCmdShow);
+	/**
+	 * \fn	int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow);
+	 *
+	 * \brief	Runs.
+	 *
+	 * \param	hInstance	Handle to the application instance
+	 * \param	nCmdShow 	whether to display minimized, maximized, or normally
+	 *
+	 * \return	An int.
+	 */
 
+	int	run(HINSTANCE hInstance, int nCmdShow);
 private:
 
 	/**
@@ -44,7 +53,6 @@ private:
 	 *
 	 * \brief	Creates the entire UI, model objects and connects them via signals.
 	 */
-
 	void onCreate();
 
 	/**
@@ -64,65 +72,254 @@ private:
 	 *
 	 * \return	A SharedRecordingConfiguration.
 	 */
-
 	SharedRecordingConfiguration initRecordDataModel();
 
-	
+	/**
+	 * \fn	void WindowsApplication::onPlaybackFinished();
+	 *
+	 * \brief	Forwards the playback finished signal to the PlaybackTabHandler.
+	 */
 	void onPlaybackFinished();
+
+	/**
+	* \fn	void WindowsApplication::onPlaybackSelected();
+	*
+	* \brief	Disconnects the stream updater and connects the playback tab handler to the
+	* 			PCLViewer instance
+	*/
 	void onPlaybackSelected();
+
+	/**
+	* \fn	void WindowsApplication::onConvertTabSelected()
+	*
+	* \brief	Hides all other tabs and shows the converstion tab
+	*/
 	void onConvertTabSelected();
+
+	/**
+	* \fn	void WindowsApplication::onRecordTabSelected()
+	*
+	* \brief	Disconnects the playback handler from the PCLViewer and reconnects the
+	* 			record tab handler. Hides all other tabs and shows only the record
+	* 			handler
+	*/
 	void onRecordTabSelected();
+
+	/**
+	* \fn	void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations)
+	*
+	* \brief	Callback to trigger the start of the recording with the specified recording configuration.
+	*
+	* \param	isColoredStream		   	true if recording should be done with color, or not.
+	* \param	recordingConfigurations	The recording configurations.
+	*/
 	void startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations);
+
+	/**
+	 * \fn	void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations);
+	 *
+	 * \brief	Callback to trigger the stop of the recording with the specified recording configuration.
+	 *
+	 * \param	isColoredStream		   	true if this object is colored stream.
+	 * \param	recordingConfigurations	The recording configurations.
+	 */
 	void stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations);
 
-	void startPlayback(SharedPlaybackConfiguration playbackConfig, bool isSingleThreatedReading);
-	void triggerReaderStart(SharedPlaybackConfiguration playbackConfig, bool isSingleThreatedReading);
+	/**
+	 * \fn	void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfig, bool isSingleThreatedReading);
+	 *
+	 * \brief	Callback to setup and trigger the start of the playback with the specified playback configuration.
+	 *
+	 * \param	playbackConfig		   	The playback configuration.
+	 * \param	isSingleThreatedReading	true if cloud files should be read single threaded.
+	 */
+	void startPlayback(SharedPlaybackConfiguration playbackConfig, bool isSingleThreadedReading);
+
+
+	/**
+	 * \fn	void WindowsApplication::triggerReaderStart(SharedPlaybackConfiguration playbackConfig, bool isSingleThreatedReading);
+	 *
+	 * \brief	Trigger reader to start.
+	 *
+	 * \param	playbackConfig		   	The playback configuration.
+	 * \param	isSingleThreatedReading	true if cloud files should be read single threaded.
+	 */
+
+	void triggerReaderStart(SharedPlaybackConfiguration playbackConfig, bool isSingleThreadedReading);
+
+	/**
+	 * \fn	void WindowsApplication::setupReaderAndBuffersForPlayback(SharedPlaybackConfiguration playbackConfig);
+	 *
+	 * \brief	Sets up the reader and buffers for playback.
+	 *
+	 * \param	playbackConfig	The playback configuration.
+	 */
 	void setupReaderAndBuffersForPlayback(SharedPlaybackConfiguration playbackConfig);
+
+	/**
+	 * \fn	void WindowsApplication::stopPlayback();
+	 *
+	 * \brief	Stops a playback .
+	 */
 	void stopPlayback();
 
+	/**
+	 * \fn	void WindowsApplication::initCloudWriter();
+	 *
+	 * \brief	Initialises the cloud writer and registers for status notification.
+	 */
 	void initCloudWriter();
+
+	/**
+	 * \fn	void WindowsApplication::initInputReaderBufferAndSynchronizer();
+	 *
+	 * \brief	Initialises the input reader buffer and synchronizer, connects them.
+	 * 			The synchronizer thread is started.
+	 */
 	void initInputReaderBufferAndSynchronizer();
+
+	/**
+	 * \fn	void WindowsApplication::initTabs();
+	 *
+	 * \brief	Creates all tabs, adds their dialog windows redirects the messages and connects
+	 * 			the notifications of the tabs to the WindowsApplication.
+	 */
 	void initTabs();
+
+	/**
+	 * \fn	void WindowsApplication::initKinectFrameGrabber();
+	 *
+	 * \brief	Initialises the kinect frame grabber, image reader and outputstream updater-stragedy and
+	 * 			connects them.
+	 */
 	void initKinectFrameGrabber();
 
+	/**
+	 * \fn	void WindowsApplication::connectStreamUpdaterToViewer();
+	 *
+	 * \brief	Connects the stream updater to viewer and KinectCloudOutputWriter.
+	 */
 	void connectStreamUpdaterToViewer();
-	void connectInputReaderToViewer();
+
+	/**
+	* \fn	void WindowsApplication::disconnectStreamUpdaterFromViewer();
+	*
+	* \brief	Disconnects the stream updater of the kinect grabber from viewer.
+	*/
 	void disconnectStreamUpdaterFromViewer();
+
+	/**
+	 * \fn	void WindowsApplication::connectInputReaderToViewer();
+	 *
+	 * \brief	Connects the input reader/buffer synchronizer to the PCLViewer.
+	 */
+	void connectInputReaderToViewer();
+
+	/**
+	 * \fn	void WindowsApplication::disconnectInputReaderFromViewer();
+	 *
+	 * \brief	Disconnects the reader/buffer synchronizer from viewer.
+	 */
+
 	void disconnectInputReaderFromViewer();
+
+	/**
+	 * \fn	void WindowsApplication::colorStreamingChangedTo(bool enable);
+	 *
+	 * \brief	Switches the OutputStreamUpdaterStragedy to color or non-colored updating
+	 *
+	 * \param	enable	true to enable color, false to disable.
+	 */
 	void colorStreamingChangedTo(bool enable);
 
+	/**
+	 * \fn	int WindowsApplication::insertTabItem(HWND tab, LPTSTR text, int tabid);
+	 *
+	 * \brief	Inserts a tab item into Windows Application tap-control
+	 *
+	 * \param	tab  	Handle of the tab.
+	 * \param	text 	The text.
+	 * \param	tabid	The tabid.
+	 *
+	 * \return	An int.
+	 */
 	int insertTabItem(HWND tab, LPTSTR text, int tabid);
 
+	/**
+	 * \fn	bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce);
+	 *
+	 * \brief	Sets status message in the bottom text field.
+	 *
+	 * \param	statusString	The status string.
+	 * \param	bForce			true to force.
+	 *
+	 * \return	true if it succeeds, false if it fails.
+	 */
 	bool setStatusMessage(std::wstring statusString, bool bForce);
 
+
+	/** \brief	The handle of the windows app instance. */
 	HINSTANCE m_hInstance;
+
+	/** \brief	Handle of the record tab. */
 	HWND m_recordTabHandle;
+
+	/** \brief	Handle of the playback tab. */
 	HWND m_playbackTabHandle;
+
+	/** \brief	Handle of the convert tab. */
 	HWND m_convertTabHandle;
+
+	/** \brief	Handle of the live view window. */
 	HWND m_liveViewWindow;
 
+	/** \brief	The min time delay for the next status update. */
 	ULONGLONG m_nNextStatusTime;
 
-	// Direct2D
+	
+	/** \brief	The image renderer for the color stream and HDFace. */
 	ImageRenderer* m_pDrawDataStreams;
-	ID2D1Factory* m_pD2DFactory;
-	bool m_isCloudWritingStarted;
 
+	/** \brief	The d 2D factory. */
+	ID2D1Factory* m_pD2DFactory;
+
+	/** \brief	The kinect frame grabber. */
 	KinectHDFaceGrabber			m_kinectFrameGrabber;
+
+	/** \brief	The PCL face viewer. */
 	std::shared_ptr<PCLViewer>	m_pclFaceViewer;
+
+	/** \brief	The input file reader. */
 	std::vector<std::shared_ptr<PCLInputReader<pcl::PointXYZRGB>>>	m_inputFileReader;
 	
-	std::vector<std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>> m_colorCloudOutputWriter;
-	std::vector<std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>> m_nonColoredCloudOutputWriter;
+	/** \brief	The color cloud writer. */
+	std::vector<std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZRGB>>> m_colorCloudOutputWriter;
+
+	/** \brief	The non colored cloud writer. */
+	std::vector<std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZ>>> m_nonColoredCloudOutputWriter;
 	
-	//SharedRecordingConfiguration	m_recordingConfiguration;
+	/** \brief	The buffer synchronizer for reading files. */
 	BufferSynchronizer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> m_bufferSynchronizer;
+
+	/** \brief	The buffer synchronizer thread. */
 	std::thread	m_bufferSynchronizerThread;
+
+	/** \brief	true if kinect updating should be triggered. */
 	bool m_isKinectRunning;
+
+	/** \brief	The record tab handler. */
 	RecordTabHandler m_recordTabHandler;
+
+	/** \brief	The plack back tab handler. */
 	PlaybackTabHandler m_plackBackTabHandler;
+
+	/** \brief	The convert tab handler. */
 	ConvertTabHandler m_convertTabHandler;
+
+	/** \brief	The coloured output stream updater. */
 	std::shared_ptr<ColouredOutputStreamUpdater> m_colouredOutputStreamUpdater;
+
+	/** \brief	The non colored output stream updater. */
 	std::shared_ptr<NonColouredOutputStreamsUpdater> m_nonColoredOutputStreamUpdater;	
 };
 

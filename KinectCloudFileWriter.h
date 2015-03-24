@@ -22,36 +22,36 @@
  */
 
 template < class PointCloudType >
-class KinectCloudOutputWriter : CloudMeasurementSource< PointCloudType >
+class KinectCloudFileWriter : CloudMeasurementSource< PointCloudType >
 {
 public:
 	
-	KinectCloudOutputWriter();
+	KinectCloudFileWriter();
 	
-	~KinectCloudOutputWriter();
+	~KinectCloudFileWriter();
 
 	/**
-	 * \fn	void KinectCloudOutputWriter::pushCloudThreated(boost::shared_ptr<pcl::PointCloud<PointCloudType>> cloud);
+	 * \fn	void KinectCloudFileWriter::pushCloudAsync(boost::shared_ptr<pcl::PointCloud<PointCloudType>> cloud);
 	 *
 	 * \brief	Pushes a cloud into the buffer holding the Point Clouds to be written to the hard drive.
 	 *
 	 * \param	cloud	The cloud to be pushed.
 	 */
 
-	void pushCloudThreated(boost::shared_ptr<pcl::PointCloud<PointCloudType>> cloud);
+	void pushCloudAsync(boost::shared_ptr<pcl::PointCloud<PointCloudType>> cloud);
 
 	/**
-	 * \fn	void KinectCloudOutputWriter::pushCloudsThreated(std::vector<boost::shared_ptr<pcl::PointCloud<PointCloudType>>> clouds);
+	 * \fn	void KinectCloudFileWriter::pushCloudsAsync(std::vector<boost::shared_ptr<pcl::PointCloud<PointCloudType>>> clouds);
 	 *
 	 * \brief	Pushes a list of Point Clouds into the buffer holding the Point Clouds to be written to the hard drive.
 	 *
 	 * \param	clouds	The clouds.
 	 */
 
-	void pushCloudsThreated(std::vector<boost::shared_ptr<pcl::PointCloud<PointCloudType>>> clouds);
+	void pushCloudsAsync(std::vector<boost::shared_ptr<pcl::PointCloud<PointCloudType>>> clouds);
 
 	/**
-	 * \fn	void KinectCloudOutputWriter::startWritingClouds();
+	 * \fn	void KinectCloudFileWriter::startWritingClouds();
 	 *
 	 * \brief	Triggers the start of writing the buffered clouds.
 	 */
@@ -59,7 +59,7 @@ public:
 	void startWritingClouds();
 
 	/**
-	 * \fn	void KinectCloudOutputWriter::stopWritingClouds();
+	 * \fn	void KinectCloudFileWriter::stopWritingClouds();
 	 *
 	 * \brief	Triggers the stop of writing the buffered clouds.
 	 */
@@ -67,7 +67,7 @@ public:
 	void stopWritingClouds();
 
 	/**
-	 * \fn	void KinectCloudOutputWriter::setRecordingConfiguration(IRecordingConfigurationPtr recordingConfiguration);
+	 * \fn	void KinectCloudFileWriter::setRecordingConfiguration(IRecordingConfigurationPtr recordingConfiguration);
 	 *
 	 * \brief	Sets recording configuration for the writing.
 	 *
@@ -97,7 +97,7 @@ public:
 private:
 
 	/**
-	 * \fn	bool KinectCloudOutputWriter::isMaximumFramesReached();
+	 * \fn	bool KinectCloudFileWriter::isMaximumFramesReached();
 	 *
 	 * \brief	Query whether the maxmimum of frames was reached.
 	 *
@@ -107,7 +107,7 @@ private:
 	bool isMaximumFramesReached();
 
 	/**
-	 * \fn	void KinectCloudOutputWriter::waitForWriterToFinish();
+	 * \fn	void KinectCloudFileWriter::waitForWriterToFinish();
 	 *
 	 * \brief	Method supposed for a thread to wait for all writer threads to finish
 	 * 			in order to update the status accordingly.
@@ -116,7 +116,7 @@ private:
 	void waitForWriterToFinish();
 
 	/**
-	 * \fn	void KinectCloudOutputWriter::pushCloud(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloud);
+	 * \fn	void KinectCloudFileWriter::pushCloud(boost::shared_ptr<const pcl::PointCloud<PointCloudType>> cloud);
 	 *
 	 * \brief	Arctually pushes a cloud to the buffer in a blocking way. 
 	 *

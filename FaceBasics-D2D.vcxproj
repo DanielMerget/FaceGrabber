@@ -36,7 +36,7 @@
     <ClCompile Include="ImageRenderer.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="KinectCloudOutputWriter.cpp">
+    <ClCompile Include="KinectCloudFileWriter.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Main.cpp" />
@@ -63,9 +63,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="SimpleRecordingConfiguration.cpp" />
-    <ClCompile Include="SingleProducerBuffer.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
     </ClCompile>
@@ -92,7 +89,7 @@
     <ClInclude Include="KinectFileWriterThread.h" />
     <ClInclude Include="KinectHDFaceGrabber.h" />
     <ClInclude Include="ImageRenderer.h" />
-    <ClInclude Include="KinectCloudOutputWriter.h" />
+    <ClInclude Include="KinectCloudFileWriter.h" />
     <ClInclude Include="MessageRouterHelper.h" />
     <ClInclude Include="NonColouredOutputStreamsUpdater.h" />
     <ClInclude Include="OutputStreamsUpdaterStragedy.h" />

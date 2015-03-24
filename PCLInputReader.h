@@ -34,7 +34,7 @@ public:
 	~PCLInputReader();
 
 	/**
-	 * \fn	void PCLInputReader::startCloudUpdateThread(bool isSingleThreatedReadingAndBlocking);
+	 * \fn	void PCLInputReader::startReading(bool isSingleThreatedReadingAndBlocking);
 	 *
 	 * \brief	Configures the Buffer of the PCLInputReader and triggers the starting of the reader threads. 
 	 * 			Before, the Buffer to be used to store the read clouds and the PlaybackConfiguration has to be set.
@@ -43,15 +43,15 @@ public:
 	 *			and the method call should be blocking, false if multiple threads should be started and
 	 *			the call to this method should be non-blocking.
 	 */
-	void startCloudUpdateThread(bool isSingleThreatedReadingAndBlocking);
+	void startReading(bool isSingleThreatedReadingAndBlocking);
 
 	/**
-	 * \fn	void PCLInputReader::stopReaderThreads();
+	 * \fn	void PCLInputReader::stopReading();
 	 *
 	 * \brief	Stops the reader threads.
 	 */
-	void stopReaderThreads();
-
+	void stopReading();
+	
 	
 
 	/**

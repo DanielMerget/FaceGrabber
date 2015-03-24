@@ -83,7 +83,6 @@ pcl::PointCloud<pcl::PointXYZ>::Ptr NonColouredOutputStreamsUpdater::extractFace
 	float right = -FLT_MAX;
 	float left = FLT_MAX;
 	float back = -FLT_MAX;
-	std::vector<cv::Point2f> ellipsePoints;
 	for (int i = 0; i < bufferSize; i++){
 		const auto& cameraSpacePoint = *cameraSpacePoints;
 		const auto& colorSpacePoint = *colorSpacePoints;

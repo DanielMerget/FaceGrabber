@@ -27,7 +27,6 @@ bool WindowsAppDialogHelper::openFileDialog(WCHAR* szDir, HWND handle)
 
 	if (GetOpenFileName(&ofn))
 	{
-		// Do something usefull with the filename stored in szFileName 
 		return true;
 	}
 	return false;

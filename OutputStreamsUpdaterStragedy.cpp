@@ -2,7 +2,12 @@
 #include "OutputStreamsUpdaterStragedy.h"
 
 
-OutputStreamsUpdaterStragedy::OutputStreamsUpdaterStragedy() : m_pCoordinateMapper(nullptr)
+OutputStreamsUpdaterStragedy::OutputStreamsUpdaterStragedy() :
+	m_pCoordinateMapper(nullptr),
+	m_depthWidth (-1),
+	m_depthHeight(-1),
+	m_colorWidth (-1),
+	m_colorHeight(-1)
 {
 }
 

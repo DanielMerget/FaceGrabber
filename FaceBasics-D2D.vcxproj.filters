@@ -22,9 +22,6 @@
     <ClCompile Include="NonColouredOutputStreamsUpdater.cpp">
       <Filter>Kinect</Filter>
     </ClCompile>
-    <ClCompile Include="KinectCloudOutputWriter.cpp">
-      <Filter>FileWriter</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
       <Filter>WindowsApp</Filter>
     </ClCompile>
@@ -38,9 +35,6 @@
       <Filter>InputReader</Filter>
     </ClCompile>
     <ClCompile Include="KinectFileWriterThread.cpp">
-      <Filter>FileWriter</Filter>
-    </ClCompile>
-    <ClCompile Include="SingleProducerBuffer.cpp">
       <Filter>FileWriter</Filter>
     </ClCompile>
     <ClCompile Include="PlaybackTabHandler.cpp">
@@ -71,6 +65,9 @@
       <Filter>WindowsApp</Filter>
     </ClCompile>
     <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="KinectCloudFileWriter.cpp">
+      <Filter>FileWriter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -100,9 +97,6 @@
     <ClInclude Include="NonColouredOutputStreamsUpdater.h">
       <Filter>Kinect</Filter>
     </ClInclude>
-    <ClInclude Include="KinectCloudOutputWriter.h">
-      <Filter>FileWriter</Filter>
-    </ClInclude>
     <ClInclude Include="Buffer.h">
       <Filter>InputReader</Filter>
     </ClInclude>
@@ -113,9 +107,6 @@
       <Filter>InputReader</Filter>
     </ClInclude>
     <ClInclude Include="KinectFileWriterThread.h">
-      <Filter>FileWriter</Filter>
-    </ClInclude>
-    <ClInclude Include="SingleProducerBuffer.h">
       <Filter>FileWriter</Filter>
     </ClInclude>
     <ClInclude Include="CloudMeasurementSource.h">
@@ -150,6 +141,9 @@
     </ClInclude>
     <ClInclude Include="WindowsAppDialogHelper.h">
       <Filter>WindowsApp</Filter>
+    </ClInclude>
+    <ClInclude Include="KinectCloudFileWriter.h">
+      <Filter>FileWriter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

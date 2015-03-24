@@ -11,7 +11,8 @@
 template PCLInputReaderWorkerThread < pcl::PointXYZRGB> ;
 template PCLInputReaderWorkerThread < pcl::PointXYZ>;
 template < typename PointType >
-PCLInputReaderWorkerThread< PointType >::PCLInputReaderWorkerThread()
+PCLInputReaderWorkerThread< PointType >::PCLInputReaderWorkerThread():
+	m_isPlaybackRunning(false)
 {
 }
 

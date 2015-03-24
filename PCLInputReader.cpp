@@ -40,7 +40,7 @@ PCLInputReader< PointType >::~PCLInputReader()
 }
 
 template <typename PointType>
-void PCLInputReader< PointType >::startCloudUpdateThread(bool isSingleThreatedReadingAndBlocking)
+void PCLInputReader< PointType >::startReading(bool isSingleThreatedReadingAndBlocking)
 {
 	if (!m_playbackConfiguration.isEnabled()){
 		return;
@@ -118,7 +118,7 @@ void PCLInputReader< PointType >::startReaderThreads(bool isSingleThreatedReadin
 }
 
 template <typename PointType>
-void PCLInputReader< PointType >::stopReaderThreads()
+void PCLInputReader< PointType >::stopReading()
 { 
 	for (auto& reader : m_inputReaderWorkerThreads){
 		reader->stopReading();

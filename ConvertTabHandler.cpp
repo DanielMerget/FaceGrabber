@@ -28,7 +28,7 @@ void ConvertTabHandler::onCreate()
 	HWND outputFormatHandle = GetDlgItem(m_hWnd, IDC_COMBO_OUTPUT_FORMAT);
 
 	for (int i = 0; i < RECORD_FILE_FORMAT_COUNT; i++){
-		LPTSTR fileFormatName = RecordingConfiguration::getFileFormatAsString(static_cast<RecordingFileFormat>(i));
+		auto fileFormatName = RecordingConfiguration::getFileFormatAsString(static_cast<RecordingFileFormat>(i));
 		ComboBox_AddString(outputFormatHandle, fileFormatName);
 	}
 	m_recordingConfiguration->setRecordFileFormat(PCD);
@@ -126,7 +126,7 @@ void ConvertTabHandler::initColoredConversionPipeline()
 	m_colorCloudReader = std::shared_ptr<ColoredCloudInputReader>(new ColoredCloudInputReader);
 	m_colorBuffer = std::shared_ptr<ColorBuffer>(new ColorBuffer);
 
-	m_colorWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>(new KinectCloudOutputWriter<pcl::PointXYZRGB>);
+	m_colorWriter = std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZRGB>>(new KinectCloudFileWriter<pcl::PointXYZRGB>);
 
 	std::vector< std::shared_ptr<ColorBuffer>> buffers;
 	buffers.push_back(m_colorBuffer);
@@ -135,7 +135,7 @@ void ConvertTabHandler::initColoredConversionPipeline()
 
 
 	m_colorBufferSynchronizer->publishSynchronizedData.connect(
-		boost::bind(&KinectCloudOutputWriter<pcl::PointXYZRGB>::pushCloudsThreated, m_colorWriter, _1));
+		boost::bind(&KinectCloudFileWriter<pcl::PointXYZRGB>::pushCloudsAsync, m_colorWriter, _1));
 	m_colorWriter->updateStatus.connect(boost::bind(&ConvertTabHandler::updateWriterStatus, this, _1));
 
 	m_colorWriter->writingWasStopped.connect(boost::bind(&ConvertTabHandler::notifyWriterFinished, this));
@@ -145,12 +145,12 @@ void ConvertTabHandler::initColoredConversionPipeline()
 	m_colorCloudReader->setBuffer(m_colorBuffer);
 }
 
-void ConvertTabHandler::nonColoredConversionPipeline()
+void ConvertTabHandler::initNonColoredConversionPipeline()
 {
 	m_nonColorCloudReader = std::shared_ptr<NonColoredCloudInputReader>(new NonColoredCloudInputReader);
 	m_nonColorBuffer = std::shared_ptr<NonColorBuffer>(new NonColorBuffer);
 
-	m_nonColorWriter = std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>(new KinectCloudOutputWriter<pcl::PointXYZ>);
+	m_nonColorWriter = std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZ>>(new KinectCloudFileWriter<pcl::PointXYZ>);
 	m_nonColorWriter->updateStatus.connect(boost::bind(&ConvertTabHandler::updateWriterStatus, this, _1));
 	m_nonColorWriter->writingWasStopped.connect(boost::bind(&ConvertTabHandler::notifyWriterFinished, this));
 
@@ -160,7 +160,7 @@ void ConvertTabHandler::nonColoredConversionPipeline()
 	m_nonColorBufferSynchronizer->setBuffer(buffers, m_playbackConfiguration->getCloudFilesToPlayCount());
 
 	m_nonColorBufferSynchronizer->publishSynchronizedData.connect(
-		boost::bind(&KinectCloudOutputWriter<pcl::PointXYZ>::pushCloudsThreated, m_nonColorWriter, _1));
+		boost::bind(&KinectCloudFileWriter<pcl::PointXYZ>::pushCloudsAsync, m_nonColorWriter, _1));
 
 	
 
@@ -179,17 +179,18 @@ void ConvertTabHandler::startFileConversion()
 		m_colorWriter->setRecordingConfiguration(m_recordingConfiguration);
 		m_colorCloudReader->setPlaybackConfiguration(m_playbackConfiguration);
 		
-		std::async(std::launch::async, &ColoredCloudInputReader::startCloudUpdateThread, m_colorCloudReader, true);
+		std::async(std::launch::async, &ColoredCloudInputReader::startReading, m_colorCloudReader, true);
 
 		m_colorWriter->startWritingClouds();
 	}
 	else{
 		if (!m_nonColorCloudReader){
+			initNonColoredConversionPipeline();
 		}
 		m_nonColorCloudReader->setPlaybackConfiguration(m_playbackConfiguration);
 		m_nonColorWriter->setRecordingConfiguration(m_recordingConfiguration);
 
-		std::async(std::launch::async, &NonColoredCloudInputReader::startCloudUpdateThread, m_nonColorCloudReader, true);
+		std::async(std::launch::async, &NonColoredCloudInputReader::startReading, m_nonColorCloudReader, true);
 		m_nonColorWriter->startWritingClouds();
 	}
 	Button_Enable(GetDlgItem(m_hWnd, IDC_BUTTON_CONVERT), false);

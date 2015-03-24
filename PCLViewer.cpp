@@ -12,7 +12,6 @@ PCLViewer::PCLViewer(int cloudCount, std::string viewerName) :
 	m_isRunning(false),
 	m_updateThread(&PCLViewer::updateLoop, this),
 	m_viewPortConfigurationChanged(false),
-	m_cloudUpdated(),
 	m_cloudsUpdated(false)
 {
 	useColoredCloud(m_useColoredCloud);
@@ -43,6 +42,7 @@ void PCLViewer::updateNonColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZ
 	m_cloudsUpdated = true;
 	m_cloudUpdate.notify_all();
 }
+
 void PCLViewer::updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> clouds)
 {
 	std::unique_lock<std::mutex> lock(m_cloudMutex);
@@ -57,60 +57,10 @@ void PCLViewer::updateColoredClouds(std::vector<pcl::PointCloud<pcl::PointXYZRGB
 }
 
 
-void PCLViewer::pushNewColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud, int index)
-{
-	if (!cloud){
-		OutputDebugString(L"pushed point cloud is null");
-		return;
-	}
-	OutputDebugString(index + L"pushNewColoredCloudAtIndex\n");
-	std::unique_lock<std::mutex> lock(m_cloudMutex);
-
-	m_coloredClouds[index] = cloud;
-	m_cloudUpdated[index] = true;
-	bool notify = true;
-	for (auto& isUpdated : m_cloudUpdated){
-		notify &= isUpdated;
-	}
-	if (notify){
-		OutputDebugString(index + L"pushNewColoredCloudAtIndex: notify \n");
-		m_isRunning = true;
-		m_cloudsUpdated = true;
-		m_cloudUpdate.notify_all();
-	}
-
-}
-
-void PCLViewer::pushNewNonColoredCloudAtIndex(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud, int index)
-{
-	//if (index >= m_cloudCount){
-	//	return;
-	//}
-	OutputDebugString(index + L"pushNewNonColoredCloudAtIndex\n");
-	std::unique_lock<std::mutex> lock(m_cloudMutex);
-	
-	m_nonColoredClouds[index] = cloud;
-	
-	m_cloudUpdated[index] = true;
-	bool notify = true;
-	for (auto& isUpdated : m_cloudUpdated){
-		notify &= isUpdated;
-	}
-	if (notify){
-		OutputDebugString(index + L"pushNewNonColoredCloudAtIndex: notify \n");
-		m_isRunning = true;
-		m_cloudsUpdated = true;
-		m_cloudUpdate.notify_all();
-	}
-
-}
-
 void PCLViewer::createViewPortsForViewer(pcl::visualization::PCLVisualizer::Ptr viewer)
 {
-	m_cloudUpdated.clear();
 	m_viewPorts.clear();
 	m_cloudIDs.clear();
-	m_cloudUpdated.resize(m_cloudCount);
 	m_viewPorts.resize(m_cloudCount);
 	m_cloudIDs.resize(m_cloudCount);
 	float horizontalSplitPlaneWidth = 1.0f / m_cloudCount;
@@ -200,7 +150,6 @@ void PCLViewer::setNumOfClouds(int numOfClouds)
 	if (m_cloudCount != numOfClouds){
 		m_cloudCount = numOfClouds;
 		m_coloredClouds.resize(numOfClouds);
-		m_cloudUpdated.resize(numOfClouds);
 		m_cloudIDs.resize(numOfClouds);
 		m_viewPorts.resize(numOfClouds);
 		m_nonColoredClouds.resize(numOfClouds);

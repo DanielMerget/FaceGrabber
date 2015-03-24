@@ -22,7 +22,7 @@ public:
 	~KinectFileWriterThread();
 
 	/**
-	 * \fn	void KinectFileWriterThread::writeCloudToFile(IRecordingConfigurationPtr recordingConfiguration);
+	 * \fn	void KinectFileWriterThread::writeCloudsToFile(IRecordingConfigurationPtr recordingConfiguration);
 	 *
 	 * \brief	Writes point clouds to the hard disc as specified in the recording configuration.
 	 * 			Poit Clouds are pulled from the CloudMeasurementSource.
@@ -30,7 +30,7 @@ public:
 	 * \param	recordingConfiguration	The recording configuration.
 	 */
 
-	void writeCloudToFile(IRecordingConfigurationPtr recordingConfiguration);
+	void writeCloudsToFile(IRecordingConfigurationPtr recordingConfiguration);
 
 	/**
 	 * \fn	void KinectFileWriterThread::setKinectCloudOutputWriter(CloudMeasurementSource<PointCloudType>* source);

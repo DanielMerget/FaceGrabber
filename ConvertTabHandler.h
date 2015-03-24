@@ -8,7 +8,7 @@
 #include "PlaybackConfiguration.h"
 #include "BufferSynchronizer.h"
 #include "SimpleRecordingConfiguration.h"
-#include "KinectCloudOutputWriter.h"
+#include "KinectCloudFileWriter.h"
 #include "Buffer.h"
 #include "PCLInputReader.h"
 #include <memory>
@@ -31,40 +31,121 @@ public:
 	
 private:
 
+	/**
+	 * \fn	void ConvertTabHandler::onCreate();
+	 *
+	 * \brief	Creates the user interface and sets preconfigured values.
+	 */
+
 	void onCreate();
 
+	/**
+	 * \fn	void ConvertTabHandler::startFileConversion();
+	 *
+	 * \brief	Triggers the file conversion.
+	 */
 	void startFileConversion();
+
+	/**
+	 * \fn	void ConvertTabHandler::playbackConfigurationChanged();
+	 *
+	 * \brief	Playback configuration changed callback.
+	 */
+
 	void playbackConfigurationChanged();
+
+	/**
+	 * \fn	void ConvertTabHandler::recordingConfigurationChanged();
+	 *
+	 * \brief	Recording configuration changed callback.
+	 */
 	void recordingConfigurationChanged();
 
+	/**
+	 * \fn	void ConvertTabHandler::notifyWriterFinished();
+	 *
+	 * \brief	Callback for the writer finish signal.
+	 */
+
 	void notifyWriterFinished();
-	
+
+	/**
+	 * \fn	void ConvertTabHandler::updateWriterStatus(std::wstring newStatus);
+	 *
+	 * \brief	Callback: Updates the writer status described by newStatus.
+	 *
+	 * \param	newStatus	The new status.
+	 */
 	void updateWriterStatus(std::wstring newStatus);
+
+	/**
+	 * \fn	void ConvertTabHandler::updateReaderStatus(std::wstring newStatus);
+	 *
+	 * \brief	Callback: Updates the reader status described by newStatus.
+	 *
+	 * \param	newStatus	The new status.
+	 */
+
 	void updateReaderStatus(std::wstring newStatus);
 
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
+
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
+
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
-	
+
+	/**
+	 * \fn	void ConvertTabHandler::initColoredConversionPipeline();
+	 *
+	 * \brief	Initialises the colored conversion pipeline.
+	 */
 	void initColoredConversionPipeline();
-	void nonColoredConversionPipeline();
-	
-	PCLInputReader<pcl::PointXYZ>		reader;
+
+	/**
+	 * \fn	void ConvertTabHandler::initNonColoredConversionPipeline();
+	 *
+	 * \brief	Initialises the non colored conversion pipeline.
+	 */
+	void initNonColoredConversionPipeline();
+
+	/** \brief	The playback configuration. */
 	PlaybackConfigurationPtr			m_playbackConfiguration;
-	SimpleRecordingConfigurationPtr		m_recordingConfiguration;
-	bool								m_enableColor;
 
+	/** \brief	The recording configuration. */
+	SimpleRecordingConfigurationPtr		m_recordingConfiguration;
+
+	/** \brief	true to enable, false to disable the color writing. */
+	bool										m_enableColor;
+
+	/** \brief	The color cloud reader. */
 	std::shared_ptr<ColoredCloudInputReader>	m_colorCloudReader;
+
+	/** \brief	Buffer for color point clouds. */
 	std::shared_ptr<ColorBuffer>				m_colorBuffer;
+
+	/** \brief	The color buffer synchronizer. */
 	std::shared_ptr<ColorBufferSynchronizer>	m_colorBufferSynchronizer;
-	std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZRGB>>	m_colorWriter;
+
+	/** \brief	The colored clouds writer. */
+	std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZRGB>>	m_colorWriter;
 
 	
+	/** \brief	The non color cloud reader. */
 	std::shared_ptr<NonColoredCloudInputReader> m_nonColorCloudReader;
-	std::shared_ptr<NonColorBuffer>				m_nonColorBuffer;
-	std::shared_ptr<NonColorBufferSynchronizer>		m_nonColorBufferSynchronizer;
-	std::shared_ptr<KinectCloudOutputWriter<pcl::PointXYZ>>	m_nonColorWriter;
 
-	std::thread									m_colorBufferSynchronizerThread;
-	std::thread									m_nonColorBufferSynchronizerThread;
+	/** \brief	Buffer for non color clouds. */
+	std::shared_ptr<NonColorBuffer>				m_nonColorBuffer;
+
+	/** \brief	The non color buffer synchronizer. */
+	std::shared_ptr<NonColorBufferSynchronizer>		m_nonColorBufferSynchronizer;
+
+
+	/** \brief	The non colored cloud writer. */
+	std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZ>>	m_nonColorWriter;
+
+	/** \brief	The color buffer synchronizer thread. */
+	std::thread	m_colorBufferSynchronizerThread;
+
+	/** \brief	The non color buffer synchronizer thread. */
+	std::thread	m_nonColorBufferSynchronizerThread;
 };

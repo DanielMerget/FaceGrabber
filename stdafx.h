@@ -50,6 +50,8 @@ inline void SafeRelease(Interface *& pInterfaceToRelease)
         pInterfaceToRelease = nullptr;
     }
 }
+#pragma warning ( disable: 4996 )
+#pragma warning ( disable: 4503 )
 
 #include <memory>
 #undef max

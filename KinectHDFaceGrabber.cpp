@@ -44,7 +44,11 @@ KinectHDFaceGrabber::KinectHDFaceGrabber() :
 	m_pColorFrameReader(nullptr),
     m_pDrawDataStreams(nullptr),
     m_pBodyFrameReader(nullptr),
-	m_pDepthFrameReader(nullptr)
+	m_pDepthFrameReader(nullptr),
+	m_depthWidth(-1),
+	m_depthHeight(-1),
+	m_colorWidth(-1),
+	m_colorHeight(-1)
 {
     for (int i = 0; i < BODY_COUNT; i++)
     {
@@ -221,7 +225,7 @@ HRESULT KinectHDFaceGrabber::initHDFaceReader()
 			hr = CreateFaceModel(1.0f, FaceShapeDeformations::FaceShapeDeformations_Count, deformations[i].data(), &m_pFaceModel[i]);
 			if (FAILED(hr)){
 				std::cerr << "Error : CreateFaceModel()" << std::endl;
-				return -1;
+				return hr;
 			}
 		}
 		
@@ -245,9 +249,7 @@ HRESULT KinectHDFaceGrabber::initializeDefaultSensor()
     }
 	
     if (m_pKinectSensor)
-    {        
-		IMultiSourceFrameReader* reader;
-		
+    {        		
         hr = m_pKinectSensor->Open();
 		
 		if (SUCCEEDED(hr)){
@@ -282,8 +284,6 @@ void KinectHDFaceGrabber::update()
 	if (!m_pColorFrameReader || !m_pBodyFrameReader){
 		return;
 	}
-
-	bool produce[BODY_COUNT] = { false };
 
     IColorFrame* pColorFrame = nullptr;
     HRESULT hr = m_pColorFrameReader->AcquireLatestFrame(&pColorFrame);
