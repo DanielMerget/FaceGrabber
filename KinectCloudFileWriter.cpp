@@ -35,6 +35,7 @@ void KinectCloudFileWriter< PointCloudType >::waitForWriterToFinish()
 		}
 	}
 	updateStatus(L"");
+	writingFinished();
 }
 
 template < typename PointCloudType >

@@ -245,9 +245,6 @@ private:
 	/** \brief	The detected file format. */
 	RecordingFileFormat			m_fileFormat;
 
-	/** \brief	Type of the cloud. */
-	RecordCloudType				m_cloudType;
-
 
 	/** \brief	Filename of the file. */
 	CString						m_fileName;

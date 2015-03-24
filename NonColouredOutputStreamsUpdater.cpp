@@ -13,33 +13,24 @@ NonColouredOutputStreamsUpdater::~NonColouredOutputStreamsUpdater()
 {
 }
 
-void NonColouredOutputStreamsUpdater::initialize(ICoordinateMapper* m_pCoordinateMapper, int depthWidth, int depthHeight, int colorWidth, int colorHeight)
+void NonColouredOutputStreamsUpdater::allocateClouds()
 {
-	OutputStreamsUpdaterStragedy::initialize(m_pCoordinateMapper, depthWidth, depthHeight, colorWidth, colorHeight);
-	
+
 	m_HDFacePointCloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud <pcl::PointXYZ>());
 	m_HDFacePointCloud->is_dense = false;
 	m_FaceRawPointCloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud <pcl::PointXYZ>());
 	m_FaceRawPointCloud->is_dense = false;
-	m_fullRawPointCloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud<pcl::PointXYZ>);
-
-	m_fullRawPointCloud->width = static_cast<uint32_t>(m_depthWidth);
-	m_fullRawPointCloud->height = static_cast<uint32_t>(m_depthHeight);
-	m_fullRawPointCloud->is_dense = false;
-
 }
 void NonColouredOutputStreamsUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer)
 {
 	m_depthBuffer = depthBuffer;
-	m_FaceRawPointCloud->clear();
-	m_HDFacePointCloud->clear();
-	m_fullRawPointCloud->clear();
+	allocateClouds();
 	m_isValidFaceFrame = true;
 }
 void NonColouredOutputStreamsUpdater::stopFaceCollection()
-{
-	m_depthBuffer = nullptr;
+{	
 	if (!m_isValidFaceFrame){
+		m_depthBuffer = nullptr;
 		return;
 	}
 
@@ -65,9 +56,11 @@ void NonColouredOutputStreamsUpdater::stopFaceCollection()
 		cloudUpdated[1](m_FaceRawPointCloud);
 	}
 	if (!cloudUpdated[2].empty()){
-		convertDepthBufferToPointCloud();
-		cloudUpdated[2](m_fullRawPointCloud);
+		auto fullDepthBufferCloud = convertDepthBufferToPointCloud();
+		cloudUpdated[2](fullDepthBufferCloud);
 	}
+	m_depthBuffer = nullptr;
+	m_isValidFaceFrame = false;
 }
 
 
@@ -208,11 +201,10 @@ bool NonColouredOutputStreamsUpdater::extractDepthCloudFromBoundingBox(CameraSpa
 	return true;
 }
 
-void NonColouredOutputStreamsUpdater::convertDepthBufferToPointCloud()
+pcl::PointCloud<pcl::PointXYZ>::Ptr  NonColouredOutputStreamsUpdater::convertDepthBufferToPointCloud()
 {
-	
+	pcl::PointCloud<pcl::PointXYZ>::Ptr fullDepthBufferCloud(new pcl::PointCloud<pcl::PointXYZ>);
 	HRESULT hr;
-
 	for (int y = 0; y < m_depthHeight; y++){
 		for (int x = 0; x < m_depthWidth; x++){
 			pcl::PointXYZ point;
@@ -230,7 +222,7 @@ void NonColouredOutputStreamsUpdater::convertDepthBufferToPointCloud()
 			CameraSpacePoint camPoint;
 			hr = m_pCoordinateMapper->MapDepthPointToCameraSpace(depthPoint, depthOfCurrentPoint, &camPoint);
 	
-			if (FAILED(hr)){
+			if (FAILED(hr) || !isValidCamSpacePoint(camPoint)){
 				continue;
 			}
 			
@@ -238,8 +230,8 @@ void NonColouredOutputStreamsUpdater::convertDepthBufferToPointCloud()
 			point.y = camPoint.Y;
 			point.z = camPoint.Z;
 				
-			m_fullRawPointCloud->push_back(point);
-			
+			fullDepthBufferCloud->push_back(point);
 		}
 	}
+	return fullDepthBufferCloud;
 }

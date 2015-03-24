@@ -10,6 +10,12 @@ public:
 	OutputStreamsUpdaterStragedy();
 	~OutputStreamsUpdaterStragedy();
 
+	bool isValidCamSpacePoint(CameraSpacePoint camSpacePoint){
+
+		return (camSpacePoint.X >= - FLT_MAX && camSpacePoint.X <= FLT_MAX)
+			&& (camSpacePoint.Y >= - FLT_MAX && camSpacePoint.Y <= FLT_MAX)
+			&& (camSpacePoint.Z >= - FLT_MAX && camSpacePoint.Z <= FLT_MAX);
+	}
 
 	bool isValidDepthPoint(DepthSpacePoint depthPoint){
 		return (depthPoint.X > 0 && depthPoint.X < m_depthWidth) && (depthPoint.Y > 0 && depthPoint.Y < m_depthWidth);

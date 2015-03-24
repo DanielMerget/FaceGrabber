@@ -94,9 +94,9 @@ void PlaybackTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 		CString inputFolder;
 		Edit_GetText(GetDlgItem(m_hWnd, IDC_FILE_PATH_EDIT_BOX), inputFolder.GetBuffer(MAX_PATH), MAX_PATH);
 
-		for (auto& playbackConfig : m_playbackConfiguration){
-			auto fullPath = RecordingConfiguration::getFullRecordingPathForCloudType(playbackConfig->getRecordCloudType(), inputFolder, timeStampFolderNameBuffer);
-			playbackConfig->setFullFilePath(fullPath);
+		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+			auto fullPath = RecordingConfiguration::getFullRecordingPathForCloudType(static_cast<RecordCloudType>(i), inputFolder, timeStampFolderNameBuffer);
+			m_playbackConfiguration[i]->setFullFilePath(fullPath);
 		}
 
 	}

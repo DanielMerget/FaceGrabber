@@ -87,6 +87,8 @@ public:
 	*/
 	bool pullData(PointCloudMeasurement<PointCloudType>& measurement);
 
+	/** \brief	The signal notfying that the writer finished. */
+	boost::signals2::signal<void()> writingFinished;
 
 	/** \brief	The signal notfying about changes of the writing status. */
 	boost::signals2::signal<void(std::wstring)> updateStatus;

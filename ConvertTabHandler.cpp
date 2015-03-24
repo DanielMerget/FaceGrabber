@@ -138,7 +138,7 @@ void ConvertTabHandler::initColoredConversionPipeline()
 		boost::bind(&KinectCloudFileWriter<pcl::PointXYZRGB>::pushCloudsAsync, m_colorWriter, _1));
 	m_colorWriter->updateStatus.connect(boost::bind(&ConvertTabHandler::updateWriterStatus, this, _1));
 
-	m_colorWriter->writingWasStopped.connect(boost::bind(&ConvertTabHandler::notifyWriterFinished, this));
+	m_colorWriter->writingFinished.connect(boost::bind(&ConvertTabHandler::notifyWriterFinished, this));
 
 	m_colorCloudReader->updateStatus.connect(boost::bind(&ConvertTabHandler::updateReaderStatus, this, _1));
 
@@ -152,7 +152,7 @@ void ConvertTabHandler::initNonColoredConversionPipeline()
 
 	m_nonColorWriter = std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZ>>(new KinectCloudFileWriter<pcl::PointXYZ>);
 	m_nonColorWriter->updateStatus.connect(boost::bind(&ConvertTabHandler::updateWriterStatus, this, _1));
-	m_nonColorWriter->writingWasStopped.connect(boost::bind(&ConvertTabHandler::notifyWriterFinished, this));
+	m_nonColorWriter->writingFinished.connect(boost::bind(&ConvertTabHandler::notifyWriterFinished, this));
 
 	std::vector< std::shared_ptr<NonColorBuffer>> buffers;
 	buffers.push_back(m_nonColorBuffer);

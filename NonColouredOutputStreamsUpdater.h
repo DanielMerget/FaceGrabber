@@ -27,21 +27,21 @@ public:
 	void startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer);
 	void stopFaceCollection();
 
-	/**
-	* \fn	void NonColouredOutputStreamsUpdater::initialize(ICoordinateMapper* m_pCoordinateMapper, int depthWidth, int depthHeight, int colorWidth, int colorHeight);
-	*
-	* \brief	Initializes the NonColouredOutputStreamsUpdater.
-	*
-	* \param [in]	m_pCoordinateMapper	Kinect coordinate mapper.
-	* \param	depthWidth				   	Width of the depth.
-	* \param	depthHeight				   	Height of the depth.
-	* \param	colorWidth				   	Width of the color.
-	* \param	colorHeight				   	Height of the color.
-	*/
-	void initialize(ICoordinateMapper* m_pCoordinateMapper, int depthWidth, int depthHeight, int colorWidth, int colorHeight);
+	///**
+	//* \fn	void NonColouredOutputStreamsUpdater::initialize(ICoordinateMapper* m_pCoordinateMapper, int depthWidth, int depthHeight, int colorWidth, int colorHeight);
+	//*
+	//* \brief	Initializes the NonColouredOutputStreamsUpdater.
+	//*
+	//* \param [in]	m_pCoordinateMapper	Kinect coordinate mapper.
+	//* \param	depthWidth				   	Width of the depth.
+	//* \param	depthHeight				   	Height of the depth.
+	//* \param	colorWidth				   	Width of the color.
+	//* \param	colorHeight				   	Height of the color.
+	//*/
+	//void initialize(ICoordinateMapper* m_pCoordinateMapper, int depthWidth, int depthHeight, int colorWidth, int colorHeight);
 private:
 
-	
+	void allocateClouds();
 
 	bool extractDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack,
 		std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV);
@@ -49,12 +49,11 @@ private:
 	void extractFaceHDPoinCloudAndBoundingBox(int bufferSize, CameraSpacePoint* cameraSpacePoints, ColorSpacePoint* colorSpacePoints,
 		CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV);
 
-	void convertDepthBufferToPointCloud();
+	pcl::PointCloud<pcl::PointXYZ>::Ptr convertDepthBufferToPointCloud();
 
 	pcl::PointCloud<pcl::PointXYZ>::Ptr m_HDFacePointCloud;
 	pcl::PointCloud<pcl::PointXYZ>::Ptr m_FaceRawPointCloud;
 
-	pcl::PointCloud<pcl::PointXYZ>::Ptr m_fullRawPointCloud;
 	bool							m_isValidFaceFrame;
 	UINT16*	m_depthBuffer;
 

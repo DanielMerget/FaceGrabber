@@ -7,17 +7,14 @@ PlaybackConfiguration::PlaybackConfiguration() : m_filePath(), m_enabled(false),
 
 PlaybackConfiguration::PlaybackConfiguration(PlaybackConfiguration& playbackConfigurationToCopy)
 {
-	this->m_cloudType = playbackConfigurationToCopy.m_cloudType;
 	this->m_enabled = playbackConfigurationToCopy.m_enabled;
 	this->m_fileFormat = playbackConfigurationToCopy.m_fileFormat;
 	this->m_filePath = playbackConfigurationToCopy.m_filePath;
 	this->m_foundCloudFiles = playbackConfigurationToCopy.m_foundCloudFiles;
-
 }
 
 PlaybackConfiguration& PlaybackConfiguration::operator= (const PlaybackConfiguration& rhs)
 {
-	this->m_cloudType	= rhs.m_cloudType;
 	this->m_enabled		= rhs.m_enabled;
 	this->m_fileFormat	= rhs.m_fileFormat;
 	this->m_filePath	= rhs.m_filePath;
@@ -54,16 +51,17 @@ bool PlaybackConfiguration::isPlaybackConfigurationValid()
 
 bool PlaybackConfiguration::operator == (PlaybackConfiguration& playbackToCompareWith)
 {
-	auto fullPathOfFirstPlaybackFile = playbackToCompareWith.getFirstPlaybackFile();
 	auto cloudCoundOfFilesInDirectoryToPlay = playbackToCompareWith.getCloudFilesToPlayCount();
-	int sameStartPlaybackFile = fullPathOfFirstPlaybackFile.Compare(getFirstPlaybackFile());
 	bool sameCloudCoundOfFilesInDirectoryToPlay = cloudCoundOfFilesInDirectoryToPlay == getCloudFilesToPlayCount();
-	if (sameStartPlaybackFile == 0 && sameCloudCoundOfFilesInDirectoryToPlay){
-		return true;
-	}
-	else{
+	if (!sameCloudCoundOfFilesInDirectoryToPlay){
 		return false;
 	}
+	if (cloudCoundOfFilesInDirectoryToPlay > 0){
+		auto fullPathOfFirstPlaybackFile = playbackToCompareWith.getCloudFilesToPlay()[0].fullFilePath;
+		auto filepath = getCloudFilesToPlay()[0].fullFilePath;
+		return fullPathOfFirstPlaybackFile == filepath;
+	}
+	return true;
 }
 
 
@@ -93,11 +91,6 @@ void PlaybackConfiguration::setEnabled(bool enabled)
 	playbackConfigurationChanged();
 }
 
-
-
-RecordCloudType PlaybackConfiguration::getRecordCloudType(){
-	return m_cloudType;
-}
 
 CString PlaybackConfiguration::getFirstPlaybackFile()
 {

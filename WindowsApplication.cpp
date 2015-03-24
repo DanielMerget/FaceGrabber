@@ -396,11 +396,13 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 
 void WindowsApplication::triggerReaderStart(SharedPlaybackConfiguration playbackConfig, bool isSingleThreatedReading)
 {
+	if (playbackConfig.size() != RECORD_CLOUD_TYPE_COUNT){
+		return;
+	}
+
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		auto& currentConfig = playbackConfig[i];
-		auto cloudType = currentConfig->getRecordCloudType();
-		m_inputFileReader[cloudType]->setPlaybackConfiguration(playbackConfig[i]);
-		m_inputFileReader[cloudType]->startReading(isSingleThreatedReading);
+		m_inputFileReader[i]->setPlaybackConfiguration(playbackConfig[i]);
+		m_inputFileReader[i]->startReading(isSingleThreatedReading);
 	}
 }
 void WindowsApplication::setupReaderAndBuffersForPlayback(SharedPlaybackConfiguration playbackConfig)
