@@ -13,7 +13,7 @@
 #include <boost/signals2.hpp>
 
 /**
- * \class	KinectCloudOutputWriter
+ * \class	KinectCloudFileWriter
  *
  * \brief	A kinect cloud output writer which writes Point Clouds to the hard disk according
  * 			to the set Configuration. Writing can be done multi-threaded.
