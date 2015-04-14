@@ -1,0 +1,128 @@
+\hypertarget{class_p_c_l_viewer}{}\section{P\+C\+L\+Viewer Class Reference}
+\label{class_p_c_l_viewer}\index{P\+C\+L\+Viewer@{P\+C\+L\+Viewer}}
+
+
+The P\+C\+L viewer is able to render Point Clouds using the P\+C\+L\+Visualizer. The \hyperlink{class_p_c_l_viewer}{P\+C\+L\+Viewer} extends the P\+C\+L\+Visualizer by enabling multi-\/threaded updating of the point clouds. Furthermore, dynamic switching between colored and non-\/colored clouds, as well as changing the amount of viewports is supported.  
+
+
+
+
+{\ttfamily \#include $<$P\+C\+L\+Viewer.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_p_c_l_viewer_a1e39d582dfc8f0ef9b4a4a6624010ff5}{P\+C\+L\+Viewer} (int cloud\+Count, std\+::string viewer\+Name=\char`\"{}P\+C\+L\+Viewer\char`\"{})
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_p_c_l_viewer_a82828db52c5df5e5341adb61b77a68eb}{}\hyperlink{class_p_c_l_viewer_a82828db52c5df5e5341adb61b77a68eb}{$\sim$\+P\+C\+L\+Viewer} ()\label{class_p_c_l_viewer_a82828db52c5df5e5341adb61b77a68eb}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+void \hyperlink{class_p_c_l_viewer_a1d53112e3f0fef3bfa7859f7701c9f3c}{update\+Colored\+Clouds} (std\+::vector$<$ pcl\+::\+Point\+Cloud$<$ pcl\+::\+Point\+X\+Y\+Z\+R\+G\+B $>$\+::Ptr $>$ clouds)
+\begin{DoxyCompactList}\small\item\em Updates the rendered cloud with the provided colored clouds. The indices of the list are matched to the created viewports. The number of clouds in the list must be specified with set\+Num\+Of\+Clouds beforehand. \end{DoxyCompactList}\item 
+void \hyperlink{class_p_c_l_viewer_a71fb70c1a38b0e39a4e3ea8fca7f8d48}{update\+Uncolored\+Clouds} (std\+::vector$<$ pcl\+::\+Point\+Cloud$<$ pcl\+::\+Point\+X\+Y\+Z $>$\+::Ptr $>$ clouds)
+\begin{DoxyCompactList}\small\item\em Updates the rendered cloud with the provided non-\/colored clouds. The indices of the list are matched to the created viewports. The number of clouds in the list must be specified with set\+Num\+Of\+Clouds beforehand. \end{DoxyCompactList}\item 
+\hypertarget{class_p_c_l_viewer_a0e09000bf3278e39ab1bcd1ca22c8eb5}{}void \hyperlink{class_p_c_l_viewer_a0e09000bf3278e39ab1bcd1ca22c8eb5}{stop\+Viewer} ()\label{class_p_c_l_viewer_a0e09000bf3278e39ab1bcd1ca22c8eb5}
+
+\begin{DoxyCompactList}\small\item\em Stops the viewer. \end{DoxyCompactList}\item 
+void \hyperlink{class_p_c_l_viewer_a10caa32f7fe84950fd14f2ab630b40d9}{use\+Colored\+Cloud} (bool use\+Colored)
+\begin{DoxyCompactList}\small\item\em Specifies whether the colored or non-\/colored clouds are rendered. \end{DoxyCompactList}\item 
+void \hyperlink{class_p_c_l_viewer_a5914246fb036ac61e3c6e6e0e110f3e7}{set\+Num\+Of\+Clouds} (int num\+Of\+Clouds)
+\begin{DoxyCompactList}\small\item\em Sets number of clouds to be rendered/expected and creates the viewports if necessary. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The P\+C\+L viewer is able to render Point Clouds using the P\+C\+L\+Visualizer. The \hyperlink{class_p_c_l_viewer}{P\+C\+L\+Viewer} extends the P\+C\+L\+Visualizer by enabling multi-\/threaded updating of the point clouds. Furthermore, dynamic switching between colored and non-\/colored clouds, as well as changing the amount of viewports is supported. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_p_c_l_viewer_a1e39d582dfc8f0ef9b4a4a6624010ff5}{}\index{P\+C\+L\+Viewer@{P\+C\+L\+Viewer}!P\+C\+L\+Viewer@{P\+C\+L\+Viewer}}
+\index{P\+C\+L\+Viewer@{P\+C\+L\+Viewer}!P\+C\+L\+Viewer@{P\+C\+L\+Viewer}}
+\subsubsection[{P\+C\+L\+Viewer}]{\setlength{\rightskip}{0pt plus 5cm}P\+C\+L\+Viewer\+::\+P\+C\+L\+Viewer (
+\begin{DoxyParamCaption}
+\item[{int}]{cloud\+Count, }
+\item[{std\+::string}]{viewer\+Name = {\ttfamily \char`\"{}PCLViewer\char`\"{}}}
+\end{DoxyParamCaption}
+)}\label{class_p_c_l_viewer_a1e39d582dfc8f0ef9b4a4a6624010ff5}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cloud\+Count} & Number of clouds to show. \\
+\hline
+{\em viewer\+Name} & Name of the viewer to be displayed. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_p_c_l_viewer_a5914246fb036ac61e3c6e6e0e110f3e7}{}\index{P\+C\+L\+Viewer@{P\+C\+L\+Viewer}!set\+Num\+Of\+Clouds@{set\+Num\+Of\+Clouds}}
+\index{set\+Num\+Of\+Clouds@{set\+Num\+Of\+Clouds}!P\+C\+L\+Viewer@{P\+C\+L\+Viewer}}
+\subsubsection[{set\+Num\+Of\+Clouds}]{\setlength{\rightskip}{0pt plus 5cm}void P\+C\+L\+Viewer\+::set\+Num\+Of\+Clouds (
+\begin{DoxyParamCaption}
+\item[{int}]{num\+Of\+Clouds}
+\end{DoxyParamCaption}
+)}\label{class_p_c_l_viewer_a5914246fb036ac61e3c6e6e0e110f3e7}
+
+
+Sets number of clouds to be rendered/expected and creates the viewports if necessary. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em num\+Of\+Clouds} & Number of clouds. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_p_c_l_viewer_a1d53112e3f0fef3bfa7859f7701c9f3c}{}\index{P\+C\+L\+Viewer@{P\+C\+L\+Viewer}!update\+Colored\+Clouds@{update\+Colored\+Clouds}}
+\index{update\+Colored\+Clouds@{update\+Colored\+Clouds}!P\+C\+L\+Viewer@{P\+C\+L\+Viewer}}
+\subsubsection[{update\+Colored\+Clouds}]{\setlength{\rightskip}{0pt plus 5cm}void P\+C\+L\+Viewer\+::update\+Colored\+Clouds (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ pcl\+::\+Point\+Cloud$<$ pcl\+::\+Point\+X\+Y\+Z\+R\+G\+B $>$\+::Ptr $>$}]{clouds}
+\end{DoxyParamCaption}
+)}\label{class_p_c_l_viewer_a1d53112e3f0fef3bfa7859f7701c9f3c}
+
+
+Updates the rendered cloud with the provided colored clouds. The indices of the list are matched to the created viewports. The number of clouds in the list must be specified with set\+Num\+Of\+Clouds beforehand. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em clouds} & The clouds to be updated. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_p_c_l_viewer_a71fb70c1a38b0e39a4e3ea8fca7f8d48}{}\index{P\+C\+L\+Viewer@{P\+C\+L\+Viewer}!update\+Uncolored\+Clouds@{update\+Uncolored\+Clouds}}
+\index{update\+Uncolored\+Clouds@{update\+Uncolored\+Clouds}!P\+C\+L\+Viewer@{P\+C\+L\+Viewer}}
+\subsubsection[{update\+Uncolored\+Clouds}]{\setlength{\rightskip}{0pt plus 5cm}void P\+C\+L\+Viewer\+::update\+Uncolored\+Clouds (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ pcl\+::\+Point\+Cloud$<$ pcl\+::\+Point\+X\+Y\+Z $>$\+::Ptr $>$}]{clouds}
+\end{DoxyParamCaption}
+)}\label{class_p_c_l_viewer_a71fb70c1a38b0e39a4e3ea8fca7f8d48}
+
+
+Updates the rendered cloud with the provided non-\/colored clouds. The indices of the list are matched to the created viewports. The number of clouds in the list must be specified with set\+Num\+Of\+Clouds beforehand. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em clouds} & The clouds. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_p_c_l_viewer_a10caa32f7fe84950fd14f2ab630b40d9}{}\index{P\+C\+L\+Viewer@{P\+C\+L\+Viewer}!use\+Colored\+Cloud@{use\+Colored\+Cloud}}
+\index{use\+Colored\+Cloud@{use\+Colored\+Cloud}!P\+C\+L\+Viewer@{P\+C\+L\+Viewer}}
+\subsubsection[{use\+Colored\+Cloud}]{\setlength{\rightskip}{0pt plus 5cm}void P\+C\+L\+Viewer\+::use\+Colored\+Cloud (
+\begin{DoxyParamCaption}
+\item[{bool}]{use\+Colored}
+\end{DoxyParamCaption}
+)}\label{class_p_c_l_viewer_a10caa32f7fe84950fd14f2ab630b40d9}
+
+
+Specifies whether the colored or non-\/colored clouds are rendered. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em use\+Colored} & true if use colored. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/P\+C\+L\+Viewer.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/P\+C\+L\+Viewer.\+cpp\end{DoxyCompactItemize}

@@ -1,0 +1,101 @@
+\hypertarget{class_p_c_l_input_reader}{}\section{P\+C\+L\+Input\+Reader$<$ Point\+Type $>$ Class Template Reference}
+\label{class_p_c_l_input_reader}\index{P\+C\+L\+Input\+Reader$<$ Point\+Type $>$@{P\+C\+L\+Input\+Reader$<$ Point\+Type $>$}}
+
+
+The \hyperlink{class_p_c_l_input_reader}{P\+C\+L\+Input\+Reader} is able to read point cloud files (ply, pcd) multi-\/threaded or single-\/threaded. The files to be read must be specified a \hyperlink{class_playback_configuration}{Playback\+Configuration}. Having started the reading, the files are stored in the given buffer which provides them for further processing. T\+He \hyperlink{class_p_c_l_input_reader}{P\+C\+L\+Input\+Reader} resizes the \hyperlink{class_buffer}{Buffer} to save all read files. So the \hyperlink{class_buffer}{Buffer} will have the same size as number of files to be read.  
+
+
+
+
+{\ttfamily \#include $<$P\+C\+L\+Input\+Reader.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_p_c_l_input_reader_a6e22e7edb9816b95e33affe189706884}{start\+Reading} (bool is\+Single\+Threated\+Reading\+And\+Blocking)
+\begin{DoxyCompactList}\small\item\em Configures the \hyperlink{class_buffer}{Buffer} of the \hyperlink{class_p_c_l_input_reader}{P\+C\+L\+Input\+Reader} and triggers the starting of the reader threads. Before, the \hyperlink{class_buffer}{Buffer} to be used to store the read clouds and the \hyperlink{class_playback_configuration}{Playback\+Configuration} has to be set. \end{DoxyCompactList}\item 
+\hypertarget{class_p_c_l_input_reader_a036d43c8d667bad9172af9ad9f98ee42}{}void \hyperlink{class_p_c_l_input_reader_a036d43c8d667bad9172af9ad9f98ee42}{stop\+Reading} ()\label{class_p_c_l_input_reader_a036d43c8d667bad9172af9ad9f98ee42}
+
+\begin{DoxyCompactList}\small\item\em Stops the reader threads. \end{DoxyCompactList}\item 
+\hypertarget{class_p_c_l_input_reader_ab9627afde1090418fd35db144e7a612f}{}std\+::shared\+\_\+ptr$<$ \hyperlink{class_buffer}{Buffer}$<$ boost\+::shared\+\_\+ptr$<$ pcl\+::\+Point\+Cloud$<$ Point\+Type $>$ $>$ $>$ $>$ {\bfseries get\+Buffer} ()\label{class_p_c_l_input_reader_ab9627afde1090418fd35db144e7a612f}
+
+\item 
+void \hyperlink{class_p_c_l_input_reader_a7457aaa810319d498c992403707252e6}{set\+Buffer} (std\+::shared\+\_\+ptr$<$ \hyperlink{class_buffer}{Buffer}$<$ boost\+::shared\+\_\+ptr$<$ pcl\+::\+Point\+Cloud$<$ Point\+Type $>$$>$$>$$>$ buffer)
+\begin{DoxyCompactList}\small\item\em Setter for the \hyperlink{class_buffer}{Buffer} of the \hyperlink{class_p_c_l_input_reader}{P\+C\+L\+Input\+Reader}. \end{DoxyCompactList}\item 
+void \hyperlink{class_p_c_l_input_reader_ad65cbfccd8aaf6560e4c334891ca17da}{set\+Playback\+Configuration} (Playback\+Configuration\+Ptr playback\+Config)
+\begin{DoxyCompactList}\small\item\em Setter for the playback configuration. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_p_c_l_input_reader_a26d60f39f151a0deed6ad990d264571f}{}boost\+::signals2\+::signal$<$ void(std\+::wstring)$>$ \hyperlink{class_p_c_l_input_reader_a26d60f39f151a0deed6ad990d264571f}{update\+Status}\label{class_p_c_l_input_reader_a26d60f39f151a0deed6ad990d264571f}
+
+\begin{DoxyCompactList}\small\item\em Signal notfying about the current reading status. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Point\+Type$>$class P\+C\+L\+Input\+Reader$<$ Point\+Type $>$}
+
+The \hyperlink{class_p_c_l_input_reader}{P\+C\+L\+Input\+Reader} is able to read point cloud files (ply, pcd) multi-\/threaded or single-\/threaded. The files to be read must be specified a \hyperlink{class_playback_configuration}{Playback\+Configuration}. Having started the reading, the files are stored in the given buffer which provides them for further processing. T\+He \hyperlink{class_p_c_l_input_reader}{P\+C\+L\+Input\+Reader} resizes the \hyperlink{class_buffer}{Buffer} to save all read files. So the \hyperlink{class_buffer}{Buffer} will have the same size as number of files to be read. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Point\+Type} & Type of the point type. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_p_c_l_input_reader_a7457aaa810319d498c992403707252e6}{}\index{P\+C\+L\+Input\+Reader@{P\+C\+L\+Input\+Reader}!set\+Buffer@{set\+Buffer}}
+\index{set\+Buffer@{set\+Buffer}!P\+C\+L\+Input\+Reader@{P\+C\+L\+Input\+Reader}}
+\subsubsection[{set\+Buffer}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Point\+Type $>$ void {\bf P\+C\+L\+Input\+Reader}$<$ Point\+Type $>$\+::set\+Buffer (
+\begin{DoxyParamCaption}
+\item[{std\+::shared\+\_\+ptr$<$ {\bf Buffer}$<$ boost\+::shared\+\_\+ptr$<$ pcl\+::\+Point\+Cloud$<$ Point\+Type $>$$>$$>$$>$}]{buffer}
+\end{DoxyParamCaption}
+)}\label{class_p_c_l_input_reader_a7457aaa810319d498c992403707252e6}
+
+
+Setter for the \hyperlink{class_buffer}{Buffer} of the \hyperlink{class_p_c_l_input_reader}{P\+C\+L\+Input\+Reader}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & The buffer to be set. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_p_c_l_input_reader_ad65cbfccd8aaf6560e4c334891ca17da}{}\index{P\+C\+L\+Input\+Reader@{P\+C\+L\+Input\+Reader}!set\+Playback\+Configuration@{set\+Playback\+Configuration}}
+\index{set\+Playback\+Configuration@{set\+Playback\+Configuration}!P\+C\+L\+Input\+Reader@{P\+C\+L\+Input\+Reader}}
+\subsubsection[{set\+Playback\+Configuration}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Point\+Type $>$ void {\bf P\+C\+L\+Input\+Reader}$<$ Point\+Type $>$\+::set\+Playback\+Configuration (
+\begin{DoxyParamCaption}
+\item[{Playback\+Configuration\+Ptr}]{playback\+Config}
+\end{DoxyParamCaption}
+)}\label{class_p_c_l_input_reader_ad65cbfccd8aaf6560e4c334891ca17da}
+
+
+Setter for the playback configuration. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em playback\+Config} & The playback configuration to be set. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_p_c_l_input_reader_a6e22e7edb9816b95e33affe189706884}{}\index{P\+C\+L\+Input\+Reader@{P\+C\+L\+Input\+Reader}!start\+Reading@{start\+Reading}}
+\index{start\+Reading@{start\+Reading}!P\+C\+L\+Input\+Reader@{P\+C\+L\+Input\+Reader}}
+\subsubsection[{start\+Reading}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Point\+Type $>$ void {\bf P\+C\+L\+Input\+Reader}$<$ Point\+Type $>$\+::start\+Reading (
+\begin{DoxyParamCaption}
+\item[{bool}]{is\+Single\+Threated\+Reading\+And\+Blocking}
+\end{DoxyParamCaption}
+)}\label{class_p_c_l_input_reader_a6e22e7edb9816b95e33affe189706884}
+
+
+Configures the \hyperlink{class_buffer}{Buffer} of the \hyperlink{class_p_c_l_input_reader}{P\+C\+L\+Input\+Reader} and triggers the starting of the reader threads. Before, the \hyperlink{class_buffer}{Buffer} to be used to store the read clouds and the \hyperlink{class_playback_configuration}{Playback\+Configuration} has to be set. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em is\+Single\+Threated\+Reading\+And\+Blocking} & true if reading is done single threated reading and the method call should be blocking, false if multiple threads should be started and the call to this method should be non-\/blocking. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/P\+C\+L\+Input\+Reader.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/P\+C\+L\+Input\+Reader.\+cpp\end{DoxyCompactItemize}

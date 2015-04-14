@@ -1,0 +1,106 @@
+\hypertarget{class_playback_tab_handler}{}\section{Playback\+Tab\+Handler Class Reference}
+\label{class_playback_tab_handler}\index{Playback\+Tab\+Handler@{Playback\+Tab\+Handler}}
+
+
+The Class handling all events of the user to configure the \hyperlink{class_playback_configuration}{Playback\+Configuration}. If requested by the user, the playback is triggered by fireing the start\+Playback, stop\+Playback signals etc.  
+
+
+
+
+{\ttfamily \#include $<$Playback\+Tab\+Handler.\+h$>$}
+
+Inheritance diagram for Playback\+Tab\+Handler\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_playback_tab_handler}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_playback_tab_handler_ac84a8a5bfb60b66c2746430fe44237a6}{set\+Shared\+Recording\+Configuration} (Shared\+Recording\+Configuration recording\+Configuration)
+\begin{DoxyCompactList}\small\item\em Sets shared recording configuration to preset values of the playback tab with the last recorded configuration. \end{DoxyCompactList}\item 
+\hypertarget{class_playback_tab_handler_aa344dc13149292bbd32a8068a7f919a2}{}void \hyperlink{class_playback_tab_handler_aa344dc13149292bbd32a8068a7f919a2}{playback\+Configuration\+Changed} ()\label{class_playback_tab_handler_aa344dc13149292bbd32a8068a7f919a2}
+
+\begin{DoxyCompactList}\small\item\em Callback if playback configuration changed. \end{DoxyCompactList}\item 
+\hypertarget{class_playback_tab_handler_a6be44500c22b0928552cebee631f13e3}{}void \hyperlink{class_playback_tab_handler_a6be44500c22b0928552cebee631f13e3}{reset\+U\+I\+Elements} ()\label{class_playback_tab_handler_a6be44500c22b0928552cebee631f13e3}
+
+\begin{DoxyCompactList}\small\item\em Resets the user interface elements. \end{DoxyCompactList}\item 
+\hypertarget{class_playback_tab_handler_a58a83041028e5f631c4cb21bff4d1723}{}void \hyperlink{class_playback_tab_handler_a58a83041028e5f631c4cb21bff4d1723}{playback\+Stopped} ()\label{class_playback_tab_handler_a58a83041028e5f631c4cb21bff4d1723}
+
+\begin{DoxyCompactList}\small\item\em Callback\+: Playback stopped by the user. \end{DoxyCompactList}\item 
+void \hyperlink{class_playback_tab_handler_a6f1ecc2e4c7a42586d4dcb7a51597cc3}{update\+Reader\+Status} (Record\+Cloud\+Type type, std\+::wstring status)
+\begin{DoxyCompactList}\small\item\em Callback\+: Updates status of the reader. \end{DoxyCompactList}\item 
+bool \hyperlink{class_playback_tab_handler_aea458d2a38ab9b7940038f137a3a7ccf}{is\+Playback\+Running} ()
+\begin{DoxyCompactList}\small\item\em Query if this object is playback running. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_playback_tab_handler_a55204c881813178243e48ce120703421}{}boost\+::signal$<$ void(Shared\+Playback\+Configuration, bool)$>$ \hyperlink{class_playback_tab_handler_a55204c881813178243e48ce120703421}{start\+Playback}\label{class_playback_tab_handler_a55204c881813178243e48ce120703421}
+
+\begin{DoxyCompactList}\small\item\em signal to start the playback. \end{DoxyCompactList}\item 
+\hypertarget{class_playback_tab_handler_a254f9ac42f7f575071f7b0271408ab74}{}boost\+::signal$<$ void(void)$>$ \hyperlink{class_playback_tab_handler_a254f9ac42f7f575071f7b0271408ab74}{stop\+Playback}\label{class_playback_tab_handler_a254f9ac42f7f575071f7b0271408ab74}
+
+\begin{DoxyCompactList}\small\item\em signal to stop the playback. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+The Class handling all events of the user to configure the \hyperlink{class_playback_configuration}{Playback\+Configuration}. If requested by the user, the playback is triggered by fireing the start\+Playback, stop\+Playback signals etc. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_playback_tab_handler_aea458d2a38ab9b7940038f137a3a7ccf}{}\index{Playback\+Tab\+Handler@{Playback\+Tab\+Handler}!is\+Playback\+Running@{is\+Playback\+Running}}
+\index{is\+Playback\+Running@{is\+Playback\+Running}!Playback\+Tab\+Handler@{Playback\+Tab\+Handler}}
+\subsubsection[{is\+Playback\+Running}]{\setlength{\rightskip}{0pt plus 5cm}bool Playback\+Tab\+Handler\+::is\+Playback\+Running (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_playback_tab_handler_aea458d2a38ab9b7940038f137a3a7ccf}
+
+
+Query if this object is playback running. 
+
+\begin{DoxyReturn}{Returns}
+true if playback running, false if not. 
+\end{DoxyReturn}
+\hypertarget{class_playback_tab_handler_ac84a8a5bfb60b66c2746430fe44237a6}{}\index{Playback\+Tab\+Handler@{Playback\+Tab\+Handler}!set\+Shared\+Recording\+Configuration@{set\+Shared\+Recording\+Configuration}}
+\index{set\+Shared\+Recording\+Configuration@{set\+Shared\+Recording\+Configuration}!Playback\+Tab\+Handler@{Playback\+Tab\+Handler}}
+\subsubsection[{set\+Shared\+Recording\+Configuration}]{\setlength{\rightskip}{0pt plus 5cm}void Playback\+Tab\+Handler\+::set\+Shared\+Recording\+Configuration (
+\begin{DoxyParamCaption}
+\item[{Shared\+Recording\+Configuration}]{recording\+Configuration}
+\end{DoxyParamCaption}
+)}\label{class_playback_tab_handler_ac84a8a5bfb60b66c2746430fe44237a6}
+
+
+Sets shared recording configuration to preset values of the playback tab with the last recorded configuration. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em recording\+Configuration} & The recording configuration. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_playback_tab_handler_a6f1ecc2e4c7a42586d4dcb7a51597cc3}{}\index{Playback\+Tab\+Handler@{Playback\+Tab\+Handler}!update\+Reader\+Status@{update\+Reader\+Status}}
+\index{update\+Reader\+Status@{update\+Reader\+Status}!Playback\+Tab\+Handler@{Playback\+Tab\+Handler}}
+\subsubsection[{update\+Reader\+Status}]{\setlength{\rightskip}{0pt plus 5cm}void Playback\+Tab\+Handler\+::update\+Reader\+Status (
+\begin{DoxyParamCaption}
+\item[{Record\+Cloud\+Type}]{type, }
+\item[{std\+::wstring}]{status}
+\end{DoxyParamCaption}
+)}\label{class_playback_tab_handler_a6f1ecc2e4c7a42586d4dcb7a51597cc3}
+
+
+Callback\+: Updates status of the reader. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & The type of the played point cloud \\
+\hline
+{\em status} & The new status. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Playback\+Tab\+Handler.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Playback\+Tab\+Handler.\+cpp\end{DoxyCompactItemize}

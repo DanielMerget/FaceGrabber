@@ -1,0 +1,283 @@
+\hypertarget{class_playback_configuration}{}\section{Playback\+Configuration Class Reference}
+\label{class_playback_configuration}\index{Playback\+Configuration@{Playback\+Configuration}}
+
+
+\hyperlink{class_playback_configuration}{Playback\+Configuration} stores all information required by the Input\+Reader to read point cloud files from the disc.  
+
+
+
+
+{\ttfamily \#include $<$Playback\+Configuration.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_playback_configuration_a9c8f27b87b192cb6c34517087975bf48}{Playback\+Configuration} (\hyperlink{class_recording_configuration}{Recording\+Configuration} \&record\+Configuration)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hyperlink{class_playback_configuration_a49c473c5400f547d931a1fc5d9164a68}{Playback\+Configuration} (\hyperlink{class_playback_configuration}{Playback\+Configuration} \&playback\+Configuration\+To\+Copy)
+\begin{DoxyCompactList}\small\item\em Copy constructor. \end{DoxyCompactList}\item 
+\hyperlink{class_playback_configuration}{Playback\+Configuration} \& \hyperlink{class_playback_configuration_ac3a2de4a2492134dc7d1351e37550e46}{operator=} (const \hyperlink{class_playback_configuration}{Playback\+Configuration} \&rhs)
+\begin{DoxyCompactList}\small\item\em Assignment operator. \end{DoxyCompactList}\item 
+bool \hyperlink{class_playback_configuration_a928896b44f93175d1e3f6ec6388fc002}{operator==} (\hyperlink{class_playback_configuration}{Playback\+Configuration} \&playback\+To\+Compare\+With)
+\begin{DoxyCompactList}\small\item\em Equality operator. \end{DoxyCompactList}\item 
+bool \hyperlink{class_playback_configuration_a1797bbadc6876281456c7b46b9a88655}{is\+Playback\+Configuration\+Valid} ()
+\begin{DoxyCompactList}\small\item\em Query if this object is playback configuration valid. \end{DoxyCompactList}\item 
+bool \hyperlink{class_playback_configuration_a1006624edfe48ca6f1a2fd97a5cbf6f7}{is\+Enabled} ()
+\begin{DoxyCompactList}\small\item\em Query if the \hyperlink{class_playback_configuration}{Playback\+Configuration} is enabled. \end{DoxyCompactList}\item 
+Recording\+File\+Format \hyperlink{class_playback_configuration_af94ca3803d76a447aeea4ddc32936f39}{get\+Record\+File\+Format} ()
+\begin{DoxyCompactList}\small\item\em Gets record file format. \end{DoxyCompactList}\item 
+void \hyperlink{class_playback_configuration_a8f75a762f95c1374f488cf80d85a82f4}{set\+Full\+File\+Path} (C\+String file\+Path)
+\begin{DoxyCompactList}\small\item\em Sets full file path of the directory containing the point cloud files. \end{DoxyCompactList}\item 
+void \hyperlink{class_playback_configuration_ad3592d82088f471856f827325a1570ff}{set\+Enabled} (bool enabled)
+\begin{DoxyCompactList}\small\item\em Sets an enabled. \end{DoxyCompactList}\item 
+Record\+Cloud\+Type \hyperlink{class_playback_configuration_afc28ebd7eccf8ecfbd38c2986f11c0fe}{get\+Record\+Cloud\+Type} ()
+\begin{DoxyCompactList}\small\item\em Gets record cloud type. \end{DoxyCompactList}\item 
+C\+String \hyperlink{class_playback_configuration_abd176702d769917d91e2ceb0a6212596}{get\+First\+Playback\+File} ()
+\begin{DoxyCompactList}\small\item\em Gets the first playback file. \end{DoxyCompactList}\item 
+int \hyperlink{class_playback_configuration_a6561c9ade83eaadf67cc0eb17dd3b9e0}{get\+Cloud\+Files\+To\+Play\+Count} ()
+\begin{DoxyCompactList}\small\item\em Gets amount of cloud files to play. \end{DoxyCompactList}\item 
+std\+::vector$<$ \hyperlink{struct_cloud_file}{Cloud\+File} $>$ \hyperlink{class_playback_configuration_a985b80b60ba9f8f78db5f6a3d230c8c9}{get\+Cloud\+Files\+To\+Play} ()
+\begin{DoxyCompactList}\small\item\em Gets cloud files to play. \end{DoxyCompactList}\item 
+\hypertarget{class_playback_configuration_a5d268787e8c36e9f27122fb8e5b3788f}{}void \hyperlink{class_playback_configuration_a5d268787e8c36e9f27122fb8e5b3788f}{sort\+Cloud\+Files\+For\+Playback} ()\label{class_playback_configuration_a5d268787e8c36e9f27122fb8e5b3788f}
+
+\begin{DoxyCompactList}\small\item\em Sort cloud files for playback according to the number contained in the point cloud file name e.\+g. H\+D\+Face\+\_\+0001.\+ply. \end{DoxyCompactList}\item 
+\hypertarget{class_playback_configuration_ac91b75c0d9b8b741a437e8d33fc87b95}{}void \hyperlink{class_playback_configuration_ac91b75c0d9b8b741a437e8d33fc87b95}{set\+Was\+Full\+Played} ()\label{class_playback_configuration_ac91b75c0d9b8b741a437e8d33fc87b95}
+
+\begin{DoxyCompactList}\small\item\em Sets was full played and therefore contained in the buffer. \end{DoxyCompactList}\item 
+bool \hyperlink{class_playback_configuration_ad72e7749e52c1495ecc9408bb6c97542}{was\+Full\+Played} ()
+\begin{DoxyCompactList}\small\item\em Determines if the \hyperlink{class_playback_configuration}{Playback\+Configuration} was already fully played. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_playback_configuration_a69b5496bdebf38fe5727fb96ccf4f40c}{}boost\+::signal$<$ void(void)$>$ \hyperlink{class_playback_configuration_a69b5496bdebf38fe5727fb96ccf4f40c}{playback\+Configuration\+Changed}\label{class_playback_configuration_a69b5496bdebf38fe5727fb96ccf4f40c}
+
+\begin{DoxyCompactList}\small\item\em The playback configuration changed signal. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{class_playback_configuration}{Playback\+Configuration} stores all information required by the Input\+Reader to read point cloud files from the disc. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_playback_configuration_a9c8f27b87b192cb6c34517087975bf48}{}\index{Playback\+Configuration@{Playback\+Configuration}!Playback\+Configuration@{Playback\+Configuration}}
+\index{Playback\+Configuration@{Playback\+Configuration}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{Playback\+Configuration}]{\setlength{\rightskip}{0pt plus 5cm}Playback\+Configuration\+::\+Playback\+Configuration (
+\begin{DoxyParamCaption}
+\item[{{\bf Recording\+Configuration} \&}]{record\+Configuration}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_a9c8f27b87b192cb6c34517087975bf48}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em record\+Configuration} & The record configuration providing the basis for most of the fields rquired by the \hyperlink{class_playback_configuration}{Playback\+Configuration}. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_playback_configuration_a49c473c5400f547d931a1fc5d9164a68}{}\index{Playback\+Configuration@{Playback\+Configuration}!Playback\+Configuration@{Playback\+Configuration}}
+\index{Playback\+Configuration@{Playback\+Configuration}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{Playback\+Configuration}]{\setlength{\rightskip}{0pt plus 5cm}Playback\+Configuration\+::\+Playback\+Configuration (
+\begin{DoxyParamCaption}
+\item[{{\bf Playback\+Configuration} \&}]{playback\+Configuration\+To\+Copy}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_a49c473c5400f547d931a1fc5d9164a68}
+
+
+Copy constructor. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em playback\+Configuration\+To\+Copy} & The playback configuration to copy. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_playback_configuration_a985b80b60ba9f8f78db5f6a3d230c8c9}{}\index{Playback\+Configuration@{Playback\+Configuration}!get\+Cloud\+Files\+To\+Play@{get\+Cloud\+Files\+To\+Play}}
+\index{get\+Cloud\+Files\+To\+Play@{get\+Cloud\+Files\+To\+Play}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{get\+Cloud\+Files\+To\+Play}]{\setlength{\rightskip}{0pt plus 5cm}std\+::vector$<$ {\bf Cloud\+File} $>$ Playback\+Configuration\+::get\+Cloud\+Files\+To\+Play (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_a985b80b60ba9f8f78db5f6a3d230c8c9}
+
+
+Gets cloud files to play. 
+
+\begin{DoxyReturn}{Returns}
+The cloud files to play. 
+\end{DoxyReturn}
+\hypertarget{class_playback_configuration_a6561c9ade83eaadf67cc0eb17dd3b9e0}{}\index{Playback\+Configuration@{Playback\+Configuration}!get\+Cloud\+Files\+To\+Play\+Count@{get\+Cloud\+Files\+To\+Play\+Count}}
+\index{get\+Cloud\+Files\+To\+Play\+Count@{get\+Cloud\+Files\+To\+Play\+Count}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{get\+Cloud\+Files\+To\+Play\+Count}]{\setlength{\rightskip}{0pt plus 5cm}int Playback\+Configuration\+::get\+Cloud\+Files\+To\+Play\+Count (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_a6561c9ade83eaadf67cc0eb17dd3b9e0}
+
+
+Gets amount of cloud files to play. 
+
+\begin{DoxyReturn}{Returns}
+The amount of point cloud files to play. 
+\end{DoxyReturn}
+\hypertarget{class_playback_configuration_abd176702d769917d91e2ceb0a6212596}{}\index{Playback\+Configuration@{Playback\+Configuration}!get\+First\+Playback\+File@{get\+First\+Playback\+File}}
+\index{get\+First\+Playback\+File@{get\+First\+Playback\+File}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{get\+First\+Playback\+File}]{\setlength{\rightskip}{0pt plus 5cm}C\+String Playback\+Configuration\+::get\+First\+Playback\+File (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_abd176702d769917d91e2ceb0a6212596}
+
+
+Gets the first playback file. 
+
+\begin{DoxyReturn}{Returns}
+The first playback file. 
+\end{DoxyReturn}
+\hypertarget{class_playback_configuration_afc28ebd7eccf8ecfbd38c2986f11c0fe}{}\index{Playback\+Configuration@{Playback\+Configuration}!get\+Record\+Cloud\+Type@{get\+Record\+Cloud\+Type}}
+\index{get\+Record\+Cloud\+Type@{get\+Record\+Cloud\+Type}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{get\+Record\+Cloud\+Type}]{\setlength{\rightskip}{0pt plus 5cm}Record\+Cloud\+Type Playback\+Configuration\+::get\+Record\+Cloud\+Type (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_afc28ebd7eccf8ecfbd38c2986f11c0fe}
+
+
+Gets record cloud type. 
+
+\begin{DoxyReturn}{Returns}
+The record cloud type. 
+\end{DoxyReturn}
+\hypertarget{class_playback_configuration_af94ca3803d76a447aeea4ddc32936f39}{}\index{Playback\+Configuration@{Playback\+Configuration}!get\+Record\+File\+Format@{get\+Record\+File\+Format}}
+\index{get\+Record\+File\+Format@{get\+Record\+File\+Format}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{get\+Record\+File\+Format}]{\setlength{\rightskip}{0pt plus 5cm}Recording\+File\+Format Playback\+Configuration\+::get\+Record\+File\+Format (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_af94ca3803d76a447aeea4ddc32936f39}
+
+
+Gets record file format. 
+
+\begin{DoxyReturn}{Returns}
+The record file format. 
+\end{DoxyReturn}
+\hypertarget{class_playback_configuration_a1006624edfe48ca6f1a2fd97a5cbf6f7}{}\index{Playback\+Configuration@{Playback\+Configuration}!is\+Enabled@{is\+Enabled}}
+\index{is\+Enabled@{is\+Enabled}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{is\+Enabled}]{\setlength{\rightskip}{0pt plus 5cm}bool Playback\+Configuration\+::is\+Enabled (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_a1006624edfe48ca6f1a2fd97a5cbf6f7}
+
+
+Query if the \hyperlink{class_playback_configuration}{Playback\+Configuration} is enabled. 
+
+\begin{DoxyReturn}{Returns}
+true if enabled, false if not. 
+\end{DoxyReturn}
+\hypertarget{class_playback_configuration_a1797bbadc6876281456c7b46b9a88655}{}\index{Playback\+Configuration@{Playback\+Configuration}!is\+Playback\+Configuration\+Valid@{is\+Playback\+Configuration\+Valid}}
+\index{is\+Playback\+Configuration\+Valid@{is\+Playback\+Configuration\+Valid}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{is\+Playback\+Configuration\+Valid}]{\setlength{\rightskip}{0pt plus 5cm}bool Playback\+Configuration\+::is\+Playback\+Configuration\+Valid (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_a1797bbadc6876281456c7b46b9a88655}
+
+
+Query if this object is playback configuration valid. 
+
+\begin{DoxyReturn}{Returns}
+true if playback configuration valid, false if not. 
+\end{DoxyReturn}
+\hypertarget{class_playback_configuration_ac3a2de4a2492134dc7d1351e37550e46}{}\index{Playback\+Configuration@{Playback\+Configuration}!operator=@{operator=}}
+\index{operator=@{operator=}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{operator=}]{\setlength{\rightskip}{0pt plus 5cm}{\bf Playback\+Configuration} \& Playback\+Configuration\+::operator= (
+\begin{DoxyParamCaption}
+\item[{const {\bf Playback\+Configuration} \&}]{rhs}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_ac3a2de4a2492134dc7d1351e37550e46}
+
+
+Assignment operator. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em rhs} & The right hand side.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A shallow copy of this object. 
+\end{DoxyReturn}
+\hypertarget{class_playback_configuration_a928896b44f93175d1e3f6ec6388fc002}{}\index{Playback\+Configuration@{Playback\+Configuration}!operator==@{operator==}}
+\index{operator==@{operator==}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{operator==}]{\setlength{\rightskip}{0pt plus 5cm}bool Playback\+Configuration\+::operator== (
+\begin{DoxyParamCaption}
+\item[{{\bf Playback\+Configuration} \&}]{playback\+To\+Compare\+With}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_a928896b44f93175d1e3f6ec6388fc002}
+
+
+Equality operator. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em playback\+To\+Compare\+With} & The playback to compare with.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if both Playback\+Configurations share the same directory path and their path contains the same amount of files, they are considered equivalent. 
+\end{DoxyReturn}
+\hypertarget{class_playback_configuration_ad3592d82088f471856f827325a1570ff}{}\index{Playback\+Configuration@{Playback\+Configuration}!set\+Enabled@{set\+Enabled}}
+\index{set\+Enabled@{set\+Enabled}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{set\+Enabled}]{\setlength{\rightskip}{0pt plus 5cm}void Playback\+Configuration\+::set\+Enabled (
+\begin{DoxyParamCaption}
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_ad3592d82088f471856f827325a1570ff}
+
+
+Sets an enabled. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em enabled} & true to enable, false to disable. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_playback_configuration_a8f75a762f95c1374f488cf80d85a82f4}{}\index{Playback\+Configuration@{Playback\+Configuration}!set\+Full\+File\+Path@{set\+Full\+File\+Path}}
+\index{set\+Full\+File\+Path@{set\+Full\+File\+Path}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{set\+Full\+File\+Path}]{\setlength{\rightskip}{0pt plus 5cm}void Playback\+Configuration\+::set\+Full\+File\+Path (
+\begin{DoxyParamCaption}
+\item[{C\+String}]{file\+Path}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_a8f75a762f95c1374f488cf80d85a82f4}
+
+
+Sets full file path of the directory containing the point cloud files. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file\+Path} & Full pathname of the directory. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_playback_configuration_ad72e7749e52c1495ecc9408bb6c97542}{}\index{Playback\+Configuration@{Playback\+Configuration}!was\+Full\+Played@{was\+Full\+Played}}
+\index{was\+Full\+Played@{was\+Full\+Played}!Playback\+Configuration@{Playback\+Configuration}}
+\subsubsection[{was\+Full\+Played}]{\setlength{\rightskip}{0pt plus 5cm}bool Playback\+Configuration\+::was\+Full\+Played (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_playback_configuration_ad72e7749e52c1495ecc9408bb6c97542}
+
+
+Determines if the \hyperlink{class_playback_configuration}{Playback\+Configuration} was already fully played. 
+
+\begin{DoxyReturn}{Returns}
+true if it was played, otherwise false. 
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Playback\+Configuration.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Playback\+Configuration.\+cpp\end{DoxyCompactItemize}

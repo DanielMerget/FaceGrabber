@@ -1,0 +1,184 @@
+\hypertarget{class_image_renderer}{}\section{Image\+Renderer Class Reference}
+\label{class_image_renderer}\index{Image\+Renderer@{Image\+Renderer}}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_image_renderer_a1550e980cb6121c21e5f554628b9c7e6}{Image\+Renderer} ()
+\begin{DoxyCompactList}\small\item\em Constructor \end{DoxyCompactList}\item 
+virtual \hyperlink{class_image_renderer_a98d1587d310a17eca400e99b56d9b5c1}{$\sim$\+Image\+Renderer} ()
+\begin{DoxyCompactList}\small\item\em Destructor \end{DoxyCompactList}\item 
+H\+R\+E\+S\+U\+L\+T \hyperlink{class_image_renderer_a28d70ffb64d4c48cfb1ff67ef54f13a8}{initialize} (H\+W\+N\+D hwnd, I\+D2\+D1\+Factory $\ast$p\+D2\+D\+Factory, int source\+Width, int source\+Height, int source\+Stride)
+\begin{DoxyCompactList}\small\item\em Set the window to draw to as well as the video format Implied bits per pixel is 32 \end{DoxyCompactList}\item 
+H\+R\+E\+S\+U\+L\+T \hyperlink{class_image_renderer_a65a85272d88da1cb9460b3c9470bad0a}{begin\+Drawing} ()
+\begin{DoxyCompactList}\small\item\em Prepare device to begin drawing \begin{DoxyReturn}{Returns}
+indicates success or failure
+\end{DoxyReturn}
+\end{DoxyCompactList}\item 
+H\+R\+E\+S\+U\+L\+T \hyperlink{class_image_renderer_a0fc06bcef542acbb8d6d1051887b1c58}{end\+Drawing} ()
+\begin{DoxyCompactList}\small\item\em Ends drawing \begin{DoxyReturn}{Returns}
+indicates success or failure
+\end{DoxyReturn}
+\end{DoxyCompactList}\item 
+H\+R\+E\+S\+U\+L\+T \hyperlink{class_image_renderer_a2aaa0c20fe3418a4eea15e613016d0fa}{draw\+Background} (B\+Y\+T\+E $\ast$p\+Image, unsigned long cb\+Image)
+\begin{DoxyCompactList}\small\item\em Draws a 32 bit per pixel image of previously specified width, height, and stride to the associated hwnd \end{DoxyCompactList}\item 
+\hypertarget{class_image_renderer_a6c1719d4629c680c9494af55fadb5aa4}{}void {\bfseries draw\+Points} (const std\+::vector$<$ Color\+Space\+Point $>$ render\+Points)\label{class_image_renderer_a6c1719d4629c680c9494af55fadb5aa4}
+
+\item 
+void \hyperlink{class_image_renderer_a15133c9189c159c9a2ee7d0764ddcc33}{draw\+Face\+Frame\+Results} (int i\+Face, const Rect\+I $\ast$p\+Face\+Box, const Point\+F $\ast$p\+Face\+Points, const Vector4 $\ast$p\+Face\+Rotation, const Detection\+Result $\ast$p\+Face\+Properties, const D2\+D1\+\_\+\+P\+O\+I\+N\+T\+\_\+2\+F $\ast$p\+Face\+Text\+Layout)
+\begin{DoxyCompactList}\small\item\em Draws face frame results \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_image_renderer_a1550e980cb6121c21e5f554628b9c7e6}{}\index{Image\+Renderer@{Image\+Renderer}!Image\+Renderer@{Image\+Renderer}}
+\index{Image\+Renderer@{Image\+Renderer}!Image\+Renderer@{Image\+Renderer}}
+\subsubsection[{Image\+Renderer}]{\setlength{\rightskip}{0pt plus 5cm}Image\+Renderer\+::\+Image\+Renderer (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_image_renderer_a1550e980cb6121c21e5f554628b9c7e6}
+
+
+Constructor 
+
+\hypertarget{class_image_renderer_a98d1587d310a17eca400e99b56d9b5c1}{}\index{Image\+Renderer@{Image\+Renderer}!````~Image\+Renderer@{$\sim$\+Image\+Renderer}}
+\index{````~Image\+Renderer@{$\sim$\+Image\+Renderer}!Image\+Renderer@{Image\+Renderer}}
+\subsubsection[{$\sim$\+Image\+Renderer}]{\setlength{\rightskip}{0pt plus 5cm}Image\+Renderer\+::$\sim$\+Image\+Renderer (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_image_renderer_a98d1587d310a17eca400e99b56d9b5c1}
+
+
+Destructor 
+
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_image_renderer_a65a85272d88da1cb9460b3c9470bad0a}{}\index{Image\+Renderer@{Image\+Renderer}!begin\+Drawing@{begin\+Drawing}}
+\index{begin\+Drawing@{begin\+Drawing}!Image\+Renderer@{Image\+Renderer}}
+\subsubsection[{begin\+Drawing}]{\setlength{\rightskip}{0pt plus 5cm}H\+R\+E\+S\+U\+L\+T Image\+Renderer\+::begin\+Drawing (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_image_renderer_a65a85272d88da1cb9460b3c9470bad0a}
+
+
+Prepare device to begin drawing \begin{DoxyReturn}{Returns}
+indicates success or failure
+\end{DoxyReturn}
+
+
+Prepare device to begin drawing 
+
+\begin{DoxyReturn}{Returns}
+indicates success or failure
+\end{DoxyReturn}
+\hypertarget{class_image_renderer_a2aaa0c20fe3418a4eea15e613016d0fa}{}\index{Image\+Renderer@{Image\+Renderer}!draw\+Background@{draw\+Background}}
+\index{draw\+Background@{draw\+Background}!Image\+Renderer@{Image\+Renderer}}
+\subsubsection[{draw\+Background}]{\setlength{\rightskip}{0pt plus 5cm}H\+R\+E\+S\+U\+L\+T Image\+Renderer\+::draw\+Background (
+\begin{DoxyParamCaption}
+\item[{B\+Y\+T\+E $\ast$}]{p\+Image, }
+\item[{unsigned long}]{cb\+Image}
+\end{DoxyParamCaption}
+)}\label{class_image_renderer_a2aaa0c20fe3418a4eea15e613016d0fa}
+
+
+Draws a 32 bit per pixel image of previously specified width, height, and stride to the associated hwnd 
+
+
+\begin{DoxyParams}{Parameters}
+{\em p\+Image} & image data in R\+G\+B\+X format\\
+\hline
+{\em cb\+Image} & size of image data in bytes\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+indicates success or failure
+\end{DoxyReturn}
+\hypertarget{class_image_renderer_a15133c9189c159c9a2ee7d0764ddcc33}{}\index{Image\+Renderer@{Image\+Renderer}!draw\+Face\+Frame\+Results@{draw\+Face\+Frame\+Results}}
+\index{draw\+Face\+Frame\+Results@{draw\+Face\+Frame\+Results}!Image\+Renderer@{Image\+Renderer}}
+\subsubsection[{draw\+Face\+Frame\+Results}]{\setlength{\rightskip}{0pt plus 5cm}void Image\+Renderer\+::draw\+Face\+Frame\+Results (
+\begin{DoxyParamCaption}
+\item[{int}]{i\+Face, }
+\item[{const Rect\+I $\ast$}]{p\+Face\+Box, }
+\item[{const Point\+F $\ast$}]{p\+Face\+Points, }
+\item[{const Vector4 $\ast$}]{p\+Face\+Rotation, }
+\item[{const Detection\+Result $\ast$}]{p\+Face\+Properties, }
+\item[{const D2\+D1\+\_\+\+P\+O\+I\+N\+T\+\_\+2\+F $\ast$}]{p\+Face\+Text\+Layout}
+\end{DoxyParamCaption}
+)}\label{class_image_renderer_a15133c9189c159c9a2ee7d0764ddcc33}
+
+
+Draws face frame results 
+
+
+\begin{DoxyParams}{Parameters}
+{\em i\+Face} & the index of the face frame corresponding to a specific body in the F\+O\+V\\
+\hline
+{\em p\+Face\+Box} & face bounding box\\
+\hline
+{\em p\+Face\+Points} & face points\\
+\hline
+{\em p\+Face\+Rotation} & face rotation\\
+\hline
+{\em p\+Face\+Properties} & face properties\\
+\hline
+{\em p\+Face\+Text\+Layout} & face result text layout\\
+\hline
+\end{DoxyParams}
+\hypertarget{class_image_renderer_a0fc06bcef542acbb8d6d1051887b1c58}{}\index{Image\+Renderer@{Image\+Renderer}!end\+Drawing@{end\+Drawing}}
+\index{end\+Drawing@{end\+Drawing}!Image\+Renderer@{Image\+Renderer}}
+\subsubsection[{end\+Drawing}]{\setlength{\rightskip}{0pt plus 5cm}H\+R\+E\+S\+U\+L\+T Image\+Renderer\+::end\+Drawing (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_image_renderer_a0fc06bcef542acbb8d6d1051887b1c58}
+
+
+Ends drawing \begin{DoxyReturn}{Returns}
+indicates success or failure
+\end{DoxyReturn}
+
+
+Ends drawing 
+
+\begin{DoxyReturn}{Returns}
+indicates success or failure
+\end{DoxyReturn}
+\hypertarget{class_image_renderer_a28d70ffb64d4c48cfb1ff67ef54f13a8}{}\index{Image\+Renderer@{Image\+Renderer}!initialize@{initialize}}
+\index{initialize@{initialize}!Image\+Renderer@{Image\+Renderer}}
+\subsubsection[{initialize}]{\setlength{\rightskip}{0pt plus 5cm}H\+R\+E\+S\+U\+L\+T Image\+Renderer\+::initialize (
+\begin{DoxyParamCaption}
+\item[{H\+W\+N\+D}]{h\+Wnd, }
+\item[{I\+D2\+D1\+Factory $\ast$}]{p\+D2\+D\+Factory, }
+\item[{int}]{source\+Width, }
+\item[{int}]{source\+Height, }
+\item[{int}]{source\+Stride}
+\end{DoxyParamCaption}
+)}\label{class_image_renderer_a28d70ffb64d4c48cfb1ff67ef54f13a8}
+
+
+Set the window to draw to as well as the video format Implied bits per pixel is 32 
+
+
+\begin{DoxyParams}{Parameters}
+{\em h\+Wnd} & window to draw to\\
+\hline
+{\em p\+D2\+D\+Factory} & already created D2\+D factory object\\
+\hline
+{\em source\+Width} & width (in pixels) of image data to be drawn\\
+\hline
+{\em source\+Height} & height (in pixels) of image data to be drawn\\
+\hline
+{\em source\+Stride} & length (in bytes) of a single scanline\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+indicates success or failure
+\end{DoxyReturn}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Image\+Renderer.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Image\+Renderer.\+cpp\end{DoxyCompactItemize}

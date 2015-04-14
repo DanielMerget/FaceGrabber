@@ -1,0 +1,89 @@
+\hypertarget{class_p_c_l_input_reader_worker_thread}{}\section{P\+C\+L\+Input\+Reader\+Worker\+Thread$<$ Point\+Type $>$ Class Template Reference}
+\label{class_p_c_l_input_reader_worker_thread}\index{P\+C\+L\+Input\+Reader\+Worker\+Thread$<$ Point\+Type $>$@{P\+C\+L\+Input\+Reader\+Worker\+Thread$<$ Point\+Type $>$}}
+
+
+A P\+C\+L input reader worker object used by the \hyperlink{class_p_c_l_input_reader}{P\+C\+L\+Input\+Reader} to read point cloud files (ply, pcd).  
+
+
+
+
+{\ttfamily \#include $<$P\+C\+L\+Input\+Reader\+Worker\+Thread.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_p_c_l_input_reader_worker_thread_ab0a65a6918b081159c2c41f5df01176e}{read\+Cloud\+Data} (const int index, const int step, std\+::vector$<$ \hyperlink{struct_cloud_file}{Cloud\+File} $>$ cloud\+Files\+To\+Play, Recording\+File\+Format format)
+\begin{DoxyCompactList}\small\item\em Reads point cloud files. For the given index and step-\/size all files are red and stored in the set buffer. e.\+g. for index = 2 and step = 3\+: the files with indecies 2, 5, 7 of the cloud\+Files\+To\+Play list are read. \end{DoxyCompactList}\item 
+\hypertarget{class_p_c_l_input_reader_worker_thread_aa40da7f26a0d69e22f4b69ea49cf02e2}{}void \hyperlink{class_p_c_l_input_reader_worker_thread_aa40da7f26a0d69e22f4b69ea49cf02e2}{stop\+Reading} ()\label{class_p_c_l_input_reader_worker_thread_aa40da7f26a0d69e22f4b69ea49cf02e2}
+
+\begin{DoxyCompactList}\small\item\em Stops a reader thread. \end{DoxyCompactList}\item 
+void \hyperlink{class_p_c_l_input_reader_worker_thread_a55e5bd15db3a1d39a2661db2f812c258}{set\+Buffer} (std\+::shared\+\_\+ptr$<$ \hyperlink{class_buffer}{Buffer}$<$ boost\+::shared\+\_\+ptr$<$ pcl\+::\+Point\+Cloud$<$ Point\+Type $>$$>$$>$$>$ buffer)
+\begin{DoxyCompactList}\small\item\em Sets a buffer the read point clouds are saved to. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_p_c_l_input_reader_worker_thread_a432c3b7de15d713d8e8a626af938f44f}{}boost\+::signals2\+::signal$<$ void(void)$>$ \hyperlink{class_p_c_l_input_reader_worker_thread_a432c3b7de15d713d8e8a626af938f44f}{finished\+Reading\+A\+File}\label{class_p_c_l_input_reader_worker_thread_a432c3b7de15d713d8e8a626af938f44f}
+
+\begin{DoxyCompactList}\small\item\em The finished reading a file signal. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$typename Point\+Type$>$class P\+C\+L\+Input\+Reader\+Worker\+Thread$<$ Point\+Type $>$}
+
+A P\+C\+L input reader worker object used by the \hyperlink{class_p_c_l_input_reader}{P\+C\+L\+Input\+Reader} to read point cloud files (ply, pcd). 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Point\+Type} & Type of the point type. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_p_c_l_input_reader_worker_thread_ab0a65a6918b081159c2c41f5df01176e}{}\index{P\+C\+L\+Input\+Reader\+Worker\+Thread@{P\+C\+L\+Input\+Reader\+Worker\+Thread}!read\+Cloud\+Data@{read\+Cloud\+Data}}
+\index{read\+Cloud\+Data@{read\+Cloud\+Data}!P\+C\+L\+Input\+Reader\+Worker\+Thread@{P\+C\+L\+Input\+Reader\+Worker\+Thread}}
+\subsubsection[{read\+Cloud\+Data}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Point\+Type $>$ void {\bf P\+C\+L\+Input\+Reader\+Worker\+Thread}$<$ Point\+Type $>$\+::read\+Cloud\+Data (
+\begin{DoxyParamCaption}
+\item[{const int}]{index, }
+\item[{const int}]{step, }
+\item[{std\+::vector$<$ {\bf Cloud\+File} $>$}]{cloud\+Files\+To\+Play, }
+\item[{Recording\+File\+Format}]{format}
+\end{DoxyParamCaption}
+)}\label{class_p_c_l_input_reader_worker_thread_ab0a65a6918b081159c2c41f5df01176e}
+
+
+Reads point cloud files. For the given index and step-\/size all files are red and stored in the set buffer. e.\+g. for index = 2 and step = 3\+: the files with indecies 2, 5, 7 of the cloud\+Files\+To\+Play list are read. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index} & Zero-\/based index of the files in the cloud\+Files\+To\+Play to be read. \\
+\hline
+{\em step} & Amount to increment the index to calculate the next index to read. \\
+\hline
+{\em cloud\+Files\+To\+Play} & The cloud files to play. \\
+\hline
+{\em format} & Describes the format to use. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_p_c_l_input_reader_worker_thread_a55e5bd15db3a1d39a2661db2f812c258}{}\index{P\+C\+L\+Input\+Reader\+Worker\+Thread@{P\+C\+L\+Input\+Reader\+Worker\+Thread}!set\+Buffer@{set\+Buffer}}
+\index{set\+Buffer@{set\+Buffer}!P\+C\+L\+Input\+Reader\+Worker\+Thread@{P\+C\+L\+Input\+Reader\+Worker\+Thread}}
+\subsubsection[{set\+Buffer}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Point\+Type $>$ void {\bf P\+C\+L\+Input\+Reader\+Worker\+Thread}$<$ Point\+Type $>$\+::set\+Buffer (
+\begin{DoxyParamCaption}
+\item[{std\+::shared\+\_\+ptr$<$ {\bf Buffer}$<$ boost\+::shared\+\_\+ptr$<$ pcl\+::\+Point\+Cloud$<$ Point\+Type $>$$>$$>$$>$}]{buffer}
+\end{DoxyParamCaption}
+)}\label{class_p_c_l_input_reader_worker_thread_a55e5bd15db3a1d39a2661db2f812c258}
+
+
+Sets a buffer the read point clouds are saved to. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer} & The buffer. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/P\+C\+L\+Input\+Reader\+Worker\+Thread.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/P\+C\+L\+Input\+Reader\+Worker\+Thread.\+cpp\end{DoxyCompactItemize}

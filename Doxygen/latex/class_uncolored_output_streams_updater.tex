@@ -1,0 +1,113 @@
+\hypertarget{class_uncolored_output_streams_updater}{}\section{Uncolored\+Output\+Streams\+Updater Class Reference}
+\label{class_uncolored_output_streams_updater}\index{Uncolored\+Output\+Streams\+Updater@{Uncolored\+Output\+Streams\+Updater}}
+
+
+Implementation of the \hyperlink{class_output_streams_updater_stragedy}{Output\+Streams\+Updater\+Stragedy} which extracts point clouds using the buffers provided method calls. The processed point clouds are provided without colored. Listeners can registered on clouds\+Updated and cloud\+Updated. Clouds\+Updated provides the H\+D\+Face and Raw\+Face\+Depth point clouds. cloud\+Updated\mbox{[}0\mbox{]}\+: H\+D\+Face cloud\+Updated\mbox{[}1\mbox{]}\+: Raw\+Face\+Depth cloud\+Updated\mbox{[}2\mbox{]}\+: Full\+Rawp\+Deth.  
+
+
+
+
+{\ttfamily \#include $<$Uncolored\+Output\+Streams\+Updater.\+h$>$}
+
+Inheritance diagram for Uncolored\+Output\+Streams\+Updater\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_uncolored_output_streams_updater}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_uncolored_output_streams_updater_a64ae7fe4aa062ea1bcffa927d5ba1624}{}\hyperlink{class_uncolored_output_streams_updater_a64ae7fe4aa062ea1bcffa927d5ba1624}{Uncolored\+Output\+Streams\+Updater} ()\label{class_uncolored_output_streams_updater_a64ae7fe4aa062ea1bcffa927d5ba1624}
+
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_uncolored_output_streams_updater_af3b179fe61b46dd17b43970834135b19}{}\hyperlink{class_uncolored_output_streams_updater_af3b179fe61b46dd17b43970834135b19}{$\sim$\+Uncolored\+Output\+Streams\+Updater} ()\label{class_uncolored_output_streams_updater_af3b179fe61b46dd17b43970834135b19}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+H\+R\+E\+S\+U\+L\+T \hyperlink{class_uncolored_output_streams_updater_a0066f3f764858f63d29a72f215f4cf5e}{update\+Output\+Streams} (I\+Face\+Model $\ast$face\+Model, I\+Face\+Alignment $\ast$face\+Alignment, int buffer\+Size, Camera\+Space\+Point $\ast$detected\+H\+D\+Face\+Points\+Cam\+Space, Color\+Space\+Point $\ast$detected\+H\+D\+Face\+Points\+Color\+Space)
+\begin{DoxyCompactList}\small\item\em Updates and processes the output streams. \end{DoxyCompactList}\item 
+void \hyperlink{class_uncolored_output_streams_updater_ae5b26d31a579242a58b98854ac4bf1b3}{start\+Face\+Collection} (R\+G\+B\+Q\+U\+A\+D $\ast$color\+Buffer, U\+I\+N\+T16 $\ast$depth\+Buffer)
+\begin{DoxyCompactList}\small\item\em Starts collecting point clouds of all tracked users. \end{DoxyCompactList}\item 
+\hypertarget{class_uncolored_output_streams_updater_aa6ef874cb8e0270f12cb7e110b7064da}{}void \hyperlink{class_uncolored_output_streams_updater_aa6ef874cb8e0270f12cb7e110b7064da}{stop\+Face\+Collection} ()\label{class_uncolored_output_streams_updater_aa6ef874cb8e0270f12cb7e110b7064da}
+
+\begin{DoxyCompactList}\small\item\em Stops the collection of the faces, runs the conversion of the entire depth buffer if neccesary and calls the signals. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_uncolored_output_streams_updater_a74fe41eccc0f4a72ea0b185b385f33ef}{}boost\+::signals2\+::signal$<$ void(std\+::vector$<$ pcl\+::\+Point\+Cloud$<$ pcl\+::\+Point\+X\+Y\+Z $>$\+::Ptr $>$)$>$ \hyperlink{class_uncolored_output_streams_updater_a74fe41eccc0f4a72ea0b185b385f33ef}{clouds\+Updated}\label{class_uncolored_output_streams_updater_a74fe41eccc0f4a72ea0b185b385f33ef}
+
+\begin{DoxyCompactList}\small\item\em The clouds updated. \end{DoxyCompactList}\item 
+\hypertarget{class_uncolored_output_streams_updater_aacae572a80c079c7305d629de2a63773}{}boost\+::signals2\+::signal$<$ void(pcl\+::\+Point\+Cloud$<$ pcl\+::\+Point\+X\+Y\+Z $>$\+::Ptr cloud)$>$ \hyperlink{class_uncolored_output_streams_updater_aacae572a80c079c7305d629de2a63773}{cloud\+Updated} \mbox{[}3\mbox{]}\label{class_uncolored_output_streams_updater_aacae572a80c079c7305d629de2a63773}
+
+\begin{DoxyCompactList}\small\item\em The clouds updated\+: cloud\+Updated\mbox{[}0\mbox{]}\+: H\+D\+Face; cloud\+Updated\mbox{[}1\mbox{]}\+: Raw\+Face\+Depth; cloud\+Updated\mbox{[}2\mbox{]}\+: Full\+Rawp\+Deth. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Implementation of the \hyperlink{class_output_streams_updater_stragedy}{Output\+Streams\+Updater\+Stragedy} which extracts point clouds using the buffers provided method calls. The processed point clouds are provided without colored. Listeners can registered on clouds\+Updated and cloud\+Updated. Clouds\+Updated provides the H\+D\+Face and Raw\+Face\+Depth point clouds. cloud\+Updated\mbox{[}0\mbox{]}\+: H\+D\+Face cloud\+Updated\mbox{[}1\mbox{]}\+: Raw\+Face\+Depth cloud\+Updated\mbox{[}2\mbox{]}\+: Full\+Rawp\+Deth. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_uncolored_output_streams_updater_ae5b26d31a579242a58b98854ac4bf1b3}{}\index{Uncolored\+Output\+Streams\+Updater@{Uncolored\+Output\+Streams\+Updater}!start\+Face\+Collection@{start\+Face\+Collection}}
+\index{start\+Face\+Collection@{start\+Face\+Collection}!Uncolored\+Output\+Streams\+Updater@{Uncolored\+Output\+Streams\+Updater}}
+\subsubsection[{start\+Face\+Collection}]{\setlength{\rightskip}{0pt plus 5cm}void Uncolored\+Output\+Streams\+Updater\+::start\+Face\+Collection (
+\begin{DoxyParamCaption}
+\item[{R\+G\+B\+Q\+U\+A\+D $\ast$}]{color\+Buffer, }
+\item[{U\+I\+N\+T16 $\ast$}]{depth\+Buffer}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_uncolored_output_streams_updater_ae5b26d31a579242a58b98854ac4bf1b3}
+
+
+Starts collecting point clouds of all tracked users. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em color\+Buffer} & the current color \hyperlink{class_buffer}{Buffer} \\
+\hline
+\mbox{\tt in}  & {\em depth\+Buffer} & the current depth \hyperlink{class_buffer}{Buffer} \\
+\hline
+\end{DoxyParams}
+
+
+Implements \hyperlink{class_output_streams_updater_stragedy_ad9a1898edc4def60a68bf6105c241bcc}{Output\+Streams\+Updater\+Stragedy}.
+
+\hypertarget{class_uncolored_output_streams_updater_a0066f3f764858f63d29a72f215f4cf5e}{}\index{Uncolored\+Output\+Streams\+Updater@{Uncolored\+Output\+Streams\+Updater}!update\+Output\+Streams@{update\+Output\+Streams}}
+\index{update\+Output\+Streams@{update\+Output\+Streams}!Uncolored\+Output\+Streams\+Updater@{Uncolored\+Output\+Streams\+Updater}}
+\subsubsection[{update\+Output\+Streams}]{\setlength{\rightskip}{0pt plus 5cm}H\+R\+E\+S\+U\+L\+T Uncolored\+Output\+Streams\+Updater\+::update\+Output\+Streams (
+\begin{DoxyParamCaption}
+\item[{I\+Face\+Model $\ast$}]{face\+Model, }
+\item[{I\+Face\+Alignment $\ast$}]{face\+Alignment, }
+\item[{int}]{buffer\+Size, }
+\item[{Camera\+Space\+Point $\ast$}]{detected\+H\+D\+Face\+Points\+Cam\+Space, }
+\item[{Color\+Space\+Point $\ast$}]{detected\+H\+D\+Face\+Points\+Color\+Space}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_uncolored_output_streams_updater_a0066f3f764858f63d29a72f215f4cf5e}
+
+
+Updates and processes the output streams. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em face\+Model} & the face model of the current face \\
+\hline
+\mbox{\tt in,out}  & {\em face\+Alignment} & the face alignment of the current face \\
+\hline
+ & {\em buffer\+Size} & Size of the detected\+H\+D\+Face\+Points\+Cam\+Space buffer. \\
+\hline
+\mbox{\tt in,out}  & {\em detected\+H\+D\+Face\+Points\+Cam\+Space} & The detected H\+D face points in camera space camera space. \\
+\hline
+\mbox{\tt in,out}  & {\em detected\+H\+D\+Face\+Points\+Color\+Space} & The detected H\+D face points in color space color space.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A h\+Result. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_output_streams_updater_stragedy_aab72baf9e0357eda8d10af52ef6046df}{Output\+Streams\+Updater\+Stragedy}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Uncolored\+Output\+Streams\+Updater.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Uncolored\+Output\+Streams\+Updater.\+cpp\end{DoxyCompactItemize}

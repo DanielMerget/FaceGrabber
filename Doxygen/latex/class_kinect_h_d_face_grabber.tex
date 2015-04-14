@@ -1,0 +1,130 @@
+\hypertarget{class_kinect_h_d_face_grabber}{}\section{Kinect\+H\+D\+Face\+Grabber Class Reference}
+\label{class_kinect_h_d_face_grabber}\index{Kinect\+H\+D\+Face\+Grabber@{Kinect\+H\+D\+Face\+Grabber}}
+
+
+\hyperlink{class_kinect_h_d_face_grabber}{Kinect\+H\+D\+Face\+Grabber} uses the Kinect v2 to process the users faces found and tracked by the Kinect A\+P\+I. With the set \hyperlink{class_output_streams_updater_stragedy}{Output\+Streams\+Updater\+Stragedy} the information about the faces found by H\+D\+Face A\+P\+I can be further processed. The \hyperlink{class_kinect_h_d_face_grabber}{Kinect\+H\+D\+Face\+Grabber} initializes the Depth, Color and H\+D\+Face Reader and grabs the frames provided by the the reades each time the \hyperlink{class_kinect_h_d_face_grabber_a619b994aaca778dd7d8ce180b59a6667}{update()} method is called. The current color camera image with the tracked face points are render using the set \hyperlink{class_image_renderer}{Image\+Renderer}.  
+
+
+
+
+{\ttfamily \#include $<$Kinect\+H\+D\+Face\+Grabber.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_kinect_h_d_face_grabber_a619b994aaca778dd7d8ce180b59a6667}{}void \hyperlink{class_kinect_h_d_face_grabber_a619b994aaca778dd7d8ce180b59a6667}{update} ()\label{class_kinect_h_d_face_grabber_a619b994aaca778dd7d8ce180b59a6667}
+
+\begin{DoxyCompactList}\small\item\em This method have to be called if a new frame should be grabbed. With this call all Depth, Color and H\+D\+Face Reader are updated and the results are provided to the \hyperlink{class_output_streams_updater_stragedy}{Output\+Streams\+Updater\+Stragedy} for further processing. \end{DoxyCompactList}\item 
+H\+R\+E\+S\+U\+L\+T \hyperlink{class_kinect_h_d_face_grabber_ae9f90e10fe776a244cd7addfd0eaac9d}{initialize\+Default\+Sensor} ()
+\begin{DoxyCompactList}\small\item\em Initializes the Kinect v2 and all streams required by the \hyperlink{class_kinect_h_d_face_grabber}{Kinect\+H\+D\+Face\+Grabber}\+: \end{DoxyCompactList}\item 
+I\+Coordinate\+Mapper $\ast$ \hyperlink{class_kinect_h_d_face_grabber_a3f0c83ad5721a4fb7ff4da043c21dc98}{get\+Coordinate\+Mapper} ()
+\begin{DoxyCompactList}\small\item\em Getter for the Kinect Coordinate Mapper. \end{DoxyCompactList}\item 
+void \hyperlink{class_kinect_h_d_face_grabber_a4a3b537dfc25c558d6f219b519ce2166}{set\+Image\+Renderer} (\hyperlink{class_image_renderer}{Image\+Renderer} $\ast$renderer)
+\begin{DoxyCompactList}\small\item\em Sets image renderer. \end{DoxyCompactList}\item 
+void \hyperlink{class_kinect_h_d_face_grabber_a12915266d3fe68e3a068d82d67342b90}{set\+Output\+Stream\+Updater} (std\+::shared\+\_\+ptr$<$ \hyperlink{class_output_streams_updater_stragedy}{Output\+Streams\+Updater\+Stragedy} $>$ output\+Stream\+Updater)
+\begin{DoxyCompactList}\small\item\em Sets output stream updater. \end{DoxyCompactList}\item 
+void \hyperlink{class_kinect_h_d_face_grabber_a8a32363822034f5d3bac76b62f1ef809}{get\+Colour\+And\+Depth\+Size} (int \&depth\+Width, int \&depth\+Height, int \&color\+Width, int \&color\+Height)
+\begin{DoxyCompactList}\small\item\em Getter for the size of the colour and depth streams. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_kinect_h_d_face_grabber_adb8982cba8b171d149869a4cc6205db4}{}boost\+::signals2\+::signal$<$ bool(std\+::wstring, bool)$>$ \hyperlink{class_kinect_h_d_face_grabber_adb8982cba8b171d149869a4cc6205db4}{status\+Changed}\label{class_kinect_h_d_face_grabber_adb8982cba8b171d149869a4cc6205db4}
+
+\begin{DoxyCompactList}\small\item\em The status of the Kinect and Kinect H\+D face modelling. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\hyperlink{class_kinect_h_d_face_grabber}{Kinect\+H\+D\+Face\+Grabber} uses the Kinect v2 to process the users faces found and tracked by the Kinect A\+P\+I. With the set \hyperlink{class_output_streams_updater_stragedy}{Output\+Streams\+Updater\+Stragedy} the information about the faces found by H\+D\+Face A\+P\+I can be further processed. The \hyperlink{class_kinect_h_d_face_grabber}{Kinect\+H\+D\+Face\+Grabber} initializes the Depth, Color and H\+D\+Face Reader and grabs the frames provided by the the reades each time the \hyperlink{class_kinect_h_d_face_grabber_a619b994aaca778dd7d8ce180b59a6667}{update()} method is called. The current color camera image with the tracked face points are render using the set \hyperlink{class_image_renderer}{Image\+Renderer}. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_kinect_h_d_face_grabber_a8a32363822034f5d3bac76b62f1ef809}{}\index{Kinect\+H\+D\+Face\+Grabber@{Kinect\+H\+D\+Face\+Grabber}!get\+Colour\+And\+Depth\+Size@{get\+Colour\+And\+Depth\+Size}}
+\index{get\+Colour\+And\+Depth\+Size@{get\+Colour\+And\+Depth\+Size}!Kinect\+H\+D\+Face\+Grabber@{Kinect\+H\+D\+Face\+Grabber}}
+\subsubsection[{get\+Colour\+And\+Depth\+Size}]{\setlength{\rightskip}{0pt plus 5cm}void Kinect\+H\+D\+Face\+Grabber\+::get\+Colour\+And\+Depth\+Size (
+\begin{DoxyParamCaption}
+\item[{int \&}]{depth\+Width, }
+\item[{int \&}]{depth\+Height, }
+\item[{int \&}]{color\+Width, }
+\item[{int \&}]{color\+Height}
+\end{DoxyParamCaption}
+)}\label{class_kinect_h_d_face_grabber_a8a32363822034f5d3bac76b62f1ef809}
+
+
+Getter for the size of the colour and depth streams. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em depth\+Width} & Width of the depth. \\
+\hline
+\mbox{\tt in,out}  & {\em depth\+Height} & Height of the depth. \\
+\hline
+\mbox{\tt in,out}  & {\em color\+Width} & Width of the color. \\
+\hline
+\mbox{\tt in,out}  & {\em color\+Height} & Height of the color. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_kinect_h_d_face_grabber_a3f0c83ad5721a4fb7ff4da043c21dc98}{}\index{Kinect\+H\+D\+Face\+Grabber@{Kinect\+H\+D\+Face\+Grabber}!get\+Coordinate\+Mapper@{get\+Coordinate\+Mapper}}
+\index{get\+Coordinate\+Mapper@{get\+Coordinate\+Mapper}!Kinect\+H\+D\+Face\+Grabber@{Kinect\+H\+D\+Face\+Grabber}}
+\subsubsection[{get\+Coordinate\+Mapper}]{\setlength{\rightskip}{0pt plus 5cm}I\+Coordinate\+Mapper $\ast$ Kinect\+H\+D\+Face\+Grabber\+::get\+Coordinate\+Mapper (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_kinect_h_d_face_grabber_a3f0c83ad5721a4fb7ff4da043c21dc98}
+
+
+Getter for the Kinect Coordinate Mapper. 
+
+\begin{DoxyReturn}{Returns}
+The coordinate mapper. 
+\end{DoxyReturn}
+\hypertarget{class_kinect_h_d_face_grabber_ae9f90e10fe776a244cd7addfd0eaac9d}{}\index{Kinect\+H\+D\+Face\+Grabber@{Kinect\+H\+D\+Face\+Grabber}!initialize\+Default\+Sensor@{initialize\+Default\+Sensor}}
+\index{initialize\+Default\+Sensor@{initialize\+Default\+Sensor}!Kinect\+H\+D\+Face\+Grabber@{Kinect\+H\+D\+Face\+Grabber}}
+\subsubsection[{initialize\+Default\+Sensor}]{\setlength{\rightskip}{0pt plus 5cm}H\+R\+E\+S\+U\+L\+T Kinect\+H\+D\+Face\+Grabber\+::initialize\+Default\+Sensor (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_kinect_h_d_face_grabber_ae9f90e10fe776a244cd7addfd0eaac9d}
+
+
+Initializes the Kinect v2 and all streams required by the \hyperlink{class_kinect_h_d_face_grabber}{Kinect\+H\+D\+Face\+Grabber}\+: 
+
+\begin{DoxyReturn}{Returns}
+A h\+Result. 
+\end{DoxyReturn}
+\hypertarget{class_kinect_h_d_face_grabber_a4a3b537dfc25c558d6f219b519ce2166}{}\index{Kinect\+H\+D\+Face\+Grabber@{Kinect\+H\+D\+Face\+Grabber}!set\+Image\+Renderer@{set\+Image\+Renderer}}
+\index{set\+Image\+Renderer@{set\+Image\+Renderer}!Kinect\+H\+D\+Face\+Grabber@{Kinect\+H\+D\+Face\+Grabber}}
+\subsubsection[{set\+Image\+Renderer}]{\setlength{\rightskip}{0pt plus 5cm}void Kinect\+H\+D\+Face\+Grabber\+::set\+Image\+Renderer (
+\begin{DoxyParamCaption}
+\item[{{\bf Image\+Renderer} $\ast$}]{renderer}
+\end{DoxyParamCaption}
+)}\label{class_kinect_h_d_face_grabber_a4a3b537dfc25c558d6f219b519ce2166}
+
+
+Sets image renderer. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em renderer} & \hyperlink{class_image_renderer}{Image\+Renderer} to render the current color image and the tracked face points. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_kinect_h_d_face_grabber_a12915266d3fe68e3a068d82d67342b90}{}\index{Kinect\+H\+D\+Face\+Grabber@{Kinect\+H\+D\+Face\+Grabber}!set\+Output\+Stream\+Updater@{set\+Output\+Stream\+Updater}}
+\index{set\+Output\+Stream\+Updater@{set\+Output\+Stream\+Updater}!Kinect\+H\+D\+Face\+Grabber@{Kinect\+H\+D\+Face\+Grabber}}
+\subsubsection[{set\+Output\+Stream\+Updater}]{\setlength{\rightskip}{0pt plus 5cm}void Kinect\+H\+D\+Face\+Grabber\+::set\+Output\+Stream\+Updater (
+\begin{DoxyParamCaption}
+\item[{std\+::shared\+\_\+ptr$<$ {\bf Output\+Streams\+Updater\+Stragedy} $>$}]{output\+Stream\+Updater}
+\end{DoxyParamCaption}
+)}\label{class_kinect_h_d_face_grabber_a12915266d3fe68e3a068d82d67342b90}
+
+
+Sets output stream updater. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em output\+Stream\+Updater} & The output stream updater for further processing of the streams provided by the kinect. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Kinect\+H\+D\+Face\+Grabber.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Kinect\+H\+D\+Face\+Grabber.\+cpp\end{DoxyCompactItemize}

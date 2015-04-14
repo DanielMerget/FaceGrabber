@@ -1,0 +1,511 @@
+\hypertarget{class_recording_configuration}{}\section{Recording\+Configuration Class Reference}
+\label{class_recording_configuration}\index{Recording\+Configuration@{Recording\+Configuration}}
+
+
+The Recording Configuration stores all information neccessary to the \hyperlink{class_kinect_cloud_file_writer}{Kinect\+Cloud\+File\+Writer} to save ply and pcd files to the directory. It allows to specify the directory for the files and automatically searches for the files. It constructs the directory path to save the point clouds in the following way\+: //outputfolder/timestamp/cloudtype/filename.fileformat.  
+
+
+
+
+{\ttfamily \#include $<$Recording\+Configuration.\+h$>$}
+
+Inheritance diagram for Recording\+Configuration\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_recording_configuration}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_recording_configuration_accc6debf7b8902aab3b79b663dd6114e}{Recording\+Configuration} (Record\+Cloud\+Type cloud\+Type, Recording\+File\+Format format)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hyperlink{class_recording_configuration_a9604baeca98377948706b1172dd89136}{Recording\+Configuration} (\hyperlink{class_recording_configuration}{Recording\+Configuration} \&recording\+Configuration)
+\begin{DoxyCompactList}\small\item\em Copy constructor. \end{DoxyCompactList}\item 
+bool \hyperlink{class_recording_configuration_a9d2e803582ba0bcdb14c32a9cb2648d5}{is\+Record\+Configuration\+Valid} ()
+\begin{DoxyCompactList}\small\item\em Query if record configuration is valid\+: Valid only if we have a valid path, name and number of frames to captures are set. \end{DoxyCompactList}\item 
+C\+String \hyperlink{class_recording_configuration_a5f3d699c918c51b15a6871dcebd6da82}{get\+File\+Path\+C\+String} ()
+\begin{DoxyCompactList}\small\item\em Gets file path as c-\/string. (for Win\+Api) \end{DoxyCompactList}\item 
+std\+::string \hyperlink{class_recording_configuration_a2052d5fe0e0de0e34caf44c592eb3d17}{get\+File\+Path} ()
+\begin{DoxyCompactList}\small\item\em Gets file path as std\+::string (for pcl) \end{DoxyCompactList}\item 
+bool \hyperlink{class_recording_configuration_aebf7ebc2f271917f97762bb696e7d6f2}{is\+Enabled} ()
+\begin{DoxyCompactList}\small\item\em Query if Recording is enabled. \end{DoxyCompactList}\item 
+Record\+Cloud\+Type \hyperlink{class_recording_configuration_af1632f5480869116ff282d5c34bd8319}{get\+Record\+Cloud\+Type} ()
+\begin{DoxyCompactList}\small\item\em Gets cloud type to record. \end{DoxyCompactList}\item 
+Recording\+File\+Format \hyperlink{class_recording_configuration_a9e319b60a4bddc838b56186b8f07bab5}{get\+Record\+File\+Format} ()
+\begin{DoxyCompactList}\small\item\em Gets fileformat to record. \end{DoxyCompactList}\item 
+C\+String \hyperlink{class_recording_configuration_adfdbe3e11f2445b8ba723ccadc0159bf}{get\+File\+Name\+C\+String} ()
+\begin{DoxyCompactList}\small\item\em Gets file name as c-\/string. (for Win\+Api) e.\+g. H\+D\+\_\+\+Face\+\_\+\+Cloud\+\_\+$\ast$.ply. \end{DoxyCompactList}\item 
+bool \hyperlink{class_recording_configuration_a4f68458e01f778ea850e47aa658b6212}{is\+Recording\+Duration\+Un\+Limited} ()
+\begin{DoxyCompactList}\small\item\em Query if recording duration is unlimited. \end{DoxyCompactList}\item 
+void \hyperlink{class_recording_configuration_aa26251ebb771b20f5042adead21f14ab}{set\+Max\+Number\+Of\+Frames} (int new\+Max\+Number\+Of\+Frames)
+\begin{DoxyCompactList}\small\item\em Sets maximum number of frames to record. \end{DoxyCompactList}\item 
+int \hyperlink{class_recording_configuration_a933bc95cc26966c34984c9de7c5681f3}{get\+Max\+Number\+Of\+Frames} ()
+\begin{DoxyCompactList}\small\item\em Gets the maximum number of frames to record. I\+F\+: U\+N\+L\+I\+M\+I\+T\+E\+D\+\_\+\+F\+R\+A\+M\+E\+S\+: recording is not limited. \end{DoxyCompactList}\item 
+std\+::string \hyperlink{class_recording_configuration_a47942807d4279966c8f61ecacdfeed27}{get\+File\+Name\+String} ()
+\begin{DoxyCompactList}\small\item\em Gets file name string. \end{DoxyCompactList}\item 
+void \hyperlink{class_recording_configuration_ab5c1119de723c38b04343642566eb0c0}{set\+File\+Name} (C\+String file\+Name)
+\begin{DoxyCompactList}\small\item\em Sets file name. \end{DoxyCompactList}\item 
+void \hyperlink{class_recording_configuration_ae3556fef5f881254a64153713897583d}{set\+File\+Path} (C\+String file\+Path)
+\begin{DoxyCompactList}\small\item\em Sets file path. \end{DoxyCompactList}\item 
+void \hyperlink{class_recording_configuration_a2748b82816a36f64accb011cea6263fa}{set\+Enabled} (bool enabled)
+\begin{DoxyCompactList}\small\item\em Sets an enabled. \end{DoxyCompactList}\item 
+void \hyperlink{class_recording_configuration_a53c318a0790f5a319448c004e3f8e21c}{set\+File\+Format} (Recording\+File\+Format file\+Format)
+\begin{DoxyCompactList}\small\item\em Sets file format. \end{DoxyCompactList}\item 
+void \hyperlink{class_recording_configuration_abcdc65db96a0704c33f0c2e537ec01cc}{set\+Time\+Stamp\+Folder\+Name} (C\+String folder\+Name)
+\begin{DoxyCompactList}\small\item\em Sets time stamp folder name. \end{DoxyCompactList}\item 
+C\+String \hyperlink{class_recording_configuration_a7e460856ed3a0b7de7a74358517069b7}{get\+Time\+Stamp\+Folder\+Name} ()
+\begin{DoxyCompactList}\small\item\em Gets time stamp folder name. \end{DoxyCompactList}\item 
+C\+String \hyperlink{class_recording_configuration_a0e6a547c0e5b2ac3433654c4c2aca105}{get\+Full\+Recording\+Path} ()
+\begin{DoxyCompactList}\small\item\em Gets full recording path. \end{DoxyCompactList}\item 
+std\+::string \hyperlink{class_recording_configuration_aa3becb682d9dd1ae2799bc37a65f17be}{get\+Full\+Recording\+Path\+String} ()
+\begin{DoxyCompactList}\small\item\em Gets full recording path as std\+::string. \end{DoxyCompactList}\item 
+int \hyperlink{class_recording_configuration_a48d2a54ab74dba016f70d7215cc4794d}{get\+Thread\+Count\+To\+Start} ()
+\begin{DoxyCompactList}\small\item\em Gets amount of threads to start. \end{DoxyCompactList}\item 
+void \hyperlink{class_recording_configuration_a024b7aff539119d56fae3cc28d8a85e5}{set\+Thread\+Count\+To\+Start} (int threads\+Count)
+\begin{DoxyCompactList}\small\item\em Sets amount of threads to start. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_recording_configuration_aacc5173ed0be04694318ab527b106b66}{}static C\+String {\bfseries get\+File\+Format\+As\+String} (Recording\+File\+Format file\+Format)\label{class_recording_configuration_aacc5173ed0be04694318ab527b106b66}
+
+\item 
+static C\+String \hyperlink{class_recording_configuration_ae3a1154cb624c0302ea9c199473f846f}{get\+Sub\+Folder\+Name\+For\+Cloud\+Type} (Record\+Cloud\+Type cloud\+Type)
+\begin{DoxyCompactList}\small\item\em Gets sub folder name for cloud type. \end{DoxyCompactList}\item 
+static C\+String \hyperlink{class_recording_configuration_a6f23c7982d24a9c46587f936a37f9f73}{get\+Full\+Recording\+Path\+For\+Cloud\+Type} (Record\+Cloud\+Type cloud\+Type, C\+String output\+Folder, C\+String time\+Stamp\+Folder\+Name)
+\begin{DoxyCompactList}\small\item\em Gets full recording path for the given parameters. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_recording_configuration_a0e614b14a910f5bd86e4bec7b4455708}{}boost\+::signal$<$ void(Record\+Cloud\+Type, bool)$>$ {\bfseries record\+Configuration\+Status\+Changed}\label{class_recording_configuration_a0e614b14a910f5bd86e4bec7b4455708}
+
+\item 
+\hypertarget{class_recording_configuration_af6f3df0d9a75176bac770d7d17d11af8}{}boost\+::signal$<$ void(Record\+Cloud\+Type)$>$ {\bfseries record\+Path\+Or\+File\+Name\+Changed}\label{class_recording_configuration_af6f3df0d9a75176bac770d7d17d11af8}
+
+\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The Recording Configuration stores all information neccessary to the \hyperlink{class_kinect_cloud_file_writer}{Kinect\+Cloud\+File\+Writer} to save ply and pcd files to the directory. It allows to specify the directory for the files and automatically searches for the files. It constructs the directory path to save the point clouds in the following way\+: //outputfolder/timestamp/cloudtype/filename.fileformat. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_recording_configuration_accc6debf7b8902aab3b79b663dd6114e}{}\index{Recording\+Configuration@{Recording\+Configuration}!Recording\+Configuration@{Recording\+Configuration}}
+\index{Recording\+Configuration@{Recording\+Configuration}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{Recording\+Configuration}]{\setlength{\rightskip}{0pt plus 5cm}Recording\+Configuration\+::\+Recording\+Configuration (
+\begin{DoxyParamCaption}
+\item[{Record\+Cloud\+Type}]{cloud\+Type, }
+\item[{Recording\+File\+Format}]{format}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_accc6debf7b8902aab3b79b663dd6114e}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cloud\+Type} & Type of the cloud to record.. \\
+\hline
+{\em format} & Describes the format to use. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_recording_configuration_a9604baeca98377948706b1172dd89136}{}\index{Recording\+Configuration@{Recording\+Configuration}!Recording\+Configuration@{Recording\+Configuration}}
+\index{Recording\+Configuration@{Recording\+Configuration}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{Recording\+Configuration}]{\setlength{\rightskip}{0pt plus 5cm}Recording\+Configuration\+::\+Recording\+Configuration (
+\begin{DoxyParamCaption}
+\item[{{\bf Recording\+Configuration} \&}]{recording\+Configuration}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_a9604baeca98377948706b1172dd89136}
+
+
+Copy constructor. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em recording\+Configuration} & The recording configuration. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_recording_configuration_adfdbe3e11f2445b8ba723ccadc0159bf}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+File\+Name\+C\+String@{get\+File\+Name\+C\+String}}
+\index{get\+File\+Name\+C\+String@{get\+File\+Name\+C\+String}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+File\+Name\+C\+String}]{\setlength{\rightskip}{0pt plus 5cm}C\+String Recording\+Configuration\+::get\+File\+Name\+C\+String (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_adfdbe3e11f2445b8ba723ccadc0159bf}
+
+
+Gets file name as c-\/string. (for Win\+Api) e.\+g. H\+D\+\_\+\+Face\+\_\+\+Cloud\+\_\+$\ast$.ply. 
+
+\begin{DoxyReturn}{Returns}
+The file name c string. 
+\end{DoxyReturn}
+\hypertarget{class_recording_configuration_a47942807d4279966c8f61ecacdfeed27}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+File\+Name\+String@{get\+File\+Name\+String}}
+\index{get\+File\+Name\+String@{get\+File\+Name\+String}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+File\+Name\+String}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string Recording\+Configuration\+::get\+File\+Name\+String (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_recording_configuration_a47942807d4279966c8f61ecacdfeed27}
+
+
+Gets file name string. 
+
+\begin{DoxyReturn}{Returns}
+The file name string. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_recording_configuration_a7f46e556537cc8628e63240889b93cc5}{I\+Recording\+Configuration}.
+
+\hypertarget{class_recording_configuration_a2052d5fe0e0de0e34caf44c592eb3d17}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+File\+Path@{get\+File\+Path}}
+\index{get\+File\+Path@{get\+File\+Path}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+File\+Path}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string Recording\+Configuration\+::get\+File\+Path (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_a2052d5fe0e0de0e34caf44c592eb3d17}
+
+
+Gets file path as std\+::string (for pcl) 
+
+\begin{DoxyReturn}{Returns}
+The file path. 
+\end{DoxyReturn}
+\hypertarget{class_recording_configuration_a5f3d699c918c51b15a6871dcebd6da82}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+File\+Path\+C\+String@{get\+File\+Path\+C\+String}}
+\index{get\+File\+Path\+C\+String@{get\+File\+Path\+C\+String}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+File\+Path\+C\+String}]{\setlength{\rightskip}{0pt plus 5cm}C\+String Recording\+Configuration\+::get\+File\+Path\+C\+String (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_a5f3d699c918c51b15a6871dcebd6da82}
+
+
+Gets file path as c-\/string. (for Win\+Api) 
+
+\begin{DoxyReturn}{Returns}
+The file path c string. 
+\end{DoxyReturn}
+\hypertarget{class_recording_configuration_a0e6a547c0e5b2ac3433654c4c2aca105}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+Full\+Recording\+Path@{get\+Full\+Recording\+Path}}
+\index{get\+Full\+Recording\+Path@{get\+Full\+Recording\+Path}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+Full\+Recording\+Path}]{\setlength{\rightskip}{0pt plus 5cm}C\+String Recording\+Configuration\+::get\+Full\+Recording\+Path (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_a0e6a547c0e5b2ac3433654c4c2aca105}
+
+
+Gets full recording path. 
+
+\begin{DoxyReturn}{Returns}
+The full recording path. 
+\end{DoxyReturn}
+\hypertarget{class_recording_configuration_a6f23c7982d24a9c46587f936a37f9f73}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+Full\+Recording\+Path\+For\+Cloud\+Type@{get\+Full\+Recording\+Path\+For\+Cloud\+Type}}
+\index{get\+Full\+Recording\+Path\+For\+Cloud\+Type@{get\+Full\+Recording\+Path\+For\+Cloud\+Type}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+Full\+Recording\+Path\+For\+Cloud\+Type}]{\setlength{\rightskip}{0pt plus 5cm}static C\+String Recording\+Configuration\+::get\+Full\+Recording\+Path\+For\+Cloud\+Type (
+\begin{DoxyParamCaption}
+\item[{Record\+Cloud\+Type}]{cloud\+Type, }
+\item[{C\+String}]{output\+Folder, }
+\item[{C\+String}]{time\+Stamp\+Folder\+Name}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{class_recording_configuration_a6f23c7982d24a9c46587f936a37f9f73}
+
+
+Gets full recording path for the given parameters. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cloud\+Type} & Type of the cloud. \\
+\hline
+{\em output\+Folder} & Path of the output folder. \\
+\hline
+{\em time\+Stamp\+Folder\+Name} & the time stamp.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The full recording path for the cloud recording parameters. 
+\end{DoxyReturn}
+\hypertarget{class_recording_configuration_aa3becb682d9dd1ae2799bc37a65f17be}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+Full\+Recording\+Path\+String@{get\+Full\+Recording\+Path\+String}}
+\index{get\+Full\+Recording\+Path\+String@{get\+Full\+Recording\+Path\+String}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+Full\+Recording\+Path\+String}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string Recording\+Configuration\+::get\+Full\+Recording\+Path\+String (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_recording_configuration_aa3becb682d9dd1ae2799bc37a65f17be}
+
+
+Gets full recording path as std\+::string. 
+
+\begin{DoxyReturn}{Returns}
+The full recording path string. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_recording_configuration_af5718b10c42674441d23b0b403367908}{I\+Recording\+Configuration}.
+
+\hypertarget{class_recording_configuration_a933bc95cc26966c34984c9de7c5681f3}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+Max\+Number\+Of\+Frames@{get\+Max\+Number\+Of\+Frames}}
+\index{get\+Max\+Number\+Of\+Frames@{get\+Max\+Number\+Of\+Frames}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+Max\+Number\+Of\+Frames}]{\setlength{\rightskip}{0pt plus 5cm}int Recording\+Configuration\+::get\+Max\+Number\+Of\+Frames (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_recording_configuration_a933bc95cc26966c34984c9de7c5681f3}
+
+
+Gets the maximum number of frames to record. I\+F\+: U\+N\+L\+I\+M\+I\+T\+E\+D\+\_\+\+F\+R\+A\+M\+E\+S\+: recording is not limited. 
+
+\begin{DoxyReturn}{Returns}
+The maximum number of frames. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_recording_configuration_a2e2719dabf4824516e7d5919dfb5f189}{I\+Recording\+Configuration}.
+
+\hypertarget{class_recording_configuration_af1632f5480869116ff282d5c34bd8319}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+Record\+Cloud\+Type@{get\+Record\+Cloud\+Type}}
+\index{get\+Record\+Cloud\+Type@{get\+Record\+Cloud\+Type}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+Record\+Cloud\+Type}]{\setlength{\rightskip}{0pt plus 5cm}Record\+Cloud\+Type Recording\+Configuration\+::get\+Record\+Cloud\+Type (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_af1632f5480869116ff282d5c34bd8319}
+
+
+Gets cloud type to record. 
+
+\begin{DoxyReturn}{Returns}
+The record cloud type. 
+\end{DoxyReturn}
+\hypertarget{class_recording_configuration_a9e319b60a4bddc838b56186b8f07bab5}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+Record\+File\+Format@{get\+Record\+File\+Format}}
+\index{get\+Record\+File\+Format@{get\+Record\+File\+Format}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+Record\+File\+Format}]{\setlength{\rightskip}{0pt plus 5cm}Recording\+File\+Format Recording\+Configuration\+::get\+Record\+File\+Format (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_recording_configuration_a9e319b60a4bddc838b56186b8f07bab5}
+
+
+Gets fileformat to record. 
+
+\begin{DoxyReturn}{Returns}
+The record file format. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_recording_configuration_aae376a55c4992f0223e877c28c3bfed9}{I\+Recording\+Configuration}.
+
+\hypertarget{class_recording_configuration_ae3a1154cb624c0302ea9c199473f846f}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+Sub\+Folder\+Name\+For\+Cloud\+Type@{get\+Sub\+Folder\+Name\+For\+Cloud\+Type}}
+\index{get\+Sub\+Folder\+Name\+For\+Cloud\+Type@{get\+Sub\+Folder\+Name\+For\+Cloud\+Type}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+Sub\+Folder\+Name\+For\+Cloud\+Type}]{\setlength{\rightskip}{0pt plus 5cm}static C\+String Recording\+Configuration\+::get\+Sub\+Folder\+Name\+For\+Cloud\+Type (
+\begin{DoxyParamCaption}
+\item[{Record\+Cloud\+Type}]{cloud\+Type}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{class_recording_configuration_ae3a1154cb624c0302ea9c199473f846f}
+
+
+Gets sub folder name for cloud type. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cloud\+Type} & Type of the cloud.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+The sub folder name for cloud type. 
+\end{DoxyReturn}
+\hypertarget{class_recording_configuration_a48d2a54ab74dba016f70d7215cc4794d}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+Thread\+Count\+To\+Start@{get\+Thread\+Count\+To\+Start}}
+\index{get\+Thread\+Count\+To\+Start@{get\+Thread\+Count\+To\+Start}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+Thread\+Count\+To\+Start}]{\setlength{\rightskip}{0pt plus 5cm}int Recording\+Configuration\+::get\+Thread\+Count\+To\+Start (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_recording_configuration_a48d2a54ab74dba016f70d7215cc4794d}
+
+
+Gets amount of threads to start. 
+
+\begin{DoxyReturn}{Returns}
+amount of threads to start 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_recording_configuration_a8148f1b3dfb5cafb347337c913058204}{I\+Recording\+Configuration}.
+
+\hypertarget{class_recording_configuration_a7e460856ed3a0b7de7a74358517069b7}{}\index{Recording\+Configuration@{Recording\+Configuration}!get\+Time\+Stamp\+Folder\+Name@{get\+Time\+Stamp\+Folder\+Name}}
+\index{get\+Time\+Stamp\+Folder\+Name@{get\+Time\+Stamp\+Folder\+Name}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{get\+Time\+Stamp\+Folder\+Name}]{\setlength{\rightskip}{0pt plus 5cm}C\+String Recording\+Configuration\+::get\+Time\+Stamp\+Folder\+Name (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_a7e460856ed3a0b7de7a74358517069b7}
+
+
+Gets time stamp folder name. 
+
+\begin{DoxyReturn}{Returns}
+The time stamp folder name. 
+\end{DoxyReturn}
+\hypertarget{class_recording_configuration_aebf7ebc2f271917f97762bb696e7d6f2}{}\index{Recording\+Configuration@{Recording\+Configuration}!is\+Enabled@{is\+Enabled}}
+\index{is\+Enabled@{is\+Enabled}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{is\+Enabled}]{\setlength{\rightskip}{0pt plus 5cm}bool Recording\+Configuration\+::is\+Enabled (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_aebf7ebc2f271917f97762bb696e7d6f2}
+
+
+Query if Recording is enabled. 
+
+\begin{DoxyReturn}{Returns}
+true if enabled, false if not. 
+\end{DoxyReturn}
+\hypertarget{class_recording_configuration_a9d2e803582ba0bcdb14c32a9cb2648d5}{}\index{Recording\+Configuration@{Recording\+Configuration}!is\+Record\+Configuration\+Valid@{is\+Record\+Configuration\+Valid}}
+\index{is\+Record\+Configuration\+Valid@{is\+Record\+Configuration\+Valid}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{is\+Record\+Configuration\+Valid}]{\setlength{\rightskip}{0pt plus 5cm}bool Recording\+Configuration\+::is\+Record\+Configuration\+Valid (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_a9d2e803582ba0bcdb14c32a9cb2648d5}
+
+
+Query if record configuration is valid\+: Valid only if we have a valid path, name and number of frames to captures are set. 
+
+\begin{DoxyReturn}{Returns}
+true if record configuration valid, false if not. 
+\end{DoxyReturn}
+\hypertarget{class_recording_configuration_a4f68458e01f778ea850e47aa658b6212}{}\index{Recording\+Configuration@{Recording\+Configuration}!is\+Recording\+Duration\+Un\+Limited@{is\+Recording\+Duration\+Un\+Limited}}
+\index{is\+Recording\+Duration\+Un\+Limited@{is\+Recording\+Duration\+Un\+Limited}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{is\+Recording\+Duration\+Un\+Limited}]{\setlength{\rightskip}{0pt plus 5cm}bool Recording\+Configuration\+::is\+Recording\+Duration\+Un\+Limited (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_recording_configuration_a4f68458e01f778ea850e47aa658b6212}
+
+
+Query if recording duration is unlimited. 
+
+\begin{DoxyReturn}{Returns}
+true if recording duration un limited, false if number of frames to record was set. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_recording_configuration_a001a4ba0282d154f014c8e35f43e212a}{I\+Recording\+Configuration}.
+
+\hypertarget{class_recording_configuration_a2748b82816a36f64accb011cea6263fa}{}\index{Recording\+Configuration@{Recording\+Configuration}!set\+Enabled@{set\+Enabled}}
+\index{set\+Enabled@{set\+Enabled}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{set\+Enabled}]{\setlength{\rightskip}{0pt plus 5cm}void Recording\+Configuration\+::set\+Enabled (
+\begin{DoxyParamCaption}
+\item[{bool}]{enabled}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_a2748b82816a36f64accb011cea6263fa}
+
+
+Sets an enabled. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em enabled} & true to enable, false to disable. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_recording_configuration_a53c318a0790f5a319448c004e3f8e21c}{}\index{Recording\+Configuration@{Recording\+Configuration}!set\+File\+Format@{set\+File\+Format}}
+\index{set\+File\+Format@{set\+File\+Format}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{set\+File\+Format}]{\setlength{\rightskip}{0pt plus 5cm}void Recording\+Configuration\+::set\+File\+Format (
+\begin{DoxyParamCaption}
+\item[{Recording\+File\+Format}]{file\+Format}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_a53c318a0790f5a319448c004e3f8e21c}
+
+
+Sets file format. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file\+Format} & The file format in which to record. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_recording_configuration_ab5c1119de723c38b04343642566eb0c0}{}\index{Recording\+Configuration@{Recording\+Configuration}!set\+File\+Name@{set\+File\+Name}}
+\index{set\+File\+Name@{set\+File\+Name}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{set\+File\+Name}]{\setlength{\rightskip}{0pt plus 5cm}void Recording\+Configuration\+::set\+File\+Name (
+\begin{DoxyParamCaption}
+\item[{C\+String}]{file\+Name}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_ab5c1119de723c38b04343642566eb0c0}
+
+
+Sets file name. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file\+Name} & Filename of the file. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_recording_configuration_ae3556fef5f881254a64153713897583d}{}\index{Recording\+Configuration@{Recording\+Configuration}!set\+File\+Path@{set\+File\+Path}}
+\index{set\+File\+Path@{set\+File\+Path}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{set\+File\+Path}]{\setlength{\rightskip}{0pt plus 5cm}void Recording\+Configuration\+::set\+File\+Path (
+\begin{DoxyParamCaption}
+\item[{C\+String}]{file\+Path}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_ae3556fef5f881254a64153713897583d}
+
+
+Sets file path. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em file\+Path} & Full pathname of the file. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_recording_configuration_aa26251ebb771b20f5042adead21f14ab}{}\index{Recording\+Configuration@{Recording\+Configuration}!set\+Max\+Number\+Of\+Frames@{set\+Max\+Number\+Of\+Frames}}
+\index{set\+Max\+Number\+Of\+Frames@{set\+Max\+Number\+Of\+Frames}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{set\+Max\+Number\+Of\+Frames}]{\setlength{\rightskip}{0pt plus 5cm}void Recording\+Configuration\+::set\+Max\+Number\+Of\+Frames (
+\begin{DoxyParamCaption}
+\item[{int}]{new\+Max\+Number\+Of\+Frames}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_aa26251ebb771b20f5042adead21f14ab}
+
+
+Sets maximum number of frames to record. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em new\+Max\+Number\+Of\+Frames} & The new maximum number of frames. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_recording_configuration_a024b7aff539119d56fae3cc28d8a85e5}{}\index{Recording\+Configuration@{Recording\+Configuration}!set\+Thread\+Count\+To\+Start@{set\+Thread\+Count\+To\+Start}}
+\index{set\+Thread\+Count\+To\+Start@{set\+Thread\+Count\+To\+Start}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{set\+Thread\+Count\+To\+Start}]{\setlength{\rightskip}{0pt plus 5cm}void Recording\+Configuration\+::set\+Thread\+Count\+To\+Start (
+\begin{DoxyParamCaption}
+\item[{int}]{threads\+Count}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_a024b7aff539119d56fae3cc28d8a85e5}
+
+
+Sets amount of threads to start. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em threads\+Count} & Number of threads. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_recording_configuration_abcdc65db96a0704c33f0c2e537ec01cc}{}\index{Recording\+Configuration@{Recording\+Configuration}!set\+Time\+Stamp\+Folder\+Name@{set\+Time\+Stamp\+Folder\+Name}}
+\index{set\+Time\+Stamp\+Folder\+Name@{set\+Time\+Stamp\+Folder\+Name}!Recording\+Configuration@{Recording\+Configuration}}
+\subsubsection[{set\+Time\+Stamp\+Folder\+Name}]{\setlength{\rightskip}{0pt plus 5cm}void Recording\+Configuration\+::set\+Time\+Stamp\+Folder\+Name (
+\begin{DoxyParamCaption}
+\item[{C\+String}]{folder\+Name}
+\end{DoxyParamCaption}
+)}\label{class_recording_configuration_abcdc65db96a0704c33f0c2e537ec01cc}
+
+
+Sets time stamp folder name. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em folder\+Name} & Name of the time stamp folder \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Recording\+Configuration.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Recording\+Configuration.\+cpp\end{DoxyCompactItemize}

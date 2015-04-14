@@ -1,0 +1,65 @@
+\hypertarget{class_cloud_measurement_source}{}\section{Cloud\+Measurement\+Source$<$ Point\+Cloud\+Type $>$ Class Template Reference}
+\label{class_cloud_measurement_source}\index{Cloud\+Measurement\+Source$<$ Point\+Cloud\+Type $>$@{Cloud\+Measurement\+Source$<$ Point\+Cloud\+Type $>$}}
+
+
+A cloud measurement source allows to pull Point\+Cloud\+Measurements.  
+
+
+
+
+{\ttfamily \#include $<$Cloud\+Measurement\+Source.\+h$>$}
+
+Inheritance diagram for Cloud\+Measurement\+Source$<$ Point\+Cloud\+Type $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_cloud_measurement_source}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual bool \hyperlink{class_cloud_measurement_source_a99c6819cec1c9e408107c140cccf8918}{pull\+Data} (\hyperlink{class_point_cloud_measurement}{Point\+Cloud\+Measurement}$<$ Point\+Cloud\+Type $>$ \&measurement)=0
+\begin{DoxyCompactList}\small\item\em Fills the given measurement with most recent data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class Point\+Cloud\+Type$>$class Cloud\+Measurement\+Source$<$ Point\+Cloud\+Type $>$}
+
+A cloud measurement source allows to pull Point\+Cloud\+Measurements. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Point\+Cloud\+Type} & Type of the point cloud type. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_cloud_measurement_source_a99c6819cec1c9e408107c140cccf8918}{}\index{Cloud\+Measurement\+Source@{Cloud\+Measurement\+Source}!pull\+Data@{pull\+Data}}
+\index{pull\+Data@{pull\+Data}!Cloud\+Measurement\+Source@{Cloud\+Measurement\+Source}}
+\subsubsection[{pull\+Data}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Point\+Cloud\+Type$>$ bool {\bf Cloud\+Measurement\+Source}$<$ Point\+Cloud\+Type $>$\+::pull\+Data (
+\begin{DoxyParamCaption}
+\item[{{\bf Point\+Cloud\+Measurement}$<$ Point\+Cloud\+Type $>$ \&}]{measurement}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{class_cloud_measurement_source_a99c6819cec1c9e408107c140cccf8918}
+
+
+Fills the given measurement with most recent data. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em measurement} & The measurement.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true the source is empty or not running, otherwise false 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_kinect_cloud_file_writer_a8d024ff1c2123d1a5600d20b6043dd8a}{Kinect\+Cloud\+File\+Writer$<$ Point\+Cloud\+Type $>$}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Cloud\+Measurement\+Source.\+h\end{DoxyCompactItemize}

@@ -1,0 +1,113 @@
+\hypertarget{class_buffer_synchronizer}{}\section{Buffer\+Synchronizer$<$ Buffer\+Data\+Type $>$ Class Template Reference}
+\label{class_buffer_synchronizer}\index{Buffer\+Synchronizer$<$ Buffer\+Data\+Type $>$@{Buffer\+Synchronizer$<$ Buffer\+Data\+Type $>$}}
+
+
+The \hyperlink{class_buffer_synchronizer}{Buffer\+Synchronizer} synchronizes the data that can be pulled from given buffers\+: The \hyperlink{class_buffer_synchronizer}{Buffer\+Synchronizer} waits until data is available on all buffers. Afterwards, the data is pulled and provided via the publish\+Synchronized\+Data signal. \hyperlink{class_buffer_synchronizer}{Buffer\+Synchronizer} is supposed to run in its threading function update\+Thread\+Func.  
+
+
+
+
+{\ttfamily \#include $<$Buffer\+Synchronizer.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{class_buffer_synchronizer_a2f5891cdfcabf932a3d3306c20263b35}{Buffer\+Synchronizer} (bool simulate\+Playback\+By\+Waiting\+Each\+Frame)
+\begin{DoxyCompactList}\small\item\em Constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_buffer_synchronizer_ad4c5d37a239212655ccc7589b442faa5}{}void \hyperlink{class_buffer_synchronizer_ad4c5d37a239212655ccc7589b442faa5}{update\+Thread\+Func} ()\label{class_buffer_synchronizer_ad4c5d37a239212655ccc7589b442faa5}
+
+\begin{DoxyCompactList}\small\item\em Function supposed to run in a thread. It synchronizes the data provided by the set Buffers and pushes them synchronized via publish\+Synchronized\+Data. T\+He method notifies about update\+Status and playback\+Finished. \end{DoxyCompactList}\item 
+\hypertarget{class_buffer_synchronizer_a65548865ccdf9703fcfc6887f1a48e29}{}void \hyperlink{class_buffer_synchronizer_a65548865ccdf9703fcfc6887f1a48e29}{on\+Application\+Quit} ()\label{class_buffer_synchronizer_a65548865ccdf9703fcfc6887f1a48e29}
+
+\begin{DoxyCompactList}\small\item\em Causes the update thread to terminate. \end{DoxyCompactList}\item 
+void \hyperlink{class_buffer_synchronizer_a398056f233d82a985b72fed992dcf86a}{signal\+Data\+Of\+Buffer\+With\+Index\+Is\+Ready} (int index)
+\begin{DoxyCompactList}\small\item\em Signals the \hyperlink{class_buffer_synchronizer}{Buffer\+Synchronizer} that the data of the Buffers with the given index has data ready. If all other Buffers are ready, too. The Pulling of Data is triggered. \end{DoxyCompactList}\item 
+void \hyperlink{class_buffer_synchronizer_aa91d6f92f9202f75ff1d20a7357dcba5}{set\+Buffer} (std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \hyperlink{class_buffer}{Buffer}$<$ Buffer\+Data\+Type $>$$>$$>$ buffers, int num\+Of\+Files\+To\+Read)
+\begin{DoxyCompactList}\small\item\em Sets the buffers to be synchronized. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_buffer_synchronizer_a7627fa702961a1585e6f6b79973e42cd}{}boost\+::signals2\+::signal$<$ void(std\+::wstring)$>$ \hyperlink{class_buffer_synchronizer_a7627fa702961a1585e6f6b79973e42cd}{update\+Status}\label{class_buffer_synchronizer_a7627fa702961a1585e6f6b79973e42cd}
+
+\begin{DoxyCompactList}\small\item\em Publishes stati. \end{DoxyCompactList}\item 
+\hypertarget{class_buffer_synchronizer_abd683dcc9e834c998abb2762cf49c7d3}{}boost\+::signals2\+::signal$<$ void(void)$>$ \hyperlink{class_buffer_synchronizer_abd683dcc9e834c998abb2762cf49c7d3}{playback\+Finished}\label{class_buffer_synchronizer_abd683dcc9e834c998abb2762cf49c7d3}
+
+\begin{DoxyCompactList}\small\item\em Notifies that the playback was finished. \end{DoxyCompactList}\item 
+\hypertarget{class_buffer_synchronizer_a773c3fdb260509be718d687045602fbb}{}boost\+::signals2\+::signal$<$ void(std\+::vector$<$ Buffer\+Data\+Type $>$ data)$>$ \hyperlink{class_buffer_synchronizer_a773c3fdb260509be718d687045602fbb}{publish\+Synchronized\+Data}\label{class_buffer_synchronizer_a773c3fdb260509be718d687045602fbb}
+
+\begin{DoxyCompactList}\small\item\em Publishes the data of the provided by Buffers synchronized. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class Buffer\+Data\+Type$>$class Buffer\+Synchronizer$<$ Buffer\+Data\+Type $>$}
+
+The \hyperlink{class_buffer_synchronizer}{Buffer\+Synchronizer} synchronizes the data that can be pulled from given buffers\+: The \hyperlink{class_buffer_synchronizer}{Buffer\+Synchronizer} waits until data is available on all buffers. Afterwards, the data is pulled and provided via the publish\+Synchronized\+Data signal. \hyperlink{class_buffer_synchronizer}{Buffer\+Synchronizer} is supposed to run in its threading function update\+Thread\+Func. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Buffer\+Data\+Type} & Type of the buffer data type. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{class_buffer_synchronizer_a2f5891cdfcabf932a3d3306c20263b35}{}\index{Buffer\+Synchronizer@{Buffer\+Synchronizer}!Buffer\+Synchronizer@{Buffer\+Synchronizer}}
+\index{Buffer\+Synchronizer@{Buffer\+Synchronizer}!Buffer\+Synchronizer@{Buffer\+Synchronizer}}
+\subsubsection[{Buffer\+Synchronizer}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Buffer\+Data\+Type $>$ {\bf Buffer\+Synchronizer}$<$ Buffer\+Data\+Type $>$\+::{\bf Buffer\+Synchronizer} (
+\begin{DoxyParamCaption}
+\item[{bool}]{simulate\+Playback\+By\+Waiting\+Each\+Frame}
+\end{DoxyParamCaption}
+)}\label{class_buffer_synchronizer_a2f5891cdfcabf932a3d3306c20263b35}
+
+
+Constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em simulate\+Playback\+By\+Waiting\+Each\+Frame} & true to simulate playback by waiting between each new pushed frame. \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_buffer_synchronizer_aa91d6f92f9202f75ff1d20a7357dcba5}{}\index{Buffer\+Synchronizer@{Buffer\+Synchronizer}!set\+Buffer@{set\+Buffer}}
+\index{set\+Buffer@{set\+Buffer}!Buffer\+Synchronizer@{Buffer\+Synchronizer}}
+\subsubsection[{set\+Buffer}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Buffer\+Data\+Type$>$ void {\bf Buffer\+Synchronizer}$<$ Buffer\+Data\+Type $>$\+::set\+Buffer (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ std\+::shared\+\_\+ptr$<$ {\bf Buffer}$<$ Buffer\+Data\+Type $>$$>$$>$}]{buffers, }
+\item[{int}]{num\+Of\+Files\+To\+Read}
+\end{DoxyParamCaption}
+)}\label{class_buffer_synchronizer_aa91d6f92f9202f75ff1d20a7357dcba5}
+
+
+Sets the buffers to be synchronized. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffers} & The buffers to be synchronized. \\
+\hline
+{\em num\+Of\+Files\+To\+Read} & Number of files to reads/pulled from the buffers. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_buffer_synchronizer_a398056f233d82a985b72fed992dcf86a}{}\index{Buffer\+Synchronizer@{Buffer\+Synchronizer}!signal\+Data\+Of\+Buffer\+With\+Index\+Is\+Ready@{signal\+Data\+Of\+Buffer\+With\+Index\+Is\+Ready}}
+\index{signal\+Data\+Of\+Buffer\+With\+Index\+Is\+Ready@{signal\+Data\+Of\+Buffer\+With\+Index\+Is\+Ready}!Buffer\+Synchronizer@{Buffer\+Synchronizer}}
+\subsubsection[{signal\+Data\+Of\+Buffer\+With\+Index\+Is\+Ready}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Buffer\+Data\+Type $>$ void {\bf Buffer\+Synchronizer}$<$ Buffer\+Data\+Type $>$\+::signal\+Data\+Of\+Buffer\+With\+Index\+Is\+Ready (
+\begin{DoxyParamCaption}
+\item[{int}]{index}
+\end{DoxyParamCaption}
+)}\label{class_buffer_synchronizer_a398056f233d82a985b72fed992dcf86a}
+
+
+Signals the \hyperlink{class_buffer_synchronizer}{Buffer\+Synchronizer} that the data of the Buffers with the given index has data ready. If all other Buffers are ready, too. The Pulling of Data is triggered. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index} & Zero-\/based index of the \hyperlink{class_buffer}{Buffer} which is ready. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Buffer\+Synchronizer.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Buffer\+Synchronizer.\+cpp\end{DoxyCompactItemize}

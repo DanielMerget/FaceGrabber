@@ -1,0 +1,122 @@
+\hypertarget{class_message_router_helper}{}\section{Message\+Router\+Helper Class Reference}
+\label{class_message_router_helper}\index{Message\+Router\+Helper@{Message\+Router\+Helper}}
+
+
+A message router helper which filters for the most important events the user triggers while using the user interface.  
+
+
+
+
+{\ttfamily \#include $<$Message\+Router\+Helper.\+h$>$}
+
+Inheritance diagram for Message\+Router\+Helper\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=1.917808cm]{class_message_router_helper}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+L\+R\+E\+S\+U\+L\+T C\+A\+L\+L\+B\+A\+C\+K \hyperlink{class_message_router_helper_aaac37caa0b5c4d76e3fbafdeca74c6e0}{Dlg\+Proc} (H\+W\+N\+D h\+Wnd, U\+I\+N\+T u\+Msg, W\+P\+A\+R\+A\+M w\+Param, L\+P\+A\+R\+A\+M l\+Param)
+\begin{DoxyCompactList}\small\item\em Handle windows messages for a class instance. \end{DoxyCompactList}\item 
+void \hyperlink{class_message_router_helper_ac88e1ed7b137f8196c0f524fb8c5464d}{process\+U\+I\+Message} (W\+P\+A\+R\+A\+M w\+Param, L\+P\+A\+R\+A\+M handle)
+\begin{DoxyCompactList}\small\item\em Process the user interface message. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static L\+R\+E\+S\+U\+L\+T C\+A\+L\+L\+B\+A\+C\+K \hyperlink{class_message_router_helper_abd2ea3c59170fe99e37193ccfd5d99ee}{Message\+Router} (H\+W\+N\+D h\+Wnd, U\+I\+N\+T u\+Msg, W\+P\+A\+R\+A\+M w\+Param, L\+P\+A\+R\+A\+M l\+Param)
+\begin{DoxyCompactList}\small\item\em Message router. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_message_router_helper_a7813211da37062be81e3e8e576248b49}{}H\+W\+N\+D \hyperlink{class_message_router_helper_a7813211da37062be81e3e8e576248b49}{m\+\_\+h\+Wnd}\label{class_message_router_helper_a7813211da37062be81e3e8e576248b49}
+
+\begin{DoxyCompactList}\small\item\em Handle of the window. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A message router helper which filters for the most important events the user triggers while using the user interface. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_message_router_helper_aaac37caa0b5c4d76e3fbafdeca74c6e0}{}\index{Message\+Router\+Helper@{Message\+Router\+Helper}!Dlg\+Proc@{Dlg\+Proc}}
+\index{Dlg\+Proc@{Dlg\+Proc}!Message\+Router\+Helper@{Message\+Router\+Helper}}
+\subsubsection[{Dlg\+Proc}]{\setlength{\rightskip}{0pt plus 5cm}L\+R\+E\+S\+U\+L\+T C\+A\+L\+L\+B\+A\+C\+K Message\+Router\+Helper\+::\+Dlg\+Proc (
+\begin{DoxyParamCaption}
+\item[{H\+W\+N\+D}]{h\+Wnd, }
+\item[{U\+I\+N\+T}]{u\+Msg, }
+\item[{W\+P\+A\+R\+A\+M}]{w\+Param, }
+\item[{L\+P\+A\+R\+A\+M}]{l\+Param}
+\end{DoxyParamCaption}
+)}\label{class_message_router_helper_aaac37caa0b5c4d76e3fbafdeca74c6e0}
+
+
+Handle windows messages for a class instance. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em h\+Wnd} & window handle \\
+\hline
+{\em u\+Msg} & message. \\
+\hline
+{\em w\+Param} & message data. \\
+\hline
+{\em l\+Param} & additional message data.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+result of message processing. 
+\end{DoxyReturn}
+\hypertarget{class_message_router_helper_abd2ea3c59170fe99e37193ccfd5d99ee}{}\index{Message\+Router\+Helper@{Message\+Router\+Helper}!Message\+Router@{Message\+Router}}
+\index{Message\+Router@{Message\+Router}!Message\+Router\+Helper@{Message\+Router\+Helper}}
+\subsubsection[{Message\+Router}]{\setlength{\rightskip}{0pt plus 5cm}static L\+R\+E\+S\+U\+L\+T C\+A\+L\+L\+B\+A\+C\+K Message\+Router\+Helper\+::\+Message\+Router (
+\begin{DoxyParamCaption}
+\item[{H\+W\+N\+D}]{h\+Wnd, }
+\item[{U\+I\+N\+T}]{u\+Msg, }
+\item[{W\+P\+A\+R\+A\+M}]{w\+Param, }
+\item[{L\+P\+A\+R\+A\+M}]{l\+Param}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [static]}}\label{class_message_router_helper_abd2ea3c59170fe99e37193ccfd5d99ee}
+
+
+Message router. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em h\+Wnd} & Handle of the window. \\
+\hline
+{\em u\+Msg} & The message. \\
+\hline
+{\em w\+Param} & The w\+Param field of the message. \\
+\hline
+{\em l\+Param} & The l\+Param field of the message.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A C\+A\+L\+L\+B\+A\+C\+K. 
+\end{DoxyReturn}
+\hypertarget{class_message_router_helper_ac88e1ed7b137f8196c0f524fb8c5464d}{}\index{Message\+Router\+Helper@{Message\+Router\+Helper}!process\+U\+I\+Message@{process\+U\+I\+Message}}
+\index{process\+U\+I\+Message@{process\+U\+I\+Message}!Message\+Router\+Helper@{Message\+Router\+Helper}}
+\subsubsection[{process\+U\+I\+Message}]{\setlength{\rightskip}{0pt plus 5cm}void Message\+Router\+Helper\+::process\+U\+I\+Message (
+\begin{DoxyParamCaption}
+\item[{W\+P\+A\+R\+A\+M}]{w\+Param, }
+\item[{L\+P\+A\+R\+A\+M}]{handle}
+\end{DoxyParamCaption}
+)}\label{class_message_router_helper_ac88e1ed7b137f8196c0f524fb8c5464d}
+
+
+Process the user interface message. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em w\+Param} & The w\+Param field of the message. \\
+\hline
+{\em handle} & The l\+Param field of the message. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Message\+Router\+Helper.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Message\+Router\+Helper.\+cpp\end{DoxyCompactItemize}

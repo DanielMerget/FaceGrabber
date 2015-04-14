@@ -1,0 +1,204 @@
+\hypertarget{class_buffer}{}\section{Buffer$<$ Data\+Type $>$ Class Template Reference}
+\label{class_buffer}\index{Buffer$<$ Data\+Type $>$@{Buffer$<$ Data\+Type $>$}}
+
+
+A buffer which allows to push new data and pull it afterwards. The buffer allows multiple threads to push data. Pulling of data blocks until new data is available. Pusing of data blocks until there is a free element in buffer.  
+
+
+
+
+{\ttfamily \#include $<$Buffer.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_buffer_afd94276bbdae3a47c5d503403828db45}{}\hyperlink{class_buffer_afd94276bbdae3a47c5d503403828db45}{Buffer} ()\label{class_buffer_afd94276bbdae3a47c5d503403828db45}
+
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_buffer_a435522d5b0cb24abf26f26ec9082db4f}{}\hyperlink{class_buffer_a435522d5b0cb24abf26f26ec9082db4f}{$\sim$\+Buffer} ()\label{class_buffer_a435522d5b0cb24abf26f26ec9082db4f}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+void \hyperlink{class_buffer_a9f2f069327c13089510fc94c69d3622e}{set\+Buffer\+Size} (int buffer\+Size)
+\begin{DoxyCompactList}\small\item\em Sets szie of the buffer. \end{DoxyCompactList}\item 
+int \hyperlink{class_buffer_a62438a4b345914d36de13f0679817ac0}{get\+Buffer\+Size} ()
+\begin{DoxyCompactList}\small\item\em Gets buffer size. \end{DoxyCompactList}\item 
+\hypertarget{class_buffer_acf39bb1a9f6ab53158e716d818089df3}{}void \hyperlink{class_buffer_acf39bb1a9f6ab53158e716d818089df3}{reset\+Buffer} ()\label{class_buffer_acf39bb1a9f6ab53158e716d818089df3}
+
+\begin{DoxyCompactList}\small\item\em Resets the buffer to the initial state. \end{DoxyCompactList}\item 
+void \hyperlink{class_buffer_a3f68d9a811e3c1c18ef9a9f684cd6284}{push\+Data} (Data\+Type new\+Data, int index)
+\begin{DoxyCompactList}\small\item\em Pushes data into the buffer at the given index. \end{DoxyCompactList}\item 
+bool \hyperlink{class_buffer_a23807200afd1b85d50578e3b2c445300}{is\+Data\+Available} ()
+\begin{DoxyCompactList}\small\item\em Queries if a data is available in the buffer. \end{DoxyCompactList}\item 
+Data\+Type \hyperlink{class_buffer_a8ce6d5bd9fc92b517e7b337fe0f3ef35}{pull\+Data} ()
+\begin{DoxyCompactList}\small\item\em Pulls the data \char`\"{}oldest\char`\"{} data of the buffer. Blocking until data is available. \end{DoxyCompactList}\item 
+bool \hyperlink{class_buffer_a5d901fc62b0711a31e3bf673320dc35b}{is\+Buffer\+At\+Index\+Set} (const int index)
+\begin{DoxyCompactList}\small\item\em Query if \textquotesingle{}index\textquotesingle{} there is an alement in the buffer at given index. \end{DoxyCompactList}\item 
+\hypertarget{class_buffer_a7d79fe9925caf138b127f2b366be400f}{}void \hyperlink{class_buffer_a7d79fe9925caf138b127f2b366be400f}{enable\+Buffer} ()\label{class_buffer_a7d79fe9925caf138b127f2b366be400f}
+
+\begin{DoxyCompactList}\small\item\em Enables the buffer. \end{DoxyCompactList}\item 
+\hypertarget{class_buffer_a70fbfbefc819a9f33c9afa0cd3a3d2f2}{}void \hyperlink{class_buffer_a70fbfbefc819a9f33c9afa0cd3a3d2f2}{disable\+Buffer} ()\label{class_buffer_a70fbfbefc819a9f33c9afa0cd3a3d2f2}
+
+\begin{DoxyCompactList}\small\item\em Disables the buffer. \end{DoxyCompactList}\item 
+\hypertarget{class_buffer_a2be95cbaad09978fb9bb792ae315a5d7}{}void \hyperlink{class_buffer_a2be95cbaad09978fb9bb792ae315a5d7}{set\+Producer\+Finished} ()\label{class_buffer_a2be95cbaad09978fb9bb792ae315a5d7}
+
+\begin{DoxyCompactList}\small\item\em Notifes the \hyperlink{class_buffer}{Buffer} that the producer finished causing the buffer to let release all elements of the buffer even if the buffer is at the moment not completely filled. \end{DoxyCompactList}\item 
+void \hyperlink{class_buffer_a163cb773d0bb6efefda50a7206c0f5f6}{set\+Release\+Data\+After\+Pull} (bool enable)
+\begin{DoxyCompactList}\small\item\em Sets the flag indicating to release the data after it was pulled. \end{DoxyCompactList}\item 
+bool \hyperlink{class_buffer_ad6142214f69f88ddde8fea68339eda01}{is\+Data\+Released\+After\+Pull} ()
+\begin{DoxyCompactList}\small\item\em Query if t data is released after pull. \end{DoxyCompactList}\item 
+\hypertarget{class_buffer_aba610c23849b04e98c488d81f7598a4a}{}void \hyperlink{class_buffer_aba610c23849b04e98c488d81f7598a4a}{reset\+Pull\+Counter\+And\+Pull\+And\+Notify\+Consumer} ()\label{class_buffer_aba610c23849b04e98c488d81f7598a4a}
+
+\begin{DoxyCompactList}\small\item\em Resets the pull counter and notifies the consumer that the data is ready. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_buffer_a721d57441cebb423dd23d2779749ad90}{}std\+::shared\+\_\+ptr$<$ boost\+::signals2\+::signal$<$ void(void)$>$ $>$ \hyperlink{class_buffer_a721d57441cebb423dd23d2779749ad90}{data\+Ready}\label{class_buffer_a721d57441cebb423dd23d2779749ad90}
+
+\begin{DoxyCompactList}\small\item\em Signals whether data is available for pulling. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class Data\+Type$>$class Buffer$<$ Data\+Type $>$}
+
+A buffer which allows to push new data and pull it afterwards. The buffer allows multiple threads to push data. Pulling of data blocks until new data is available. Pusing of data blocks until there is a free element in buffer. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Data\+Type} & Type of the data to be buffered. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_buffer_a62438a4b345914d36de13f0679817ac0}{}\index{Buffer@{Buffer}!get\+Buffer\+Size@{get\+Buffer\+Size}}
+\index{get\+Buffer\+Size@{get\+Buffer\+Size}!Buffer@{Buffer}}
+\subsubsection[{get\+Buffer\+Size}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ int {\bf Buffer}$<$ Data\+Type $>$\+::get\+Buffer\+Size (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_buffer_a62438a4b345914d36de13f0679817ac0}
+
+
+Gets buffer size. 
+
+\begin{DoxyReturn}{Returns}
+The buffer size. 
+\end{DoxyReturn}
+\hypertarget{class_buffer_a5d901fc62b0711a31e3bf673320dc35b}{}\index{Buffer@{Buffer}!is\+Buffer\+At\+Index\+Set@{is\+Buffer\+At\+Index\+Set}}
+\index{is\+Buffer\+At\+Index\+Set@{is\+Buffer\+At\+Index\+Set}!Buffer@{Buffer}}
+\subsubsection[{is\+Buffer\+At\+Index\+Set}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ bool {\bf Buffer}$<$ Data\+Type $>$\+::is\+Buffer\+At\+Index\+Set (
+\begin{DoxyParamCaption}
+\item[{const int}]{index}
+\end{DoxyParamCaption}
+)}\label{class_buffer_a5d901fc62b0711a31e3bf673320dc35b}
+
+
+Query if \textquotesingle{}index\textquotesingle{} there is an alement in the buffer at given index. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em index} & Zero-\/based index where to look for buffered data.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if buffer at index set or if overriding of all existing data is enabled, false if not. 
+\end{DoxyReturn}
+\hypertarget{class_buffer_a23807200afd1b85d50578e3b2c445300}{}\index{Buffer@{Buffer}!is\+Data\+Available@{is\+Data\+Available}}
+\index{is\+Data\+Available@{is\+Data\+Available}!Buffer@{Buffer}}
+\subsubsection[{is\+Data\+Available}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ bool {\bf Buffer}$<$ Data\+Type $>$\+::is\+Data\+Available (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_buffer_a23807200afd1b85d50578e3b2c445300}
+
+
+Queries if a data is available in the buffer. 
+
+\begin{DoxyReturn}{Returns}
+true if a data is available, false if not. 
+\end{DoxyReturn}
+\hypertarget{class_buffer_ad6142214f69f88ddde8fea68339eda01}{}\index{Buffer@{Buffer}!is\+Data\+Released\+After\+Pull@{is\+Data\+Released\+After\+Pull}}
+\index{is\+Data\+Released\+After\+Pull@{is\+Data\+Released\+After\+Pull}!Buffer@{Buffer}}
+\subsubsection[{is\+Data\+Released\+After\+Pull}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ bool {\bf Buffer}$<$ Data\+Type $>$\+::is\+Data\+Released\+After\+Pull (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_buffer_ad6142214f69f88ddde8fea68339eda01}
+
+
+Query if t data is released after pull. 
+
+\begin{DoxyReturn}{Returns}
+true if data is released, false if not. 
+\end{DoxyReturn}
+\hypertarget{class_buffer_a8ce6d5bd9fc92b517e7b337fe0f3ef35}{}\index{Buffer@{Buffer}!pull\+Data@{pull\+Data}}
+\index{pull\+Data@{pull\+Data}!Buffer@{Buffer}}
+\subsubsection[{pull\+Data}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ Data\+Type {\bf Buffer}$<$ Data\+Type $>$\+::pull\+Data (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_buffer_a8ce6d5bd9fc92b517e7b337fe0f3ef35}
+
+
+Pulls the data \char`\"{}oldest\char`\"{} data of the buffer. Blocking until data is available. 
+
+\begin{DoxyReturn}{Returns}
+The oldest buffered data. Null if the buffer is disabled or empty. 
+\end{DoxyReturn}
+\hypertarget{class_buffer_a3f68d9a811e3c1c18ef9a9f684cd6284}{}\index{Buffer@{Buffer}!push\+Data@{push\+Data}}
+\index{push\+Data@{push\+Data}!Buffer@{Buffer}}
+\subsubsection[{push\+Data}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Buffer}$<$ Data\+Type $>$\+::push\+Data (
+\begin{DoxyParamCaption}
+\item[{Data\+Type}]{new\+Data, }
+\item[{int}]{index}
+\end{DoxyParamCaption}
+)}\label{class_buffer_a3f68d9a811e3c1c18ef9a9f684cd6284}
+
+
+Pushes data into the buffer at the given index. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em new\+Data} & The data to be pushed to the buffer. \\
+\hline
+{\em index} & Zero-\/based index in the buffer the data h should be pushed \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_buffer_a9f2f069327c13089510fc94c69d3622e}{}\index{Buffer@{Buffer}!set\+Buffer\+Size@{set\+Buffer\+Size}}
+\index{set\+Buffer\+Size@{set\+Buffer\+Size}!Buffer@{Buffer}}
+\subsubsection[{set\+Buffer\+Size}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Buffer}$<$ Data\+Type $>$\+::set\+Buffer\+Size (
+\begin{DoxyParamCaption}
+\item[{int}]{buffer\+Size}
+\end{DoxyParamCaption}
+)}\label{class_buffer_a9f2f069327c13089510fc94c69d3622e}
+
+
+Sets szie of the buffer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em buffer\+Size} & Size of the buffer. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_buffer_a163cb773d0bb6efefda50a7206c0f5f6}{}\index{Buffer@{Buffer}!set\+Release\+Data\+After\+Pull@{set\+Release\+Data\+After\+Pull}}
+\index{set\+Release\+Data\+After\+Pull@{set\+Release\+Data\+After\+Pull}!Buffer@{Buffer}}
+\subsubsection[{set\+Release\+Data\+After\+Pull}]{\setlength{\rightskip}{0pt plus 5cm}template$<$class Data\+Type $>$ void {\bf Buffer}$<$ Data\+Type $>$\+::set\+Release\+Data\+After\+Pull (
+\begin{DoxyParamCaption}
+\item[{bool}]{enable}
+\end{DoxyParamCaption}
+)}\label{class_buffer_a163cb773d0bb6efefda50a7206c0f5f6}
+
+
+Sets the flag indicating to release the data after it was pulled. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em enable} & true to enable, false to disable. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Buffer.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Buffer.\+cpp\end{DoxyCompactItemize}

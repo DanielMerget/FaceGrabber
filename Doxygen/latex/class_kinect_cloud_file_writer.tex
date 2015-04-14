@@ -1,0 +1,138 @@
+\hypertarget{class_kinect_cloud_file_writer}{}\section{Kinect\+Cloud\+File\+Writer$<$ Point\+Cloud\+Type $>$ Class Template Reference}
+\label{class_kinect_cloud_file_writer}\index{Kinect\+Cloud\+File\+Writer$<$ Point\+Cloud\+Type $>$@{Kinect\+Cloud\+File\+Writer$<$ Point\+Cloud\+Type $>$}}
+
+
+A kinect cloud output writer which writes Point Clouds to the hard disk according to the set Configuration. Writing can be done multi-\/threaded.  
+
+
+
+
+{\ttfamily \#include $<$Kinect\+Cloud\+File\+Writer.\+h$>$}
+
+Inheritance diagram for Kinect\+Cloud\+File\+Writer$<$ Point\+Cloud\+Type $>$\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_kinect_cloud_file_writer}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_kinect_cloud_file_writer_ad983b3035813cc7e1ff9de989783b351}{push\+Cloud\+Async} (boost\+::shared\+\_\+ptr$<$ pcl\+::\+Point\+Cloud$<$ Point\+Cloud\+Type $>$$>$ cloud)
+\begin{DoxyCompactList}\small\item\em Pushes a cloud into the buffer holding the Point Clouds to be written to the hard drive. \end{DoxyCompactList}\item 
+void \hyperlink{class_kinect_cloud_file_writer_a2798609201757a1d05e0d138a9a9eb2b}{push\+Clouds\+Async} (std\+::vector$<$ boost\+::shared\+\_\+ptr$<$ pcl\+::\+Point\+Cloud$<$ Point\+Cloud\+Type $>$$>$$>$ clouds)
+\begin{DoxyCompactList}\small\item\em Pushes a list of Point Clouds into the buffer holding the Point Clouds to be written to the hard drive. \end{DoxyCompactList}\item 
+\hypertarget{class_kinect_cloud_file_writer_a1501ce3e57880c7391916dfe08659a5c}{}void \hyperlink{class_kinect_cloud_file_writer_a1501ce3e57880c7391916dfe08659a5c}{start\+Writing\+Clouds} ()\label{class_kinect_cloud_file_writer_a1501ce3e57880c7391916dfe08659a5c}
+
+\begin{DoxyCompactList}\small\item\em Triggers the start of writing the buffered clouds. \end{DoxyCompactList}\item 
+\hypertarget{class_kinect_cloud_file_writer_ad2e2ee4a0d8ba6c9707a1902762a58e9}{}void \hyperlink{class_kinect_cloud_file_writer_ad2e2ee4a0d8ba6c9707a1902762a58e9}{stop\+Writing\+Clouds} ()\label{class_kinect_cloud_file_writer_ad2e2ee4a0d8ba6c9707a1902762a58e9}
+
+\begin{DoxyCompactList}\small\item\em Triggers the stop of writing the buffered clouds. \end{DoxyCompactList}\item 
+void \hyperlink{class_kinect_cloud_file_writer_ae99ef4fbf2221d0dfe5be340f1f8aac7}{set\+Recording\+Configuration} (I\+Recording\+Configuration\+Ptr recording\+Configuration)
+\begin{DoxyCompactList}\small\item\em Sets recording configuration for the writing. \end{DoxyCompactList}\item 
+bool \hyperlink{class_kinect_cloud_file_writer_a8d024ff1c2123d1a5600d20b6043dd8a}{pull\+Data} (\hyperlink{class_point_cloud_measurement}{Point\+Cloud\+Measurement}$<$ Point\+Cloud\+Type $>$ \&measurement)
+\begin{DoxyCompactList}\small\item\em Fills the given measurement with most recent data. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_kinect_cloud_file_writer_af9ac0f04741dd59c723a3c253cc732c9}{}boost\+::signals2\+::signal$<$ void()$>$ \hyperlink{class_kinect_cloud_file_writer_af9ac0f04741dd59c723a3c253cc732c9}{writing\+Finished}\label{class_kinect_cloud_file_writer_af9ac0f04741dd59c723a3c253cc732c9}
+
+\begin{DoxyCompactList}\small\item\em The signal notfying that the writer finished. \end{DoxyCompactList}\item 
+\hypertarget{class_kinect_cloud_file_writer_a0529ebd3acf2d41aa3967c6d320b7120}{}boost\+::signals2\+::signal$<$ void(std\+::wstring)$>$ \hyperlink{class_kinect_cloud_file_writer_a0529ebd3acf2d41aa3967c6d320b7120}{update\+Status}\label{class_kinect_cloud_file_writer_a0529ebd3acf2d41aa3967c6d320b7120}
+
+\begin{DoxyCompactList}\small\item\em The signal notfying about changes of the writing status. \end{DoxyCompactList}\item 
+\hypertarget{class_kinect_cloud_file_writer_aa04ac751f2d02a6b81f3e5f194c03c09}{}boost\+::signals2\+::signal$<$ void(void)$>$ \hyperlink{class_kinect_cloud_file_writer_aa04ac751f2d02a6b81f3e5f194c03c09}{writing\+Was\+Stopped}\label{class_kinect_cloud_file_writer_aa04ac751f2d02a6b81f3e5f194c03c09}
+
+\begin{DoxyCompactList}\small\item\em The signal notifying about the stop of the writing by the user. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class Point\+Cloud\+Type$>$class Kinect\+Cloud\+File\+Writer$<$ Point\+Cloud\+Type $>$}
+
+A kinect cloud output writer which writes Point Clouds to the hard disk according to the set Configuration. Writing can be done multi-\/threaded. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Point\+Cloud\+Type} & Type of the point cloud type. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_kinect_cloud_file_writer_a8d024ff1c2123d1a5600d20b6043dd8a}{}\index{Kinect\+Cloud\+File\+Writer@{Kinect\+Cloud\+File\+Writer}!pull\+Data@{pull\+Data}}
+\index{pull\+Data@{pull\+Data}!Kinect\+Cloud\+File\+Writer@{Kinect\+Cloud\+File\+Writer}}
+\subsubsection[{pull\+Data}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Point\+Cloud\+Type $>$ bool {\bf Kinect\+Cloud\+File\+Writer}$<$ Point\+Cloud\+Type $>$\+::pull\+Data (
+\begin{DoxyParamCaption}
+\item[{{\bf Point\+Cloud\+Measurement}$<$ Point\+Cloud\+Type $>$ \&}]{measurement}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_kinect_cloud_file_writer_a8d024ff1c2123d1a5600d20b6043dd8a}
+
+
+Fills the given measurement with most recent data. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em measurement} & The measurement.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true the source is empty or not running, otherwise false 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_cloud_measurement_source_a99c6819cec1c9e408107c140cccf8918}{Cloud\+Measurement\+Source$<$ Point\+Cloud\+Type $>$}.
+
+\hypertarget{class_kinect_cloud_file_writer_ad983b3035813cc7e1ff9de989783b351}{}\index{Kinect\+Cloud\+File\+Writer@{Kinect\+Cloud\+File\+Writer}!push\+Cloud\+Async@{push\+Cloud\+Async}}
+\index{push\+Cloud\+Async@{push\+Cloud\+Async}!Kinect\+Cloud\+File\+Writer@{Kinect\+Cloud\+File\+Writer}}
+\subsubsection[{push\+Cloud\+Async}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Point\+Cloud\+Type $>$ void {\bf Kinect\+Cloud\+File\+Writer}$<$ Point\+Cloud\+Type $>$\+::push\+Cloud\+Async (
+\begin{DoxyParamCaption}
+\item[{boost\+::shared\+\_\+ptr$<$ pcl\+::\+Point\+Cloud$<$ Point\+Cloud\+Type $>$$>$}]{cloud}
+\end{DoxyParamCaption}
+)}\label{class_kinect_cloud_file_writer_ad983b3035813cc7e1ff9de989783b351}
+
+
+Pushes a cloud into the buffer holding the Point Clouds to be written to the hard drive. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cloud} & The cloud to be pushed. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_kinect_cloud_file_writer_a2798609201757a1d05e0d138a9a9eb2b}{}\index{Kinect\+Cloud\+File\+Writer@{Kinect\+Cloud\+File\+Writer}!push\+Clouds\+Async@{push\+Clouds\+Async}}
+\index{push\+Clouds\+Async@{push\+Clouds\+Async}!Kinect\+Cloud\+File\+Writer@{Kinect\+Cloud\+File\+Writer}}
+\subsubsection[{push\+Clouds\+Async}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Point\+Cloud\+Type $>$ void {\bf Kinect\+Cloud\+File\+Writer}$<$ Point\+Cloud\+Type $>$\+::push\+Clouds\+Async (
+\begin{DoxyParamCaption}
+\item[{std\+::vector$<$ boost\+::shared\+\_\+ptr$<$ pcl\+::\+Point\+Cloud$<$ Point\+Cloud\+Type $>$$>$$>$}]{clouds}
+\end{DoxyParamCaption}
+)}\label{class_kinect_cloud_file_writer_a2798609201757a1d05e0d138a9a9eb2b}
+
+
+Pushes a list of Point Clouds into the buffer holding the Point Clouds to be written to the hard drive. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em clouds} & The clouds. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_kinect_cloud_file_writer_ae99ef4fbf2221d0dfe5be340f1f8aac7}{}\index{Kinect\+Cloud\+File\+Writer@{Kinect\+Cloud\+File\+Writer}!set\+Recording\+Configuration@{set\+Recording\+Configuration}}
+\index{set\+Recording\+Configuration@{set\+Recording\+Configuration}!Kinect\+Cloud\+File\+Writer@{Kinect\+Cloud\+File\+Writer}}
+\subsubsection[{set\+Recording\+Configuration}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Point\+Cloud\+Type $>$ void {\bf Kinect\+Cloud\+File\+Writer}$<$ Point\+Cloud\+Type $>$\+::set\+Recording\+Configuration (
+\begin{DoxyParamCaption}
+\item[{I\+Recording\+Configuration\+Ptr}]{recording\+Configuration}
+\end{DoxyParamCaption}
+)}\label{class_kinect_cloud_file_writer_ae99ef4fbf2221d0dfe5be340f1f8aac7}
+
+
+Sets recording configuration for the writing. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em recording\+Configuration} & The recording configuration. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Kinect\+Cloud\+File\+Writer.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Kinect\+Cloud\+File\+Writer.\+cpp\end{DoxyCompactItemize}

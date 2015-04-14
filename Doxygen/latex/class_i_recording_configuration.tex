@@ -1,0 +1,151 @@
+\hypertarget{class_i_recording_configuration}{}\section{I\+Recording\+Configuration Class Reference}
+\label{class_i_recording_configuration}\index{I\+Recording\+Configuration@{I\+Recording\+Configuration}}
+
+
+The recording configuration interface provides all information required by the Kinect\+Cloud\+Output\+Writer to record point clouds to the hard disc.  
+
+
+
+
+{\ttfamily \#include $<$I\+Recording\+Configuration.\+h$>$}
+
+Inheritance diagram for I\+Recording\+Configuration\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_i_recording_configuration}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual Recording\+File\+Format \hyperlink{class_i_recording_configuration_aae376a55c4992f0223e877c28c3bfed9}{get\+Record\+File\+Format} ()=0
+\begin{DoxyCompactList}\small\item\em Gets record file format. \end{DoxyCompactList}\item 
+virtual std\+::string \hyperlink{class_i_recording_configuration_af5718b10c42674441d23b0b403367908}{get\+Full\+Recording\+Path\+String} ()=0
+\begin{DoxyCompactList}\small\item\em Gets full recording path. \end{DoxyCompactList}\item 
+virtual std\+::string \hyperlink{class_i_recording_configuration_a7f46e556537cc8628e63240889b93cc5}{get\+File\+Name\+String} ()=0
+\begin{DoxyCompactList}\small\item\em Gets file name. \end{DoxyCompactList}\item 
+virtual bool \hyperlink{class_i_recording_configuration_a001a4ba0282d154f014c8e35f43e212a}{is\+Recording\+Duration\+Un\+Limited} ()=0
+\begin{DoxyCompactList}\small\item\em Query if this object is recording duration unlimited. If it is limited get\+Max\+Number\+Of\+Frames provides the amount of frames to record. \end{DoxyCompactList}\item 
+virtual int \hyperlink{class_i_recording_configuration_a2e2719dabf4824516e7d5919dfb5f189}{get\+Max\+Number\+Of\+Frames} ()=0
+\begin{DoxyCompactList}\small\item\em Gets maximum number of frames to record. \end{DoxyCompactList}\item 
+virtual int \hyperlink{class_i_recording_configuration_a8148f1b3dfb5cafb347337c913058204}{get\+Thread\+Count\+To\+Start} ()=0
+\begin{DoxyCompactList}\small\item\em Gets thread amount of threads to start for recording. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The recording configuration interface provides all information required by the Kinect\+Cloud\+Output\+Writer to record point clouds to the hard disc. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_i_recording_configuration_a7f46e556537cc8628e63240889b93cc5}{}\index{I\+Recording\+Configuration@{I\+Recording\+Configuration}!get\+File\+Name\+String@{get\+File\+Name\+String}}
+\index{get\+File\+Name\+String@{get\+File\+Name\+String}!I\+Recording\+Configuration@{I\+Recording\+Configuration}}
+\subsubsection[{get\+File\+Name\+String}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string I\+Recording\+Configuration\+::get\+File\+Name\+String (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{class_i_recording_configuration_a7f46e556537cc8628e63240889b93cc5}
+
+
+Gets file name. 
+
+\begin{DoxyReturn}{Returns}
+The file name. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_recording_configuration_a47942807d4279966c8f61ecacdfeed27}{Recording\+Configuration}, and \hyperlink{class_simple_recording_configuration_ae28ce09b38e1029cf1eab94ff1a51b9a}{Simple\+Recording\+Configuration}.
+
+\hypertarget{class_i_recording_configuration_af5718b10c42674441d23b0b403367908}{}\index{I\+Recording\+Configuration@{I\+Recording\+Configuration}!get\+Full\+Recording\+Path\+String@{get\+Full\+Recording\+Path\+String}}
+\index{get\+Full\+Recording\+Path\+String@{get\+Full\+Recording\+Path\+String}!I\+Recording\+Configuration@{I\+Recording\+Configuration}}
+\subsubsection[{get\+Full\+Recording\+Path\+String}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string I\+Recording\+Configuration\+::get\+Full\+Recording\+Path\+String (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{class_i_recording_configuration_af5718b10c42674441d23b0b403367908}
+
+
+Gets full recording path. 
+
+\begin{DoxyReturn}{Returns}
+The full recording path. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_recording_configuration_aa3becb682d9dd1ae2799bc37a65f17be}{Recording\+Configuration}, and \hyperlink{class_simple_recording_configuration_a9b46181e3fcf6b8b27f33ae878f45b0e}{Simple\+Recording\+Configuration}.
+
+\hypertarget{class_i_recording_configuration_a2e2719dabf4824516e7d5919dfb5f189}{}\index{I\+Recording\+Configuration@{I\+Recording\+Configuration}!get\+Max\+Number\+Of\+Frames@{get\+Max\+Number\+Of\+Frames}}
+\index{get\+Max\+Number\+Of\+Frames@{get\+Max\+Number\+Of\+Frames}!I\+Recording\+Configuration@{I\+Recording\+Configuration}}
+\subsubsection[{get\+Max\+Number\+Of\+Frames}]{\setlength{\rightskip}{0pt plus 5cm}int I\+Recording\+Configuration\+::get\+Max\+Number\+Of\+Frames (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{class_i_recording_configuration_a2e2719dabf4824516e7d5919dfb5f189}
+
+
+Gets maximum number of frames to record. 
+
+\begin{DoxyReturn}{Returns}
+The maximum number of frames to record. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_recording_configuration_a933bc95cc26966c34984c9de7c5681f3}{Recording\+Configuration}, and \hyperlink{class_simple_recording_configuration_a571a390604684c9b5de9467e12e23c43}{Simple\+Recording\+Configuration}.
+
+\hypertarget{class_i_recording_configuration_aae376a55c4992f0223e877c28c3bfed9}{}\index{I\+Recording\+Configuration@{I\+Recording\+Configuration}!get\+Record\+File\+Format@{get\+Record\+File\+Format}}
+\index{get\+Record\+File\+Format@{get\+Record\+File\+Format}!I\+Recording\+Configuration@{I\+Recording\+Configuration}}
+\subsubsection[{get\+Record\+File\+Format}]{\setlength{\rightskip}{0pt plus 5cm}Recording\+File\+Format I\+Recording\+Configuration\+::get\+Record\+File\+Format (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{class_i_recording_configuration_aae376a55c4992f0223e877c28c3bfed9}
+
+
+Gets record file format. 
+
+\begin{DoxyReturn}{Returns}
+The record file format. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_recording_configuration_a9e319b60a4bddc838b56186b8f07bab5}{Recording\+Configuration}, and \hyperlink{class_simple_recording_configuration_af68ce5a5bea0bf9da25e95266c684f56}{Simple\+Recording\+Configuration}.
+
+\hypertarget{class_i_recording_configuration_a8148f1b3dfb5cafb347337c913058204}{}\index{I\+Recording\+Configuration@{I\+Recording\+Configuration}!get\+Thread\+Count\+To\+Start@{get\+Thread\+Count\+To\+Start}}
+\index{get\+Thread\+Count\+To\+Start@{get\+Thread\+Count\+To\+Start}!I\+Recording\+Configuration@{I\+Recording\+Configuration}}
+\subsubsection[{get\+Thread\+Count\+To\+Start}]{\setlength{\rightskip}{0pt plus 5cm}int I\+Recording\+Configuration\+::get\+Thread\+Count\+To\+Start (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{class_i_recording_configuration_a8148f1b3dfb5cafb347337c913058204}
+
+
+Gets thread amount of threads to start for recording. 
+
+\begin{DoxyReturn}{Returns}
+The number of threads to start. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_recording_configuration_a48d2a54ab74dba016f70d7215cc4794d}{Recording\+Configuration}, and \hyperlink{class_simple_recording_configuration_afcd4ac5d77fc4e358746db9127186e94}{Simple\+Recording\+Configuration}.
+
+\hypertarget{class_i_recording_configuration_a001a4ba0282d154f014c8e35f43e212a}{}\index{I\+Recording\+Configuration@{I\+Recording\+Configuration}!is\+Recording\+Duration\+Un\+Limited@{is\+Recording\+Duration\+Un\+Limited}}
+\index{is\+Recording\+Duration\+Un\+Limited@{is\+Recording\+Duration\+Un\+Limited}!I\+Recording\+Configuration@{I\+Recording\+Configuration}}
+\subsubsection[{is\+Recording\+Duration\+Un\+Limited}]{\setlength{\rightskip}{0pt plus 5cm}bool I\+Recording\+Configuration\+::is\+Recording\+Duration\+Un\+Limited (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{class_i_recording_configuration_a001a4ba0282d154f014c8e35f43e212a}
+
+
+Query if this object is recording duration unlimited. If it is limited get\+Max\+Number\+Of\+Frames provides the amount of frames to record. 
+
+\begin{DoxyReturn}{Returns}
+true if recording duration un limited, false if not. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_recording_configuration_a4f68458e01f778ea850e47aa658b6212}{Recording\+Configuration}, and \hyperlink{class_simple_recording_configuration_a87d0cf9356d24d1c6c7bb1bd6ad238ad}{Simple\+Recording\+Configuration}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/I\+Recording\+Configuration.\+h\end{DoxyCompactItemize}

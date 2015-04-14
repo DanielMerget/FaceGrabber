@@ -1,0 +1,197 @@
+\hypertarget{class_output_streams_updater_stragedy}{}\section{Output\+Streams\+Updater\+Stragedy Class Reference}
+\label{class_output_streams_updater_stragedy}\index{Output\+Streams\+Updater\+Stragedy@{Output\+Streams\+Updater\+Stragedy}}
+
+
+The \hyperlink{class_output_streams_updater_stragedy}{Output\+Streams\+Updater\+Stragedy} defines method stubs which should called by the \hyperlink{class_kinect_h_d_face_grabber}{Kinect\+H\+D\+Face\+Grabber} for each new Face\+Frame. Inherited classes can use the provided data to run various algorithmns. start\+Face\+Collection should be called before calling update\+Output\+Streams for tracked Kinect-\/\+Face\+Frame. Afterwards stop\+Face\+Collection should be called. \hyperlink{class_output_streams_updater_stragedy}{Output\+Streams\+Updater\+Stragedy} hides the implementation to allow switching the implementation at run time.  
+
+
+
+
+{\ttfamily \#include $<$Output\+Streams\+Updater\+Stragedy.\+h$>$}
+
+Inheritance diagram for Output\+Streams\+Updater\+Stragedy\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_output_streams_updater_stragedy}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_output_streams_updater_stragedy_aa1a18127665771ddc94a896e33afd1ef}{}\hyperlink{class_output_streams_updater_stragedy_aa1a18127665771ddc94a896e33afd1ef}{Output\+Streams\+Updater\+Stragedy} ()\label{class_output_streams_updater_stragedy_aa1a18127665771ddc94a896e33afd1ef}
+
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_output_streams_updater_stragedy_a677aab9989e7a229bf04b4710e9f85af}{}\hyperlink{class_output_streams_updater_stragedy_a677aab9989e7a229bf04b4710e9f85af}{$\sim$\+Output\+Streams\+Updater\+Stragedy} ()\label{class_output_streams_updater_stragedy_a677aab9989e7a229bf04b4710e9f85af}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+bool \hyperlink{class_output_streams_updater_stragedy_a1880ded54b27751d84401bdc2a638668}{is\+Valid\+Cam\+Space\+Point} (Camera\+Space\+Point cam\+Space\+Point)
+\begin{DoxyCompactList}\small\item\em Query if \textquotesingle{}cam\+Space\+Point\textquotesingle{} is valid camera space point. \end{DoxyCompactList}\item 
+bool \hyperlink{class_output_streams_updater_stragedy_ad22baa921eb2098e6059b0b0d41e1438}{is\+Valid\+Depth\+Point} (Depth\+Space\+Point depth\+Point)
+\begin{DoxyCompactList}\small\item\em Query if \textquotesingle{}depth\+Point\textquotesingle{} is valid depth point. Coordinates of invalid points are outside the depth frame size. \end{DoxyCompactList}\item 
+virtual H\+R\+E\+S\+U\+L\+T \hyperlink{class_output_streams_updater_stragedy_aab72baf9e0357eda8d10af52ef6046df}{update\+Output\+Streams} (I\+Face\+Model $\ast$face\+Model, I\+Face\+Alignment $\ast$face\+Alignment, int buffer\+Size, Camera\+Space\+Point $\ast$detected\+H\+D\+Face\+Points\+Cam\+Space, Color\+Space\+Point $\ast$detected\+H\+D\+Face\+Points\+Color\+Space)=0
+\begin{DoxyCompactList}\small\item\em Updates and processes the output streams. \end{DoxyCompactList}\item 
+virtual void \hyperlink{class_output_streams_updater_stragedy_a2eb4731e5dd15fa676ae1fe8ef4517af}{initialize} (I\+Coordinate\+Mapper $\ast$\hyperlink{class_output_streams_updater_stragedy_a3526d196182b8231f73ef97c49982579}{m\+\_\+p\+Coordinate\+Mapper}, int depth\+Width, int depth\+Height, int color\+Width, int color\+Height)
+\begin{DoxyCompactList}\small\item\em Initializes the Output\+Stream\+Updater\+Stragedy with the frame sizes. \end{DoxyCompactList}\item 
+virtual void \hyperlink{class_output_streams_updater_stragedy_ad9a1898edc4def60a68bf6105c241bcc}{start\+Face\+Collection} (R\+G\+B\+Q\+U\+A\+D $\ast$color\+Buffer, U\+I\+N\+T16 $\ast$depth\+Buffer)=0
+\begin{DoxyCompactList}\small\item\em Indicates that tracked/found faces will be provided with calls to update\+Output\+Streams. \end{DoxyCompactList}\item 
+\hypertarget{class_output_streams_updater_stragedy_a41553b7aa7e80d91e706bf1eb8acc3df}{}virtual void \hyperlink{class_output_streams_updater_stragedy_a41553b7aa7e80d91e706bf1eb8acc3df}{stop\+Face\+Collection} ()=0\label{class_output_streams_updater_stragedy_a41553b7aa7e80d91e706bf1eb8acc3df}
+
+\begin{DoxyCompactList}\small\item\em Stops face collection/processing. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_output_streams_updater_stragedy_a3526d196182b8231f73ef97c49982579}{}I\+Coordinate\+Mapper $\ast$ \hyperlink{class_output_streams_updater_stragedy_a3526d196182b8231f73ef97c49982579}{m\+\_\+p\+Coordinate\+Mapper}\label{class_output_streams_updater_stragedy_a3526d196182b8231f73ef97c49982579}
+
+\begin{DoxyCompactList}\small\item\em The coordinate mapper. \end{DoxyCompactList}\item 
+\hypertarget{class_output_streams_updater_stragedy_a4fd7cb646232a330861a8bca67843611}{}int \hyperlink{class_output_streams_updater_stragedy_a4fd7cb646232a330861a8bca67843611}{m\+\_\+depth\+Width}\label{class_output_streams_updater_stragedy_a4fd7cb646232a330861a8bca67843611}
+
+\begin{DoxyCompactList}\small\item\em Width of the depth frame. \end{DoxyCompactList}\item 
+\hypertarget{class_output_streams_updater_stragedy_a4b8d71da2310776bc82874d7860f297a}{}int \hyperlink{class_output_streams_updater_stragedy_a4b8d71da2310776bc82874d7860f297a}{m\+\_\+depth\+Height}\label{class_output_streams_updater_stragedy_a4b8d71da2310776bc82874d7860f297a}
+
+\begin{DoxyCompactList}\small\item\em Height of the depth frame. \end{DoxyCompactList}\item 
+\hypertarget{class_output_streams_updater_stragedy_ad4d04daabc5670e974dea6044a34a806}{}int \hyperlink{class_output_streams_updater_stragedy_ad4d04daabc5670e974dea6044a34a806}{m\+\_\+color\+Width}\label{class_output_streams_updater_stragedy_ad4d04daabc5670e974dea6044a34a806}
+
+\begin{DoxyCompactList}\small\item\em Width of the color frame. \end{DoxyCompactList}\item 
+\hypertarget{class_output_streams_updater_stragedy_a6b2c11c6b802be2270a080fc72f3ff40}{}int \hyperlink{class_output_streams_updater_stragedy_a6b2c11c6b802be2270a080fc72f3ff40}{m\+\_\+color\+Height}\label{class_output_streams_updater_stragedy_a6b2c11c6b802be2270a080fc72f3ff40}
+
+\begin{DoxyCompactList}\small\item\em Height of the color frame. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The \hyperlink{class_output_streams_updater_stragedy}{Output\+Streams\+Updater\+Stragedy} defines method stubs which should called by the \hyperlink{class_kinect_h_d_face_grabber}{Kinect\+H\+D\+Face\+Grabber} for each new Face\+Frame. Inherited classes can use the provided data to run various algorithmns. start\+Face\+Collection should be called before calling update\+Output\+Streams for tracked Kinect-\/\+Face\+Frame. Afterwards stop\+Face\+Collection should be called. \hyperlink{class_output_streams_updater_stragedy}{Output\+Streams\+Updater\+Stragedy} hides the implementation to allow switching the implementation at run time. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_output_streams_updater_stragedy_a2eb4731e5dd15fa676ae1fe8ef4517af}{}\index{Output\+Streams\+Updater\+Stragedy@{Output\+Streams\+Updater\+Stragedy}!initialize@{initialize}}
+\index{initialize@{initialize}!Output\+Streams\+Updater\+Stragedy@{Output\+Streams\+Updater\+Stragedy}}
+\subsubsection[{initialize}]{\setlength{\rightskip}{0pt plus 5cm}void Output\+Streams\+Updater\+Stragedy\+::initialize (
+\begin{DoxyParamCaption}
+\item[{I\+Coordinate\+Mapper $\ast$}]{m\+\_\+p\+Coordinate\+Mapper, }
+\item[{int}]{depth\+Width, }
+\item[{int}]{depth\+Height, }
+\item[{int}]{color\+Width, }
+\item[{int}]{color\+Height}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_output_streams_updater_stragedy_a2eb4731e5dd15fa676ae1fe8ef4517af}
+
+
+Initializes the Output\+Stream\+Updater\+Stragedy with the frame sizes. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em m\+\_\+p\+Coordinate\+Mapper} & If non-\/null, the coordinate mapper. \\
+\hline
+ & {\em depth\+Width} & Width of the depth. \\
+\hline
+ & {\em depth\+Height} & Height of the depth. \\
+\hline
+ & {\em color\+Width} & Width of the color. \\
+\hline
+ & {\em color\+Height} & Height of the color. \\
+\hline
+\end{DoxyParams}
+
+
+Reimplemented in \hyperlink{class_colored_output_stream_updater_a4120a90878331011a523723430779c56}{Colored\+Output\+Stream\+Updater}.
+
+\hypertarget{class_output_streams_updater_stragedy_a1880ded54b27751d84401bdc2a638668}{}\index{Output\+Streams\+Updater\+Stragedy@{Output\+Streams\+Updater\+Stragedy}!is\+Valid\+Cam\+Space\+Point@{is\+Valid\+Cam\+Space\+Point}}
+\index{is\+Valid\+Cam\+Space\+Point@{is\+Valid\+Cam\+Space\+Point}!Output\+Streams\+Updater\+Stragedy@{Output\+Streams\+Updater\+Stragedy}}
+\subsubsection[{is\+Valid\+Cam\+Space\+Point}]{\setlength{\rightskip}{0pt plus 5cm}bool Output\+Streams\+Updater\+Stragedy\+::is\+Valid\+Cam\+Space\+Point (
+\begin{DoxyParamCaption}
+\item[{Camera\+Space\+Point}]{cam\+Space\+Point}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{class_output_streams_updater_stragedy_a1880ded54b27751d84401bdc2a638668}
+
+
+Query if \textquotesingle{}cam\+Space\+Point\textquotesingle{} is valid camera space point. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cam\+Space\+Point} & The camera space point.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if valid camera space point, false if not. Points with coordinates of infinity are treated as invalid points. 
+\end{DoxyReturn}
+\hypertarget{class_output_streams_updater_stragedy_ad22baa921eb2098e6059b0b0d41e1438}{}\index{Output\+Streams\+Updater\+Stragedy@{Output\+Streams\+Updater\+Stragedy}!is\+Valid\+Depth\+Point@{is\+Valid\+Depth\+Point}}
+\index{is\+Valid\+Depth\+Point@{is\+Valid\+Depth\+Point}!Output\+Streams\+Updater\+Stragedy@{Output\+Streams\+Updater\+Stragedy}}
+\subsubsection[{is\+Valid\+Depth\+Point}]{\setlength{\rightskip}{0pt plus 5cm}bool Output\+Streams\+Updater\+Stragedy\+::is\+Valid\+Depth\+Point (
+\begin{DoxyParamCaption}
+\item[{Depth\+Space\+Point}]{depth\+Point}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [inline]}}\label{class_output_streams_updater_stragedy_ad22baa921eb2098e6059b0b0d41e1438}
+
+
+Query if \textquotesingle{}depth\+Point\textquotesingle{} is valid depth point. Coordinates of invalid points are outside the depth frame size. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em depth\+Point} & The depth point.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+true if valid depth point, false if not. 
+\end{DoxyReturn}
+\hypertarget{class_output_streams_updater_stragedy_ad9a1898edc4def60a68bf6105c241bcc}{}\index{Output\+Streams\+Updater\+Stragedy@{Output\+Streams\+Updater\+Stragedy}!start\+Face\+Collection@{start\+Face\+Collection}}
+\index{start\+Face\+Collection@{start\+Face\+Collection}!Output\+Streams\+Updater\+Stragedy@{Output\+Streams\+Updater\+Stragedy}}
+\subsubsection[{start\+Face\+Collection}]{\setlength{\rightskip}{0pt plus 5cm}void Output\+Streams\+Updater\+Stragedy\+::start\+Face\+Collection (
+\begin{DoxyParamCaption}
+\item[{R\+G\+B\+Q\+U\+A\+D $\ast$}]{color\+Buffer, }
+\item[{U\+I\+N\+T16 $\ast$}]{depth\+Buffer}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{class_output_streams_updater_stragedy_ad9a1898edc4def60a68bf6105c241bcc}
+
+
+Indicates that tracked/found faces will be provided with calls to update\+Output\+Streams. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in}  & {\em color\+Buffer} & the current color \hyperlink{class_buffer}{Buffer} \\
+\hline
+\mbox{\tt in}  & {\em depth\+Buffer} & the current depth \hyperlink{class_buffer}{Buffer} \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{class_uncolored_output_streams_updater_ae5b26d31a579242a58b98854ac4bf1b3}{Uncolored\+Output\+Streams\+Updater}, and \hyperlink{class_colored_output_stream_updater_a2b786514c791f56b9d30313d6bf092a5}{Colored\+Output\+Stream\+Updater}.
+
+\hypertarget{class_output_streams_updater_stragedy_aab72baf9e0357eda8d10af52ef6046df}{}\index{Output\+Streams\+Updater\+Stragedy@{Output\+Streams\+Updater\+Stragedy}!update\+Output\+Streams@{update\+Output\+Streams}}
+\index{update\+Output\+Streams@{update\+Output\+Streams}!Output\+Streams\+Updater\+Stragedy@{Output\+Streams\+Updater\+Stragedy}}
+\subsubsection[{update\+Output\+Streams}]{\setlength{\rightskip}{0pt plus 5cm}H\+R\+E\+S\+U\+L\+T Output\+Streams\+Updater\+Stragedy\+::update\+Output\+Streams (
+\begin{DoxyParamCaption}
+\item[{I\+Face\+Model $\ast$}]{face\+Model, }
+\item[{I\+Face\+Alignment $\ast$}]{face\+Alignment, }
+\item[{int}]{buffer\+Size, }
+\item[{Camera\+Space\+Point $\ast$}]{detected\+H\+D\+Face\+Points\+Cam\+Space, }
+\item[{Color\+Space\+Point $\ast$}]{detected\+H\+D\+Face\+Points\+Color\+Space}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [pure virtual]}}\label{class_output_streams_updater_stragedy_aab72baf9e0357eda8d10af52ef6046df}
+
+
+Updates and processes the output streams. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em face\+Model} & the face model of the current face \\
+\hline
+\mbox{\tt in,out}  & {\em face\+Alignment} & the face alignment of the current face \\
+\hline
+ & {\em buffer\+Size} & Size of the detected\+H\+D\+Face\+Points\+Cam\+Space buffer. \\
+\hline
+\mbox{\tt in,out}  & {\em detected\+H\+D\+Face\+Points\+Cam\+Space} & The detected H\+D face points in camera space camera space. \\
+\hline
+\mbox{\tt in,out}  & {\em detected\+H\+D\+Face\+Points\+Color\+Space} & The detected H\+D face points in color space color space.\\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+A h\+Result. 
+\end{DoxyReturn}
+
+
+Implemented in \hyperlink{class_uncolored_output_streams_updater_a0066f3f764858f63d29a72f215f4cf5e}{Uncolored\+Output\+Streams\+Updater}, and \hyperlink{class_colored_output_stream_updater_a5fde62c28b46d9113c06f9b317097797}{Colored\+Output\+Stream\+Updater}.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Output\+Streams\+Updater\+Stragedy.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Output\+Streams\+Updater\+Stragedy.\+cpp\end{DoxyCompactItemize}

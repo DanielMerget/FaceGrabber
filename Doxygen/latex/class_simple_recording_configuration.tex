@@ -1,0 +1,264 @@
+\hypertarget{class_simple_recording_configuration}{}\section{Simple\+Recording\+Configuration Class Reference}
+\label{class_simple_recording_configuration}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+
+
+A simple recording configuration which allows to specify only the required attributes manually. In contrast to \hyperlink{class_recording_configuration}{Recording\+Configuration} no concatenation of outputfolder, timestamps etc. is done here.  
+
+
+
+
+{\ttfamily \#include $<$Simple\+Recording\+Configuration.\+h$>$}
+
+Inheritance diagram for Simple\+Recording\+Configuration\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_simple_recording_configuration}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_simple_recording_configuration_a97fce15654a90e949196a0ba9c0b32e6}{}\hyperlink{class_simple_recording_configuration_a97fce15654a90e949196a0ba9c0b32e6}{Simple\+Recording\+Configuration} ()\label{class_simple_recording_configuration_a97fce15654a90e949196a0ba9c0b32e6}
+
+\begin{DoxyCompactList}\small\item\em Default constructor. \end{DoxyCompactList}\item 
+\hypertarget{class_simple_recording_configuration_aecd963668a23f688305118b89c70c62a}{}\hyperlink{class_simple_recording_configuration_aecd963668a23f688305118b89c70c62a}{$\sim$\+Simple\+Recording\+Configuration} ()\label{class_simple_recording_configuration_aecd963668a23f688305118b89c70c62a}
+
+\begin{DoxyCompactList}\small\item\em Destructor. \end{DoxyCompactList}\item 
+Recording\+File\+Format \hyperlink{class_simple_recording_configuration_af68ce5a5bea0bf9da25e95266c684f56}{get\+Record\+File\+Format} ()
+\begin{DoxyCompactList}\small\item\em Gets record file format. \end{DoxyCompactList}\item 
+std\+::string \hyperlink{class_simple_recording_configuration_a9b46181e3fcf6b8b27f33ae878f45b0e}{get\+Full\+Recording\+Path\+String} ()
+\begin{DoxyCompactList}\small\item\em Gets full recording path string. \end{DoxyCompactList}\item 
+std\+::string \hyperlink{class_simple_recording_configuration_ae28ce09b38e1029cf1eab94ff1a51b9a}{get\+File\+Name\+String} ()
+\begin{DoxyCompactList}\small\item\em Gets file name prefix as string. \end{DoxyCompactList}\item 
+void \hyperlink{class_simple_recording_configuration_affd217f70efb4b5aa41657ec57bdd6b8}{set\+Record\+File\+Format} (Recording\+File\+Format fileformat)
+\begin{DoxyCompactList}\small\item\em Sets record file format. \end{DoxyCompactList}\item 
+void \hyperlink{class_simple_recording_configuration_ad79cfd752bd8095be050ff4d39fcc900}{set\+Full\+Recording\+Path\+String} (std\+::string full\+Recording\+Gapth)
+\begin{DoxyCompactList}\small\item\em Sets full recording path string. \end{DoxyCompactList}\item 
+void \hyperlink{class_simple_recording_configuration_aa22a7a67d3424ede25e3cb56ef0299c5}{set\+File\+Name\+String} (std\+::string the\+File\+Prefix)
+\begin{DoxyCompactList}\small\item\em Sets file name given as string. \end{DoxyCompactList}\item 
+bool \hyperlink{class_simple_recording_configuration_aa62572bce9d1031272ef1e2e43d8f524}{is\+Record\+Configuration\+Valid} ()
+\begin{DoxyCompactList}\small\item\em Query if the \hyperlink{class_simple_recording_configuration}{Simple\+Recording\+Configuration} is record configuration valid meaning all necessary values are set. \end{DoxyCompactList}\item 
+bool \hyperlink{class_simple_recording_configuration_a87d0cf9356d24d1c6c7bb1bd6ad238ad}{is\+Recording\+Duration\+Un\+Limited} ()
+\begin{DoxyCompactList}\small\item\em Query if recording duration unlimited. \end{DoxyCompactList}\item 
+int \hyperlink{class_simple_recording_configuration_a571a390604684c9b5de9467e12e23c43}{get\+Max\+Number\+Of\+Frames} ()
+\begin{DoxyCompactList}\small\item\em Gets maximum number of frames to record. \end{DoxyCompactList}\item 
+void \hyperlink{class_simple_recording_configuration_aecd02808bbcaf8a2b613b2d705dbcf24}{set\+Max\+Number\+Of\+Frames} (int new\+Max\+Number\+Of\+Frames)
+\begin{DoxyCompactList}\small\item\em Sets maximum number of frames to record. \end{DoxyCompactList}\item 
+int \hyperlink{class_simple_recording_configuration_afcd4ac5d77fc4e358746db9127186e94}{get\+Thread\+Count\+To\+Start} ()
+\begin{DoxyCompactList}\small\item\em Gets amount of threads to start. \end{DoxyCompactList}\item 
+void \hyperlink{class_simple_recording_configuration_a1405dd8e98b6238b9368a8c36d712b04}{set\+Thread\+Count\+To\+Start} (int amount\+Of\+Threads)
+\begin{DoxyCompactList}\small\item\em Sets thread count to start. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+A simple recording configuration which allows to specify only the required attributes manually. In contrast to \hyperlink{class_recording_configuration}{Recording\+Configuration} no concatenation of outputfolder, timestamps etc. is done here. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_simple_recording_configuration_ae28ce09b38e1029cf1eab94ff1a51b9a}{}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}!get\+File\+Name\+String@{get\+File\+Name\+String}}
+\index{get\+File\+Name\+String@{get\+File\+Name\+String}!Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+\subsubsection[{get\+File\+Name\+String}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string Simple\+Recording\+Configuration\+::get\+File\+Name\+String (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_simple_recording_configuration_ae28ce09b38e1029cf1eab94ff1a51b9a}
+
+
+Gets file name prefix as string. 
+
+\begin{DoxyReturn}{Returns}
+The file name string. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_recording_configuration_a7f46e556537cc8628e63240889b93cc5}{I\+Recording\+Configuration}.
+
+\hypertarget{class_simple_recording_configuration_a9b46181e3fcf6b8b27f33ae878f45b0e}{}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}!get\+Full\+Recording\+Path\+String@{get\+Full\+Recording\+Path\+String}}
+\index{get\+Full\+Recording\+Path\+String@{get\+Full\+Recording\+Path\+String}!Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+\subsubsection[{get\+Full\+Recording\+Path\+String}]{\setlength{\rightskip}{0pt plus 5cm}std\+::string Simple\+Recording\+Configuration\+::get\+Full\+Recording\+Path\+String (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_simple_recording_configuration_a9b46181e3fcf6b8b27f33ae878f45b0e}
+
+
+Gets full recording path string. 
+
+\begin{DoxyReturn}{Returns}
+The full recording path string. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_recording_configuration_af5718b10c42674441d23b0b403367908}{I\+Recording\+Configuration}.
+
+\hypertarget{class_simple_recording_configuration_a571a390604684c9b5de9467e12e23c43}{}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}!get\+Max\+Number\+Of\+Frames@{get\+Max\+Number\+Of\+Frames}}
+\index{get\+Max\+Number\+Of\+Frames@{get\+Max\+Number\+Of\+Frames}!Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+\subsubsection[{get\+Max\+Number\+Of\+Frames}]{\setlength{\rightskip}{0pt plus 5cm}int Simple\+Recording\+Configuration\+::get\+Max\+Number\+Of\+Frames (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_simple_recording_configuration_a571a390604684c9b5de9467e12e23c43}
+
+
+Gets maximum number of frames to record. 
+
+\begin{DoxyReturn}{Returns}
+The maximum number of frames. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_recording_configuration_a2e2719dabf4824516e7d5919dfb5f189}{I\+Recording\+Configuration}.
+
+\hypertarget{class_simple_recording_configuration_af68ce5a5bea0bf9da25e95266c684f56}{}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}!get\+Record\+File\+Format@{get\+Record\+File\+Format}}
+\index{get\+Record\+File\+Format@{get\+Record\+File\+Format}!Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+\subsubsection[{get\+Record\+File\+Format}]{\setlength{\rightskip}{0pt plus 5cm}Recording\+File\+Format Simple\+Recording\+Configuration\+::get\+Record\+File\+Format (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_simple_recording_configuration_af68ce5a5bea0bf9da25e95266c684f56}
+
+
+Gets record file format. 
+
+\begin{DoxyReturn}{Returns}
+The record file format. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_recording_configuration_aae376a55c4992f0223e877c28c3bfed9}{I\+Recording\+Configuration}.
+
+\hypertarget{class_simple_recording_configuration_afcd4ac5d77fc4e358746db9127186e94}{}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}!get\+Thread\+Count\+To\+Start@{get\+Thread\+Count\+To\+Start}}
+\index{get\+Thread\+Count\+To\+Start@{get\+Thread\+Count\+To\+Start}!Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+\subsubsection[{get\+Thread\+Count\+To\+Start}]{\setlength{\rightskip}{0pt plus 5cm}int Simple\+Recording\+Configuration\+::get\+Thread\+Count\+To\+Start (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_simple_recording_configuration_afcd4ac5d77fc4e358746db9127186e94}
+
+
+Gets amount of threads to start. 
+
+\begin{DoxyReturn}{Returns}
+The amount of threads to start. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_recording_configuration_a8148f1b3dfb5cafb347337c913058204}{I\+Recording\+Configuration}.
+
+\hypertarget{class_simple_recording_configuration_aa62572bce9d1031272ef1e2e43d8f524}{}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}!is\+Record\+Configuration\+Valid@{is\+Record\+Configuration\+Valid}}
+\index{is\+Record\+Configuration\+Valid@{is\+Record\+Configuration\+Valid}!Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+\subsubsection[{is\+Record\+Configuration\+Valid}]{\setlength{\rightskip}{0pt plus 5cm}bool Simple\+Recording\+Configuration\+::is\+Record\+Configuration\+Valid (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_simple_recording_configuration_aa62572bce9d1031272ef1e2e43d8f524}
+
+
+Query if the \hyperlink{class_simple_recording_configuration}{Simple\+Recording\+Configuration} is record configuration valid meaning all necessary values are set. 
+
+\begin{DoxyReturn}{Returns}
+true if record configuration valid, false if not. 
+\end{DoxyReturn}
+\hypertarget{class_simple_recording_configuration_a87d0cf9356d24d1c6c7bb1bd6ad238ad}{}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}!is\+Recording\+Duration\+Un\+Limited@{is\+Recording\+Duration\+Un\+Limited}}
+\index{is\+Recording\+Duration\+Un\+Limited@{is\+Recording\+Duration\+Un\+Limited}!Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+\subsubsection[{is\+Recording\+Duration\+Un\+Limited}]{\setlength{\rightskip}{0pt plus 5cm}bool Simple\+Recording\+Configuration\+::is\+Recording\+Duration\+Un\+Limited (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)\hspace{0.3cm}{\ttfamily [virtual]}}\label{class_simple_recording_configuration_a87d0cf9356d24d1c6c7bb1bd6ad238ad}
+
+
+Query if recording duration unlimited. 
+
+\begin{DoxyReturn}{Returns}
+true if recording duration un limited, false if not. 
+\end{DoxyReturn}
+
+
+Implements \hyperlink{class_i_recording_configuration_a001a4ba0282d154f014c8e35f43e212a}{I\+Recording\+Configuration}.
+
+\hypertarget{class_simple_recording_configuration_aa22a7a67d3424ede25e3cb56ef0299c5}{}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}!set\+File\+Name\+String@{set\+File\+Name\+String}}
+\index{set\+File\+Name\+String@{set\+File\+Name\+String}!Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+\subsubsection[{set\+File\+Name\+String}]{\setlength{\rightskip}{0pt plus 5cm}void Simple\+Recording\+Configuration\+::set\+File\+Name\+String (
+\begin{DoxyParamCaption}
+\item[{std\+::string}]{the\+File\+Prefix}
+\end{DoxyParamCaption}
+)}\label{class_simple_recording_configuration_aa22a7a67d3424ede25e3cb56ef0299c5}
+
+
+Sets file name given as string. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em the\+File\+Prefix} & the file prefix. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_simple_recording_configuration_ad79cfd752bd8095be050ff4d39fcc900}{}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}!set\+Full\+Recording\+Path\+String@{set\+Full\+Recording\+Path\+String}}
+\index{set\+Full\+Recording\+Path\+String@{set\+Full\+Recording\+Path\+String}!Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+\subsubsection[{set\+Full\+Recording\+Path\+String}]{\setlength{\rightskip}{0pt plus 5cm}void Simple\+Recording\+Configuration\+::set\+Full\+Recording\+Path\+String (
+\begin{DoxyParamCaption}
+\item[{std\+::string}]{full\+Recordin\+Gapth}
+\end{DoxyParamCaption}
+)}\label{class_simple_recording_configuration_ad79cfd752bd8095be050ff4d39fcc900}
+
+
+Sets full recording path string. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em full\+Recordin\+Gapth} & The full recording gapth. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_simple_recording_configuration_aecd02808bbcaf8a2b613b2d705dbcf24}{}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}!set\+Max\+Number\+Of\+Frames@{set\+Max\+Number\+Of\+Frames}}
+\index{set\+Max\+Number\+Of\+Frames@{set\+Max\+Number\+Of\+Frames}!Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+\subsubsection[{set\+Max\+Number\+Of\+Frames}]{\setlength{\rightskip}{0pt plus 5cm}void Simple\+Recording\+Configuration\+::set\+Max\+Number\+Of\+Frames (
+\begin{DoxyParamCaption}
+\item[{int}]{new\+Max\+Number\+Of\+Frames}
+\end{DoxyParamCaption}
+)}\label{class_simple_recording_configuration_aecd02808bbcaf8a2b613b2d705dbcf24}
+
+
+Sets maximum number of frames to record. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em new\+Max\+Number\+Of\+Frames} & The new maximum number of frames. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_simple_recording_configuration_affd217f70efb4b5aa41657ec57bdd6b8}{}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}!set\+Record\+File\+Format@{set\+Record\+File\+Format}}
+\index{set\+Record\+File\+Format@{set\+Record\+File\+Format}!Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+\subsubsection[{set\+Record\+File\+Format}]{\setlength{\rightskip}{0pt plus 5cm}void Simple\+Recording\+Configuration\+::set\+Record\+File\+Format (
+\begin{DoxyParamCaption}
+\item[{Recording\+File\+Format}]{fileformat}
+\end{DoxyParamCaption}
+)}\label{class_simple_recording_configuration_affd217f70efb4b5aa41657ec57bdd6b8}
+
+
+Sets record file format. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em fileformat} & The fileformat. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_simple_recording_configuration_a1405dd8e98b6238b9368a8c36d712b04}{}\index{Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}!set\+Thread\+Count\+To\+Start@{set\+Thread\+Count\+To\+Start}}
+\index{set\+Thread\+Count\+To\+Start@{set\+Thread\+Count\+To\+Start}!Simple\+Recording\+Configuration@{Simple\+Recording\+Configuration}}
+\subsubsection[{set\+Thread\+Count\+To\+Start}]{\setlength{\rightskip}{0pt plus 5cm}void Simple\+Recording\+Configuration\+::set\+Thread\+Count\+To\+Start (
+\begin{DoxyParamCaption}
+\item[{int}]{amount\+Of\+Threads}
+\end{DoxyParamCaption}
+)}\label{class_simple_recording_configuration_a1405dd8e98b6238b9368a8c36d712b04}
+
+
+Sets thread count to start. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em amount\+Of\+Threads} & The amount of threads. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Simple\+Recording\+Configuration.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Simple\+Recording\+Configuration.\+cpp\end{DoxyCompactItemize}

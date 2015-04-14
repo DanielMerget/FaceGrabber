@@ -1,0 +1,77 @@
+\hypertarget{class_kinect_file_writer_thread}{}\section{Kinect\+File\+Writer\+Thread$<$ Point\+Cloud\+Type $>$ Class Template Reference}
+\label{class_kinect_file_writer_thread}\index{Kinect\+File\+Writer\+Thread$<$ Point\+Cloud\+Type $>$@{Kinect\+File\+Writer\+Thread$<$ Point\+Cloud\+Type $>$}}
+
+
+A kinect file writer thread supposed to write Point Cloud files in the given generates to the hard disk. Cloud\+Measurements are pulled from the set source.  
+
+
+
+
+{\ttfamily \#include $<$Kinect\+File\+Writer\+Thread.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \hyperlink{class_kinect_file_writer_thread_a01f9ee028eaa9d7c589450b559073de8}{write\+Clouds\+To\+File} (I\+Recording\+Configuration\+Ptr recording\+Configuration)
+\begin{DoxyCompactList}\small\item\em Writes point clouds to the hard disc as specified in the recording configuration. Poit Clouds are pulled from the \hyperlink{class_cloud_measurement_source}{Cloud\+Measurement\+Source}. \end{DoxyCompactList}\item 
+void \hyperlink{class_kinect_file_writer_thread_a637b890fa3e51e7aacfcf7e673e0203b}{set\+Kinect\+Cloud\+Output\+Writer} (\hyperlink{class_cloud_measurement_source}{Cloud\+Measurement\+Source}$<$ Point\+Cloud\+Type $>$ $\ast$source)
+\begin{DoxyCompactList}\small\item\em Sets kinect cloud output writer for pulling the Cloud\+Measurements to be written. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_kinect_file_writer_thread_ad8c1969775c3b52166630f7258eba0bc}{}\hyperlink{class_cloud_measurement_source}{Cloud\+Measurement\+Source}$<$ Point\+Cloud\+Type $>$ $\ast$ \hyperlink{class_kinect_file_writer_thread_ad8c1969775c3b52166630f7258eba0bc}{m\+\_\+source}\label{class_kinect_file_writer_thread_ad8c1969775c3b52166630f7258eba0bc}
+
+\begin{DoxyCompactList}\small\item\em Source for Cloud\+Measurements. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+\subsubsection*{template$<$class Point\+Cloud\+Type$>$class Kinect\+File\+Writer\+Thread$<$ Point\+Cloud\+Type $>$}
+
+A kinect file writer thread supposed to write Point Cloud files in the given generates to the hard disk. Cloud\+Measurements are pulled from the set source. 
+
+
+\begin{DoxyTemplParams}{Template Parameters}
+{\em Point\+Cloud\+Type} & Type of the point cloud type. \\
+\hline
+\end{DoxyTemplParams}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{class_kinect_file_writer_thread_a637b890fa3e51e7aacfcf7e673e0203b}{}\index{Kinect\+File\+Writer\+Thread@{Kinect\+File\+Writer\+Thread}!set\+Kinect\+Cloud\+Output\+Writer@{set\+Kinect\+Cloud\+Output\+Writer}}
+\index{set\+Kinect\+Cloud\+Output\+Writer@{set\+Kinect\+Cloud\+Output\+Writer}!Kinect\+File\+Writer\+Thread@{Kinect\+File\+Writer\+Thread}}
+\subsubsection[{set\+Kinect\+Cloud\+Output\+Writer}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Point\+Cloud\+Type $>$ void {\bf Kinect\+File\+Writer\+Thread}$<$ Point\+Cloud\+Type $>$\+::set\+Kinect\+Cloud\+Output\+Writer (
+\begin{DoxyParamCaption}
+\item[{{\bf Cloud\+Measurement\+Source}$<$ Point\+Cloud\+Type $>$ $\ast$}]{source}
+\end{DoxyParamCaption}
+)}\label{class_kinect_file_writer_thread_a637b890fa3e51e7aacfcf7e673e0203b}
+
+
+Sets kinect cloud output writer for pulling the Cloud\+Measurements to be written. 
+
+
+\begin{DoxyParams}[1]{Parameters}
+\mbox{\tt in,out}  & {\em source} & If non-\/null, source for the. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_kinect_file_writer_thread_a01f9ee028eaa9d7c589450b559073de8}{}\index{Kinect\+File\+Writer\+Thread@{Kinect\+File\+Writer\+Thread}!write\+Clouds\+To\+File@{write\+Clouds\+To\+File}}
+\index{write\+Clouds\+To\+File@{write\+Clouds\+To\+File}!Kinect\+File\+Writer\+Thread@{Kinect\+File\+Writer\+Thread}}
+\subsubsection[{write\+Clouds\+To\+File}]{\setlength{\rightskip}{0pt plus 5cm}template$<$typename Point\+Cloud\+Type $>$ void {\bf Kinect\+File\+Writer\+Thread}$<$ Point\+Cloud\+Type $>$\+::write\+Clouds\+To\+File (
+\begin{DoxyParamCaption}
+\item[{I\+Recording\+Configuration\+Ptr}]{recording\+Configuration}
+\end{DoxyParamCaption}
+)}\label{class_kinect_file_writer_thread_a01f9ee028eaa9d7c589450b559073de8}
+
+
+Writes point clouds to the hard disc as specified in the recording configuration. Poit Clouds are pulled from the \hyperlink{class_cloud_measurement_source}{Cloud\+Measurement\+Source}. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em recording\+Configuration} & The recording configuration. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Kinect\+File\+Writer\+Thread.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Kinect\+File\+Writer\+Thread.\+cpp\end{DoxyCompactItemize}

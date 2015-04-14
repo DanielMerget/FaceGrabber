@@ -1,0 +1,177 @@
+\hypertarget{class_record_tab_handler}{}\section{Record\+Tab\+Handler Class Reference}
+\label{class_record_tab_handler}\index{Record\+Tab\+Handler@{Record\+Tab\+Handler}}
+
+
+Record\+Tab\+Handle handles all user inputs and configures the \hyperlink{class_recording_configuration}{Recording\+Configuration} used to record point cloud files. If requested by the user, the \hyperlink{class_record_tab_handler}{Record\+Tab\+Handler} fires the start\+Writing and stop\+Writing signals providing the \hyperlink{class_recording_configuration}{Recording\+Configuration}.  
+
+
+
+
+{\ttfamily \#include $<$Record\+Tab\+Handler.\+h$>$}
+
+Inheritance diagram for Record\+Tab\+Handler\+:\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=2.000000cm]{class_record_tab_handler}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_record_tab_handler_a17ea59082d2d9e7638fffc96a9f0717b}{}void \hyperlink{class_record_tab_handler_a17ea59082d2d9e7638fffc96a9f0717b}{on\+Create} ()\label{class_record_tab_handler_a17ea59082d2d9e7638fffc96a9f0717b}
+
+\begin{DoxyCompactList}\small\item\em Creates the user interface. \end{DoxyCompactList}\item 
+void \hyperlink{class_record_tab_handler_a0c51292366cbd2519ca702505a9a3b2e}{set\+Shared\+Recording\+Configuration} (Shared\+Recording\+Configuration recording\+Configuration)
+\begin{DoxyCompactList}\small\item\em Sets shared recording configuration. \end{DoxyCompactList}\item 
+Shared\+Recording\+Configuration \hyperlink{class_record_tab_handler_a141be59e81660f5cf6cff7aa3e527ba8}{get\+Record\+Configuration} ()
+\begin{DoxyCompactList}\small\item\em Getter for the record configuration. \end{DoxyCompactList}\item 
+bool \hyperlink{class_record_tab_handler_a352050f9e525e107a39d202fe592aba4}{is\+Color\+Enabled} ()
+\begin{DoxyCompactList}\small\item\em Queries if a color recording is enabled. \end{DoxyCompactList}\item 
+\hypertarget{class_record_tab_handler_aaa359ad1668615eb6cbf96830f0a6ea6}{}void \hyperlink{class_record_tab_handler_aaa359ad1668615eb6cbf96830f0a6ea6}{recording\+Stopped} ()\label{class_record_tab_handler_aaa359ad1668615eb6cbf96830f0a6ea6}
+
+\begin{DoxyCompactList}\small\item\em Callback\+: Recording has stopped. \end{DoxyCompactList}\item 
+bool \hyperlink{class_record_tab_handler_aae5d39bded2dcc0dfa2fff625807e39b}{is\+Recording} ()
+\begin{DoxyCompactList}\small\item\em Query if the Record\+Tab is currently recording. \end{DoxyCompactList}\item 
+void \hyperlink{class_record_tab_handler_a88ad4f17404ff13c5d85c350b98da388}{update\+Writer\+Status} (Record\+Cloud\+Type type, std\+::wstring status)
+\begin{DoxyCompactList}\small\item\em Updates the writer status with the provided status. \end{DoxyCompactList}\item 
+void \hyperlink{class_record_tab_handler_a95b900a146875e4f73c6019d2266728b}{record\+Path\+Changed} (Record\+Cloud\+Type type)
+\begin{DoxyCompactList}\small\item\em Callback\+: Record path has changed. \end{DoxyCompactList}\item 
+void \hyperlink{class_record_tab_handler_a509e2af90482fd705268242df3e9f21c}{record\+Configuration\+Status\+Changed} (Record\+Cloud\+Type type, bool new\+State)
+\begin{DoxyCompactList}\small\item\em Record configuration status changed. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\hypertarget{class_record_tab_handler_a4c46c36196133f6f24960c4946c0aebc}{}boost\+::signal$<$ void(bool)$>$ \hyperlink{class_record_tab_handler_a4c46c36196133f6f24960c4946c0aebc}{color\+Configuration\+Changed}\label{class_record_tab_handler_a4c46c36196133f6f24960c4946c0aebc}
+
+\begin{DoxyCompactList}\small\item\em The color configuration changed signal\+: color is noew enabled or not. \end{DoxyCompactList}\item 
+\hypertarget{class_record_tab_handler_a714535ef2c737bbde7b9ceff8404e41b}{}boost\+::signal$<$ void(bool, Shared\+Recording\+Configuration)$>$ \hyperlink{class_record_tab_handler_a714535ef2c737bbde7b9ceff8404e41b}{start\+Writing}\label{class_record_tab_handler_a714535ef2c737bbde7b9ceff8404e41b}
+
+\begin{DoxyCompactList}\small\item\em The start writing signal. \end{DoxyCompactList}\item 
+\hypertarget{class_record_tab_handler_a929a4811350c7ff4ffe913d6a7f42c9b}{}boost\+::signal$<$ void(bool, Shared\+Recording\+Configuration)$>$ \hyperlink{class_record_tab_handler_a929a4811350c7ff4ffe913d6a7f42c9b}{stop\+Writing}\label{class_record_tab_handler_a929a4811350c7ff4ffe913d6a7f42c9b}
+
+\begin{DoxyCompactList}\small\item\em The stop writing signal. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Additional Inherited Members}
+
+
+\subsection{Detailed Description}
+Record\+Tab\+Handle handles all user inputs and configures the \hyperlink{class_recording_configuration}{Recording\+Configuration} used to record point cloud files. If requested by the user, the \hyperlink{class_record_tab_handler}{Record\+Tab\+Handler} fires the start\+Writing and stop\+Writing signals providing the \hyperlink{class_recording_configuration}{Recording\+Configuration}. 
+
+\subsection{Member Function Documentation}
+\hypertarget{class_record_tab_handler_a141be59e81660f5cf6cff7aa3e527ba8}{}\index{Record\+Tab\+Handler@{Record\+Tab\+Handler}!get\+Record\+Configuration@{get\+Record\+Configuration}}
+\index{get\+Record\+Configuration@{get\+Record\+Configuration}!Record\+Tab\+Handler@{Record\+Tab\+Handler}}
+\subsubsection[{get\+Record\+Configuration}]{\setlength{\rightskip}{0pt plus 5cm}Shared\+Recording\+Configuration Record\+Tab\+Handler\+::get\+Record\+Configuration (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_record_tab_handler_a141be59e81660f5cf6cff7aa3e527ba8}
+
+
+Getter for the record configuration. 
+
+\begin{DoxyReturn}{Returns}
+The record configuration. 
+\end{DoxyReturn}
+\hypertarget{class_record_tab_handler_a352050f9e525e107a39d202fe592aba4}{}\index{Record\+Tab\+Handler@{Record\+Tab\+Handler}!is\+Color\+Enabled@{is\+Color\+Enabled}}
+\index{is\+Color\+Enabled@{is\+Color\+Enabled}!Record\+Tab\+Handler@{Record\+Tab\+Handler}}
+\subsubsection[{is\+Color\+Enabled}]{\setlength{\rightskip}{0pt plus 5cm}bool Record\+Tab\+Handler\+::is\+Color\+Enabled (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_record_tab_handler_a352050f9e525e107a39d202fe592aba4}
+
+
+Queries if a color recording is enabled. 
+
+\begin{DoxyReturn}{Returns}
+true if a color is enabled, false if not. 
+\end{DoxyReturn}
+\hypertarget{class_record_tab_handler_aae5d39bded2dcc0dfa2fff625807e39b}{}\index{Record\+Tab\+Handler@{Record\+Tab\+Handler}!is\+Recording@{is\+Recording}}
+\index{is\+Recording@{is\+Recording}!Record\+Tab\+Handler@{Record\+Tab\+Handler}}
+\subsubsection[{is\+Recording}]{\setlength{\rightskip}{0pt plus 5cm}bool Record\+Tab\+Handler\+::is\+Recording (
+\begin{DoxyParamCaption}
+{}
+\end{DoxyParamCaption}
+)}\label{class_record_tab_handler_aae5d39bded2dcc0dfa2fff625807e39b}
+
+
+Query if the Record\+Tab is currently recording. 
+
+\begin{DoxyReturn}{Returns}
+true if recording, false if not. 
+\end{DoxyReturn}
+\hypertarget{class_record_tab_handler_a509e2af90482fd705268242df3e9f21c}{}\index{Record\+Tab\+Handler@{Record\+Tab\+Handler}!record\+Configuration\+Status\+Changed@{record\+Configuration\+Status\+Changed}}
+\index{record\+Configuration\+Status\+Changed@{record\+Configuration\+Status\+Changed}!Record\+Tab\+Handler@{Record\+Tab\+Handler}}
+\subsubsection[{record\+Configuration\+Status\+Changed}]{\setlength{\rightskip}{0pt plus 5cm}void Record\+Tab\+Handler\+::record\+Configuration\+Status\+Changed (
+\begin{DoxyParamCaption}
+\item[{Record\+Cloud\+Type}]{type, }
+\item[{bool}]{new\+State}
+\end{DoxyParamCaption}
+)}\label{class_record_tab_handler_a509e2af90482fd705268242df3e9f21c}
+
+
+Record configuration status changed. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & The type of the record configuration which has changed. \\
+\hline
+{\em new\+State} & true if the configuration is now enabled, otherwise it is disabled. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_record_tab_handler_a95b900a146875e4f73c6019d2266728b}{}\index{Record\+Tab\+Handler@{Record\+Tab\+Handler}!record\+Path\+Changed@{record\+Path\+Changed}}
+\index{record\+Path\+Changed@{record\+Path\+Changed}!Record\+Tab\+Handler@{Record\+Tab\+Handler}}
+\subsubsection[{record\+Path\+Changed}]{\setlength{\rightskip}{0pt plus 5cm}void Record\+Tab\+Handler\+::record\+Path\+Changed (
+\begin{DoxyParamCaption}
+\item[{Record\+Cloud\+Type}]{type}
+\end{DoxyParamCaption}
+)}\label{class_record_tab_handler_a95b900a146875e4f73c6019d2266728b}
+
+
+Callback\+: Record path has changed. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & The type of the Cloud which path has changed. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_record_tab_handler_a0c51292366cbd2519ca702505a9a3b2e}{}\index{Record\+Tab\+Handler@{Record\+Tab\+Handler}!set\+Shared\+Recording\+Configuration@{set\+Shared\+Recording\+Configuration}}
+\index{set\+Shared\+Recording\+Configuration@{set\+Shared\+Recording\+Configuration}!Record\+Tab\+Handler@{Record\+Tab\+Handler}}
+\subsubsection[{set\+Shared\+Recording\+Configuration}]{\setlength{\rightskip}{0pt plus 5cm}void Record\+Tab\+Handler\+::set\+Shared\+Recording\+Configuration (
+\begin{DoxyParamCaption}
+\item[{Shared\+Recording\+Configuration}]{recording\+Configuration}
+\end{DoxyParamCaption}
+)}\label{class_record_tab_handler_a0c51292366cbd2519ca702505a9a3b2e}
+
+
+Sets shared recording configuration. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em recording\+Configuration} & The recording configuration. \\
+\hline
+\end{DoxyParams}
+\hypertarget{class_record_tab_handler_a88ad4f17404ff13c5d85c350b98da388}{}\index{Record\+Tab\+Handler@{Record\+Tab\+Handler}!update\+Writer\+Status@{update\+Writer\+Status}}
+\index{update\+Writer\+Status@{update\+Writer\+Status}!Record\+Tab\+Handler@{Record\+Tab\+Handler}}
+\subsubsection[{update\+Writer\+Status}]{\setlength{\rightskip}{0pt plus 5cm}void Record\+Tab\+Handler\+::update\+Writer\+Status (
+\begin{DoxyParamCaption}
+\item[{Record\+Cloud\+Type}]{type, }
+\item[{std\+::wstring}]{status}
+\end{DoxyParamCaption}
+)}\label{class_record_tab_handler_a88ad4f17404ff13c5d85c350b98da388}
+
+
+Updates the writer status with the provided status. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em type} & The type of the writer whose status has changed. \\
+\hline
+{\em status} & The new status. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Record\+Tab\+Handler.\+h\item 
+C\+:/\+Users/\+Martin/\+Documents/idp-\/kinecthdfacegrabber/Record\+Tab\+Handler.\+cpp\end{DoxyCompactItemize}
