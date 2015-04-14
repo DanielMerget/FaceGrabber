@@ -108,6 +108,11 @@ void PCLInputReader< PointType >::startReaderThreads(bool isSingleThreatedReadin
 	m_numOfFilesRead = 0;
 	m_playbackConfiguration.sortCloudFilesForPlayback();
 	m_buffer->enableBuffer();
+
+	std::wstringstream statusMessage;
+	statusMessage << "read: " << 0 << "/" << m_playbackConfiguration.getCloudFilesToPlay().size();
+	updateStatus(statusMessage.str());
+	
 	if (isSingleThreatedReadingAndBlocking){
 		createAndStartThreadForIndex(0, 1);
 

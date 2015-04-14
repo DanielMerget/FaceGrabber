@@ -303,6 +303,7 @@ pcl::PointCloud<pcl::PointXYZRGB>::Ptr ColoredOutputStreamUpdater::convertDepthB
 	//distance between color camera and depth camera
 	//only store the depth of the closest of those depth points to be able to ignore those depth points later on
 	//which are not seen by the color camera
+	//algorithm similar to z-Buffering/Shadow Mapping/Kinect Fusion Explorer Sample
 	for (const UINT16* pDepth = m_depthBuffer; pDepth < pDepthEnd; pDepth++, pColorPoint++)
 	{
 		//color cam resolution is 1920x1080; depth: 512x424 => divide the color coodinates by 4 to be able
