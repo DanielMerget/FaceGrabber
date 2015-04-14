@@ -7,4 +7,5 @@ Required Libraries/Dependencies:
 - Eigen
 - OpenCV
 - QT (4.8.5)
-
+- OpenNI
+- Kinect API 2.0
