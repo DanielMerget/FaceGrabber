@@ -310,7 +310,7 @@ void KinectHDFaceGrabber::update()
 			hr = depthFrame->CopyFrameDataToArray(m_depthBuffer.size(), &m_depthBuffer[0]);
 		}
 		if (SUCCEEDED(hr)){
-			updateHDFaceAndColor();
+			renderColorFrameAndProcessFaces();
 		}
 				
 	}
