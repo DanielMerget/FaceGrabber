@@ -180,6 +180,10 @@ void PlaybackTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 	{
 		WCHAR szDir[MAX_PATH];
 		if (WindowsAppDialogHelper::openDirectoryDialog(szDir, m_hWnd)){
+			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+				auto fullPath = RecordingConfiguration::getFullRecordingPathForCloudType(static_cast<RecordCloudType>(i), szDir, "");
+				m_playbackConfiguration[i]->setFullFilePath(fullPath);
+			}
 			DlgDirList(m_hWnd,
 				szDir,
 				IDC_RECODINGS_LIST_BOX,
