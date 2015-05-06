@@ -98,7 +98,14 @@ void PCLViewer::matchPointCloudsToViewPorts(pcl::visualization::PCLVisualizer::P
 		viewer->setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 3, m_cloudIDs[i]);
 		viewer->createViewPortCamera(m_viewPorts[i]);
 	}
+	
+	//Fix for initial CoordinateSystem Rotation
+	viewer->setCameraPosition(0, 0, -1, 0, 1, 1, 0);
+
 	viewer->resetCamera();
+
+	//Debug Coordinates
+	//viewer->addCoordinateSystem(0.1);
 }
 void PCLViewer::updateLoop()
 {
