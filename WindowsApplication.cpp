@@ -268,8 +268,8 @@ void WindowsApplication::initTabs()
 	GetWindowRect(tabControlHandle, &tabControlRect);
 
 	//create subwindow for the color live stream
-	const int width = 869;
-	const int height = 489;
+	const int width = 840;
+	const int height = (width / 16) * 9;
 	const int xPos = (windowRect.right - windowRect.left - width) / 2;
 	m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, tabControlRect.top, width, height, m_hWnd, NULL, m_hInstance, NULL);
 }
