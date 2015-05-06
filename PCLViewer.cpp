@@ -100,11 +100,11 @@ void PCLViewer::matchPointCloudsToViewPorts(pcl::visualization::PCLVisualizer::P
 	}
 	
 	//Fix for initial CoordinateSystem Rotation
-	viewer->setCameraPosition(0, 0, -1, 0, 1, 1, 0);
+	viewer->setCameraPosition(0, 0, -1, 0, 1, 0, 0);
 
 	viewer->resetCamera();
 
-	//Debug Coordinates
+	//Debug CoordinateSystem
 	//viewer->addCoordinateSystem(0.1);
 }
 void PCLViewer::updateLoop()
