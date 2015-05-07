@@ -334,6 +334,25 @@ void KinectHDFaceGrabber::renderColorFrameAndProcessFaces()
         {
             // Draw the data with Direct2D
             hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_colorBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+
+			/*
+			// View Depth Sensor Output
+			std::vector<RGBQUAD> depth(1920 * 1080);
+			int row;
+			int col;
+			int value;
+
+			for (int i = 0; i < (1920 * 1080); i++)
+			{
+				col = i % 1920;
+				row = (i - col) / 1920;
+				value = static_cast<UINT8>((m_depthBuffer[((row % m_depthHeight) * m_depthWidth + (col % m_depthWidth))] / 30) % 256);
+				depth[i].rgbRed = value;
+				depth[i].rgbGreen = value;
+				depth[i].rgbBlue = value;
+			}
+			hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(depth.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+			*/
         }
         else
         {
