@@ -17,8 +17,12 @@ void UncoloredOutputStreamsUpdater::allocateClouds()
 {
 	m_HDFacePointCloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud <pcl::PointXYZ>());
 	m_HDFacePointCloud->is_dense = false;
+	m_HDFacePointCloud_centered = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud <pcl::PointXYZ>());
+	m_HDFacePointCloud_centered->is_dense = false;
 	m_FaceRawPointCloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud <pcl::PointXYZ>());
 	m_FaceRawPointCloud->is_dense = false;
+	m_FaceRawPointCloud_centered = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud <pcl::PointXYZ>());
+	m_FaceRawPointCloud_centered->is_dense = false;
 }
 void UncoloredOutputStreamsUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer)
 {
@@ -32,36 +36,43 @@ void UncoloredOutputStreamsUpdater::stopFaceCollection()
 		m_depthBuffer = nullptr;
 		return;
 	}
-	//center the point clouds in the coordinate systems
-	Eigen::Vector4f centroid;
-	pcl::compute3DCentroid(*m_HDFacePointCloud, centroid);
-	Eigen::Vector3f center(-centroid.x(), -centroid.y(), -centroid.z());
-	Eigen::Matrix4f m = Eigen::Affine3f(Eigen::Translation3f(center)).matrix();
 
-	pcl::transformPointCloud(*m_HDFacePointCloud, *m_HDFacePointCloud, m);
-	pcl::transformPointCloud(*m_FaceRawPointCloud, *m_FaceRawPointCloud, m);
 
 	//update HDFace & Raw Face Depth
 	if (!cloudsUpdated.empty()){
+
+		//center the point clouds for viewer
+		Eigen::Vector4f centroid;
+		pcl::compute3DCentroid(*m_HDFacePointCloud, centroid);
+		Eigen::Vector3f center(-centroid.x(), -centroid.y(), -centroid.z());
+		Eigen::Matrix4f m = Eigen::Affine3f(Eigen::Translation3f(center)).matrix();
+
+		pcl::transformPointCloud(*m_HDFacePointCloud, *m_HDFacePointCloud_centered, m);
+		pcl::transformPointCloud(*m_FaceRawPointCloud, *m_FaceRawPointCloud_centered, m);
+
 		std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> updatedClouds;
-		updatedClouds.push_back(m_HDFacePointCloud);
-		updatedClouds.push_back(m_FaceRawPointCloud);
+		updatedClouds.push_back(m_HDFacePointCloud_centered);
+		updatedClouds.push_back(m_FaceRawPointCloud_centered);
+		//update viewer
 		cloudsUpdated(updatedClouds);
 	}
 
 	//HDface
 	if (!cloudUpdated[0].empty()){
+		// update writer
 		cloudUpdated[0](m_HDFacePointCloud);
 	}
 
 	//Raw Face Depth
 	if (!cloudUpdated[1].empty()){
+		// update writer
 		cloudUpdated[1](m_FaceRawPointCloud);
 	}
 
 	//create the full depth only if requested und notify
 	if (!cloudUpdated[2].empty()){
 		auto fullDepthBufferCloud = convertDepthBufferToPointCloud();
+		// update writer
 		cloudUpdated[2](fullDepthBufferCloud);
 	}
 	m_depthBuffer = nullptr;

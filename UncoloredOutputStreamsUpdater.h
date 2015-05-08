@@ -128,8 +128,14 @@ private:
 	/** \brief	The HD face point cloud buffer. */
 	pcl::PointCloud<pcl::PointXYZ>::Ptr m_HDFacePointCloud;
 
+	/** \brief	The centered HD face point cloud buffer. */
+	pcl::PointCloud<pcl::PointXYZ>::Ptr m_HDFacePointCloud_centered;
+
 	/** \brief	The face raw point cloud. buffer */
 	pcl::PointCloud<pcl::PointXYZ>::Ptr m_FaceRawPointCloud;
+
+	/** \brief	The centred face raw point cloud. buffer */
+	pcl::PointCloud<pcl::PointXYZ>::Ptr m_FaceRawPointCloud_centered;
 
 	/** \brief	true if this object is valid face frame. */
 	bool m_isValidFaceFrame;

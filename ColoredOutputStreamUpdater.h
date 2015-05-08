@@ -132,8 +132,14 @@ private:
 	/** \brief	The HD face point cloud. */
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_HDFacePointCloud;
 
+	/** \brief	The centered HD face point cloud. */
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_HDFacePointCloud_centered;
+
 	/** \brief	The face raw point cloud. */
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_FaceRawPointCloud;
+
+	/** \brief	The centered face raw point cloud. */
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_FaceRawPointCloud_centered;
 	
 
 	/** \brief	The depth visibility test map for checking whether color camera is able to see provided depth points. */
