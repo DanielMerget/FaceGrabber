@@ -234,6 +234,15 @@ private:
 	void colorStreamingChangedTo(bool enable);
 
 	/**
+	* \fn	void WindowsApplication::centerRecordingChangedTo(bool enable);
+	*
+	* \brief	Switches the OutputStreamUpdaterStragedy to centered or non-centered recording
+	*
+	* \param	enable	true to enable color, false to disable.
+	*/
+	void centerRecordingChangedTo(bool enable);
+
+	/**
 	 * \fn	int WindowsApplication::insertTabItem(HWND tab, LPTSTR text, int tabid);
 	 *
 	 * \brief	Inserts a tab item into Windows Application tap-control

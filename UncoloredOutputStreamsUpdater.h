@@ -78,6 +78,15 @@ public:
 	 */
 	void stopFaceCollection();
 
+	/**
+	* \fn	void RecordTabHandler::setCeterEnabled(bool enable);
+	*
+	* \brief	Enables or disables the centering of recorded Clouds.
+	*
+	* \param	enable	true to enable, false to disable.
+	*/
+	void setCeterEnabled(bool enable);
+
 private:
 
 	/**
@@ -139,6 +148,9 @@ private:
 
 	/** \brief	true if this object is valid face frame. */
 	bool m_isValidFaceFrame;
+
+	/** \brief	true to enable, false to disable the centering. */
+	bool m_centerEnabled;
 
 	/** \brief	Buffer for depth data. */
 	UINT16*	m_depthBuffer;

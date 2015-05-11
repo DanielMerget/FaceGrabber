@@ -4,6 +4,7 @@
 #include <pcl/common/transforms.h>
 
 UncoloredOutputStreamsUpdater::UncoloredOutputStreamsUpdater() :
+m_centerEnabled(false),
 m_depthBuffer(nullptr)
 {
 }
@@ -24,6 +25,12 @@ void UncoloredOutputStreamsUpdater::allocateClouds()
 	m_FaceRawPointCloud_centered = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud <pcl::PointXYZ>());
 	m_FaceRawPointCloud_centered->is_dense = false;
 }
+
+void UncoloredOutputStreamsUpdater::setCeterEnabled(bool enable)
+{
+	m_centerEnabled = enable;
+}
+
 void UncoloredOutputStreamsUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer)
 {
 	m_depthBuffer = depthBuffer;
@@ -37,19 +44,17 @@ void UncoloredOutputStreamsUpdater::stopFaceCollection()
 		return;
 	}
 
+	//center the point clouds
+	Eigen::Vector4f centroid;
+	pcl::compute3DCentroid(*m_HDFacePointCloud, centroid);
+	Eigen::Vector3f center(-centroid.x(), -centroid.y(), -centroid.z());
+	Eigen::Matrix4f m = Eigen::Affine3f(Eigen::Translation3f(center)).matrix();
+
+	pcl::transformPointCloud(*m_HDFacePointCloud, *m_HDFacePointCloud_centered, m);
+	pcl::transformPointCloud(*m_FaceRawPointCloud, *m_FaceRawPointCloud_centered, m);
 
 	//update HDFace & Raw Face Depth
 	if (!cloudsUpdated.empty()){
-
-		//center the point clouds for viewer
-		Eigen::Vector4f centroid;
-		pcl::compute3DCentroid(*m_HDFacePointCloud, centroid);
-		Eigen::Vector3f center(-centroid.x(), -centroid.y(), -centroid.z());
-		Eigen::Matrix4f m = Eigen::Affine3f(Eigen::Translation3f(center)).matrix();
-
-		pcl::transformPointCloud(*m_HDFacePointCloud, *m_HDFacePointCloud_centered, m);
-		pcl::transformPointCloud(*m_FaceRawPointCloud, *m_FaceRawPointCloud_centered, m);
-
 		std::vector<pcl::PointCloud<pcl::PointXYZ>::Ptr> updatedClouds;
 		updatedClouds.push_back(m_HDFacePointCloud_centered);
 		updatedClouds.push_back(m_FaceRawPointCloud_centered);
@@ -60,13 +65,15 @@ void UncoloredOutputStreamsUpdater::stopFaceCollection()
 	//HDface
 	if (!cloudUpdated[0].empty()){
 		// update writer
-		cloudUpdated[0](m_HDFacePointCloud);
+		if (m_centerEnabled) cloudUpdated[0](m_HDFacePointCloud_centered);
+		else cloudUpdated[0](m_HDFacePointCloud);
 	}
 
 	//Raw Face Depth
 	if (!cloudUpdated[1].empty()){
 		// update writer
-		cloudUpdated[1](m_FaceRawPointCloud);
+		if (m_centerEnabled) cloudUpdated[1](m_FaceRawPointCloud_centered);
+		else cloudUpdated[1](m_HDFacePointCloud);
 	}
 
 	//create the full depth only if requested und notify

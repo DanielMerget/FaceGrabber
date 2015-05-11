@@ -224,6 +224,7 @@ void WindowsApplication::initTabs()
 		(DLGPROC)MessageRouterHelper::MessageRouter,
 		reinterpret_cast<LPARAM>(&m_recordTabHandler));
 	m_recordTabHandler.colorConfigurationChanged.connect(boost::bind(&WindowsApplication::colorStreamingChangedTo, this, _1));
+	m_recordTabHandler.centerConfigurationChanged.connect(boost::bind(&WindowsApplication::centerRecordingChangedTo, this, _1));
 	m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1, _2));
 	m_recordTabHandler.stopWriting.connect(boost::bind(&WindowsApplication::stopRecording, this, _1, _2));
 
@@ -554,6 +555,12 @@ void WindowsApplication::colorStreamingChangedTo(bool enable)
 	}
 	//let the PCLViwer know which of the clouds will be updated
 	m_pclFaceViewer->useColoredCloud(enable);
+}
+
+void WindowsApplication::centerRecordingChangedTo(bool enable)
+{
+	m_coloredOutputStreamUpdater->setCeterEnabled(enable);
+	m_uncoloredOutputStreamUpdater->setCeterEnabled(enable);
 }
 
 bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce)

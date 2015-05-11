@@ -7,6 +7,7 @@
 
 RecordTabHandler::RecordTabHandler() : 
 	m_colorEnabled(true),
+	m_centerEnabled(false),
 	m_isRecording(false)
 {
 }
@@ -34,6 +35,7 @@ void RecordTabHandler::onCreate()
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_recordingConfiguration[  FaceRaw	 ]->getFileNameCString());
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX),	m_recordingConfiguration[FullDepthRaw]->getFileNameCString());
 	CheckDlgButton(m_hWnd, IDC_RECORD_COLOR, m_colorEnabled);
+	CheckDlgButton(m_hWnd, IDC_CENTER_CLOUDS, m_centerEnabled);
 
 	//create combo box items for the recording file formats (ply, pcd, binary etc.)
 	HWND hdFaceComboBox = GetDlgItem(m_hWnd, IDC_HD_FACE_COMBO_BOX);
@@ -70,6 +72,11 @@ void RecordTabHandler::onCreate()
 bool RecordTabHandler::isColorEnabled()
 {
 	return m_colorEnabled;
+}
+
+bool RecordTabHandler::isCenterEnabled()
+{
+	return m_centerEnabled;
 }
 
 void RecordTabHandler::updateWriterStatus(RecordCloudType recordType, std::wstring status)
@@ -201,6 +208,12 @@ void RecordTabHandler::setColorEnabled(bool enable)
 	colorConfigurationChanged(enable);
 }
 
+void RecordTabHandler::setCeterEnabled(bool enable)
+{
+	m_centerEnabled = enable;
+	centerConfigurationChanged(enable);
+}
+
 void RecordTabHandler::updateFrameLimit()
 {
 	bool isLimited = IsDlgButtonChecked(m_hWnd, IDC_LIMIT_FRAMES_CHECK);
@@ -227,6 +240,9 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 	{
 	case IDC_RECORD_COLOR:
 		setColorEnabled(IsDlgButtonChecked(m_hWnd, IDC_RECORD_COLOR));
+		break;
+	case IDC_CENTER_CLOUDS:
+		setCeterEnabled(IsDlgButtonChecked(m_hWnd, IDC_CENTER_CLOUDS));
 		break;
 	case IDC_LIMIT_FRAMES_CHECK:
 	{

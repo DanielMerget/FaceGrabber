@@ -67,6 +67,14 @@ public:
 	 */
 	void stopFaceCollection();
 
+	/**
+	* \fn	void RecordTabHandler::setCeterEnabled(bool enable);
+	*
+	* \brief	Enables or disables the centering of recorded Clouds.
+	*
+	* \param	enable	true to enable, false to disable.
+	*/
+	void setCeterEnabled(bool enable);
 
 	/**
 	* \fn	virtual void OutputStreamsUpdaterStragedy::initialize(ICoordinateMapper* m_pCoordinateMapper, int depthWidth, int depthHeight, int colorWidth, int colorHeight);
@@ -150,6 +158,9 @@ private:
 
 	/** \brief	true if face frame is valid. */
 	bool							m_isValidFaceFrame;
+
+	/** \brief	true to enable, false to disable the centering. */
+	bool m_centerEnabled;
 
 	/** \brief	Buffer for color data. */
 	RGBQUAD* m_colorBuffer;

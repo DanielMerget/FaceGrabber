@@ -58,6 +58,15 @@ public:
 	bool isColorEnabled();
 
 	/**
+	* \fn	bool RecordTabHandler::isCenterEnabled();
+	*
+	* \brief	Queries if a centered recording is enabled.
+	*
+	* \return	true if a centered is enabled, false if not.
+	*/
+	bool isCenterEnabled();
+
+	/**
 	 * \fn	void RecordTabHandler::recordingStopped();
 	 *
 	 * \brief	Callback: Recording has stopped.
@@ -86,6 +95,9 @@ public:
 
 	/** \brief	The color configuration changed signal: color is noew enabled or not. */
 	boost::signal<void(bool)> colorConfigurationChanged;
+
+	/** \brief	The color configuration changed signal: color is noew enabled or not. */
+	boost::signal<void(bool)> centerConfigurationChanged;
 
 	/** \brief	The start writing signal. */
 	boost::signal<void(bool, SharedRecordingConfiguration)> startWriting;
@@ -153,6 +165,16 @@ private:
 	void setColorEnabled(bool enable);
 
 	/**
+	* \fn	void RecordTabHandler::setCeterEnabled(bool enable);
+	*
+	* \brief	Enables or disables the centering of recorded Clouds and notfies listners about that.
+	 * 			(e.g. Windows Application to change the recorded Point Cloud)
+	*
+	* \param	enable	true to enable, false to disable.
+	*/
+	void setCeterEnabled(bool enable);
+
+	/**
 	 * \fn	void RecordTabHandler::updateFrameLimit();
 	 *
 	 * \brief	Updates the frame limit according to the new values in the UI
@@ -168,6 +190,10 @@ private:
 
 	/** \brief	true to enable, false to disable the color. */
 	bool m_colorEnabled;
+
+
+	/** \brief	true to enable, false to disable the centering. */
+	bool m_centerEnabled;
 
 
 	/** \brief	true if recording is running at the moment. */

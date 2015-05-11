@@ -109,6 +109,15 @@ public:
 	 * \brief	Stops face collection/processing.
 	 */
 	virtual void stopFaceCollection() = 0;
+
+	/**
+	* \fn	void RecordTabHandler::setCeterEnabled(bool enable);
+	*
+	* \brief	Enables or disables the centering of recorded Clouds.
+	*
+	* \param	enable	true to enable, false to disable.
+	*/
+	virtual void setCeterEnabled(bool enable) = 0;
 protected:
 	
 	/** \brief	The coordinate mapper. */
