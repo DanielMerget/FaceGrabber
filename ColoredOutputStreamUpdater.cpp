@@ -95,7 +95,7 @@ void ColoredOutputStreamUpdater::stopFaceCollection()
 	if (!cloudUpdated[1].empty()){
 		// update writer
 		if (m_centerEnabled) cloudUpdated[1](m_FaceRawPointCloud_centered);
-		else cloudUpdated[1](m_HDFacePointCloud);
+		else cloudUpdated[1](m_FaceRawPointCloud);
 	}
 
 	//create and update full depth before cloud
