@@ -25,9 +25,13 @@ CString RecordingConfiguration::getFileFormatAsString(RecordingFileFormat fileFo
 	case PLY_BINARY:
 		return CString(L"ply binary");
 	case PCD:
-		return L"pcd";
+		return CString(L"pcd");
 	case PCD_BINARY:
 		return CString(L"pcd binary");
+	case PPM_BINARY:
+		return CString(L"ppm binary");
+	case PGM_BINARY:
+		return CString(L"pgm binary");
 	case RECORD_FILE_FORMAT_COUNT:
 		return CString(L"ERROR");
 	default:
@@ -38,10 +42,10 @@ CString RecordingConfiguration::getFileFormatAsString(RecordingFileFormat fileFo
 
 void RecordingConfiguration::setDefaultFileName()
 {
-	m_fileName = getDefauldFileName();
+	m_fileName = getDefaultFileName();
 }
 
-CString RecordingConfiguration::getDefauldFileName()
+CString RecordingConfiguration::getDefaultFileName()
 {
 	switch (m_cloudType){
 	case HDFace:
@@ -50,6 +54,10 @@ CString RecordingConfiguration::getDefauldFileName()
 		return CString(L"Face_Raw");
 	case FullDepthRaw:
 		return CString(L"Full_Raw_Depth");
+	case KinectColorRaw:
+		return CString(L"Kinect_Color_Raw");
+	case KinectDepthRaw:
+		return CString(L"Kinect_Depth_Raw");
 	default:
 		return CString(L"Cloud");
 	}
@@ -179,6 +187,10 @@ CString RecordingConfiguration::getSubFolderNameForCloudType(RecordCloudType clo
 		return L"FaceRaw";
 	case FullDepthRaw:
 		return L"FullDepthRaw";
+	case KinectColorRaw:
+		return L"KinectColorRaw";
+	case KinectDepthRaw:
+		return L"KinectDepthRaw";
 	case RECORD_CLOUD_TYPE_COUNT:
 		break;
 	default:

@@ -137,6 +137,10 @@ void WindowsApplication::disconnectStreamUpdaterFromViewer()
 {
 	//disconnect all slots, so e.g. the PCLViewer does not get updated any more
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+		//No Signals connected for both Raw Images
+		if (i == KinectColorRaw || i == KinectDepthRaw){
+			continue;
+		}
 		m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 		m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 	}
@@ -148,6 +152,10 @@ void WindowsApplication::disconnectStreamUpdaterFromViewer()
 void WindowsApplication::initCloudWriter()
 {
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+		//No CloudFileWriter for both Raw Images
+		if (i == KinectColorRaw || i == KinectDepthRaw){
+			continue;
+		}
 		//init
 		auto uncoloredCloudWriter = std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZ>>(new KinectCloudFileWriter<pcl::PointXYZ>);
 		//register for events
@@ -169,10 +177,10 @@ void WindowsApplication::initCloudWriter()
 void WindowsApplication::connectStreamUpdaterToViewer()
 {
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		//we skip enabling the fulldepth raw; this signal is connected 
+		//we skip enabling the fulldepth raw and kinect raw; this signal is connected 
 		//only if recording is enabled; this way, full depth buffer conversion is skipped 
 		//if not recorded
-		if (i == FullDepthRaw){
+		if (i == FullDepthRaw || i == KinectColorRaw || i == KinectDepthRaw){
 			continue;
 		}
 		//bind to the writer
@@ -281,6 +289,10 @@ void WindowsApplication::initInputReaderBufferAndSynchronizer()
 	//create the buffers and store them for the synchronizer
 	std::vector<std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>>> buffers;
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+		//No Playback for both Raw Images
+		if (i == KinectColorRaw || i == KinectDepthRaw){
+			continue;
+		}
 		//create buffer & input reader
 		auto buffer = std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>>(new Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>);
 		auto inputReader = std::shared_ptr<PCLInputReader<pcl::PointXYZRGB>>(new PCLInputReader<pcl::PointXYZRGB>());
@@ -407,6 +419,10 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 	//use the correct recoder & updater
 	if (isColoredStream){
 		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+			//No CloudFileWriter for both Raw Images
+			if (i == KinectColorRaw || i == KinectDepthRaw){
+				continue;
+			}
 			auto recordingConfig = recordingConfigurations[i];
 			auto cloudWriter = m_colorCloudOutputWriter[i];
 			if (i == FullDepthRaw){
@@ -428,6 +444,10 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 	}
 	else{
 		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+			//No CloudFileWriter for both Raw Images
+			if (i == KinectColorRaw || i == KinectDepthRaw){
+				continue;
+			}
 			auto recordingConfig = recordingConfigurations[i];
 			auto cloudWriter = m_uncoloredCloudOutputWriter[i];
 			cloudWriter->setRecordingConfiguration(recordingConfig);
@@ -456,6 +476,10 @@ void WindowsApplication::triggerReaderStart(SharedPlaybackConfiguration playback
 	}
 	//start all readers; reading for playbackConfig is disable the inputreader will finish immediately
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+		//No Playback for both Raw Images
+		if (i == KinectColorRaw || i == KinectDepthRaw){
+			continue;
+		}
 		m_inputFileReader[i]->setPlaybackConfiguration(playbackConfig[i]);
 		m_inputFileReader[i]->startReading(isSingleThreatedReading);
 	}
@@ -471,6 +495,10 @@ void WindowsApplication::setupReaderAndBuffersForPlayback(SharedPlaybackConfigur
 	//ones
 	int numOfFilesToRead = 0;
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+		//No Playback for both Raw Images
+		if (i == KinectColorRaw || i == KinectDepthRaw){
+			continue;
+		}
 		auto& currentConfig = playbackConfig[i];
 		if (currentConfig->isEnabled()){
 			enabledClouds++;

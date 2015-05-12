@@ -10,6 +10,8 @@ enum RecordingFileFormat{
 	PLY_BINARY,
 	PCD,
 	PCD_BINARY,
+	PPM_BINARY,
+	PGM_BINARY,
 	RECORD_FILE_FORMAT_COUNT
 };
 
@@ -17,6 +19,8 @@ enum RecordCloudType{
 	HDFace,
 	FaceRaw,
 	FullDepthRaw,
+	KinectColorRaw,
+	KinectDepthRaw,
 	RECORD_CLOUD_TYPE_COUNT
 };
 

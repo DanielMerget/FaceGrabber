@@ -273,13 +273,13 @@ public:
 private:
 
 	/**
-	 * \fn	CString RecordingConfiguration::getDefauldFileName();
+	 * \fn	CString RecordingConfiguration::getDefaultFileName();
 	 *
-	 * \brief	Gets defauld file name of the set cloudtype
+	 * \brief	Gets default file name of the set cloudtype
 	 *
-	 * \return	The defauld file name.
+	 * \return	The default file name.
 	 */
-	CString getDefauldFileName();
+	CString getDefaultFileName();
 
 	/**
 	 * \fn	void RecordingConfiguration::setDefaultFileName();
