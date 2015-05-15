@@ -104,6 +104,25 @@ void ColoredOutputStreamUpdater::stopFaceCollection()
 		// update writer
 		cloudUpdated[2](depthBufferCloud);
 	}
+
+	//KinectColorRaw
+	if (!colorImageUpdated.empty()){
+		// update writer
+		cv::Mat m_colorImage = cv::Mat(m_colorHeight, m_colorWidth, CV_8UC4, m_colorBuffer, cv::Mat::AUTO_STEP);
+		boost::shared_ptr<cv::Mat> m_colorImagePtr(new cv::Mat());
+		*m_colorImagePtr = m_colorImage.clone();
+		colorImageUpdated(m_colorImagePtr);
+	}
+
+	//KinectDepthRaw
+	if (!depthImageUpdated.empty()){
+		// update writer
+		cv::Mat m_depthImage = cv::Mat(m_depthHeight, m_depthWidth, CV_16UC1, m_depthBuffer, cv::Mat::AUTO_STEP);
+		boost::shared_ptr<cv::Mat> m_depthImagePtr(new cv::Mat());
+		*m_depthImagePtr = m_depthImage.clone();
+		depthImageUpdated(m_depthImagePtr);
+	}
+
 	m_isValidFaceFrame = false;
 	m_colorBuffer = nullptr;
 	m_depthBuffer = nullptr;

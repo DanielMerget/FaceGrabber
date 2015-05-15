@@ -12,6 +12,7 @@ enum RecordingFileFormat{
 	PCD_BINARY,
 	PPM_BINARY,
 	PGM_BINARY,
+	PNG,
 	RECORD_FILE_FORMAT_COUNT
 };
 

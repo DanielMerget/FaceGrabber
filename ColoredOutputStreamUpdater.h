@@ -50,6 +50,12 @@ public:
 	/** \brief	The clouds updated:  cloudUpdated[0]: HDFace; cloudUpdated[1]: RawFaceDepth; cloudUpdated[2]: FullRawpDeth */
 	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud)> cloudUpdated[3];
 
+	/** \brief	The color images updated */
+	boost::signals2::signal<void(boost::shared_ptr<cv::Mat>)> colorImageUpdated;
+
+	/** \brief	The depth images updated */
+	boost::signals2::signal<void(boost::shared_ptr<cv::Mat>)> depthImageUpdated;
+
 	/**
 	 * \fn	void ColoredOutputStreamUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer);
 	 *

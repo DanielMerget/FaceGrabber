@@ -194,7 +194,7 @@ void ConvertTabHandler::startFileConversion()
 		std::async(std::launch::async, &ColoredCloudInputReader::startReading, m_colorCloudReader, true);
 
 		//trigger writer to start
-		m_colorWriter->startWritingClouds();
+		m_colorWriter->startWriting();
 	}
 	else{
 		if (!m_nonColorCloudReader){
@@ -207,7 +207,7 @@ void ConvertTabHandler::startFileConversion()
 		std::async(std::launch::async, &NonColoredCloudInputReader::startReading, m_nonColorCloudReader, true);
 
 		//trigger writer to start
-		m_nonColorWriter->startWritingClouds();
+		m_nonColorWriter->startWriting();
 	}
 	Button_Enable(GetDlgItem(m_hWnd, IDC_BUTTON_CONVERT), false);
 }

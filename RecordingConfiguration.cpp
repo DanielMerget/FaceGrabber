@@ -32,6 +32,8 @@ CString RecordingConfiguration::getFileFormatAsString(RecordingFileFormat fileFo
 		return CString(L"ppm binary");
 	case PGM_BINARY:
 		return CString(L"pgm binary");
+	case PNG:
+		return CString(L"png");
 	case RECORD_FILE_FORMAT_COUNT:
 		return CString(L"ERROR");
 	default:
@@ -163,6 +165,9 @@ void RecordingConfiguration::setEnabled(bool enabled)
 
 void RecordingConfiguration::setFileFormat(RecordingFileFormat fileFormat)
 {
+	wchar_t buffer[256];
+	wsprintfW(buffer, L"Set File Format to %d", fileFormat);
+	OutputDebugString(buffer);
 	m_fileFormat = fileFormat;
 }
 

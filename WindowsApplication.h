@@ -9,6 +9,7 @@
 #include "PCLViewer.h"
 
 #include "KinectCloudFileWriter.h"
+#include "KinectRawFileWriter.h"
 #include "RecordingConfiguration.h"
 #include "RecordTabHandler.h"
 #include "PlaybackTabHandler.h"
@@ -172,6 +173,13 @@ private:
 	void initCloudWriter();
 
 	/**
+	* \fn	void WindowsApplication::initImageWriter();
+	*
+	* \brief	Initialises the image writer and registers for status notification.
+	*/
+	void initImageWriter();
+
+	/**
 	 * \fn	void WindowsApplication::initInputReaderBufferAndSynchronizer();
 	 *
 	 * \brief	Initialises the input reader buffer and synchronizer, connects them.
@@ -307,6 +315,12 @@ private:
 
 	/** \brief	The non colored cloud writer. */
 	std::vector<std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZ>>> m_uncoloredCloudOutputWriter;
+
+	/** \brief	The image writer. */
+	std::vector<std::shared_ptr<KinectRawFileWriter>> m_colorImageOutputWriter;
+
+	/** \brief	The image writer. */
+	std::vector<std::shared_ptr<KinectRawFileWriter>> m_depthImageOutputWriter;
 	
 	/** \brief	The buffer synchronizer for reading files. */
 	BufferSynchronizer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> m_bufferSynchronizer;

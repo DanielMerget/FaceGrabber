@@ -37,6 +37,8 @@
     <ClCompile Include="KinectCloudFileWriter.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="KinectImageWriterThread.cpp" />
+    <ClCompile Include="KinectRawFileWriter.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MessageRouterHelper.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
@@ -81,11 +83,14 @@
     <ClInclude Include="CloudMeasurementSource.h" />
     <ClInclude Include="ColoredOutputStreamUpdater.h" />
     <ClInclude Include="ConvertTabHandler.h" />
+    <ClInclude Include="ImageMeasurementSource.h" />
     <ClInclude Include="IRecordingConfiguration.h" />
     <ClInclude Include="KinectFileWriterThread.h" />
     <ClInclude Include="KinectHDFaceGrabber.h" />
     <ClInclude Include="ImageRenderer.h" />
     <ClInclude Include="KinectCloudFileWriter.h" />
+    <ClInclude Include="KinectImageWriterThread.h" />
+    <ClInclude Include="KinectRawFileWriter.h" />
     <ClInclude Include="MessageRouterHelper.h" />
     <ClInclude Include="OutputStreamsUpdaterStragedy.h" />
     <ClInclude Include="PCLInputReader.h" />

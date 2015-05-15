@@ -51,20 +51,20 @@ public:
 	void pushCloudsAsync(std::vector<boost::shared_ptr<pcl::PointCloud<PointCloudType>>> clouds);
 
 	/**
-	 * \fn	void KinectCloudFileWriter::startWritingClouds();
+	 * \fn	void KinectCloudFileWriter::startWriting();
 	 *
 	 * \brief	Triggers the start of writing the buffered clouds.
 	 */
 
-	void startWritingClouds();
+	void startWriting();
 
 	/**
-	 * \fn	void KinectCloudFileWriter::stopWritingClouds();
+	 * \fn	void KinectCloudFileWriter::stopWriting();
 	 *
 	 * \brief	Triggers the stop of writing the buffered clouds.
 	 */
 
-	void stopWritingClouds();
+	void stopWriting();
 
 	/**
 	 * \fn	void KinectCloudFileWriter::setRecordingConfiguration(IRecordingConfigurationPtr recordingConfiguration);

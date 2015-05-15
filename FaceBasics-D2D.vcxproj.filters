@@ -68,6 +68,12 @@
     <ClCompile Include="UncoloredOutputStreamsUpdater.cpp">
       <Filter>Kinect</Filter>
     </ClCompile>
+    <ClCompile Include="KinectRawFileWriter.cpp">
+      <Filter>FileWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="KinectImageWriterThread.cpp">
+      <Filter>FileWriter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -144,6 +150,15 @@
     </ClInclude>
     <ClInclude Include="UncoloredOutputStreamsUpdater.h">
       <Filter>Kinect</Filter>
+    </ClInclude>
+    <ClInclude Include="KinectRawFileWriter.h">
+      <Filter>FileWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageMeasurementSource.h">
+      <Filter>FileWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="KinectImageWriterThread.h">
+      <Filter>FileWriter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

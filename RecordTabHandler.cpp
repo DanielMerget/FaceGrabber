@@ -59,7 +59,9 @@ void RecordTabHandler::onCreate()
 
 	//combobox for Kinect Raw data
 	ComboBox_AddString(kinectColorComboBox, RecordingConfiguration::getFileFormatAsString(PPM_BINARY));
+	ComboBox_AddString(kinectColorComboBox, RecordingConfiguration::getFileFormatAsString(PNG));
 	ComboBox_AddString(kinectDepthComboBox, RecordingConfiguration::getFileFormatAsString(PGM_BINARY));
+	ComboBox_AddString(kinectDepthComboBox, RecordingConfiguration::getFileFormatAsString(PNG));
 	ComboBox_SetCurSel(kinectColorComboBox, 0);
 	ComboBox_SetCurSel(kinectDepthComboBox, 0);
 	//overwrite default fileFormat from init in WindowsApplication::initRecordDataModel()
@@ -140,10 +142,10 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 		m_recordingConfiguration[FullDepthRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
 		break;
 	case IDC_KINECT_RAW_COLOR_COMBO_BOX:
-		m_recordingConfiguration[KinectColorRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+		m_recordingConfiguration[KinectColorRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection + 5));
 		break;
 	case IDC_KINECT_RAW_DEPTH_COMBO_BOX:
-		m_recordingConfiguration[KinectDepthRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+		m_recordingConfiguration[KinectDepthRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection + 5));
 		break;
 	case IDC_HD_FACE_COMBO_BOX_THREADS:
 		m_recordingConfiguration[HDFace]->setThreadCountToStart(currentSelection+1);

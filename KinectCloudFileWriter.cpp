@@ -39,7 +39,7 @@ void KinectCloudFileWriter< PointCloudType >::waitForWriterToFinish()
 }
 
 template < typename PointCloudType >
-void KinectCloudFileWriter< PointCloudType >::startWritingClouds()
+void KinectCloudFileWriter< PointCloudType >::startWriting()
 {
 	m_running = true;
 	m_cloudCount = 0;
@@ -55,7 +55,7 @@ void KinectCloudFileWriter< PointCloudType >::startWritingClouds()
 	std::async(std::launch::async, &KinectCloudFileWriter::waitForWriterToFinish, this);
 }
 template < typename PointCloudType >
-void KinectCloudFileWriter<PointCloudType>::stopWritingClouds()
+void KinectCloudFileWriter<PointCloudType>::stopWriting()
 {
 	m_running = false;
 	m_cloudCount = 0;
@@ -114,7 +114,7 @@ void KinectCloudFileWriter<PointCloudType>::pushCloud(boost::shared_ptr<const pc
 	
 	//check whether we captured enough frames
 	if (isMaximumFramesReached()){
-		stopWritingClouds();
+		stopWriting();
 	}
 	else{
 		m_checkCloud.notify_all();

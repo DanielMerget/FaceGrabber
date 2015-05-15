@@ -61,6 +61,12 @@ public:
 	/** \brief	The clouds updated:  cloudUpdated[0]: HDFace; cloudUpdated[1]: RawFaceDepth; cloudUpdated[2]: FullRawpDeth */
 	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)> cloudUpdated[3];
 
+	/** \brief	The color images updated */
+	boost::signals2::signal<void(boost::shared_ptr<cv::Mat>)> colorImageUpdated;
+
+	/** \brief	The depth images updated */
+	boost::signals2::signal<void(boost::shared_ptr<cv::Mat>)> depthImageUpdated;
+
 	/**
 	 * \fn	void UncoloredOutputStreamsUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer);
 	 *
@@ -151,6 +157,9 @@ private:
 
 	/** \brief	true to enable, false to disable the centering. */
 	bool m_centerEnabled;
+
+	/** \brief	Buffer for color data. */
+	RGBQUAD* m_colorBuffer;
 
 	/** \brief	Buffer for depth data. */
 	UINT16*	m_depthBuffer;
