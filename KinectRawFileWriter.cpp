@@ -134,7 +134,7 @@ void KinectRawFileWriter::pushImageAsync(boost::shared_ptr<cv::Mat> image)
 }
 
 
-void KinectRawFileWriter::setRecordingConfiguration(IRecordingConfigurationPtr recordingConfiguration)
+void KinectRawFileWriter::setRecordingConfiguration(IImageRecordingConfigurationPtr recordingConfiguration)
 {
 	m_recordingConfiguration = recordingConfiguration;
 }

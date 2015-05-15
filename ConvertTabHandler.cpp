@@ -28,11 +28,6 @@ void ConvertTabHandler::onCreate()
 	HWND outputFormatHandle = GetDlgItem(m_hWnd, IDC_COMBO_OUTPUT_FORMAT);
 	//create the combo box values; pcd, ply etc. and set default
 	for (int i = 0; i < RECORD_FILE_FORMAT_COUNT; i++){
-		//no conversion to non-cloud format
-		if (i == PPM_BINARY || i == PGM_BINARY)
-		{
-			continue;
-		}
 		auto fileFormatName = RecordingConfiguration::getFileFormatAsString(static_cast<RecordingFileFormat>(i));
 		ComboBox_AddString(outputFormatHandle, fileFormatName);
 	}

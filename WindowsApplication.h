@@ -11,6 +11,7 @@
 #include "KinectCloudFileWriter.h"
 #include "KinectRawFileWriter.h"
 #include "RecordingConfiguration.h"
+#include "ImageRecordingConfiguration.h"
 #include "RecordTabHandler.h"
 #include "PlaybackTabHandler.h"
 #include "ColoredOutputStreamUpdater.h"
@@ -77,6 +78,15 @@ private:
 	SharedRecordingConfiguration initRecordDataModel();
 
 	/**
+	* \fn	SharedImageRecordingConfiguration WindowsApplication::initImageRecordDataModel();
+	*
+	* \brief	Initialises the ImageRecordingConfiguration for the RecordTabHandler class.
+	*
+	* \return	A SharedImageRecordingConfiguration.
+	*/
+	SharedImageRecordingConfiguration initImageRecordDataModel();
+
+	/**
 	 * \fn	void WindowsApplication::onPlaybackFinished();
 	 *
 	 * \brief	Forwards the playback finished signal to the PlaybackTabHandler.
@@ -108,24 +118,26 @@ private:
 	void onRecordTabSelected();
 
 	/**
-	* \fn	void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations)
+	* \fn	void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations)
 	*
 	* \brief	Callback to trigger the start of the recording with the specified recording configuration.
 	*
-	* \param	isColoredStream		   	true if recording should be done with color, or not.
-	* \param	recordingConfigurations	The recording configurations.
+	* \param	isColoredStream		   			true if recording should be done with color, or not.
+	* \param	recordingConfigurations			The recording configurations.
+	* \param	imageRecordingConfigurations	The image recording configurations.
 	*/
-	void startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations);
+	void startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations);
 
 	/**
-	 * \fn	void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations);
+	 * \fn	void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations);
 	 *
 	 * \brief	Callback to trigger the stop of the recording with the specified recording configuration.
 	 *
-	 * \param	isColoredStream		   	true if this object is colored stream.
-	 * \param	recordingConfigurations	The recording configurations.
+	 * \param	isColoredStream					true if this object is colored stream.
+	 * \param	recordingConfigurations			The recording configurations.
+	 * \param	imageRecordingConfigurations	The image recording configurations.
 	 */
-	void stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations);
+	void stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations);
 
 	/**
 	 * \fn	void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfig, bool isSingleThreatedReading);
@@ -317,10 +329,7 @@ private:
 	std::vector<std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZ>>> m_uncoloredCloudOutputWriter;
 
 	/** \brief	The image writer. */
-	std::vector<std::shared_ptr<KinectRawFileWriter>> m_colorImageOutputWriter;
-
-	/** \brief	The image writer. */
-	std::vector<std::shared_ptr<KinectRawFileWriter>> m_depthImageOutputWriter;
+	std::vector<std::shared_ptr<KinectRawFileWriter>> m_imageOutputWriter;
 	
 	/** \brief	The buffer synchronizer for reading files. */
 	BufferSynchronizer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> m_bufferSynchronizer;

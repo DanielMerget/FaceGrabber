@@ -74,6 +74,9 @@
     <ClCompile Include="KinectImageWriterThread.cpp">
       <Filter>FileWriter</Filter>
     </ClCompile>
+    <ClCompile Include="ImageRecordingconfiguration.cpp">
+      <Filter>WindowsApp\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -159,6 +162,12 @@
     </ClInclude>
     <ClInclude Include="KinectImageWriterThread.h">
       <Filter>FileWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="IImageRecordingConfiguration.h">
+      <Filter>WindowsApp\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageRecordingConfiguration.h">
+      <Filter>WindowsApp\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -66,14 +66,14 @@ public:
 	void stopWriting();
 
 	/**
-	* \fn	void KinectRawFileWriter::setRecordingConfiguration(IRecordingConfigurationPtr recordingConfiguration);
+	* \fn	void KinectRawFileWriter::setRecordingConfiguration(IImageRecordingConfigurationPtr recordingConfiguration);
 	*
 	* \brief	Sets recording configuration for the writing.
 	*
 	* \param	recordingConfiguration	The recording configuration.
 	*/
 
-	void setRecordingConfiguration(IRecordingConfigurationPtr recordingConfiguration);
+	void setRecordingConfiguration(IImageRecordingConfigurationPtr recordingConfiguration);
 
 	/**
 	* \fn	virtual bool ImageMeasurementSource::pullData(PointCloudMeasurement& measurement) = 0;
@@ -149,7 +149,7 @@ private:
 
 
 	/** \brief	The recording configuration. */
-	IRecordingConfigurationPtr m_recordingConfiguration;
+	IImageRecordingConfigurationPtr m_recordingConfiguration;
 
 
 	/** \brief	true if writing is currently running. */

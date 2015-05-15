@@ -5,6 +5,7 @@
 #include <windowsx.h>
 #include "resource.h"
 #include "RecordingConfiguration.h"
+#include "ImageRecordingConfiguration.h"
 #include <memory>
 #include <boost/signals.hpp>
 
@@ -40,6 +41,15 @@ public:
 	void setSharedRecordingConfiguration(SharedRecordingConfiguration recordingConfiguration);
 
 	/**
+	* \fn	void RecordTabHandler::setSharedImageRecordingConfiguration(SharedImageRecordingConfiguration imageRecordingConfiguration);
+	*
+	* \brief	Sets shared image recording configuration.
+	*
+	* \param	imageRecordingConfiguration		The image recording configuration.
+	*/
+	void setSharedImageRecordingConfiguration(SharedImageRecordingConfiguration imageRecordingConfiguration);
+
+	/**
 	 * \fn	SharedRecordingConfiguration RecordTabHandler::getRecordConfiguration();
 	 *
 	 * \brief	Getter for the record configuration.
@@ -47,6 +57,15 @@ public:
 	 * \return	The record configuration.
 	 */
 	SharedRecordingConfiguration getRecordConfiguration();
+
+	/**
+	* \fn	SharedImageRecordingConfiguration RecordTabHandler::getImageRecordConfiguration();
+	*
+	* \brief	Getter for the image record configuration.
+	*
+	* \return	The image record configuration.
+	*/
+	SharedImageRecordingConfiguration getImageRecordConfiguration();
 
 	/**
 	 * \fn	bool RecordTabHandler::isColorEnabled();
@@ -93,6 +112,16 @@ public:
 	 */
 	void updateWriterStatus(RecordCloudType type, std::wstring status);
 
+	/**
+	* \fn	void RecordTabHandler::updateWriterStatus(ImageRecordType type, std::wstring status);
+	*
+	* \brief	Updates the writer status with the provided status.
+	*
+	* \param	type  	The type of the writer whose status has changed.
+	* \param	status	The new status.
+	*/
+	void updateWriterStatus(ImageRecordType type, std::wstring status);
+
 	/** \brief	The color configuration changed signal: color is noew enabled or not. */
 	boost::signal<void(bool)> colorConfigurationChanged;
 
@@ -100,10 +129,10 @@ public:
 	boost::signal<void(bool)> centerConfigurationChanged;
 
 	/** \brief	The start writing signal. */
-	boost::signal<void(bool, SharedRecordingConfiguration)> startWriting;
+	boost::signal<void(bool, SharedRecordingConfiguration, SharedImageRecordingConfiguration)> startWriting;
 
 	/** \brief	The stop writing signal. */
-	boost::signal<void(bool, SharedRecordingConfiguration)> stopWriting;
+	boost::signal<void(bool, SharedRecordingConfiguration, SharedImageRecordingConfiguration)> stopWriting;
 
 	/**
 	* \fn	void RecordTabHandler::recordPathChanged(RecordCloudType type);
@@ -115,6 +144,15 @@ public:
 	void recordPathChanged(RecordCloudType type);
 
 	/**
+	* \fn	void RecordTabHandler::recordPathChanged(ImageRecordType type);
+	*
+	* \brief	Callback: Record path has changed.
+	*
+	* \param	type	The type of the image which path has changed.
+	*/
+	void recordPathChanged(ImageRecordType type);
+
+	/**
 	 * \fn	void RecordTabHandler::recordConfigurationStatusChanged(RecordCloudType type, bool newState);
 	 *
 	 * \brief	Record configuration status changed.
@@ -123,6 +161,16 @@ public:
 	 * \param	newState	true if the configuration is now enabled, otherwise it is disabled.
 	 */
 	void recordConfigurationStatusChanged(RecordCloudType type, bool newState);
+
+	/**
+	* \fn	void RecordTabHandler::recordConfigurationStatusChanged(ImageRecordType type, bool newState);
+	*
+	* \brief	Record configuration status changed.
+	*
+	* \param	type		The type of the record configuration which has changed.
+	* \param	newState	true if the configuration is now enabled, otherwise it is disabled.
+	*/
+	void recordConfigurationStatusChanged(ImageRecordType type, bool newState);
 private:
 
 	/**
@@ -186,6 +234,9 @@ private:
 
 	/** \brief	The recording configuration. */
 	SharedRecordingConfiguration m_recordingConfiguration;
+
+	/** \brief	The image recording configuration. */
+	SharedImageRecordingConfiguration m_imageRecordingConfiguration;
 
 
 	/** \brief	true to enable, false to disable the color. */

@@ -17,8 +17,20 @@ SharedRecordingConfiguration WindowsApplication::initRecordDataModel()
 	SharedRecordingConfiguration recordingConfigurations(RECORD_CLOUD_TYPE_COUNT);
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		recordingConfigurations[i] = std::shared_ptr<RecordingConfiguration>(new RecordingConfiguration(static_cast<RecordCloudType>(i), PLY));
-		recordingConfigurations[i]->recordConfigurationStatusChanged.connect(boost::bind(&RecordTabHandler::recordConfigurationStatusChanged, &m_recordTabHandler, _1, _2));
-		recordingConfigurations[i]->recordPathOrFileNameChanged.connect(boost::bind(&RecordTabHandler::recordPathChanged, &m_recordTabHandler, _1));
+		recordingConfigurations[i]->recordConfigurationStatusChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(RecordCloudType, bool)>(&RecordTabHandler::recordConfigurationStatusChanged), &m_recordTabHandler, _1, _2));
+		recordingConfigurations[i]->recordPathOrFileNameChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(RecordCloudType)>(&RecordTabHandler::recordPathChanged), &m_recordTabHandler, _1));
+		recordingConfigurations[i]->setThreadCountToStart(2);
+	}
+	return recordingConfigurations;
+}
+
+SharedImageRecordingConfiguration WindowsApplication::initImageRecordDataModel()
+{
+	SharedImageRecordingConfiguration recordingConfigurations(IMAGE_RECORD_TYPE_COUNT);
+	for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+		recordingConfigurations[i] = std::shared_ptr<ImageRecordingConfiguration>(new ImageRecordingConfiguration(static_cast<ImageRecordType>(i), PNM_BINARY));
+		recordingConfigurations[i]->recordConfigurationStatusChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType, bool)>(&RecordTabHandler::recordConfigurationStatusChanged), &m_recordTabHandler, _1, _2));
+		recordingConfigurations[i]->recordPathOrFileNameChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType)>(&RecordTabHandler::recordPathChanged), &m_recordTabHandler, _1));
 		recordingConfigurations[i]->setThreadCountToStart(2);
 	}
 	return recordingConfigurations;
@@ -138,10 +150,6 @@ void WindowsApplication::disconnectStreamUpdaterFromViewer()
 {
 	//disconnect all slots, so e.g. the PCLViewer does not get updated any more
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		//No Signals connected for both Raw Images
-		if (i == KinectColorRaw || i == KinectDepthRaw){
-			continue;
-		}
 		m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 		m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 	}
@@ -153,14 +161,10 @@ void WindowsApplication::disconnectStreamUpdaterFromViewer()
 void WindowsApplication::initCloudWriter()
 {
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		//No CloudFileWriter for both Raw Images
-		if (i == KinectColorRaw || i == KinectDepthRaw){
-			continue;
-		}
 		//init
 		auto uncoloredCloudWriter = std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZ>>(new KinectCloudFileWriter<pcl::PointXYZ>);
 		//register for events
-		uncoloredCloudWriter->updateStatus.connect(boost::bind(&RecordTabHandler::updateWriterStatus, &m_recordTabHandler, static_cast<RecordCloudType>(i), _1));
+		uncoloredCloudWriter->updateStatus.connect(boost::bind(static_cast<void (RecordTabHandler::*)(RecordCloudType, std::wstring)>(&RecordTabHandler::updateWriterStatus), &m_recordTabHandler, static_cast<RecordCloudType>(i), _1));
 		uncoloredCloudWriter->writingWasStopped.connect(boost::bind(&RecordTabHandler::recordingStopped, &m_recordTabHandler));
 
 		m_uncoloredCloudOutputWriter.push_back(uncoloredCloudWriter);
@@ -168,7 +172,7 @@ void WindowsApplication::initCloudWriter()
 		//init
 		auto coloredCloudWriter = std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZRGB>>(new KinectCloudFileWriter<pcl::PointXYZRGB>);
 		//register for events
-		coloredCloudWriter->updateStatus.connect(boost::bind(&RecordTabHandler::updateWriterStatus, &m_recordTabHandler, static_cast<RecordCloudType>(i), _1));
+		coloredCloudWriter->updateStatus.connect(boost::bind(static_cast<void (RecordTabHandler::*)(RecordCloudType, std::wstring)>(&RecordTabHandler::updateWriterStatus), &m_recordTabHandler, static_cast<RecordCloudType>(i), _1));
 		coloredCloudWriter->writingWasStopped.connect(boost::bind(&RecordTabHandler::recordingStopped, &m_recordTabHandler));
 
 		m_colorCloudOutputWriter.push_back(coloredCloudWriter);
@@ -177,26 +181,14 @@ void WindowsApplication::initCloudWriter()
 
 void WindowsApplication::initImageWriter()
 {
-	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		if (i == KinectColorRaw){
-			//init
-			auto imageWriter = std::shared_ptr<KinectRawFileWriter>(new KinectRawFileWriter);
-			//register for events
-			imageWriter->updateStatus.connect(boost::bind(&RecordTabHandler::updateWriterStatus, &m_recordTabHandler, static_cast<RecordCloudType>(i), _1));
-			imageWriter->writingWasStopped.connect(boost::bind(&RecordTabHandler::recordingStopped, &m_recordTabHandler));
+	for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+		//init
+		auto imageWriter = std::shared_ptr<KinectRawFileWriter>(new KinectRawFileWriter);
+		//register for events
+		imageWriter->updateStatus.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType, std::wstring)>(&RecordTabHandler::updateWriterStatus), &m_recordTabHandler, static_cast<ImageRecordType>(i), _1));
+		imageWriter->writingWasStopped.connect(boost::bind(&RecordTabHandler::recordingStopped, &m_recordTabHandler));
 
-			m_colorImageOutputWriter.push_back(imageWriter);
-		}
-		if (i == KinectDepthRaw)
-		{
-			//init
-			auto imageWriter = std::shared_ptr<KinectRawFileWriter>(new KinectRawFileWriter);
-			//register for events
-			imageWriter->updateStatus.connect(boost::bind(&RecordTabHandler::updateWriterStatus, &m_recordTabHandler, static_cast<RecordCloudType>(i), _1));
-			imageWriter->writingWasStopped.connect(boost::bind(&RecordTabHandler::recordingStopped, &m_recordTabHandler));
-
-			m_depthImageOutputWriter.push_back(imageWriter);
-		}
+		m_imageOutputWriter.push_back(imageWriter);
 	}
 }
 
@@ -206,7 +198,7 @@ void WindowsApplication::connectStreamUpdaterToViewer()
 		//we skip enabling the fulldepth raw and kinect raw; this signal is connected 
 		//only if recording is enabled; this way, full depth buffer conversion is skipped 
 		//if not recorded
-		if (i == FullDepthRaw || i == KinectColorRaw || i == KinectDepthRaw){
+		if (i == FullDepthRaw){
 			continue;
 		}
 		//bind to the writer
@@ -246,7 +238,10 @@ void WindowsApplication::initKinectFrameGrabber()
 void WindowsApplication::initTabs()
 {
 	auto recordingConfiguration = initRecordDataModel();
+	auto imageRecordingConfiguration = initImageRecordDataModel();
+
 	m_recordTabHandler.setSharedRecordingConfiguration(recordingConfiguration);
+	m_recordTabHandler.setSharedImageRecordingConfiguration(imageRecordingConfiguration);
 
 	//record, playback and convert are "subdialogs" with own message routers. They process their UI messages on their own
 	//we will show only one of those subdialogs once
@@ -259,8 +254,8 @@ void WindowsApplication::initTabs()
 		reinterpret_cast<LPARAM>(&m_recordTabHandler));
 	m_recordTabHandler.colorConfigurationChanged.connect(boost::bind(&WindowsApplication::colorStreamingChangedTo, this, _1));
 	m_recordTabHandler.centerConfigurationChanged.connect(boost::bind(&WindowsApplication::centerRecordingChangedTo, this, _1));
-	m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1, _2));
-	m_recordTabHandler.stopWriting.connect(boost::bind(&WindowsApplication::stopRecording, this, _1, _2));
+	m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1, _2, _3));
+	m_recordTabHandler.stopWriting.connect(boost::bind(&WindowsApplication::stopRecording, this, _1, _2, _3));
 
 	m_plackBackTabHandler.setSharedRecordingConfiguration(recordingConfiguration);
 
@@ -315,10 +310,6 @@ void WindowsApplication::initInputReaderBufferAndSynchronizer()
 	//create the buffers and store them for the synchronizer
 	std::vector<std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>>> buffers;
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		//No Playback for both Raw Images
-		if (i == KinectColorRaw || i == KinectDepthRaw){
-			continue;
-		}
 		//create buffer & input reader
 		auto buffer = std::shared_ptr<Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>>(new Buffer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>);
 		auto inputReader = std::shared_ptr<PCLInputReader<pcl::PointXYZRGB>>(new PCLInputReader<pcl::PointXYZRGB>());
@@ -440,103 +431,57 @@ void WindowsApplication::onPlaybackSelected()
 }
 
 
-void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations)
+void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations)
 {
+	for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+		auto recordingConfig = imageRecordingConfigurations[i];
+		auto imageWriter = m_imageOutputWriter[i];
+		imageWriter->setRecordingConfiguration(recordingConfig);
+		if (recordingConfig->isEnabled()){
+			//we agreed on manually enabling the Raw image writer, so we do not that image creation if not required
+			m_coloredOutputStreamUpdater->imageUpdated[i].connect(boost::bind(&KinectRawFileWriter::pushImageAsync, imageWriter, _1));
+			m_uncoloredOutputStreamUpdater->imageUpdated[i].connect(boost::bind(&KinectRawFileWriter::pushImageAsync, imageWriter, _1));
+			imageWriter->startWriting();
+		}
+	}
 	//use the correct recoder & updater
 	if (isColoredStream){
 		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 			auto recordingConfig = recordingConfigurations[i];
-			if (i == KinectColorRaw){
-				auto writer = m_colorImageOutputWriter[0];
-
-				//make sure the KinectColorRaw was disconnected from last recording session
-				//we only want to do that image creation if required
-				m_coloredOutputStreamUpdater->colorImageUpdated.disconnect_all_slots();
-				m_uncoloredOutputStreamUpdater->colorImageUpdated.disconnect_all_slots();
-				if (recordingConfig->isEnabled()){
-					writer->setRecordingConfiguration(recordingConfig);
-					m_coloredOutputStreamUpdater->colorImageUpdated.connect(boost::bind(&KinectRawFileWriter::pushImageAsync, writer, _1));
-					writer->startWriting();
-				}
+			auto cloudWriter = m_colorCloudOutputWriter[i];
+			if (i == FullDepthRaw){
+				//make sure the FullDepthRaw was disconnected from last recording session
+				//we only want to do that point cloud creation if required
+				m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+				m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 			}
-			else if (i == KinectDepthRaw){
-				auto writer = m_depthImageOutputWriter[0];
-
-				//make sure the KinectDepthRaw was disconnected from last recording session
-				//we only want to do that image creation if required
-				m_coloredOutputStreamUpdater->depthImageUpdated.disconnect_all_slots();
-				m_uncoloredOutputStreamUpdater->depthImageUpdated.disconnect_all_slots();
-				if (recordingConfig->isEnabled()){
-					writer->setRecordingConfiguration(recordingConfig);
-					m_coloredOutputStreamUpdater->depthImageUpdated.connect(boost::bind(&KinectRawFileWriter::pushImageAsync, writer, _1));
-					writer->startWriting();
-				}
-			}
-			else{
-				auto writer = m_colorCloudOutputWriter[i];
+			cloudWriter->setRecordingConfiguration(recordingConfig);
+			if (recordingConfig->isEnabled()){
+				//we agreed on manually enabling the FullDepthRaw file writer, so we do not that cloud if not required
 				if (i == FullDepthRaw){
-					//make sure the FullDepthRaw was disconnected from last recording session
-					//we only want to do that point cloud creation if required
-					m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
-					m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+					m_coloredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZRGB>::pushCloudAsync, cloudWriter, _1));
 				}
-			
-				writer->setRecordingConfiguration(recordingConfig);
-				if (recordingConfig->isEnabled()){
-					//we agreed on manually enabling the FullDepthRaw file writer, so we do not that cloud if not required
-					if (i == FullDepthRaw){
-						m_coloredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZRGB>::pushCloudAsync, writer, _1));
-					}
-					writer->startWriting();
-				}
+				cloudWriter->startWriting();
 			}
 		}
 	}
 	else{
 		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 			auto recordingConfig = recordingConfigurations[i];
-			if (i == KinectColorRaw){
-				auto writer = m_colorImageOutputWriter[0];
-
-				//make sure the KinectColorRaw was disconnected from last recording session
-				//we only want to do that image creation if required
-				m_coloredOutputStreamUpdater->colorImageUpdated.disconnect_all_slots();
-				m_uncoloredOutputStreamUpdater->colorImageUpdated.disconnect_all_slots();
-				if (recordingConfig->isEnabled()){
-					writer->setRecordingConfiguration(recordingConfig);
-					m_uncoloredOutputStreamUpdater->colorImageUpdated.connect(boost::bind(&KinectRawFileWriter::pushImageAsync, writer, _1));
-					writer->startWriting();
-				}
+			auto cloudWriter = m_uncoloredCloudOutputWriter[i];
+			if (i == FullDepthRaw){
+				//make sure the FullDepthRaw was disconnected from last recording session
+				//we only want to do that point cloud creation if required
+				m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+				m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 			}
-			else if (i == KinectDepthRaw){
-				auto writer = m_depthImageOutputWriter[0];
-
-				//make sure the KinectDepthRaw was disconnected from last recording session
-				//we only want to do that image creation if required
-				m_coloredOutputStreamUpdater->depthImageUpdated.disconnect_all_slots();
-				m_uncoloredOutputStreamUpdater->depthImageUpdated.disconnect_all_slots();
-				if (recordingConfig->isEnabled()){
-					writer->setRecordingConfiguration(recordingConfig);
-					m_uncoloredOutputStreamUpdater->depthImageUpdated.connect(boost::bind(&KinectRawFileWriter::pushImageAsync, writer, _1));
-					writer->startWriting();
-				}
-			}
-			else{
-				auto writer = m_uncoloredCloudOutputWriter[i];
+			cloudWriter->setRecordingConfiguration(recordingConfig);
+			if (recordingConfig->isEnabled()){
+				//we agreed on manually enabling the FullDepthRaw file writer, so we do not that cloud if not required
 				if (i == FullDepthRaw){
-					//make sure the FullDepthRaw was disconnected from last recording session
-					//we only want to do that point cloud creation if required
-					m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
-					m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+					m_uncoloredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZ>::pushCloudAsync, cloudWriter, _1));
 				}
-
-				if (recordingConfig->isEnabled()){
-					if (i == FullDepthRaw){
-						//we agreed on manually enabling the FullDepthRaw file writer, so we do not that cloud if not required
-						m_uncoloredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZ>::pushCloudAsync, writer, _1));
-					}
-					writer->startWriting();
-				}
+				cloudWriter->startWriting();
 			}
 		}
 	}
@@ -550,10 +495,6 @@ void WindowsApplication::triggerReaderStart(SharedPlaybackConfiguration playback
 	}
 	//start all readers; reading for playbackConfig is disable the inputreader will finish immediately
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		//No Playback for both Raw Images
-		if (i == KinectColorRaw || i == KinectDepthRaw){
-			continue;
-		}
 		m_inputFileReader[i]->setPlaybackConfiguration(playbackConfig[i]);
 		m_inputFileReader[i]->startReading(isSingleThreatedReading);
 	}
@@ -569,10 +510,6 @@ void WindowsApplication::setupReaderAndBuffersForPlayback(SharedPlaybackConfigur
 	//ones
 	int numOfFilesToRead = 0;
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		//No Playback for both Raw Images
-		if (i == KinectColorRaw || i == KinectDepthRaw){
-			continue;
-		}
 		auto& currentConfig = playbackConfig[i];
 		if (currentConfig->isEnabled()){
 			enabledClouds++;
@@ -609,8 +546,18 @@ void WindowsApplication::stopPlayback()
 	}
 }
 
-void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations)
+void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations)
 {
+	for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+		auto recordingConfig = imageRecordingConfigurations[i];
+		auto imageWriter = m_imageOutputWriter[i];
+		if (recordingConfig->isEnabled()){
+			//disconnect all connected signals
+			m_coloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
+			m_uncoloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
+			imageWriter->stopWriting();
+		}
+	}
 	//stop the correct writer
 	if (isColoredStream){
 		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){

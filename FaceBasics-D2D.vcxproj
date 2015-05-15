@@ -25,6 +25,7 @@
     <ClCompile Include="ConvertTabHandler.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ImageRecordingconfiguration.cpp" />
     <ClCompile Include="KinectFileWriterThread.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
     </ClCompile>
@@ -83,7 +84,9 @@
     <ClInclude Include="CloudMeasurementSource.h" />
     <ClInclude Include="ColoredOutputStreamUpdater.h" />
     <ClInclude Include="ConvertTabHandler.h" />
+    <ClInclude Include="IImageRecordingConfiguration.h" />
     <ClInclude Include="ImageMeasurementSource.h" />
+    <ClInclude Include="ImageRecordingConfiguration.h" />
     <ClInclude Include="IRecordingConfiguration.h" />
     <ClInclude Include="KinectFileWriterThread.h" />
     <ClInclude Include="KinectHDFaceGrabber.h" />

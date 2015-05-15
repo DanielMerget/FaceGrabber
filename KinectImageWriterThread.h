@@ -1,7 +1,7 @@
 #pragma once
 #include "stdafx.h"
 #include <memory>
-#include "RecordingConfiguration.h"
+#include "ImageRecordingConfiguration.h"
 #include "ImageMeasurementSource.h"
 #include "opencv2\highgui\highgui.hpp"
 
@@ -30,7 +30,7 @@ public:
 	* \param	recordingConfiguration	The recording configuration.
 	*/
 
-	void writeImagesToFile(IRecordingConfigurationPtr recordingConfiguration);
+	void writeImagesToFile(IImageRecordingConfigurationPtr recordingConfiguration);
 
 	/**
 	* \fn	void KinectImageWriterThread::setKinectImageOutputWriter(ImageMeasurementSource* source);

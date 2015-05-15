@@ -27,6 +27,11 @@ void RecordTabHandler::setSharedRecordingConfiguration(SharedRecordingConfigurat
 	m_recordingConfiguration = recordingConfiguration;
 }
 
+void RecordTabHandler::setSharedImageRecordingConfiguration(SharedImageRecordingConfiguration imageRecordingConfiguration)
+{
+	m_imageRecordingConfiguration = imageRecordingConfiguration;
+}
+
 
 void RecordTabHandler::onCreate()
 {
@@ -34,8 +39,8 @@ void RecordTabHandler::onCreate()
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_recordingConfiguration[    HDFace	   ]->getFileNameCString());
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_recordingConfiguration[   FaceRaw	   ]->getFileNameCString());
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_EDIT_BOX),	m_recordingConfiguration[ FullDepthRaw ]->getFileNameCString());
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_KINECT_RAW_COLOR_EDIT_BOX), m_recordingConfiguration[KinectColorRaw]->getFileNameCString());
-	Edit_SetText(GetDlgItem(m_hWnd, IDC_KINECT_RAW_DEPTH_EDIT_BOX), m_recordingConfiguration[KinectDepthRaw]->getFileNameCString());
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_KINECT_RAW_COLOR_EDIT_BOX), m_imageRecordingConfiguration[KinectColorRaw]->getFileNameCString());
+	Edit_SetText(GetDlgItem(m_hWnd, IDC_KINECT_RAW_DEPTH_EDIT_BOX), m_imageRecordingConfiguration[KinectDepthRaw]->getFileNameCString());
 	CheckDlgButton(m_hWnd, IDC_RECORD_COLOR, m_colorEnabled);
 	CheckDlgButton(m_hWnd, IDC_CENTER_CLOUDS, m_centerEnabled);
 
@@ -45,7 +50,7 @@ void RecordTabHandler::onCreate()
 	HWND fullRawDepthCombobox = GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_COMBO_BOX);
 	HWND kinectColorComboBox = GetDlgItem(m_hWnd, IDC_KINECT_RAW_COLOR_COMBO_BOX);
 	HWND kinectDepthComboBox = GetDlgItem(m_hWnd, IDC_KINECT_RAW_DEPTH_COMBO_BOX);
-	for (int i = 0; i < 4; i++){
+	for (int i = 0; i < RECORD_FILE_FORMAT_COUNT; i++){
 		CString fileFormatName = RecordingConfiguration::getFileFormatAsString(static_cast<RecordingFileFormat>(i));
 		ComboBox_AddString(hdFaceComboBox, fileFormatName);
 		ComboBox_AddString(facerawDepthComboBox, fileFormatName);
@@ -57,16 +62,15 @@ void RecordTabHandler::onCreate()
 		}
 	}
 
-	//combobox for Kinect Raw data
-	ComboBox_AddString(kinectColorComboBox, RecordingConfiguration::getFileFormatAsString(PPM_BINARY));
-	ComboBox_AddString(kinectColorComboBox, RecordingConfiguration::getFileFormatAsString(PNG));
-	ComboBox_AddString(kinectDepthComboBox, RecordingConfiguration::getFileFormatAsString(PGM_BINARY));
-	ComboBox_AddString(kinectDepthComboBox, RecordingConfiguration::getFileFormatAsString(PNG));
-	ComboBox_SetCurSel(kinectColorComboBox, 0);
-	ComboBox_SetCurSel(kinectDepthComboBox, 0);
-	//overwrite default fileFormat from init in WindowsApplication::initRecordDataModel()
-	m_recordingConfiguration[KinectColorRaw]->setFileFormat(PPM_BINARY);
-	m_recordingConfiguration[KinectDepthRaw]->setFileFormat(PGM_BINARY);
+	for (int i = 0; i < IMAGE_RECORD_FILE_FORMAT_COUNT; i++){
+		CString fileFormatName = ImageRecordingConfiguration::getFileFormatAsString(static_cast<ImageRecordingFileFormat>(i));
+		ComboBox_AddString(kinectColorComboBox, fileFormatName);
+		ComboBox_AddString(kinectDepthComboBox, fileFormatName);
+		if (i == 0){
+			ComboBox_SetCurSel(kinectColorComboBox, i);
+			ComboBox_SetCurSel(kinectDepthComboBox, i);
+		}
+	}
 
 	//create combo box items for the amount of threads to start
 	HWND hdFaceComboBoxThreads			= GetDlgItem(m_hWnd, IDC_HD_FACE_COMBO_BOX_THREADS);
@@ -86,8 +90,8 @@ void RecordTabHandler::onCreate()
 	ComboBox_SetCurSel(hdFaceComboBoxThreads,			m_recordingConfiguration[HDFace]->getThreadCountToStart() - 1);
 	ComboBox_SetCurSel(facerawDepthComboBoxThreads,		m_recordingConfiguration[FaceRaw]->getThreadCountToStart() - 1);
 	ComboBox_SetCurSel(fullRawDepthComboboxThreads,		m_recordingConfiguration[FullDepthRaw]->getThreadCountToStart() - 1);
-	ComboBox_SetCurSel(kinectColorRawComboboxThreads,	m_recordingConfiguration[KinectColorRaw]->getThreadCountToStart() - 1);
-	ComboBox_SetCurSel(kinectDepthRawComboboxThreads,	m_recordingConfiguration[KinectDepthRaw]->getThreadCountToStart() - 1);
+	ComboBox_SetCurSel(kinectColorRawComboboxThreads,	m_imageRecordingConfiguration[KinectColorRaw]->getThreadCountToStart() - 1);
+	ComboBox_SetCurSel(kinectDepthRawComboboxThreads,	m_imageRecordingConfiguration[KinectDepthRaw]->getThreadCountToStart() - 1);
 }
 
 bool RecordTabHandler::isColorEnabled()
@@ -114,13 +118,25 @@ void RecordTabHandler::updateWriterStatus(RecordCloudType recordType, std::wstri
 	case FullDepthRaw:
 		SetDlgItemText(m_hWnd, IDC_FULL_RAW_DEPTH_STATUS, newStatus);
 		break;
+	case RECORD_CLOUD_TYPE_COUNT:
+		break;
+	default:
+		break;
+	}
+}
+
+void RecordTabHandler::updateWriterStatus(ImageRecordType recordType, std::wstring status)
+{
+	_In_z_ WCHAR* newStatus = &status[0];
+	switch (recordType)
+	{
 	case KinectColorRaw:
 		SetDlgItemText(m_hWnd, IDC_KINECT_RAW_COLOR_STATUS, newStatus);
 		break;
 	case KinectDepthRaw:
 		SetDlgItemText(m_hWnd, IDC_KINECT_RAW_DEPTH_STATUS, newStatus);
 		break;
-	case RECORD_CLOUD_TYPE_COUNT:
+	case IMAGE_RECORD_TYPE_COUNT:
 		break;
 	default:
 		break;
@@ -142,10 +158,10 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 		m_recordingConfiguration[FullDepthRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
 		break;
 	case IDC_KINECT_RAW_COLOR_COMBO_BOX:
-		m_recordingConfiguration[KinectColorRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection + 5));
+		m_imageRecordingConfiguration[KinectColorRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
 		break;
 	case IDC_KINECT_RAW_DEPTH_COMBO_BOX:
-		m_recordingConfiguration[KinectDepthRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection + 5));
+		m_imageRecordingConfiguration[KinectDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
 		break;
 	case IDC_HD_FACE_COMBO_BOX_THREADS:
 		m_recordingConfiguration[HDFace]->setThreadCountToStart(currentSelection+1);
@@ -157,10 +173,10 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 		m_recordingConfiguration[FullDepthRaw]->setThreadCountToStart(currentSelection+1);
 		break;
 	case IDC_KINECT_RAW_COLOR_COMBO_BOX_THREADS:
-		m_recordingConfiguration[KinectColorRaw]->setThreadCountToStart(currentSelection + 1);
+		m_imageRecordingConfiguration[KinectColorRaw]->setThreadCountToStart(currentSelection + 1);
 		break;
 	case IDC_KINECT_RAW_DEPTH_COMBO_BOX_THREADS:
-		m_recordingConfiguration[KinectDepthRaw]->setThreadCountToStart(currentSelection + 1);
+		m_imageRecordingConfiguration[KinectDepthRaw]->setThreadCountToStart(currentSelection + 1);
 		break;
 	}
 }
@@ -173,6 +189,10 @@ void RecordTabHandler::checkRecordingConfigurationPossible()
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		oneEnabled |=	m_recordingConfiguration[i]->isEnabled();
 		allValid &=		m_recordingConfiguration[i]->isRecordConfigurationValid();
+	}
+	for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+		oneEnabled |= m_imageRecordingConfiguration[i]->isEnabled();
+		allValid &= m_imageRecordingConfiguration[i]->isRecordConfigurationValid();
 	}
 	if (!oneEnabled || !allValid){
 		Button_Enable(GetDlgItem(m_hWnd, IDC_RECORD_BUTTON), false);
@@ -212,7 +232,14 @@ void RecordTabHandler::setupRecording()
 			SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
 		}
 	}
-	
+
+	for (auto& recordConfig : m_imageRecordingConfiguration){
+		recordConfig->setTimeStampFolderName(timeStamp);
+		if (recordConfig->isEnabled()){
+			auto fullRecordingPath = recordConfig->getFullRecordingPath();
+			SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
+		}
+	}
 }
 
 void RecordTabHandler::recordingStopped()
@@ -231,11 +258,11 @@ void RecordTabHandler::setRecording(bool enable)
 	
 	if (enable){
 		setupRecording();
-		startWriting(m_colorEnabled, m_recordingConfiguration);
+		startWriting(m_colorEnabled, m_recordingConfiguration, m_imageRecordingConfiguration);
 		SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Stop");
 	}
 	else{
-		stopWriting(m_colorEnabled, m_recordingConfiguration);
+		stopWriting(m_colorEnabled, m_recordingConfiguration, m_imageRecordingConfiguration);
 	}	
 }
 
@@ -270,6 +297,9 @@ void RecordTabHandler::updateFrameLimit()
 	for (auto recordConfig : m_recordingConfiguration){
 		recordConfig->setMaxNumberOfFrames(limitAsInt);
 	}
+	for (auto recordConfig : m_imageRecordingConfiguration){
+		recordConfig->setMaxNumberOfFrames(limitAsInt);
+	}
 }
 void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 {
@@ -301,10 +331,10 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		m_recordingConfiguration[FullDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
 		break;
 	case IDC_KINECT_RAW_COLOR_CHECKBOX:
-		m_recordingConfiguration[KinectColorRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_RAW_COLOR_CHECKBOX));
+		m_imageRecordingConfiguration[KinectColorRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_RAW_COLOR_CHECKBOX));
 		break;
 	case IDC_KINECT_RAW_DEPTH_CHECKBOX:
-		m_recordingConfiguration[KinectDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_RAW_DEPTH_CHECKBOX));
+		m_imageRecordingConfiguration[KinectDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_RAW_DEPTH_CHECKBOX));
 		break;
 	case IDC_BUTTON_CHOOSE_OUTPUT_DIRECTORY:
 	{
@@ -314,6 +344,9 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 			SetDlgItemText(m_hWnd, IDC_FILE_PATH_EDIT_BOX, szDir);
 			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 				m_recordingConfiguration[i]->setFilePath(szDir);
+			}
+			for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+				m_imageRecordingConfiguration[i]->setFilePath(szDir);
 			}
 		}
 		break;
@@ -341,10 +374,10 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 		m_recordingConfiguration[FullDepthRaw]->setFileName(editBoxText);
 		break;
 	case IDC_KINECT_RAW_COLOR_EDIT_BOX:
-		m_recordingConfiguration[KinectColorRaw]->setFileName(editBoxText);
+		m_imageRecordingConfiguration[KinectColorRaw]->setFileName(editBoxText);
 		break;
 	case IDC_KINECT_RAW_DEPTH_EDIT_BOX:
-		m_recordingConfiguration[KinectDepthRaw]->setFileName(editBoxText);
+		m_imageRecordingConfiguration[KinectDepthRaw]->setFileName(editBoxText);
 		break;
 	case IDC_LIMIT_FRAMES_EDIT_BOX:
 		updateFrameLimit();
@@ -352,6 +385,9 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 	case IDC_FILE_PATH_EDIT_BOX:
 	{
 		for (auto recordConfig : m_recordingConfiguration){
+			recordConfig->setFilePath(editBoxText);
+		}
+		for (auto recordConfig : m_imageRecordingConfiguration){
 			recordConfig->setFilePath(editBoxText);
 		}
 		break;
@@ -380,6 +416,19 @@ void RecordTabHandler::recordConfigurationStatusChanged(RecordCloudType type, bo
 		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_COMBO_BOX), newState);
 		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_FULL_RAW_DEPTH_COMBO_BOX_THREADS), newState);
 		break;
+	case RECORD_CLOUD_TYPE_COUNT:
+		break;
+	default:
+		break;
+	}
+
+	checkRecordingConfigurationPossible();
+}
+
+void RecordTabHandler::recordConfigurationStatusChanged(ImageRecordType type, bool newState)
+{
+	switch (type)
+	{
 	case KinectColorRaw:
 		Edit_Enable(GetDlgItem(m_hWnd, IDC_KINECT_RAW_COLOR_EDIT_BOX), newState);
 		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_KINECT_RAW_COLOR_COMBO_BOX), newState);
@@ -390,7 +439,7 @@ void RecordTabHandler::recordConfigurationStatusChanged(RecordCloudType type, bo
 		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_KINECT_RAW_DEPTH_COMBO_BOX), newState);
 		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_KINECT_RAW_DEPTH_COMBO_BOX_THREADS), newState);
 		break;
-	case RECORD_CLOUD_TYPE_COUNT:
+	case IMAGE_RECORD_TYPE_COUNT:
 		break;
 	default:
 		break;
@@ -404,7 +453,17 @@ void RecordTabHandler::recordPathChanged(RecordCloudType type)
 	checkRecordingConfigurationPossible();
 }
 
+void RecordTabHandler::recordPathChanged(ImageRecordType type)
+{
+	checkRecordingConfigurationPossible();
+}
+
 SharedRecordingConfiguration RecordTabHandler::getRecordConfiguration()
 {
 	return m_recordingConfiguration;
+}
+
+SharedImageRecordingConfiguration RecordTabHandler::getImageRecordConfiguration()
+{
+	return m_imageRecordingConfiguration;
 }

@@ -14,7 +14,7 @@ KinectImageWriterThread::~KinectImageWriterThread()
 }
 
 
-void KinectImageWriterThread::writeImagesToFile(IRecordingConfigurationPtr recordingConfiguration)
+void KinectImageWriterThread::writeImagesToFile(IImageRecordingConfigurationPtr recordingConfiguration)
 {
 	//collect important writing information
 	auto recordingFileFormat = recordingConfiguration->getRecordFileFormat();
@@ -25,16 +25,13 @@ void KinectImageWriterThread::writeImagesToFile(IRecordingConfigurationPtr recor
 	std::string fileFormatExtension;
 	switch (recordingFileFormat)
 	{
-	case PPM_BINARY:
-		fileFormatExtension = ".ppm";
-		break;
-	case PGM_BINARY:
-		fileFormatExtension = ".pgm";
+	case PNM_BINARY:
+		fileFormatExtension = ".pnm";
 		break;
 	case PNG:
 		fileFormatExtension = ".png";
 		break;
-	case RECORD_FILE_FORMAT_COUNT:
+	case IMAGE_RECORD_FILE_FORMAT_COUNT:
 		break;
 	default:
 		break;
@@ -51,23 +48,24 @@ void KinectImageWriterThread::writeImagesToFile(IRecordingConfigurationPtr recor
 			return;
 		}
 
-		wchar_t buffer[256];
-		wsprintfW(buffer, L"%d", recordingFileFormat);
-		OutputDebugString(buffer);
+		if (recordingFileFormat == PNM_BINARY){
+			if (measurement.image->type() == CV_8UC4){
+				//drop alpha channel
+				cv::Mat imageCopy;
+				imageCopy = measurement.image->clone();
+				cv::cvtColor(imageCopy, *measurement.image, CV_BGRA2BGR);
+				fileFormatExtension = ".ppm";
+			}
+			else if(measurement.image->type() == CV_16U){
+				fileFormatExtension = ".pgm";
+			}
+		}
 
 		//write data to constructed path
 		std::stringstream outputFileWithPath;
 		outputFileWithPath << filePath << "\\" << fileName << "_" << measurement.index << fileFormatExtension;
-		if (recordingFileFormat == PPM_BINARY)
-		{
-			cv::Mat converted;
-			cv::cvtColor(*measurement.image, converted, CV_BGRA2BGR);
-			cv::imwrite(outputFileWithPath.str(), converted);
-		}
-		else
-		{
-			cv::imwrite(outputFileWithPath.str(), *measurement.image);
-		}
+
+		cv::imwrite(outputFileWithPath.str(), *measurement.image);
 
 		if (isDone){
 			OutputDebugString(L"writer finished isDone");
