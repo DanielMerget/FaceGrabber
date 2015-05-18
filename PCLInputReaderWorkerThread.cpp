@@ -7,6 +7,8 @@
 #include <pcl/io/ply_io.h>
 #include <pcl/PCLPointCloud2.h>
 #include <pcl/io/pcd_io.h>
+#include <pcl/common/centroid.h>
+#include <pcl/common/transforms.h>
 
 template PCLInputReaderWorkerThread < pcl::PointXYZRGB> ;
 template PCLInputReaderWorkerThread < pcl::PointXYZ>;
@@ -95,6 +97,14 @@ void PCLInputReaderWorkerThread< PointType >::readCloudData(const int index, con
 
 		//read the file
 		fileReader->read<PointType>(filePath, *cloud);
+
+		//center the point cloud
+		Eigen::Vector4f centroid;
+		pcl::compute3DCentroid(*cloud, centroid);
+		Eigen::Vector3f center(-centroid.x(), -centroid.y(), -centroid.z());
+		Eigen::Matrix4f m = Eigen::Affine3f(Eigen::Translation3f(center)).matrix();
+
+		pcl::transformPointCloud(*cloud, *cloud, m);
 
 		readingfileMessage << " finished";
 		printMessage(readingfileMessage.str());
