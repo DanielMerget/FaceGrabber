@@ -140,7 +140,7 @@ HRESULT UncoloredOutputStreamsUpdater::updateOutputStreams(IFaceModel* faceModel
 
 
 void UncoloredOutputStreamsUpdater::extractFaceHDPoinCloudAndBoundingBox(int bufferSize, CameraSpacePoint* cameraSpacePoints,
-	ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV)
+	ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeft, CameraSpacePoint& camBottomRight, std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV)
 {
 	//init bounding box
 	float bottom = FLT_MAX;
@@ -148,6 +148,7 @@ void UncoloredOutputStreamsUpdater::extractFaceHDPoinCloudAndBoundingBox(int buf
 	float right = -FLT_MAX;
 	float left = FLT_MAX;
 	float back = -FLT_MAX;
+	float front = FLT_MAX;
 	for (int i = 0; i < bufferSize; i++){
 		const auto& cameraSpacePoint = *cameraSpacePoints;
 		const auto& colorSpacePoint = *colorSpacePoints;
@@ -173,6 +174,7 @@ void UncoloredOutputStreamsUpdater::extractFaceHDPoinCloudAndBoundingBox(int buf
 		right = std::max(point.x, right);
 		left = std::min(point.x, left);
 		back = std::max(point.z, back);
+		front = std::min(point.z, front);
 
 		m_HDFacePointCloud->push_back(point);
 
@@ -181,25 +183,35 @@ void UncoloredOutputStreamsUpdater::extractFaceHDPoinCloudAndBoundingBox(int buf
 	}
 
 	//construct bounding box
-	camTopLeftBack.X = left;
-	camTopLeftBack.Y = top;
-	camTopLeftBack.Z = back;
+	//widen the box 1cm in each direction
+	top = top + 0.01;
+	bottom = bottom - 0.01;
+	left = left - 0.01;
+	right = right + 0.01;
+	back = back + 0.01;
+	front = front - 0.01;
+
+	camTopLeft.X = left;
+	camTopLeft.Y = top;
+	if (left < 0) camTopLeft.Z = front;
+	else camTopLeft.Z = back;
 
 
-	camBottomRightBack.X = right;
-	camBottomRightBack.Y = bottom;
-	camBottomRightBack.Z = back;
+	camBottomRight.X = right;
+	camBottomRight.Y = bottom;
+	if (right > 0) camBottomRight.Z = front;
+	else camBottomRight.Z = back;
 }
 
-bool UncoloredOutputStreamsUpdater::extractDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack,
+bool UncoloredOutputStreamsUpdater::extractDepthCloudFromBoundingBox(CameraSpacePoint camTopLeft, CameraSpacePoint camBottomRight,
 	std::vector<cv::Point2f>& hdFacePointsInCamSpaceOpenCV)
 {
 	//map corners of bounding box into color space for convex hull test
 	DepthSpacePoint depthTopLeftBack;
-	m_pCoordinateMapper->MapCameraPointToDepthSpace(camTopLeftBack, &depthTopLeftBack);
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camTopLeft, &depthTopLeftBack);
 
 	DepthSpacePoint depthBottomRightBack;
-	m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomRightBack, &depthBottomRightBack);
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomRight, &depthBottomRightBack);
 
 	if (!isValidDepthPoint(depthTopLeftBack) || !isValidDepthPoint(depthBottomRightBack)){
 		return false;
@@ -246,7 +258,7 @@ bool UncoloredOutputStreamsUpdater::extractDepthCloudFromBoundingBox(CameraSpace
 				point.z = camPoint.Z;
 			}
 
-			if (point.x < camTopLeftBack.X || point.x > camBottomRightBack.X)
+			if (point.x < camTopLeft.X || point.x > camBottomRight.X)
 				continue;
 			
 			m_FaceRawPointCloud->push_back(point);

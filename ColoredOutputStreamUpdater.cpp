@@ -159,7 +159,7 @@ HRESULT ColoredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, I
 
 
 void ColoredOutputStreamUpdater::extractColoredFaceHDPoinCloudAndBoundingBox(int bufferSize, CameraSpacePoint* cameraSpacePoints,
-	ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeftBack, CameraSpacePoint& camBottomRightBack, std::vector<cv::Point2f>& hdFacePointsInColorSpaceSpaceOpenCV)
+	ColorSpacePoint* colorSpacePoints, CameraSpacePoint& camTopLeft, CameraSpacePoint& camBottomRight, std::vector<cv::Point2f>& hdFacePointsInColorSpaceSpaceOpenCV)
 {
 	//init for bounding box
 	float bottom = FLT_MAX;
@@ -167,6 +167,7 @@ void ColoredOutputStreamUpdater::extractColoredFaceHDPoinCloudAndBoundingBox(int
 	float right = -FLT_MAX;
 	float left = FLT_MAX;
 	float back = -FLT_MAX;
+	float front = FLT_MAX;
 
 	std::vector<cv::Point2f> ellipsePoints;
 	for (int i = 0; i < bufferSize; i++){
@@ -192,6 +193,7 @@ void ColoredOutputStreamUpdater::extractColoredFaceHDPoinCloudAndBoundingBox(int
 		right = std::max(point.x, right);
 		left = std::min(point.x, left);
 		back = std::max(point.z, back);
+		front = std::min(point.z, front);
 		
 		//color the point
 		int colorImageIndex = ((m_colorWidth * colorY) + colorX);
@@ -207,26 +209,36 @@ void ColoredOutputStreamUpdater::extractColoredFaceHDPoinCloudAndBoundingBox(int
 	}
 
 	//construct bounding box
-	camTopLeftBack.X = left;
-	camTopLeftBack.Y = top;
-	camTopLeftBack.Z = back;
+	//widen the box 1cm in each direction
+	top = top + 0.01;
+	bottom = bottom - 0.01;
+	left = left - 0.01;
+	right = right + 0.01;
+	back = back + 0.01;
+	front = front - 0.01;
+
+	camTopLeft.X = left;
+	camTopLeft.Y = top;
+	if (left < 0) camTopLeft.Z = front;
+	else camTopLeft.Z = back;
 
 
-	camBottomRightBack.X = right;
-	camBottomRightBack.Y = bottom;
-	camBottomRightBack.Z = back;
+	camBottomRight.X = right;
+	camBottomRight.Y = bottom;
+	if (right > 0) camBottomRight.Z = front;
+	else camBottomRight.Z = back;
 }
 
 
-bool ColoredOutputStreamUpdater::extractColoredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeftBack, CameraSpacePoint camBottomRightBack,
+bool ColoredOutputStreamUpdater::extractColoredDepthCloudFromBoundingBox(CameraSpacePoint camTopLeft, CameraSpacePoint camBottomRight,
 	std::vector<cv::Point2f>& hdFacePointsInColorSpaceSpaceOpenCV)
 {
 	//map the bounding box points into depth space
 	DepthSpacePoint depthTopLeftBack;
-	m_pCoordinateMapper->MapCameraPointToDepthSpace(camTopLeftBack, &depthTopLeftBack);
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camTopLeft, &depthTopLeftBack);
 
 	DepthSpacePoint depthBottomRightBack;
-	m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomRightBack, &depthBottomRightBack);
+	m_pCoordinateMapper->MapCameraPointToDepthSpace(camBottomRight, &depthBottomRightBack);
 
 	cv::vector<cv::Point2f> hullPoints;
 	//check vor validty of transformed box corners
@@ -288,7 +300,7 @@ bool ColoredOutputStreamUpdater::extractColoredDepthCloudFromBoundingBox(CameraS
 				isInDepth = true;
 			}
 
-			if (point.x < camTopLeftBack.X || point.x > camBottomRightBack.X)
+			if (point.x < camTopLeft.X || point.x > camBottomRight.X)
 				continue;
 
 			if (isInColor && isInDepth){
