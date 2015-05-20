@@ -6,10 +6,10 @@
 #include <memory>
 
 enum RecordingFileFormat{
-	PLY,
-	PLY_BINARY,
-	PCD,
 	PCD_BINARY,
+	PCD,
+	PLY_BINARY,
+	PLY,
 	RECORD_FILE_FORMAT_COUNT
 };
 

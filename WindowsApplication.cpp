@@ -16,7 +16,7 @@ SharedRecordingConfiguration WindowsApplication::initRecordDataModel()
 {
 	SharedRecordingConfiguration recordingConfigurations(RECORD_CLOUD_TYPE_COUNT);
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		recordingConfigurations[i] = std::shared_ptr<RecordingConfiguration>(new RecordingConfiguration(static_cast<RecordCloudType>(i), PLY));
+		recordingConfigurations[i] = std::shared_ptr<RecordingConfiguration>(new RecordingConfiguration(static_cast<RecordCloudType>(i), PCD_BINARY));
 		recordingConfigurations[i]->recordConfigurationStatusChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(RecordCloudType, bool)>(&RecordTabHandler::recordConfigurationStatusChanged), &m_recordTabHandler, _1, _2));
 		recordingConfigurations[i]->recordPathOrFileNameChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(RecordCloudType)>(&RecordTabHandler::recordPathChanged), &m_recordTabHandler, _1));
 		recordingConfigurations[i]->setThreadCountToStart(2);
@@ -28,7 +28,7 @@ SharedImageRecordingConfiguration WindowsApplication::initImageRecordDataModel()
 {
 	SharedImageRecordingConfiguration recordingConfigurations(IMAGE_RECORD_TYPE_COUNT);
 	for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
-		recordingConfigurations[i] = std::shared_ptr<ImageRecordingConfiguration>(new ImageRecordingConfiguration(static_cast<ImageRecordType>(i), PNM_BINARY));
+		recordingConfigurations[i] = std::shared_ptr<ImageRecordingConfiguration>(new ImageRecordingConfiguration(static_cast<ImageRecordType>(i), PNG));
 		recordingConfigurations[i]->recordConfigurationStatusChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType, bool)>(&RecordTabHandler::recordConfigurationStatusChanged), &m_recordTabHandler, _1, _2));
 		recordingConfigurations[i]->recordPathOrFileNameChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType)>(&RecordTabHandler::recordPathChanged), &m_recordTabHandler, _1));
 		recordingConfigurations[i]->setThreadCountToStart(2);

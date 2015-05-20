@@ -6,8 +6,8 @@
 #include <memory>
 
 enum ImageRecordingFileFormat{
-	PNM_BINARY,
 	PNG,
+	PNM_BINARY,
 	IMAGE_RECORD_FILE_FORMAT_COUNT
 };
 
