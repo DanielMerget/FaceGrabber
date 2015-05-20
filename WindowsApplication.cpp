@@ -198,7 +198,7 @@ void WindowsApplication::connectStreamUpdaterToViewer()
 		//we skip enabling the fulldepth raw and kinect raw; this signal is connected 
 		//only if recording is enabled; this way, full depth buffer conversion is skipped 
 		//if not recorded
-		if (i == FullDepthRaw){
+		if (i == FullDepthRaw || i == HDFace2D){
 			continue;
 		}
 		//bind to the writer
@@ -449,16 +449,16 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 			auto recordingConfig = recordingConfigurations[i];
 			auto cloudWriter = m_colorCloudOutputWriter[i];
-			if (i == FullDepthRaw){
-				//make sure the FullDepthRaw was disconnected from last recording session
+			if (i == FullDepthRaw || i == HDFace2D){
+				//make sure the FullDepthRaw and HDFace2D was disconnected from last recording session
 				//we only want to do that point cloud creation if required
 				m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 				m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 			}
 			cloudWriter->setRecordingConfiguration(recordingConfig);
 			if (recordingConfig->isEnabled()){
-				//we agreed on manually enabling the FullDepthRaw file writer, so we do not that cloud if not required
-				if (i == FullDepthRaw){
+				//we agreed on manually enabling the FullDepthRaw and HDFace2D file writer, so we do not that cloud if not required
+				if (i == FullDepthRaw || i == HDFace2D){
 					m_coloredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZRGB>::pushCloudAsync, cloudWriter, _1));
 				}
 				cloudWriter->startWriting();
@@ -469,16 +469,16 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 			auto recordingConfig = recordingConfigurations[i];
 			auto cloudWriter = m_uncoloredCloudOutputWriter[i];
-			if (i == FullDepthRaw){
-				//make sure the FullDepthRaw was disconnected from last recording session
+			if (i == FullDepthRaw || i == HDFace2D){
+				//make sure the FullDepthRaw and HDFace2D was disconnected from last recording session
 				//we only want to do that point cloud creation if required
 				m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 				m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 			}
 			cloudWriter->setRecordingConfiguration(recordingConfig);
 			if (recordingConfig->isEnabled()){
-				//we agreed on manually enabling the FullDepthRaw file writer, so we do not that cloud if not required
-				if (i == FullDepthRaw){
+				//we agreed on manually enabling the FullDepthRaw and HDFace2D file writer, so we do not that cloud if not required
+				if (i == FullDepthRaw || i == HDFace2D){
 					m_uncoloredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZ>::pushCloudAsync, cloudWriter, _1));
 				}
 				cloudWriter->startWriting();
@@ -569,8 +569,8 @@ void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConf
 				cloudWriter->stopWriting();
 			}
 
-			//disconect again so FullDepthRaw is not created anymore
-			if (i == FullDepthRaw){
+			//disconect again so FullDepthRaw and HDFace2D is not created anymore
+			if (i == FullDepthRaw || i == HDFace2D){
 				m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 			}
 		}
@@ -584,8 +584,8 @@ void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConf
 			if (recordingConfig->isEnabled()){
 				cloudWriter->stopWriting();
 			}
-			//disconect again so FullDepthRaw is not created anymore
-			if (i == FullDepthRaw){
+			//disconect again so FullDepthRaw and HDFace2D is not created anymore
+			if (i == FullDepthRaw || i == HDFace2D){
 				m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 			}
 		}

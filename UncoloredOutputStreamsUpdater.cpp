@@ -25,6 +25,8 @@ void UncoloredOutputStreamsUpdater::allocateClouds()
 	m_FaceRawPointCloud->is_dense = false;
 	m_FaceRawPointCloud_centered = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud <pcl::PointXYZ>());
 	m_FaceRawPointCloud_centered->is_dense = false;
+	m_HDFacePointCloud2D = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud <pcl::PointXYZ>());
+	m_HDFacePointCloud2D->is_dense = false;
 }
 
 void UncoloredOutputStreamsUpdater::setCeterEnabled(bool enable)
@@ -83,6 +85,12 @@ void UncoloredOutputStreamsUpdater::stopFaceCollection()
 		auto fullDepthBufferCloud = convertDepthBufferToPointCloud();
 		// update writer
 		cloudUpdated[2](fullDepthBufferCloud);
+	}
+
+	//HDFace2D
+	if (!cloudUpdated[3].empty()){
+		// update writer
+		cloudUpdated[3](m_HDFacePointCloud2D);
 	}
 
 	//KinectColorRaw
@@ -155,9 +163,13 @@ void UncoloredOutputStreamsUpdater::extractFaceHDPoinCloudAndBoundingBox(int buf
 
 		//copy 3D coordinates
 		pcl::PointXYZ point;
+		pcl::PointXYZ point2D;
 		point.x = cameraSpacePoint.X;
 		point.y = cameraSpacePoint.Y;
 		point.z = cameraSpacePoint.Z;
+		point2D.x = colorSpacePoint.X;
+		point2D.y = colorSpacePoint.Y;
+		point2D.z = 0;
 		
 		//get color index for convex hull raw face depth point
 		int colorX = static_cast<int>(std::floor(colorSpacePoint.X + 0.5f));
@@ -177,6 +189,7 @@ void UncoloredOutputStreamsUpdater::extractFaceHDPoinCloudAndBoundingBox(int buf
 		front = std::min(point.z, front);
 
 		m_HDFacePointCloud->push_back(point);
+		m_HDFacePointCloud2D->push_back(point2D);
 
 		cameraSpacePoints++;
 		colorSpacePoints++;

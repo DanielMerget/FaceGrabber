@@ -47,8 +47,8 @@ public:
 	/** \brief	The clouds updated. */
 	boost::signals2::signal<void(std::vector<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>)> cloudsUpdated;
 
-	/** \brief	The clouds updated:  cloudUpdated[0]: HDFace; cloudUpdated[1]: RawFaceDepth; cloudUpdated[2]: FullRawpDeth */
-	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud)> cloudUpdated[3];
+	/** \brief	The clouds updated:  cloudUpdated[0]: HDFace; cloudUpdated[1]: RawFaceDepth; cloudUpdated[2]: FullRawpDeth; cloudUpdated[3]: HDFace2D */
+	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud)> cloudUpdated[4];
 
 	/** \brief	The images updated */
 	boost::signals2::signal<void(boost::shared_ptr<cv::Mat>)> imageUpdated[2];
@@ -151,6 +151,9 @@ private:
 
 	/** \brief	The centered face raw point cloud. */
 	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_FaceRawPointCloud_centered;
+
+	/** \brief	The HD face point cloud 2D ColorSpace representation. */
+	pcl::PointCloud<pcl::PointXYZRGB>::Ptr m_HDFacePointCloud2D;
 	
 
 	/** \brief	The depth visibility test map for checking whether color camera is able to see provided depth points. */

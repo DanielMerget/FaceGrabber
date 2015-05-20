@@ -42,6 +42,8 @@ void ColoredOutputStreamUpdater::allocateClouds()
 	m_FaceRawPointCloud->is_dense = false;
 	m_FaceRawPointCloud_centered = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud <pcl::PointXYZRGB>());
 	m_FaceRawPointCloud_centered->is_dense = false;
+	m_HDFacePointCloud2D = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud <pcl::PointXYZRGB>());
+	m_HDFacePointCloud2D->is_dense = false;
 }
 
 void ColoredOutputStreamUpdater::setCeterEnabled(bool enable)
@@ -103,6 +105,12 @@ void ColoredOutputStreamUpdater::stopFaceCollection()
 		auto depthBufferCloud = convertDepthBufferToPointCloud();
 		// update writer
 		cloudUpdated[2](depthBufferCloud);
+	}
+
+	//HDFace2D
+	if (!cloudUpdated[3].empty()){
+		// update writer
+		cloudUpdated[3](m_HDFacePointCloud2D);
 	}
 
 	//KinectColorRaw
@@ -174,9 +182,13 @@ void ColoredOutputStreamUpdater::extractColoredFaceHDPoinCloudAndBoundingBox(int
 		const auto& cameraSpacePoint = *cameraSpacePoints;
 		const auto& colorSpacePoint = *colorSpacePoints;
 		pcl::PointXYZRGB point;
+		pcl::PointXYZRGB point2D;
 		point.x = cameraSpacePoint.X;
 		point.y = cameraSpacePoint.Y;
 		point.z = cameraSpacePoint.Z;
+		point2D.x = colorSpacePoint.X;
+		point2D.y = colorSpacePoint.Y;
+		point2D.z = 0;
 
 		//find color buffer indices
 		int colorX = static_cast<int>(std::floor(colorSpacePoint.X + 0.5f));
@@ -201,8 +213,12 @@ void ColoredOutputStreamUpdater::extractColoredFaceHDPoinCloudAndBoundingBox(int
 		point.r = pixel.rgbRed;
 		point.g = pixel.rgbGreen;
 		point.b = pixel.rgbBlue;
+		point2D.r = pixel.rgbRed;
+		point2D.g = pixel.rgbGreen;
+		point2D.b = pixel.rgbBlue;
 
 		m_HDFacePointCloud->push_back(point);
+		m_HDFacePointCloud2D->push_back(point2D);
 
 		cameraSpacePoints++;
 		colorSpacePoints++;

@@ -50,6 +50,8 @@ CString RecordingConfiguration::getDefaultFileName()
 		return CString(L"Face_Raw");
 	case FullDepthRaw:
 		return CString(L"Full_Raw_Depth");
+	case HDFace2D:
+		return CString(L"HD_Face_2D");
 	default:
 		return CString(L"Cloud");
 	}
@@ -179,6 +181,8 @@ CString RecordingConfiguration::getSubFolderNameForCloudType(RecordCloudType clo
 		return L"FaceRaw";
 	case FullDepthRaw:
 		return L"FullDepthRaw";
+	case HDFace2D:
+		return L"HDFace2D";
 	case RECORD_CLOUD_TYPE_COUNT:
 		break;
 	default:
