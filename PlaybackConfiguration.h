@@ -89,6 +89,25 @@ public:
 	bool isEnabled();
 
 	/**
+	* \fn	bool PlaybackConfiguration::isCenteredReading();
+	*
+	* \brief	Query if the centered Reading.
+	*
+	* \return	true if enabled, false if not.
+	*/
+	bool isCenteredReading();
+
+	/**
+	* \fn	void PlaybackConfiguration::setCenteredReading(bool enable);
+	*
+	* \brief	Sets centering for reading.
+	*
+	* \param	enable	true if enabled, false if not.
+	*/
+
+	void setCenteredReading(bool enable);
+
+	/**
 	 * \fn	RecordingFileFormat PlaybackConfiguration::getRecordFileFormat();
 	 *
 	 * \brief	Gets record file format.
@@ -251,6 +270,9 @@ private:
 
 	/** \brief	true to enable, false to disable the PlaybackConfiguration. */
 	bool						m_enabled;
+
+	/** \brief	true to enable, false to disable the centering of the read cloud. */
+	bool						m_centeredReading;
 
 	/** \brief	true if was full played. */
 	bool						m_wasFullPlayed;

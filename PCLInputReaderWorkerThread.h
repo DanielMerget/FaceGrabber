@@ -23,7 +23,7 @@ public:
 	~PCLInputReaderWorkerThread();
 
 	/**
-	 * \fn	void PCLInputReaderWorkerThread::readCloudData(const int index, const int step, std::vector<CloudFile> cloudFilesToPlay, RecordingFileFormat format);
+	 * \fn	void PCLInputReaderWorkerThread::readCloudData(const int index, const int step, const bool centeredReading, std::vector<CloudFile> cloudFilesToPlay, RecordingFileFormat format);
 	 *
 	 * \brief	Reads point cloud files. For the given index and step-size all files are red and stored in the
 	 * 			set buffer. e.g. for index = 2 and step = 3: the files with indecies 2, 5, 7 of the
@@ -31,10 +31,11 @@ public:
 	 *
 	 * \param	index				Zero-based index of the files in the cloudFilesToPlay to be read.
 	 * \param	step				Amount to increment the index to calculate the next index to read.
+	 * \param	centeredReading		Center cloud while reading
 	 * \param	cloudFilesToPlay	The cloud files to play.
 	 * \param	format				Describes the format to use.
 	 */
-	void readCloudData(const int index, const int step, std::vector<CloudFile> cloudFilesToPlay, RecordingFileFormat format);
+	void readCloudData(const int index, const int step, const bool centeredReading, std::vector<CloudFile> cloudFilesToPlay, RecordingFileFormat format);
 
 	/**
 	 * \fn	void PCLInputReaderWorkerThread::stopReading();

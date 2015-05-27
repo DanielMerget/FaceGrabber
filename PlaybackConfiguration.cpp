@@ -2,7 +2,7 @@
 #include "PlaybackConfiguration.h"
 
 
-PlaybackConfiguration::PlaybackConfiguration() : m_filePath(), m_enabled(false), m_wasFullPlayed(false)
+PlaybackConfiguration::PlaybackConfiguration() : m_filePath(), m_enabled(false), m_wasFullPlayed(false), m_centeredReading(false)
 {}
 
 PlaybackConfiguration::PlaybackConfiguration(PlaybackConfiguration& playbackConfigurationToCopy)
@@ -11,6 +11,7 @@ PlaybackConfiguration::PlaybackConfiguration(PlaybackConfiguration& playbackConf
 	this->m_fileFormat = playbackConfigurationToCopy.m_fileFormat;
 	this->m_filePath = playbackConfigurationToCopy.m_filePath;
 	this->m_foundCloudFiles = playbackConfigurationToCopy.m_foundCloudFiles;
+	this->m_centeredReading = playbackConfigurationToCopy.m_centeredReading;
 }
 
 PlaybackConfiguration& PlaybackConfiguration::operator= (const PlaybackConfiguration& rhs)
@@ -20,12 +21,14 @@ PlaybackConfiguration& PlaybackConfiguration::operator= (const PlaybackConfigura
 	this->m_filePath	= rhs.m_filePath;
 	this->m_foundCloudFiles = rhs.m_foundCloudFiles;
 	this->m_wasFullPlayed = rhs.m_wasFullPlayed;
+	this->m_centeredReading = rhs.m_centeredReading;
 	return *this;
 }
 
 PlaybackConfiguration::PlaybackConfiguration(RecordingConfiguration& recordConfiguration) :
 m_enabled(false),
 m_fileFormat(recordConfiguration.getRecordFileFormat()),
+m_centeredReading(false),
 m_wasFullPlayed(false)
 {
 	auto fullFilePath = recordConfiguration.getFullRecordingPath();
@@ -51,12 +54,12 @@ bool PlaybackConfiguration::isPlaybackConfigurationValid()
 
 bool PlaybackConfiguration::operator == (PlaybackConfiguration& playbackToCompareWith)
 {
-	auto cloudCoundOfFilesInDirectoryToPlay = playbackToCompareWith.getCloudFilesToPlayCount();
-	bool sameCloudCoundOfFilesInDirectoryToPlay = cloudCoundOfFilesInDirectoryToPlay == getCloudFilesToPlayCount();
-	if (!sameCloudCoundOfFilesInDirectoryToPlay){
+	auto cloudCountOfFilesInDirectoryToPlay = playbackToCompareWith.getCloudFilesToPlayCount();
+	bool sameCloudCountOfFilesInDirectoryToPlay = cloudCountOfFilesInDirectoryToPlay == getCloudFilesToPlayCount();
+	if (!sameCloudCountOfFilesInDirectoryToPlay){
 		return false;
 	}
-	if (cloudCoundOfFilesInDirectoryToPlay > 0){
+	if (cloudCountOfFilesInDirectoryToPlay > 0){
 		auto fullPathOfFirstPlaybackFile = playbackToCompareWith.getCloudFilesToPlay()[0].fullFilePath;
 		auto filepath = getCloudFilesToPlay()[0].fullFilePath;
 		return fullPathOfFirstPlaybackFile == filepath;
@@ -68,6 +71,16 @@ bool PlaybackConfiguration::operator == (PlaybackConfiguration& playbackToCompar
 bool PlaybackConfiguration::isEnabled()
 {
 	return m_enabled;
+}
+
+bool PlaybackConfiguration::isCenteredReading()
+{
+	return m_centeredReading;
+}
+
+void PlaybackConfiguration::setCenteredReading(bool enable)
+{
+	m_centeredReading = enable;
 }
 
 RecordingFileFormat PlaybackConfiguration::getRecordFileFormat()

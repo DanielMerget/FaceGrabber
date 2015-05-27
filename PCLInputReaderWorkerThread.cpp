@@ -44,7 +44,7 @@ void PCLInputReaderWorkerThread< PointType >::setBuffer(std::shared_ptr<Buffer< 
 }
 
 template < typename PointType >
-void PCLInputReaderWorkerThread< PointType >::readCloudData(const int index, const int step, std::vector<CloudFile> cloudFilesToPlay, RecordingFileFormat format)
+void PCLInputReaderWorkerThread< PointType >::readCloudData(const int index, const int step, const bool centeredReading, std::vector<CloudFile> cloudFilesToPlay, RecordingFileFormat format)
 {
 	m_isPlaybackRunning = true;
 	int indexOfFileToRead = index;
@@ -98,13 +98,15 @@ void PCLInputReaderWorkerThread< PointType >::readCloudData(const int index, con
 		//read the file
 		fileReader->read<PointType>(filePath, *cloud);
 
-		//center the point cloud
-		Eigen::Vector4f centroid;
-		pcl::compute3DCentroid(*cloud, centroid);
-		Eigen::Vector3f center(-centroid.x(), -centroid.y(), -centroid.z());
-		Eigen::Matrix4f m = Eigen::Affine3f(Eigen::Translation3f(center)).matrix();
+		if (centeredReading){
+			//center the point cloud
+			Eigen::Vector4f centroid;
+			pcl::compute3DCentroid(*cloud, centroid);
+			Eigen::Vector3f center(-centroid.x(), -centroid.y(), -centroid.z());
+			Eigen::Matrix4f m = Eigen::Affine3f(Eigen::Translation3f(center)).matrix();
 
-		pcl::transformPointCloud(*cloud, *cloud, m);
+			pcl::transformPointCloud(*cloud, *cloud, m);
+		}
 
 		readingfileMessage << " finished";
 		printMessage(readingfileMessage.str());

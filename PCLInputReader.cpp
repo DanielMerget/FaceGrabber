@@ -79,11 +79,12 @@ void PCLInputReader< PointType >::createAndStartThreadForIndex(int index, int nu
 {
 	auto recordingType = m_playbackConfiguration.getRecordFileFormat();
 	auto filesToPlay = m_playbackConfiguration.getCloudFilesToPlay();
+	bool centeredReading = m_playbackConfiguration.isCenteredReading();
 	std::shared_ptr<PCLInputReaderWorkerThread<PointType>> reader(new PCLInputReaderWorkerThread<PointType>);
 	reader->setBuffer(m_buffer);
 	reader->finishedReadingAFile.connect(boost::bind(&PCLInputReader<PointType>::readerFinishedReadingAFile, this));
 	m_inputReaderWorkerThreads.push_back(reader);
-	m_readerThreads.push_back(std::thread(&PCLInputReaderWorkerThread<PointType>::readCloudData, reader, index, numOfThreads, filesToPlay, recordingType));
+	m_readerThreads.push_back(std::thread(&PCLInputReaderWorkerThread<PointType>::readCloudData, reader, index, numOfThreads, centeredReading, filesToPlay, recordingType));
 }
 
 template <typename PointType>

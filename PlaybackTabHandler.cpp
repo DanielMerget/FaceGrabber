@@ -33,6 +33,8 @@ void PlaybackTabHandler::setSharedRecordingConfiguration(SharedRecordingConfigur
 	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
 		m_playbackConfiguration[i] = std::shared_ptr<PlaybackConfiguration>(new PlaybackConfiguration(*recordingConfiguration[i]));
 		m_playbackConfiguration[i]->playbackConfigurationChanged.connect(boost::bind(&PlaybackTabHandler::playbackConfigurationChanged, this));
+		// center for playback
+		m_playbackConfiguration[i]->setCenteredReading(true);
 	}
 	//init file path
 	auto outputFolderPath = recordingConfiguration[HDFace]->getFilePathCString();

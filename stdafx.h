@@ -12,6 +12,8 @@
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #endif
 
+#define _VARIADIC_MAX 6 // Max arguments increased for PCLInputReaderWorkerThread::readCloudData(...)
+
 // Windows Header Files
 #include <windows.h>
 

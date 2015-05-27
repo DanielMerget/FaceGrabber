@@ -8,6 +8,7 @@ ConvertTabHandler::ConvertTabHandler():
 	m_recordingConfiguration(new SimpleRecordingConfiguration)
 {
 	m_playbackConfiguration->setEnabled(true);
+	m_playbackConfiguration->setCenteredReading(false);
 }
 
 
