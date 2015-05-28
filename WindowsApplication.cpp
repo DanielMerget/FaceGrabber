@@ -4,6 +4,7 @@
 
 WindowsApplication::WindowsApplication() :
 	m_nNextStatusTime(0),
+	m_FPSLimit(0),
 	m_isKinectRunning(true),
 	m_bufferSynchronizer(true),
 	m_pDrawDataStreams(nullptr),
@@ -75,9 +76,15 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	// Show window
 	ShowWindow(hWndApp, nCmdShow);
 
+	clock_t start;
+	float timedelta;
+	std::stringstream FPSinfo;
+
 	// Main message loop
 	while (WM_QUIT != msg.message)
 	{
+		start = clock();
+
 		if (m_isKinectRunning){
 			m_kinectFrameGrabber.update();
 		}
@@ -92,6 +99,21 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
 		}
+
+		if (m_FPSLimit != 0)
+		{
+			// timedelta in seconds
+			timedelta = (float(clock() - start)) / CLOCKS_PER_SEC;
+			// if faster than specified target fps: sleep
+			if (timedelta < (1.0 / m_FPSLimit)) Sleep(((1.0 / m_FPSLimit) - timedelta) * 1000);
+		}
+
+		FPSinfo.str("");
+		FPSinfo.clear();
+		FPSinfo << "UPDATE Loop actual fps: " << CLOCKS_PER_SEC / (float(clock() - start)) << " target fps: " << m_FPSLimit;
+		auto msgCstring = CString(FPSinfo.str().c_str());
+		msgCstring += L"\n";
+		OutputDebugString(msgCstring);
 	}
 
 	return static_cast<int>(msg.wParam);
@@ -254,6 +276,7 @@ void WindowsApplication::initTabs()
 		reinterpret_cast<LPARAM>(&m_recordTabHandler));
 	m_recordTabHandler.colorConfigurationChanged.connect(boost::bind(&WindowsApplication::colorStreamingChangedTo, this, _1));
 	m_recordTabHandler.centerConfigurationChanged.connect(boost::bind(&WindowsApplication::centerRecordingChangedTo, this, _1));
+	m_recordTabHandler.fpsLimitUpdated.connect(boost::bind(&WindowsApplication::setFPSLimit, this, _1));
 	m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1, _2, _3));
 	m_recordTabHandler.stopWriting.connect(boost::bind(&WindowsApplication::stopRecording, this, _1, _2, _3));
 
@@ -610,6 +633,11 @@ void WindowsApplication::centerRecordingChangedTo(bool enable)
 {
 	m_coloredOutputStreamUpdater->setCeterEnabled(enable);
 	m_uncoloredOutputStreamUpdater->setCeterEnabled(enable);
+}
+
+void WindowsApplication::setFPSLimit(int fps)
+{
+	m_FPSLimit = fps;
 }
 
 bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce)

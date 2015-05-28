@@ -263,6 +263,15 @@ private:
 	void centerRecordingChangedTo(bool enable);
 
 	/**
+	* \fn	void WindowsApplication::setFPSLimit(int fps);
+	*
+	* \brief	Sets fps limit
+	*
+	* \param	fps.
+	*/
+	void setFPSLimit(int fps);
+
+	/**
 	 * \fn	int WindowsApplication::insertTabItem(HWND tab, LPTSTR text, int tabid);
 	 *
 	 * \brief	Inserts a tab item into Windows Application tap-control
@@ -353,6 +362,9 @@ private:
 	std::shared_ptr<ColoredOutputStreamUpdater> m_coloredOutputStreamUpdater;
 
 	/** \brief	The non colored output stream updater. */
-	std::shared_ptr<UncoloredOutputStreamsUpdater> m_uncoloredOutputStreamUpdater;	
+	std::shared_ptr<UncoloredOutputStreamsUpdater> m_uncoloredOutputStreamUpdater;
+
+	/** \brief	FPS Limit. */
+	int m_FPSLimit;
 };
 

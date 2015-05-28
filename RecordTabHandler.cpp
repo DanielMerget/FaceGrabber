@@ -317,6 +317,25 @@ void RecordTabHandler::updateFrameLimit()
 		recordConfig->setMaxNumberOfFrames(limitAsInt);
 	}
 }
+
+void RecordTabHandler::updateFPSLimit()
+{
+	bool isLimited = IsDlgButtonChecked(m_hWnd, IDC_LIMIT_FRAMERATE_CHECK);
+	Edit_Enable(GetDlgItem(m_hWnd, IDC_LIMIT_FRAMRATE_EDIT_BOX), isLimited);
+
+	int fps = 0;
+
+	//if the user has set an limit it is now parsed and overridden
+	if (isLimited){
+		auto editBoxHandle = GetDlgItem(m_hWnd, IDC_LIMIT_FRAMRATE_EDIT_BOX);
+		std::vector<wchar_t> buffer(MAX_PATH);
+		Edit_GetText(editBoxHandle, buffer.data(), buffer.size());
+		fps = _tstoi(buffer.data());
+	}
+
+	fpsLimitUpdated(fps);
+}
+
 void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 {
 	switch (LOWORD(wParam))
@@ -337,6 +356,9 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		setRecording(!m_isRecording);
 		break;
 	}
+	case IDC_LIMIT_FRAMERATE_CHECK:
+		updateFPSLimit();
+		break;
 	case IDC_HD_FACE_CHECKBOX:
 		m_recordingConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
 		break;
@@ -403,6 +425,9 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 		break;
 	case IDC_LIMIT_FRAMES_EDIT_BOX:
 		updateFrameLimit();
+		break;
+	case IDC_LIMIT_FRAMRATE_EDIT_BOX:
+		updateFPSLimit();
 		break;
 	case IDC_FILE_PATH_EDIT_BOX:
 	{

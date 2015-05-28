@@ -99,7 +99,6 @@ public:
 	 *
 	 * \return	true if recording, false if not.
 	 */
-
 	bool isRecording();
 
 	/**
@@ -122,10 +121,13 @@ public:
 	*/
 	void updateWriterStatus(ImageRecordType type, std::wstring status);
 
-	/** \brief	The color configuration changed signal: color is noew enabled or not. */
+	/** \brief	The fps limit changed signal. */
+	boost::signal<void(int)> fpsLimitUpdated;
+
+	/** \brief	The color configuration changed signal: color is now enabled or not. */
 	boost::signal<void(bool)> colorConfigurationChanged;
 
-	/** \brief	The color configuration changed signal: color is noew enabled or not. */
+	/** \brief	The color configuration changed signal: color is now enabled or not. */
 	boost::signal<void(bool)> centerConfigurationChanged;
 
 	/** \brief	The start writing signal. */
@@ -230,6 +232,15 @@ private:
 	 */
 
 	void updateFrameLimit();
+
+	/**
+	* \fn	void RecordTabHandler::updateFPSLimit();
+	*
+	* \brief	Updates the fps limit according to the new values in the UI
+	* 			which has changed by the user.
+	*/
+
+	void updateFPSLimit();
 
 
 	/** \brief	The recording configuration. */
