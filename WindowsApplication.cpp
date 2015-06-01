@@ -77,7 +77,8 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	ShowWindow(hWndApp, nCmdShow);
 
 	clock_t start;
-	float timedelta;
+	double timedelta;
+	double actualFPS;
 	std::stringstream FPSinfo;
 
 	// Main message loop
@@ -103,14 +104,16 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 		if (m_FPSLimit != 0)
 		{
 			// timedelta in seconds
-			timedelta = (float(clock() - start)) / CLOCKS_PER_SEC;
+			timedelta = (double(clock() - start)) / CLOCKS_PER_SEC;
 			// if faster than specified target fps: sleep
 			if (timedelta < (1.0 / m_FPSLimit)) Sleep(((1.0 / m_FPSLimit) - timedelta) * 1000);
 		}
 
+		actualFPS = CLOCKS_PER_SEC / (float(clock() - start));
+
 		FPSinfo.str("");
 		FPSinfo.clear();
-		FPSinfo << "UPDATE Loop actual fps: " << CLOCKS_PER_SEC / (float(clock() - start)) << " target fps: " << m_FPSLimit;
+		FPSinfo << "UPDATE Loop actual fps: " << actualFPS << " target fps: " << m_FPSLimit;
 		auto msgCstring = CString(FPSinfo.str().c_str());
 		msgCstring += L"\n";
 		OutputDebugString(msgCstring);
