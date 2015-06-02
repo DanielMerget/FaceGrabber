@@ -63,7 +63,7 @@ void KinectImageWriterThread::writeImagesToFile(IImageRecordingConfigurationPtr 
 
 		//write data to constructed path
 		std::stringstream outputFileWithPath;
-		outputFileWithPath << filePath << "\\" << fileName << "_" << measurement.index << fileFormatExtension;
+		outputFileWithPath << filePath << "\\" << fileName << "_" << std::setfill('0') << std::setw(6) << measurement.index << fileFormatExtension;
 
 		cv::imwrite(outputFileWithPath.str(), *measurement.image);
 
