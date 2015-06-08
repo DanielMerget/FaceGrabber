@@ -44,7 +44,7 @@ void KinectImageWriterThread::writeImagesToFile(IImageRecordingConfigurationPtr 
 		measurement.index = 0;
 		bool isDone = m_source->pullData(measurement);
 		if (!measurement.image){
-			OutputDebugString(L"writer finished cloud null");
+			OutputDebugString(L"writer finished image null");
 			return;
 		}
 

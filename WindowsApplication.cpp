@@ -463,10 +463,15 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 		auto recordingConfig = imageRecordingConfigurations[i];
 		auto imageWriter = m_imageOutputWriter[i];
 		imageWriter->setRecordingConfiguration(recordingConfig);
+
+		//disconnect all connected signals
+		m_coloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
+		m_uncoloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
+
 		if (recordingConfig->isEnabled()){
 			//we agreed on manually enabling the Raw image writer, so we do not that image creation if not required
-			m_coloredOutputStreamUpdater->imageUpdated[i].connect(boost::bind(&KinectRawFileWriter::pushImageAsync, imageWriter, _1));
-			m_uncoloredOutputStreamUpdater->imageUpdated[i].connect(boost::bind(&KinectRawFileWriter::pushImageAsync, imageWriter, _1));
+			if (isColoredStream) m_coloredOutputStreamUpdater->imageUpdated[i].connect(boost::bind(&KinectRawFileWriter::pushImageAsync, imageWriter, _1));
+			else m_uncoloredOutputStreamUpdater->imageUpdated[i].connect(boost::bind(&KinectRawFileWriter::pushImageAsync, imageWriter, _1));
 			imageWriter->startWriting();
 		}
 	}
@@ -578,11 +583,11 @@ void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConf
 		auto recordingConfig = imageRecordingConfigurations[i];
 		auto imageWriter = m_imageOutputWriter[i];
 		if (recordingConfig->isEnabled()){
-			//disconnect all connected signals
-			m_coloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
-			m_uncoloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
 			imageWriter->stopWriting();
 		}
+		//disconnect all connected signals
+		m_coloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
+		m_uncoloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
 	}
 	//stop the correct writer
 	if (isColoredStream){
