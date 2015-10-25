@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "MessageRouterHelper.h"
 
-
 MessageRouterHelper::MessageRouterHelper()
 {
 }
@@ -60,6 +59,9 @@ LRESULT CALLBACK MessageRouterHelper::DlgProc(HWND hWnd, UINT message, WPARAM wP
 	case WM_COMMAND:
 		processUIMessage(wParam, lParam);
 		break;
+	case WM_HSCROLL:
+		onSliderChanged(wParam, lParam);
+		break;
 	case WM_NOTIFY:
 		switch (((LPNMHDR)lParam)->code)
 		{
@@ -99,7 +101,10 @@ void MessageRouterHelper::processUIMessage(WPARAM wParam, LPARAM handle)
 	}
 }
 
+void MessageRouterHelper::onSliderChanged(WPARAM wParam, LPARAM handle)
+{
 
+}
 void MessageRouterHelper::onSelectionChanged(WPARAM wParam, LPARAM handle)
 {
 

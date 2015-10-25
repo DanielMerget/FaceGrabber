@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Microsoft Visual C++ generated include file.
-// Used by FaceBasics.rc
+// Von Microsoft Visual C++ generierte Includedatei.
+// Verwendet durch FaceBasics.rc
 //
 #define IDI_APP                         100
 #define IDD_DIALOGBAR                   103
@@ -33,6 +33,7 @@
 #define IDC_TAB_PLAYBACK                1036
 #define IDC_CHECK1                      1037
 #define IDC_SLIDER1                     1038
+#define IDC_PLAYBACK_SLIDER             1038
 #define IDC_LIST2                       1039
 #define IDC_RECODINGS_LIST_BOX          1039
 #define IDC_COMBO1                      1040
@@ -70,11 +71,15 @@
 #define IDC_KINECT_RAW_DEPTH_CHECKBOX   1060
 #define IDC_EDIT2                       1061
 #define IDC_LIMIT_FRAMES_EDIT_BOX       1061
+#define IDC_PLAY_PAUSE_BUTTON           1061
 #define IDC_EDIT_BOX_OUTPUT_FOLDER_CONVERT 1062
 #define IDC_KINECT_RAW_DEPTH_EDIT_BOX   1062
+#define IDC_PLAY_PREV_FRAME_BUTTON      1062
 #define IDC_TAB_CONVERT                 1063
 #define IDC_KINECT_DEPTH_COMBO_BOX      1063
 #define IDC_KINECT_RAW_DEPTH_COMBO_BOX  1063
+#define IDC_PLAY_NEXT_FRAME_BUTTON3     1063
+#define IDC_PLAY_NEXT_FRAME_BUTTON      1063
 #define IDC_BUTTON_CONVERT              1064
 #define IDC_CHECK_BOX_SINGLE_THREATED_READING 1064
 #define IDC_KINECT_RAW_DEPTH_COMBO_BOX_THREADS 1064
@@ -85,8 +90,10 @@
 #define IDC_TEXT_LABEL_FOUND_FILES      1067
 #define IDC_HDFACE_EDIT_BOX2            1067
 #define IDC_HDFACE_2D_EDIT_BOX          1067
+#define IDC_LIMIT_PLAYBACK_FRAMRATE_EDIT_BOX 1067
 #define IDC_CHECKBOX_COLOR              1068
 #define IDC_HD_FACE_2D_COMBO_BOX        1068
+#define IDC_LIMIT_PLAYBACK_FRAMERATE_CHECK 1068
 #define IDC_TEXT_LABEL_STATUS_READER    1069
 #define IDC_HD_FACE_2D_COMBO_BOX_THREADS 1069
 #define IDC_TEXT_LABEL_STATUS_WRITER    1070
@@ -110,7 +117,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1066
+#define _APS_NEXT_CONTROL_VALUE         1069
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
