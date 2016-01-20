@@ -10,3 +10,5 @@ PCL (sub-)dependencies
 - Eigen
 - QT (e.g., 4.8.5)
 - OpenNI
+
+The current Visual Studio solution file (.sln) expects all libraries to be installed in C:/Libraries/$Library_Name
