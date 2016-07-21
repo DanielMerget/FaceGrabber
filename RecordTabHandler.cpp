@@ -189,6 +189,8 @@ void RecordTabHandler::onCreate()
 	CheckDlgButton(m_hWnd, HD_FACE_SHOW_RADIO, true);
 	m_commonConfiguration[KinectV2_COMMON]->setFacePointsShowOpt(FacePointsShowOpt::HDFacePoints_Opt);
 
+	CheckDlgButton(m_hWnd, IDC_KINECT_REMOVE_BG_CHECKBOX, m_commonConfiguration[KinectV2_COMMON]->isKeepBGEnabled());
+
 }
 
 bool RecordTabHandler::isColorEnabled()

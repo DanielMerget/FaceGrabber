@@ -2,7 +2,7 @@
 #include "stdafx.h"
 #include "CommonConfiguration.h"
 
-CommonConfiguration::CommonConfiguration()
+CommonConfiguration::CommonConfiguration():m_keepBGEnabled(true),m_Enabled(false)
 {
 
 }

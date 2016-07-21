@@ -143,7 +143,7 @@ void UncoloredOutputStreamsUpdater::stopFaceCollection()
 	if (!imageUpdated[4].empty()){
 		// update writer
 		//cv::Mat m_alignedDepthImage = cv::Mat(m_colorHeight, m_colorWidth, CV_8UC4, m_alignedDepthBuffer, cv::Mat::AUTO_STEP);   
-		cv::Mat m_infraredImage = cv::Mat(m_depthHeight, m_depthWidth, CV_8UC4, m_alignedInfraredBuffer, cv::Mat::AUTO_STEP);   
+		cv::Mat m_infraredImage = cv::Mat(m_colorHeight, m_colorWidth, CV_8UC4, m_alignedInfraredBuffer, cv::Mat::AUTO_STEP);   
 		boost::shared_ptr<cv::Mat> m_infraredImagePtr(new cv::Mat());
 		*m_infraredImagePtr = m_infraredImage.clone();
 		imageUpdated[4](m_infraredImagePtr);
