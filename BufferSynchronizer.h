@@ -71,41 +71,10 @@ public:
 	 */
 	void setBuffer(std::vector<std::shared_ptr<Buffer<BufferDataType>>> buffers, int numOfFilesToRead);
 	
-	/**
-	* \fn	void BufferSynchronizer::setFPSLimit(int fps);
-	*
-	* \brief	Sets fps limit
-	*
-	* \param	fps.
-	*/
-	void setFPSLimit(int fps);
-
-	/**
-	* \fn	void BufferSynchronizer::setPaused(bool enable);
-	*
-	* \brief	Sets fps limit
-	*
-	* \param	enable.
-	*/
-	void setPaused(bool enable);
-
-	/**
-	* \fn	void BufferSynchronizer::setPlaybackFrame(int pos);
-	*
-	* \brief	Set frame for playback
-	*
-	* \param	pos.
-	*/
-	void setPlaybackFrame(int pos);
-
-	/** \brief	Move playback slider. */
-	boost::signal<void(int)> updatePlaybackSliderPos;
-
-	/** \brief	Set slider range. */
-	boost::signal<void(int, int)> updatePlaybackSliderRange;
 
 	/** \brief	Publishes stati. */
 	boost::signals2::signal<void(std::wstring)> updateStatus;
+
 
 	/** \brief	Notifies that the playback was finished. */
 	boost::signals2::signal<void(void)> playbackFinished;
@@ -158,11 +127,5 @@ private:
 
 	/** \brief	true if wait after publishing data to simulate delay between each recorded frame. */
 	bool m_waitEachFrame;
-
-	/** \brief	true if playback paused. */
-	bool m_Paused;
-
-	/** \brief	FPS Limit. */
-	int m_FPSLimit;
 };
 

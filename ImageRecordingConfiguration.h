@@ -20,6 +20,7 @@
 *			//outputfolder/timestamp/imagetype/filename.fileformat.
 */
 
+//template <typename RecordType, typename RecordingFileFormat>
 class ImageRecordingConfiguration : public IImageRecordingConfiguration{
 #define UNLIMITED_FRAMES -1;
 #define FRAMES_NOT_SET 0;
@@ -37,6 +38,8 @@ public:
 	*/
 
 	ImageRecordingConfiguration(ImageRecordType imageType, ImageRecordingFileFormat format);
+
+	//ImageRecordingConfiguration(StringFileRecordType imageType, StringFileRecordingFileFormat format);
 
 	/**
 	* \fn	ImageRecordingConfiguration::ImageRecordingConfiguration(ImageRecordingConfiguration& ImageRecordingConfiguration);
@@ -105,6 +108,8 @@ public:
 	* \return	The record file format.
 	*/
 	ImageRecordingFileFormat getRecordFileFormat();
+
+
 
 	/**
 	* \fn	CString ImageRecordingConfiguration::getFileNameCString();
@@ -268,6 +273,9 @@ public:
 	void setThreadCountToStart(int threadsCount);
 
 	boost::signal<void(ImageRecordType, bool)> recordConfigurationStatusChanged;
+
+	//boost::signal<void(StringFileRecordType, bool)> recordConfigurationStatusChanged;
+
 	boost::signal<void(ImageRecordType)>	recordPathOrFileNameChanged;
 private:
 
@@ -299,8 +307,12 @@ private:
 	/** \brief	Type of the image to record. */
 	ImageRecordType			m_imageType;
 
+	StringFileRecordType			m_stringFileType;
+
 	/** \brief	The file format. */
 	ImageRecordingFileFormat		m_fileFormat;
+
+	StringFileRecordingFileFormat		m_stringFileFormat;
 
 	/** \brief	The maximum number of frames to record. can be UNLIMITED_FRAMES (-1). */
 	int						m_maxNumberOfFrames;

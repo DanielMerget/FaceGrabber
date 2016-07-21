@@ -16,6 +16,9 @@ m_fileFormat(format)
 }
 
 
+
+
+
 CString ImageRecordingConfiguration::getFileFormatAsString(ImageRecordingFileFormat fileFormat)
 {
 	switch (fileFormat)
@@ -39,11 +42,18 @@ void ImageRecordingConfiguration::setDefaultFileName()
 
 CString ImageRecordingConfiguration::getDefaultFileName()
 {
+
 	switch (m_imageType){
 	case KinectColorRaw:
 		return CString(L"Kinect_Color_Raw");
 	case KinectDepthRaw:
 		return CString(L"Kinect_Depth_Raw");
+	case KinectAlignedDepthRaw:
+		return CString(L"Kinect_Aligned_Depth_Raw");
+	case KinectInfrared:
+		return CString(L"Kinect_Infrared");
+	case KinectAlignedInfrared:
+		return CString(L"Kinect_Aligned_Infrared");
 	default:
 		return CString(L"Image");
 	}
@@ -89,6 +99,8 @@ ImageRecordingFileFormat ImageRecordingConfiguration::getRecordFileFormat()
 {
 	return m_fileFormat;
 }
+
+
 
 CString ImageRecordingConfiguration::getFileNameCString()
 {
@@ -171,6 +183,13 @@ CString ImageRecordingConfiguration::getSubFolderNameForImageType(ImageRecordTyp
 		return L"KinectColorRaw";
 	case KinectDepthRaw:
 		return L"KinectDepthRaw";
+	case KinectAlignedDepthRaw:
+		return L"KinectAlignedDepthRaw";
+	case KinectInfrared:
+		return L"KinectInfrared";
+	case KinectAlignedInfrared:
+		return L"KinectAlignedInfrared";
+		break;
 	case IMAGE_RECORD_TYPE_COUNT:
 		break;
 	default:

@@ -14,7 +14,9 @@
 ColoredOutputStreamUpdater::ColoredOutputStreamUpdater() :
 m_colorBuffer(nullptr),
 m_centerEnabled(false),
-m_depthBuffer(nullptr)
+m_depthBuffer(nullptr),
+m_alignedDepthBuffer(nullptr),
+m_infraredBuffer(nullptr)
 {
 }
 
@@ -34,6 +36,9 @@ void ColoredOutputStreamUpdater::initialize(ICoordinateMapper* m_pCoordinateMapp
 
 void ColoredOutputStreamUpdater::allocateClouds()
 {
+	//boost::shared_ptr<std::string> tmp("");
+	//m_pFiveKeyPoints = tmp;
+	m_pFiveKeyPoints =  std::shared_ptr<std::string> (new std::string(""));
 	m_HDFacePointCloud = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud <pcl::PointXYZRGB>());
 	m_HDFacePointCloud->is_dense = false;
 	m_HDFacePointCloud_centered = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud <pcl::PointXYZRGB>());
@@ -51,13 +56,16 @@ void ColoredOutputStreamUpdater::setCeterEnabled(bool enable)
 	m_centerEnabled = enable;
 }
 
-void ColoredOutputStreamUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer)
+void ColoredOutputStreamUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer,UINT16* alignedDepthBuffer,RGBQUAD* infraredBuffer,RGBQUAD* alignedInfraredBuffer)
 {
 	allocateClouds();
 	m_isValidFaceFrame = true;
 
 	m_colorBuffer = colorBuffer;
 	m_depthBuffer = depthBuffer;
+	m_alignedDepthBuffer = alignedDepthBuffer;
+	m_infraredBuffer = infraredBuffer;
+	m_alignedInfraredBuffer = alignedInfraredBuffer;
 }
 
 void ColoredOutputStreamUpdater::stopFaceCollection()
@@ -65,6 +73,9 @@ void ColoredOutputStreamUpdater::stopFaceCollection()
 	if (!m_isValidFaceFrame){
 		m_colorBuffer = nullptr;
 		m_depthBuffer = nullptr;
+		m_alignedDepthBuffer = nullptr;
+		m_infraredBuffer = nullptr;
+		m_alignedInfraredBuffer = nullptr;
 		return;
 	}
 
@@ -131,16 +142,56 @@ void ColoredOutputStreamUpdater::stopFaceCollection()
 		imageUpdated[1](m_depthImagePtr);
 	}
 
+	//KinectAlignedDepthRaw
+	if (!imageUpdated[2].empty()){
+		// update writer
+		//cv::Mat m_alignedDepthImage = cv::Mat(m_colorHeight, m_colorWidth, CV_8UC4, m_alignedDepthBuffer, cv::Mat::AUTO_STEP);   
+		cv::Mat m_alignedDepthImage = cv::Mat(m_colorHeight, m_colorWidth, CV_16UC1, m_alignedDepthBuffer, cv::Mat::AUTO_STEP);   
+		boost::shared_ptr<cv::Mat> m_alignedDepthImagePtr(new cv::Mat());
+		*m_alignedDepthImagePtr = m_alignedDepthImage.clone();
+		imageUpdated[2](m_alignedDepthImagePtr);
+	}
+
+	//KinectInfrared
+	if (!imageUpdated[3].empty()){
+		// update writer
+		//cv::Mat m_alignedDepthImage = cv::Mat(m_colorHeight, m_colorWidth, CV_8UC4, m_alignedDepthBuffer, cv::Mat::AUTO_STEP);   
+		cv::Mat m_infraredImage = cv::Mat(m_depthHeight, m_depthWidth, CV_8UC4, m_infraredBuffer, cv::Mat::AUTO_STEP);   
+		boost::shared_ptr<cv::Mat> m_infraredImagePtr(new cv::Mat());
+		*m_infraredImagePtr = m_infraredImage.clone();
+		imageUpdated[3](m_infraredImagePtr);
+	}
+
+		//KinectInfrared
+	if (!imageUpdated[4].empty()){
+		// update writer
+		//cv::Mat m_alignedDepthImage = cv::Mat(m_colorHeight, m_colorWidth, CV_8UC4, m_alignedDepthBuffer, cv::Mat::AUTO_STEP);   
+		cv::Mat m_infraredImage = cv::Mat(m_depthHeight, m_depthWidth, CV_8UC4, m_alignedInfraredBuffer, cv::Mat::AUTO_STEP);   
+		boost::shared_ptr<cv::Mat> m_infraredImagePtr(new cv::Mat());
+		*m_infraredImagePtr = m_infraredImage.clone();
+		imageUpdated[4](m_infraredImagePtr);
+	}
+
+		//KinectInfrared
+	if (!keyPointsUpdated[0].empty()){
+
+		
+		keyPointsUpdated[0](m_pFiveKeyPoints);
+	}
+
+
 	m_isValidFaceFrame = false;
 	m_colorBuffer = nullptr;
 	m_depthBuffer = nullptr;
+	m_alignedDepthBuffer = nullptr;
+	m_infraredBuffer = nullptr;
 }
 
 
 HRESULT ColoredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize,
-	CameraSpacePoint* detectedHDFacePointsCamSpace, ColorSpacePoint* detectedHDFacePointsColorSpace)
+	CameraSpacePoint* detectedHDFacePointsCamSpace, ColorSpacePoint* detectedHDFacePointsColorSpace, std::string sKeyPoints)
 {
-	if (m_colorBuffer == nullptr || m_depthBuffer == nullptr){
+	if (m_colorBuffer == nullptr || m_depthBuffer == nullptr  ){
 		return -1;
 	}
 	//create vectices of face
@@ -162,6 +213,10 @@ HRESULT ColoredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, I
 		m_isValidFaceFrame &= extractColoredDepthCloudFromBoundingBox(boundingBoxPointTopLeft, boundingBoxPointBottomRight,
 			hdFacePointsInColorSpaceSpaceOpenCV);
 	}
+	
+
+	m_pFiveKeyPoints->append(sKeyPoints.c_str());
+
 	return hr;
 }
 

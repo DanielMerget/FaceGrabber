@@ -11,10 +11,23 @@ enum ImageRecordingFileFormat{
 	IMAGE_RECORD_FILE_FORMAT_COUNT
 };
 
+enum StringFileRecordingFileFormat{
+	TXT,
+	STRING_FILE_RECORD_FILE_FORMAT_COUNT
+};
+
 enum ImageRecordType{
 	KinectColorRaw,
 	KinectDepthRaw,
+	KinectAlignedDepthRaw,
+	KinectInfrared,
+	KinectAlignedInfrared,
 	IMAGE_RECORD_TYPE_COUNT
+};
+
+enum StringFileRecordType{
+	FiveKeyPoints,
+	STRING_FILE_RECORD_TYPE_COUNT
 };
 
 /**

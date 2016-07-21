@@ -51,6 +51,8 @@ public:
 	
 	static CString getFileFormatAsString(RecordingFileFormat fileFormat);
 
+	static CString getShowOptAsString(RecordingShowOpt ShowOpt);
+
 	/**
 	 * \fn	bool RecordingConfiguration::isRecordConfigurationValid();
 	 *
@@ -105,6 +107,15 @@ public:
 	 * \return	The record file format.
 	 */
 	RecordingFileFormat getRecordFileFormat();
+
+	/**
+	 * \fn	RecordingFileFormat RecordingConfiguration::getRecordFileFormat();
+	 *
+	 * \brief	Gets fileformat to record
+	 *
+	 * \return	The show  Option.
+	 */
+	RecordingShowOpt getShowOpt();
 
 	/**
 	 * \fn	CString RecordingConfiguration::getFileNameCString();
@@ -189,6 +200,31 @@ public:
 	 * \param	fileFormat	The file format in which to record.
 	 */
 	void setFileFormat(RecordingFileFormat fileFormat);
+
+		/**
+	 * \fn	void RecordingConfiguration::setShowOpt(RecordingShowOpt ShowOpt);
+	 *
+	 * \brief	Sets show option.
+	 *
+	 * \param	showOpt	Will show accoding to the ShowOpt.
+	 */
+
+	void setShowOpt(RecordingShowOpt ShowOpt);
+
+	/**
+	 * \fn	void RecordingConfiguration::setFacePointsShowOpt(FacePointsShowOpt FacePointsShowOpt);
+	 *
+	 * \brief	Sets show option for face points.
+	 *
+	 * \param	showOpt	Will show accoding to the ShowOpt.
+	 */
+
+
+	void setFacePointsShowOpt(FacePointsShowOpt FacePointsShowOpt);
+
+	FacePointsShowOpt getFacePointsShowOpt();
+
+
 
 	/**
 	 * \fn	void RecordingConfiguration::setTimeStampFolderName(CString folderName);
@@ -303,11 +339,15 @@ private:
 	/** \brief	The file format. */
 	RecordingFileFormat		m_fileFormat;
 
+	/** \brief	The Show Option. */
+	RecordingShowOpt         m_ShowOpt;
+
 	/** \brief	The maximum number of frames to record. can be UNLIMITED_FRAMES (-1). */
 	int						m_maxNumberOfFrames;
 
 	/** \brief	true to enable recording, false to disable. */
 	bool					m_enabled;
+	FacePointsShowOpt		m_FacePointsShowOpt;
 
 	/** \brief	Number of threads to start for recording. */
 	int						m_threadsCount;

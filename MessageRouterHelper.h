@@ -61,15 +61,6 @@ protected:
 	HWND m_hWnd;
 
 private:
-	/**
-	* \fn	virtual void MessageRouterHelper::onSliderChanged(WPARAM wParam, LPARAM handle);
-	*
-	* \brief	Callback for slider changes.
-	*
-	* \param	wParam	The wParam field of the message.
-	* \param	handle	The lParam field of the message.
-	*/
-	virtual void onSliderChanged(WPARAM wParam, LPARAM handle);
 
 	/**
 	 * \fn	virtual void MessageRouterHelper::onSelectionChanged(WPARAM wParam, LPARAM handle);

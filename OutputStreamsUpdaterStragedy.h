@@ -78,7 +78,7 @@ public:
 	 * \return	A hResult.
 	 */
 	virtual HRESULT updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize, CameraSpacePoint* detectedHDFacePointsCamSpace,
-		ColorSpacePoint* detectedHDFacePointsColorSpace) = 0;
+		ColorSpacePoint* detectedHDFacePointsColorSpace,std::string sKeyPoints) = 0;
 
 	/**
 	 * \fn	virtual void OutputStreamsUpdaterStragedy::initialize(ICoordinateMapper* m_pCoordinateMapper, int depthWidth, int depthHeight, int colorWidth, int colorHeight);
@@ -101,7 +101,7 @@ public:
 	 * \param [in]	colorBuffer the current color Buffer
 	 * \param [in]	depthBuffer the current depth Buffer
 	 */
-	virtual void startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer) = 0;
+	virtual void startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer,UINT16* alignedDepthBuffer,RGBQUAD* infraredBuffer,RGBQUAD* alignedInfraredBuffer) = 0;
 
 	/**
 	 * \fn	virtual void OutputStreamsUpdaterStragedy::stopFaceCollection() = 0;

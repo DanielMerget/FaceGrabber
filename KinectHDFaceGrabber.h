@@ -16,7 +16,37 @@
 #include <mutex>
 #include <condition_variable>
 #include <opencv2/imgproc/imgproc.hpp>
+#include "RecordingConfiguration.h"
 #include "OutputStreamsUpdaterStragedy.h"
+#include <array>
+#include "CommonConfiguration.h"
+
+// InfraredSourceValueMaximum is the highest value that can be returned in the InfraredFrame.
+// It is cast to a float for readability in the visualization code.
+#define InfraredSourceValueMaximum static_cast<float>(USHRT_MAX)
+
+// The InfraredOutputValueMinimum value is used to set the lower limit, post processing, of the
+// infrared data that we will render.
+// Increasing or decreasing this value sets a brightness "wall" either closer or further away.
+#define InfraredOutputValueMinimum 0.01f 
+
+// The InfraredOutputValueMaximum value is the upper limit, post processing, of the
+// infrared data that we will render.
+#define InfraredOutputValueMaximum 1.0f
+
+// The InfraredSceneValueAverage value specifies the average infrared value of the scene.
+// This value was selected by analyzing the average pixel intensity for a given scene.
+// Depending on the visualization requirements for a given application, this value can be
+// hard coded, as was done here, or calculated by averaging the intensity for each pixel prior
+// to rendering.
+#define InfraredSceneValueAverage 0.08f
+
+/// The InfraredSceneStandardDeviations value specifies the number of standard deviations
+/// to apply to InfraredSceneValueAverage. This value was selected by analyzing data
+/// from a given scene.
+/// Depending on the visualization requirements for a given application, this value can be
+/// hard coded, as was done here, or calculated at runtime.
+#define InfraredSceneStandardDeviations 3.0f
 
 /**
  * \class	KinectHDFaceGrabber
@@ -99,6 +129,11 @@ public:
 	 */
 	void getColourAndDepthSize(int& depthWidth, int& depthHeight, int& colorWidth, int& colorHeight);
 
+	void SetConfiguration(CommonConfigurationPtr commonConfiguration)
+	{
+		m_commonConfiguration = commonConfiguration;
+	}
+
 private:
 
 	/**
@@ -139,6 +174,81 @@ private:
 	 * \return	A hResult.
 	 */
 	HRESULT initHDFaceReader();
+
+	/**
+	 * \fn	HRESULT KinectHDFaceGrabber::initDepthAndColorAlignment();
+	 *
+	 * \brief	Initialises Aligment of Depth and Color.
+	 *
+	 * \return	A hResult.
+	 */
+
+	HRESULT initDepthAndColorAlignment();
+	/**
+	 * \fn	HRESULT KinectHDFaceGrabber::initInfraredFrameReader();
+	 *
+	 * \brief	Initialises the infrared frame reader.
+	 *
+	 * \return	A hResult.
+	 */
+	HRESULT initInfraredFrameReader();
+		
+	/**
+	 * \fn	HRESULT KinectHDFaceGrabber::initBodyIndexReader();
+	 *
+	 * \brief	Initialises the Body index frame reader.
+	 *
+	 * \return	A hResult.
+	 */
+	HRESULT initBodyIndexFrameReader();
+
+	/**
+	 * \fn	HRESULT KinectHDFaceGrabber::alighDepthWithColor();
+	 *
+	 * \brief	aligh depth data with color data.
+	 *
+	 * \return	A hResult.
+	 */
+	HRESULT alighDepthWithColor();
+
+	/**
+	 * \fn	HRESULT KinectHDFaceGrabber::getInfraredFrame();
+	 *
+	 * \brief	get infrared data.
+	 *
+	 * \return	A hResult.
+	 */
+	HRESULT getInfraredFrame();
+
+	/// <summary>
+    /// Handle new infrared data
+    /// <param name="nTime">timestamp of frame</param>
+    /// <param name="pBuffer">pointer to frame data</param>
+    /// <param name="nWidth">width (in pixels) of input image data</param>
+    /// <param name="nHeight">height (in pixels) of input image data</param>
+    /// </summary>
+    void                    ProcessInfrared(INT64 nTime, const UINT16* pBuffer, int nHeight, int nWidth);
+
+	    /// <summary>
+    /// Computes the face result text layout position by adding an offset to the corresponding 
+    /// body's head joint in camera space and then by projecting it to screen space
+    /// </summary>
+    /// <param name="pBody">pointer to the body data</param>
+    /// <param name="pFaceTextLayout">pointer to the text layout position in screen space</param>
+    /// <returns>indicates success or failure</returns>
+		HRESULT GetFaceTextPositionInColorSpace(IBody* pBody, D2D1_POINT_2F* pFaceTextLayout);
+
+	/**
+	 * \fn	HRESULT KinectHDFaceGrabber::getFiveKeyPointsOnFaces(bool bFaceTracked);
+	 *
+	 * \brief	get five key points on faces.
+	 *
+	 * \param [in]	bFaceTracked  	
+	 * 	
+	 * \return	A hResult.
+	 */
+
+	HRESULT getFiveKeyPointsOnFaces(int iFace,IBody* ppBodies,bool bHaveBodyData, bool bFaceTracked);
 
 	/**
 	 * \fn	HRESULT KinectHDFaceGrabber::updateHDFaceTrackingID(IHighDefinitionFaceFrameSource* faceFrame, IBody* trackedBody);
@@ -210,7 +320,14 @@ private:
     /** \brief	The body frame reader. */
     IBodyFrameReader*		m_pBodyFrameReader;
 
-    
+	// Infrared reader
+    IInfraredFrameReader*  m_pInfraredFrameReader;
+
+
+	/** \brief	The multi source frame reader. */
+	IMultiSourceFrameReader * m_pMultiSourceFrameReader;
+	IBodyIndexFrameReader * m_pBodyIndexFrameReader;
+
     /** \brief	The face frame sources for each. */
     IFaceFrameSource*		m_pFaceFrameSources[BODY_COUNT];
 
@@ -220,7 +337,7 @@ private:
 
 	
 	/** \brief	The HD face source fo each body*/
-	IHighDefinitionFaceFrameSource* m_pHDFaceSource[BODY_COUNT];;
+	IHighDefinitionFaceFrameSource* m_pHDFaceSource[BODY_COUNT];
 
 	/** \brief	The HD face reader for each body. */
 	IHighDefinitionFaceFrameReader* m_pHDFaceReader[BODY_COUNT];
@@ -254,17 +371,40 @@ private:
 
 	/** \brief	Buffer for depth data. */
 	std::vector<UINT16>			m_depthBuffer;
-
+	std::vector<UINT16>			m_alignedRawDepthBuffer;
 
 	/** \brief	Buffer for color data. */
 	std::vector<RGBQUAD>		m_colorBuffer;
 
+	/** \brief	Buffer for aligned depth data. */
+	std::vector<RGBQUAD>		m_alighedDepthBuffer;
 
+	/** \brief	Buffer for infrared data. */
+	std::vector<RGBQUAD>		m_alighedInfraredBuffer;
+
+	/** \brief	Buffer for aligned color data. */
+	std::vector<RGBQUAD>		m_alighedColorBuffer;
+
+		/** \brief	Buffer for aligned color data. */
+	std::vector<RGBQUAD>		m_infraredBuffer;
+
+
+	std:: vector <std::array<PointF, FacePointType::FacePointType_Count>> m_facePoints;
+	Vector4 m_faceRotation[BODY_COUNT];
+	RectI m_faceBox[BODY_COUNT];
+	
 	/** \brief	Width of the depth. */
 	int							m_depthWidth;
 
 	/** \brief	Height of the depth. */
 	int							m_depthHeight;
+
+		/** \brief	Width of the depth. */
+	int							m_infraredWidth;
+
+	/** \brief	Height of the depth. */
+	int							m_infraredHeight;
+
 
 	/** \brief	Width of the color. */
 	int							m_colorWidth;
@@ -272,5 +412,9 @@ private:
 
 	/** \brief	Height of the color. */
 	int							m_colorHeight;
+
+
+
+	CommonConfigurationPtr m_commonConfiguration;
 };
 

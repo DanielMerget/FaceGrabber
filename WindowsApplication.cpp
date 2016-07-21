@@ -25,6 +25,19 @@ SharedRecordingConfiguration WindowsApplication::initRecordDataModel()
 	return recordingConfigurations;
 }
 
+SharedCommonConfiguration WindowsApplication::initCommonDataModel()
+{
+	SharedCommonConfiguration commonConfigurations(COMMON_CONFIGURATION_TYPE_COUNT);
+	for (int i = 0; i < COMMON_CONFIGURATION_TYPE_COUNT; i++){
+		commonConfigurations[i] = std::shared_ptr<CommonConfiguration>(new CommonConfiguration);
+		//recordingConfigurations[i]->recordConfigurationStatusChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(RecordCloudType, bool)>(&RecordTabHandler::recordConfigurationStatusChanged), &m_recordTabHandler, _1, _2));
+		//recordingConfigurations[i]->recordPathOrFileNameChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(RecordCloudType)>(&RecordTabHandler::recordPathChanged), &m_recordTabHandler, _1));
+		commonConfigurations[i]->setThreadCountToStart(2);
+	}
+	return commonConfigurations;
+}
+
+
 SharedImageRecordingConfiguration WindowsApplication::initImageRecordDataModel()
 {
 	SharedImageRecordingConfiguration recordingConfigurations(IMAGE_RECORD_TYPE_COUNT);
@@ -32,6 +45,19 @@ SharedImageRecordingConfiguration WindowsApplication::initImageRecordDataModel()
 		recordingConfigurations[i] = std::shared_ptr<ImageRecordingConfiguration>(new ImageRecordingConfiguration(static_cast<ImageRecordType>(i), PNG));
 		recordingConfigurations[i]->recordConfigurationStatusChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType, bool)>(&RecordTabHandler::recordConfigurationStatusChanged), &m_recordTabHandler, _1, _2));
 		recordingConfigurations[i]->recordPathOrFileNameChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType)>(&RecordTabHandler::recordPathChanged), &m_recordTabHandler, _1));
+		recordingConfigurations[i]->setThreadCountToStart(2);
+	}
+	return recordingConfigurations;
+}
+
+SharedStringFileRecordingConfiguration WindowsApplication::initStringFileRecordDataModel()
+{
+	SharedStringFileRecordingConfiguration recordingConfigurations(STRING_FILE_RECORD_TYPE_COUNT);
+	for (int i = 0; i < STRING_FILE_RECORD_TYPE_COUNT; i++){
+		recordingConfigurations[i] = std::shared_ptr<StringFileRecordingConfiguration>(new StringFileRecordingConfiguration(static_cast<StringFileRecordType>(i), StringFileRecordingFileFormat::TXT));
+
+		recordingConfigurations[i]->recordConfigurationStatusChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(StringFileRecordType, bool)>(&RecordTabHandler::recordConfigurationStatusChanged), &m_recordTabHandler, _1, _2));
+		recordingConfigurations[i]->recordPathOrFileNameChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(StringFileRecordType)>(&RecordTabHandler::recordPathChanged), &m_recordTabHandler, _1));
 		recordingConfigurations[i]->setThreadCountToStart(2);
 	}
 	return recordingConfigurations;
@@ -80,15 +106,12 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	double timedelta;
 	double actualFPS;
 	std::stringstream FPSinfo;
-	CString msgCstring;
-
-	HWND tabControlHandle = GetDlgItem(m_hWnd, IDC_TAB2);
-
-	start = clock();
 
 	// Main message loop
 	while (WM_QUIT != msg.message)
 	{
+		start = clock();
+
 		if (m_isKinectRunning){
 			m_kinectFrameGrabber.update();
 		}
@@ -104,42 +127,22 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 			DispatchMessageW(&msg);
 		}
 
-		int sel = TabCtrl_GetCurSel(tabControlHandle);
-
-		// Record Tab active
-		if (sel == 0){
-			/*
-			FPSinfo.str("");
-			FPSinfo.clear();
-			FPSinfo << "Tab Sel: " << sel;
-			msgCstring = CString(FPSinfo.str().c_str());
-			msgCstring += L"\n";
-			OutputDebugString(msgCstring);
-			*/
-
-			if (m_FPSLimit != 0)
-			{
-				// timedelta in seconds
-				timedelta = (double(clock() - start)) / CLOCKS_PER_SEC;
-				// if faster than specified target fps: sleep
-				if (timedelta < (1.0 / m_FPSLimit)) Sleep(((1.0 / m_FPSLimit) - timedelta) * 1000);
-			}
-
-			actualFPS = CLOCKS_PER_SEC / (float(clock() - start));
-			start = clock();
-
-			FPSinfo.str("");
-			FPSinfo.clear();
-			FPSinfo << "UPDATE Loop actual fps: " << actualFPS << " target fps: " << m_FPSLimit;
-			msgCstring = CString(FPSinfo.str().c_str());
-			msgCstring += L"\n";
-			OutputDebugString(msgCstring);
+		if (m_FPSLimit != 0)
+		{
+			// timedelta in seconds
+			timedelta = (double(clock() - start)) / CLOCKS_PER_SEC;
+			// if faster than specified target fps: sleep
+			if (timedelta < (1.0 / m_FPSLimit)) Sleep(((1.0 / m_FPSLimit) - timedelta) * 1000);
 		}
-		// Playback/Convert Tab active
-		else{
-			// Limit CPU usage from while(WM_QUIT != msg.message)
-			Sleep(10);
-		}
+
+		actualFPS = CLOCKS_PER_SEC / (float(clock() - start));
+
+		FPSinfo.str("");
+		FPSinfo.clear();
+		FPSinfo << "UPDATE Loop actual fps: " << actualFPS << " target fps: " << m_FPSLimit;
+		auto msgCstring = CString(FPSinfo.str().c_str());
+		msgCstring += L"\n";
+		OutputDebugString(msgCstring);
 	}
 
 	return static_cast<int>(msg.wParam);
@@ -171,6 +174,7 @@ void WindowsApplication::onCreate()
 	initTabs();
 	initCloudWriter();
 	initImageWriter();
+	initStringFileWriter();
 	connectStreamUpdaterToViewer();
 
 	initInputReaderBufferAndSynchronizer();
@@ -239,6 +243,20 @@ void WindowsApplication::initImageWriter()
 		m_imageOutputWriter.push_back(imageWriter);
 	}
 }
+void WindowsApplication::initStringFileWriter()
+{
+	for (int i = 0; i < STRING_FILE_RECORD_TYPE_COUNT; i++){
+		//init
+		auto imageWriter = std::shared_ptr<StringFileWriter>(new StringFileWriter);
+		//register for events
+		imageWriter->updateStatus.connect(boost::bind(static_cast<void (RecordTabHandler::*)(StringFileRecordType, std::wstring)>(&RecordTabHandler::updateWriterStatus), &m_recordTabHandler, static_cast<StringFileRecordType>(i), _1));
+		imageWriter->writingWasStopped.connect(boost::bind(&RecordTabHandler::recordingStopped, &m_recordTabHandler));
+
+		m_stringFileOutputWriter.push_back(imageWriter);
+	}
+}
+
+
 
 void WindowsApplication::connectStreamUpdaterToViewer()
 {
@@ -287,9 +305,13 @@ void WindowsApplication::initTabs()
 {
 	auto recordingConfiguration = initRecordDataModel();
 	auto imageRecordingConfiguration = initImageRecordDataModel();
+	auto stringFileRecordingConfiguration = initStringFileRecordDataModel();
+	auto commonConfiguration = initCommonDataModel();
 
 	m_recordTabHandler.setSharedRecordingConfiguration(recordingConfiguration);
 	m_recordTabHandler.setSharedImageRecordingConfiguration(imageRecordingConfiguration);
+	m_recordTabHandler.setSharedStringStringRecordingConfiguration(stringFileRecordingConfiguration);
+	m_recordTabHandler.setSharedCommonConfiguration(commonConfiguration);
 
 	//record, playback and convert are "subdialogs" with own message routers. They process their UI messages on their own
 	//we will show only one of those subdialogs once
@@ -303,10 +325,12 @@ void WindowsApplication::initTabs()
 	m_recordTabHandler.colorConfigurationChanged.connect(boost::bind(&WindowsApplication::colorStreamingChangedTo, this, _1));
 	m_recordTabHandler.centerConfigurationChanged.connect(boost::bind(&WindowsApplication::centerRecordingChangedTo, this, _1));
 	m_recordTabHandler.fpsLimitUpdated.connect(boost::bind(&WindowsApplication::setFPSLimit, this, _1));
-	m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1, _2, _3));
-	m_recordTabHandler.stopWriting.connect(boost::bind(&WindowsApplication::stopRecording, this, _1, _2, _3));
+	m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1, _2, _3,_4));
+	m_recordTabHandler.stopWriting.connect(boost::bind(&WindowsApplication::stopRecording, this, _1, _2, _3,_4));
 
 	m_plackBackTabHandler.setSharedRecordingConfiguration(recordingConfiguration);
+
+	m_kinectFrameGrabber.SetConfiguration(commonConfiguration[KinectV2_COMMON]);
 
 	//init playbackt tab
 	m_playbackTabHandle = CreateDialogParamW(
@@ -318,11 +342,6 @@ void WindowsApplication::initTabs()
 	ShowWindow(m_playbackTabHandle, SW_HIDE);
 	m_plackBackTabHandler.startPlayback.connect(boost::bind(&WindowsApplication::startPlayback, this, _1, _2));
 	m_plackBackTabHandler.stopPlayback.connect(boost::bind(&WindowsApplication::stopPlayback, this));
-	m_plackBackTabHandler.fpsLimitUpdated.connect(boost::bind(&BufferSynchronizer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>::setFPSLimit, &m_bufferSynchronizer, _1));
-	m_plackBackTabHandler.playbackSliderMoved.connect(boost::bind(&BufferSynchronizer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>::setPlaybackFrame, &m_bufferSynchronizer, _1));
-	m_plackBackTabHandler.pausePlayback.connect(boost::bind(&BufferSynchronizer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr>::setPaused, &m_bufferSynchronizer, _1));
-	m_bufferSynchronizer.updatePlaybackSliderPos.connect(boost::bind(&PlaybackTabHandler::updatePlaybackSliderPos, &m_plackBackTabHandler, _1));
-	m_bufferSynchronizer.updatePlaybackSliderRange.connect(boost::bind(&PlaybackTabHandler::updatePlaybackSliderRange, &m_plackBackTabHandler, _1, _2));
 
 	//init conver tab
 	m_convertTabHandle = CreateDialogParamW(
@@ -485,7 +504,7 @@ void WindowsApplication::onPlaybackSelected()
 }
 
 
-void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations)
+void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations, SharedStringFileRecordingConfiguration KeyPointsRecordingConfiguration)
 {
 	for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
 		auto recordingConfig = imageRecordingConfigurations[i];
@@ -503,6 +522,24 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 			imageWriter->startWriting();
 		}
 	}
+
+	for (int i = 0; i < STRING_FILE_RECORD_TYPE_COUNT; i++){
+		auto recordingConfig = KeyPointsRecordingConfiguration[i]; //
+		auto stringFileWriter = m_stringFileOutputWriter[i];
+		stringFileWriter->setRecordingConfiguration(recordingConfig);
+
+		//disconnect all connected signals
+		m_coloredOutputStreamUpdater->keyPointsUpdated[i].disconnect_all_slots();
+		m_uncoloredOutputStreamUpdater->keyPointsUpdated[i].disconnect_all_slots();
+
+		if (recordingConfig->isEnabled()){
+			//we agreed on manually enabling the Raw image writer, so we do not that image creation if not required
+			if (isColoredStream) m_coloredOutputStreamUpdater->keyPointsUpdated[i].connect(boost::bind(&StringFileWriter::pushStringFileAsync, stringFileWriter, _1));
+			else m_uncoloredOutputStreamUpdater->keyPointsUpdated[i].connect(boost::bind(&StringFileWriter::pushStringFileAsync, stringFileWriter, _1));
+			stringFileWriter->startWriting();
+		}
+	}
+
 	//use the correct recoder & updater
 	if (isColoredStream){
 		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
@@ -605,7 +642,7 @@ void WindowsApplication::stopPlayback()
 	}
 }
 
-void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations)
+void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations,SharedStringFileRecordingConfiguration KeyPointsRecordingConfiguration)
 {
 	for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
 		auto recordingConfig = imageRecordingConfigurations[i];
@@ -617,6 +654,18 @@ void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConf
 		m_coloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
 		m_uncoloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
 	}
+
+	for (int i = 0; i < STRING_FILE_RECORD_TYPE_COUNT; i++){
+		auto recordingConfig = KeyPointsRecordingConfiguration[i];
+		auto stringFileWriter = m_stringFileOutputWriter[i];
+		if (recordingConfig->isEnabled()){
+			stringFileWriter->stopWriting();
+		}
+		//disconnect all connected signals
+		m_coloredOutputStreamUpdater->keyPointsUpdated[i].disconnect_all_slots();
+		m_uncoloredOutputStreamUpdater->keyPointsUpdated[i].disconnect_all_slots();
+	}
+
 	//stop the correct writer
 	if (isColoredStream){
 		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){

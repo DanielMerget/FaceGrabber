@@ -5,7 +5,8 @@
 //------------------------------------------------------------------------------
 
 #include "stdafx.h"
-#include <strsafe.h>
+
+
 #include "resource.h"
 #include "KinectHDFaceGrabber.h"
 #include <iostream>
@@ -16,6 +17,7 @@
 #include <future>
 #include <pcl/filters/voxel_grid.h>
 #include <opencv2/imgproc/imgproc.hpp>
+#include <strsafe.h>
 
 // face property text layout offset in X axis
 static const float c_FaceTextLayoutOffsetX = -0.1f;
@@ -45,6 +47,8 @@ KinectHDFaceGrabber::KinectHDFaceGrabber() :
     m_pDrawDataStreams(nullptr),
     m_pBodyFrameReader(nullptr),
 	m_pDepthFrameReader(nullptr),
+	m_pBodyIndexFrameReader(nullptr),
+	m_pInfraredFrameReader(nullptr),
 	m_depthWidth(-1),
 	m_depthHeight(-1),
 	m_colorWidth(-1),
@@ -92,6 +96,9 @@ KinectHDFaceGrabber::~KinectHDFaceGrabber()
     SafeRelease(m_pCoordinateMapper);
 
 	SafeRelease(m_pDepthFrameReader);
+
+	SafeRelease(m_pBodyIndexFrameReader);
+	SafeRelease(m_pInfraredFrameReader);
     // close the Kinect Sensor
     if (m_pKinectSensor)
     {
@@ -133,6 +140,10 @@ HRESULT KinectHDFaceGrabber::initColorFrameReader()
 		m_colorBuffer.resize(m_colorHeight * m_colorWidth);
 	}
 
+
+
+	
+
 	SafeRelease(pFrameDescription);
 	SafeRelease(pColorFrameSource);
 	
@@ -163,6 +174,8 @@ HRESULT KinectHDFaceGrabber::initDepthFrameReader()
 		m_depthBuffer.resize(m_depthHeight * m_depthWidth);
 	}
 
+	
+
 	SafeRelease(frameDescription);
 	if (SUCCEEDED(hr)){
 		hr = depthFrameSource->OpenReader(&m_pDepthFrameReader);
@@ -180,6 +193,7 @@ HRESULT KinectHDFaceGrabber::initHDFaceReader()
 
 	if (SUCCEEDED(hr)){
 		hr = m_pKinectSensor->get_BodyFrameSource(&pBodyFrameSource);
+		
 	}
 	std::vector<std::vector<float>> deformations(BODY_COUNT, std::vector<float>(FaceShapeDeformations::FaceShapeDeformations_Count));
 
@@ -188,7 +202,9 @@ HRESULT KinectHDFaceGrabber::initHDFaceReader()
 		for (int i = 0; i < BODY_COUNT; i++){
 			if (SUCCEEDED(hr)){
 				// create the face frame source by specifying the required face frame features
-				hr = CreateFaceFrameSource(m_pKinectSensor, 0, c_FaceFrameFeatures, &m_pFaceFrameSources[i]);
+				hr = CreateFaceFrameSource(m_pKinectSensor, 0,  
+					FaceFrameFeatures::FaceFrameFeatures_BoundingBoxInColorSpace   | FaceFrameFeatures::FaceFrameFeatures_PointsInColorSpace  | FaceFrameFeatures::FaceFrameFeatures_RotationOrientation, 
+					&m_pFaceFrameSources[i]);  //c_FaceFrameFeatures
 			}
 
 			if (SUCCEEDED(hr)){
@@ -228,13 +244,89 @@ HRESULT KinectHDFaceGrabber::initHDFaceReader()
 				return hr;
 			}
 		}
-		
+		if (SUCCEEDED(hr)){
+			m_facePoints.resize(BODY_COUNT);
+		}
+
 		if (SUCCEEDED(hr)){
 			hr = pBodyFrameSource->OpenReader(&m_pBodyFrameReader);
 		}
 		SafeRelease(pBodyFrameSource);
 	}
 
+	return hr;
+}
+
+HRESULT KinectHDFaceGrabber::initDepthAndColorAlignment()
+{
+	HRESULT hr = initBodyIndexFrameReader();
+
+    // for align depth data with color data
+    if (SUCCEEDED(hr) && m_pDepthFrameReader && m_pColorFrameReader){
+		m_alighedDepthBuffer.resize(m_colorHeight * m_colorWidth);
+		m_alighedColorBuffer.resize(m_colorHeight * m_colorWidth);
+		m_alignedRawDepthBuffer.resize(m_colorHeight * m_colorWidth);
+	}
+
+	return hr;
+}
+/* */
+HRESULT KinectHDFaceGrabber::initBodyIndexFrameReader()
+{
+	
+	// open Bodey index Frame Reader 
+	HRESULT hr;
+	IBodyIndexFrameSource *pBodyIndexFrameSource = nullptr;
+	if(m_pKinectSensor)
+	{
+		hr = m_pKinectSensor->get_BodyIndexFrameSource(&pBodyIndexFrameSource);
+	}
+
+	if(SUCCEEDED(hr))
+	{
+		pBodyIndexFrameSource->OpenReader(&m_pBodyIndexFrameReader);
+	}
+
+	SafeRelease(pBodyIndexFrameSource);
+	//HRESULT hr = m_pKinectSensor->OpenMultiSourceFrameReader(FrameSourceTypes::FrameSourceTypes_BodyIndex,&m_pMultiSourceFrameReader);
+
+	return hr;
+}
+
+
+HRESULT KinectHDFaceGrabber::initInfraredFrameReader()
+{
+	IInfraredFrameSource* pInfraredFrameSource = nullptr;
+	HRESULT hr = m_pKinectSensor->get_InfraredFrameSource(&pInfraredFrameSource);
+	
+	IFrameDescription* frameDescription = nullptr;
+	if (SUCCEEDED(hr)){
+		hr = pInfraredFrameSource->get_FrameDescription(&frameDescription);
+	}
+
+	if (SUCCEEDED(hr)){
+		hr = frameDescription->get_Width(&m_infraredWidth);
+	}
+
+	if (SUCCEEDED(hr)){
+		hr = frameDescription->get_Height(&m_infraredHeight);
+	}
+
+
+	if (SUCCEEDED(hr))
+    {
+        hr = pInfraredFrameSource->OpenReader(&m_pInfraredFrameReader);
+    }
+
+	if (SUCCEEDED(hr)){
+		m_infraredBuffer.resize(m_infraredHeight * m_infraredWidth);
+	}
+
+	m_alighedInfraredBuffer.resize(m_colorHeight * m_colorWidth);;
+
+	SafeRelease(frameDescription);
+	SafeRelease(pInfraredFrameSource);
+	
 	return hr;
 }
 
@@ -259,11 +351,22 @@ HRESULT KinectHDFaceGrabber::initializeDefaultSensor()
 		if (SUCCEEDED(hr)){
 			hr = initDepthFrameReader();
 		}
+
+				
+		if (SUCCEEDED(hr)){
+			hr = initInfraredFrameReader();
+		}
 		
 		if (SUCCEEDED(hr)){
 			hr = initHDFaceReader();
 		}
-
+				
+								
+		//
+		if (SUCCEEDED(hr)){
+			hr = initDepthAndColorAlignment(); // 
+		}
+		
 		if (SUCCEEDED(hr))
 		{
 			hr = m_pKinectSensor->get_CoordinateMapper(&m_pCoordinateMapper);
@@ -285,9 +388,11 @@ void KinectHDFaceGrabber::update()
 		return;
 	}
 
+	
+
     IColorFrame* pColorFrame = nullptr;
     HRESULT hr = m_pColorFrameReader->AcquireLatestFrame(&pColorFrame);
-
+	
 	IDepthFrame* depthFrame = nullptr;
 	if (SUCCEEDED(hr)){
 		hr = m_pDepthFrameReader->AcquireLatestFrame(&depthFrame);
@@ -309,6 +414,18 @@ void KinectHDFaceGrabber::update()
 		if (SUCCEEDED(hr)){
 			hr = depthFrame->CopyFrameDataToArray(m_depthBuffer.size(), &m_depthBuffer[0]);
 		}
+
+				
+		if (SUCCEEDED(hr)){
+			 hr = getInfraredFrame();
+		}
+			
+		/* */
+		if (SUCCEEDED(hr)){
+			hr = alighDepthWithColor();
+		}
+		/* */
+		
 		if (SUCCEEDED(hr)){
 			renderColorFrameAndProcessFaces();
 		}
@@ -317,9 +434,220 @@ void KinectHDFaceGrabber::update()
 	
 	SafeRelease(depthFrame);
 	SafeRelease(pColorFrame);  
+	
+}
+
+ 
+HRESULT KinectHDFaceGrabber::getInfraredFrame() 
+{
+	if (!m_pInfraredFrameReader)
+    {
+        return -1;
+    }
+
+    IInfraredFrame* pInfraredFrame = NULL;
+
+    HRESULT hr = m_pInfraredFrameReader->AcquireLatestFrame(&pInfraredFrame);
+
+    if (SUCCEEDED(hr))
+    {
+        INT64 nTime = 0;
+        UINT nBufferSize = 0;
+        UINT16 *pBuffer = NULL;
+
+        hr = pInfraredFrame->get_RelativeTime(&nTime);
+
+        
+        if (SUCCEEDED(hr))
+        {
+            hr = pInfraredFrame->AccessUnderlyingBuffer(&nBufferSize, &pBuffer);            
+        }
+
+        if (SUCCEEDED(hr))
+        {
+            ProcessInfrared(nTime, pBuffer, m_infraredWidth, m_infraredHeight);
+        }
+
+    }
+
+    SafeRelease(pInfraredFrame);
+
+	return hr;
+}
+
+void KinectHDFaceGrabber::ProcessInfrared(INT64 nTime, const UINT16* pBuffer, int nWidth, int nHeight)
+{
+    
+
+    if (pBuffer && (nWidth == m_infraredWidth) && (nHeight == m_infraredHeight))
+    {
+        //RGBQUAD* pDest = m_infraredBuffer;
+
+        // end pixel is start + width*height - 1
+        //const UINT16* pBufferEnd = pBuffer + (nWidth * nHeight);
+
+		for (int i = 0; i < m_infraredWidth * m_infraredHeight; ++i)
+		{
+			// normalize the incoming infrared data (ushort) to a float ranging from 
+			// [InfraredOutputValueMinimum, InfraredOutputValueMaximum] by
+			// 1. dividing the incoming value by the source maximum value
+			float intensityRatio = static_cast<float>(*pBuffer) / InfraredSourceValueMaximum;
+
+			// 2. dividing by the (average scene value * standard deviations)
+			intensityRatio /= InfraredSceneValueAverage * InfraredSceneStandardDeviations;
+		
+			// 3. limiting the value to InfraredOutputValueMaximum
+			intensityRatio = std::min(InfraredOutputValueMaximum, intensityRatio);
+
+			// 4. limiting the lower value InfraredOutputValueMinimym
+			intensityRatio = std::max(InfraredOutputValueMinimum, intensityRatio);
+	
+			// 5. converting the normalized value to a byte and using the result
+			// as the RGB components required by the image
+			byte intensity = static_cast<byte>(intensityRatio * 255.0f); 
+			m_infraredBuffer[i].rgbRed = intensity;
+			m_infraredBuffer[i].rgbGreen = intensity;
+			m_infraredBuffer[i].rgbBlue = intensity;
+			m_infraredBuffer[i].rgbReserved = 255;
+			++pBuffer;
+        }
+
+       
+    }
 }
 
 
+HRESULT KinectHDFaceGrabber::alighDepthWithColor()
+{
+	HRESULT hr;
+	//IMultiSourceFrame* pMultiSourceFrame = NULL;
+	IBodyIndexFrame* pBodyIndexFrame = NULL;
+	//IBodyIndexFrameReference* pBodyIndexFrameReference = NULL;
+	IFrameDescription* pBodyIndexFrameDescription = NULL;
+	BYTE* m_bodyIndexBuffer = NULL;
+	UINT  m_bodyIndexBufferSize;
+	int	m_bodyIndexWidth;
+	int	m_bodyIndexHeight;
+	bool RmBG = m_commonConfiguration->isKeepBGEnabled();
+
+	if (RmBG == false)
+	{
+		
+		hr = m_pBodyIndexFrameReader->AcquireLatestFrame(&pBodyIndexFrame);	
+
+		if (SUCCEEDED(hr))
+		{
+			hr = pBodyIndexFrame->get_FrameDescription(&pBodyIndexFrameDescription);
+		}
+
+		if (SUCCEEDED(hr))
+		{
+			hr = pBodyIndexFrameDescription->get_Width(&m_bodyIndexWidth);
+		}
+
+		if (SUCCEEDED(hr))
+		{
+			hr = pBodyIndexFrameDescription->get_Height(&m_bodyIndexWidth);
+		}
+		if (SUCCEEDED(hr))
+		{
+			hr = pBodyIndexFrame->AccessUnderlyingBuffer(&m_bodyIndexBufferSize, &m_bodyIndexBuffer); 
+		}
+			
+
+		
+	}
+	
+	DepthSpacePoint * m_pDepthCoordinates = new DepthSpacePoint[cColorWidth * cColorHeight];
+
+	hr = getCoordinateMapper()->MapColorFrameToDepthSpace(m_depthHeight*m_depthWidth, (UINT16*)m_depthBuffer.data(), m_colorWidth * m_colorHeight, m_pDepthCoordinates);
+
+	//CameraIntrinsics  pCameraIntrinsics;
+	//UINT32 u32TableCount;
+	//PointF *pPointF;
+	//getCoordinateMapper()->GetDepthCameraIntrinsics(&pCameraIntrinsics);
+	//getCoordinateMapper()->GetDepthFrameToCameraSpaceTable(&u32TableCount,&pPointF);
+	
+	if (SUCCEEDED(hr))
+	{
+		RGBQUAD rgb_zero;
+		rgb_zero.rgbRed = 0;
+		rgb_zero.rgbBlue = 0;
+		rgb_zero.rgbGreen = 0;
+		rgb_zero.rgbReserved = 255;
+		std::fill(m_alighedDepthBuffer.begin(), m_alighedDepthBuffer.end(), rgb_zero);
+		std::fill(m_alighedColorBuffer.begin(), m_alighedColorBuffer.end(), rgb_zero);
+		std::fill(m_alighedInfraredBuffer.begin(), m_alighedInfraredBuffer.end(), rgb_zero);
+		std::fill(m_alignedRawDepthBuffer.begin(), m_alignedRawDepthBuffer.end(), 0);
+		
+		for (int i = 0; i < m_colorWidth * m_colorHeight; i++)
+		{
+			DepthSpacePoint depthPoint = m_pDepthCoordinates[i];
+			BYTE intensity = 0;
+			BYTE infraredIntensity = 0;		
+			int depthX = static_cast<int>(depthPoint.X + 0.5f);                 
+			int depthY = static_cast<int>(depthPoint.Y + 0.5f);
+			if (depthPoint.X >= 0 && depthPoint.Y >= 0)
+			{
+				int depthIdx = (int)(depthPoint.X + depthPoint.Y * m_depthWidth);
+				USHORT depth = m_depthBuffer.data()[depthIdx];
+
+				intensity = static_cast<BYTE>(depth % 256);
+				infraredIntensity = m_infraredBuffer[depthIdx].rgbBlue;
+				if (RmBG == false && m_bodyIndexBuffer)
+				{
+					BYTE player = m_bodyIndexBuffer[depthX + (depthY* m_depthWidth)];
+
+					if (player != 0xff)                   
+					{
+						//
+						//m_pDepthRGBX = m_colorBuffer[i].rgbBlue;
+						m_alighedColorBuffer[i].rgbRed = m_colorBuffer[i].rgbRed;
+						m_alighedColorBuffer[i].rgbGreen = m_colorBuffer[i].rgbGreen;
+						m_alighedColorBuffer[i].rgbBlue = m_colorBuffer[i].rgbBlue;
+
+						//m_pDepthRGBX[i] = m_colorBuffer.data()[i];
+						m_alighedDepthBuffer[i].rgbRed = intensity; //depth
+						m_alighedDepthBuffer[i].rgbGreen = intensity;
+						m_alighedDepthBuffer[i].rgbBlue = intensity;
+						m_alignedRawDepthBuffer[i] = depth;
+
+						m_alighedInfraredBuffer[i].rgbRed = infraredIntensity; //depth
+						m_alighedInfraredBuffer[i].rgbGreen = infraredIntensity;
+						m_alighedInfraredBuffer[i].rgbBlue = infraredIntensity;
+
+					}
+				}
+				else
+				{
+						m_alighedColorBuffer[i].rgbRed = m_colorBuffer[i].rgbRed;
+						m_alighedColorBuffer[i].rgbGreen = m_colorBuffer[i].rgbGreen;
+						m_alighedColorBuffer[i].rgbBlue = m_colorBuffer[i].rgbBlue;
+
+						//m_pDepthRGBX[i] = m_colorBuffer.data()[i];
+						m_alighedDepthBuffer[i].rgbRed = intensity; //depth
+						m_alighedDepthBuffer[i].rgbGreen = intensity;
+						m_alighedDepthBuffer[i].rgbBlue = intensity;
+
+						m_alignedRawDepthBuffer[i] = depth;
+
+						m_alighedInfraredBuffer[i].rgbRed = infraredIntensity; //depth
+						m_alighedInfraredBuffer[i].rgbGreen = infraredIntensity;
+						m_alighedInfraredBuffer[i].rgbBlue = infraredIntensity;
+				}
+
+			}
+
+		}
+		
+	}
+								
+	delete m_pDepthCoordinates;		
+	SafeRelease(pBodyIndexFrameDescription);
+	SafeRelease(pBodyIndexFrame);
+
+	return hr;
+}
 
 void KinectHDFaceGrabber::renderColorFrameAndProcessFaces()
 {
@@ -330,29 +658,84 @@ void KinectHDFaceGrabber::renderColorFrameAndProcessFaces()
     if (SUCCEEDED(hr))
     {
         // Make sure we've received valid color data
-		if ((m_colorWidth > 0 ) && (m_colorHeight > 0))
-        {
-            // Draw the data with Direct2D
-            hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_colorBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
-
-			/*
+		 // Draw the data with Direct2D
+		
 			// View Depth Sensor Output
-			std::vector<RGBQUAD> depth(1920 * 1080);
-			int row;
-			int col;
-			int value;
+		
+		std::vector<RGBQUAD> depth(m_colorWidth * m_colorHeight);
+		RGBQUAD rgb_zero;
+		rgb_zero.rgbRed = 255;
+		rgb_zero.rgbBlue = 0;
+		rgb_zero.rgbGreen = 0;
+		rgb_zero.rgbReserved = 255;
+		std::fill(depth.begin(), depth.end(), rgb_zero);
 
-			for (int i = 0; i < (1920 * 1080); i++)
+		int value;
+		int k = 0;
+		for (int i = 0; i < m_depthHeight ; ++i)
+		{
+			for (int j = 0; j < m_depthWidth; ++j )
 			{
-				col = i % 1920;
-				row = (i - col) / 1920;
-				value = static_cast<UINT8>((m_depthBuffer[((row % m_depthHeight) * m_depthWidth + (col % m_depthWidth))] / 30) % 256);
-				depth[i].rgbRed = value;
-				depth[i].rgbGreen = value;
-				depth[i].rgbBlue = value;
+				USHORT depth_v = m_depthBuffer.data()[k++];
+				
+				//value = static_cast<BYTE>((depth_v >= 0) && (depth_v <= 5000) ? (depth_v % 256) : 0);
+				value =  static_cast<BYTE>(depth_v % 256);
+				//value = static_cast<UINT8>((m_depthBuffer[((row % m_depthHeight) * m_depthWidth + (col % m_depthWidth))] / 30) % 256);
+				depth[i*1920+j].rgbRed = value;
+				depth[i*1920+j].rgbGreen = value;
+				depth[i*1920+j].rgbBlue = value;
 			}
-			hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(depth.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
-			*/
+		}
+
+		
+		std::vector<RGBQUAD> infrared(1920 * 1080);
+		int row;
+		int col;
+		RGBQUAD infrared_pixel;
+
+		for (int i = 0; i < (1920 * 1080); i++)
+		{
+			col = i % 1920;
+			row = (i - col) / 1920;
+			//value = static_cast<UINT8>((m_depthBuffer[((row % m_depthHeight) * m_depthWidth + (col % m_depthWidth))] / 30) % 256);
+			infrared_pixel = m_infraredBuffer[(row % m_depthHeight) * m_depthWidth + (col % m_depthWidth)];
+			infrared[i].rgbRed = infrared_pixel.rgbRed;
+			infrared[i].rgbGreen = infrared_pixel.rgbGreen;
+			infrared[i].rgbBlue = infrared_pixel.rgbBlue;
+		}
+		//hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(depth.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+			
+		if ((m_colorWidth > 0 ) && (m_colorHeight > 0))
+		{
+			switch(m_commonConfiguration->getShowOpt()){
+				case 	Color_Raw:
+					hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_colorBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+					break;
+				case Depth_Raw:
+					hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(depth.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+					break;
+				case Color_Body:
+					hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_alighedColorBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+					break;
+				case Depth_Body:
+					hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_alighedDepthBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+					
+				    break;
+				case Infrared_Raw:
+					hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_alighedInfraredBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+					//hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(infrared.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+				    break;
+					
+				default:
+					hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_colorBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+					break;
+			}
+						
+
+			//test code end
+
+
+			
         }
         else
         {
@@ -417,11 +800,12 @@ void KinectHDFaceGrabber::processFaces()
 	HRESULT hr;
     IBody* ppBodies[BODY_COUNT] = {0};
     bool bHaveBodyData = SUCCEEDED( updateBodyData(ppBodies) );
+	
 	if (!bHaveBodyData)
 		return;
-
+	
 	//indicate the start of data providing
-	m_outputStreamUpdater->startFaceCollection(m_colorBuffer.data(), m_depthBuffer.data());
+	m_outputStreamUpdater->startFaceCollection(m_colorBuffer.data(), m_depthBuffer.data(),m_alignedRawDepthBuffer.data(),m_infraredBuffer.data(),m_alighedInfraredBuffer.data()); //m_alighedColorBuffer m_alighedDepthBuffer m_infraredBuffer
 	bool updatedOneFace = false;
 	UINT32 vertex = 0;
 	hr = GetFaceModelVertexCount(&vertex); // 1347
@@ -431,13 +815,16 @@ void KinectHDFaceGrabber::processFaces()
     {
 		//asociate the faces with the bodies
 		updateHDFaceTrackingID(m_pHDFaceSource[iFace], ppBodies[iFace]);
-
+		
 		IHighDefinitionFaceFrame* pHDFaceFrame = nullptr;
 		hr = m_pHDFaceReader[iFace]->AcquireLatestFrame(&pHDFaceFrame);
 		
 		BOOLEAN bFaceTracked = false;
 		if (SUCCEEDED(hr) && pHDFaceFrame != nullptr){
 			hr = pHDFaceFrame->get_IsFaceTracked(&bFaceTracked);
+		}
+		if (SUCCEEDED(hr)) {
+			getFiveKeyPointsOnFaces(iFace, ppBodies[iFace],bHaveBodyData, bFaceTracked);
 		}
 		//update face aligment
 		if (SUCCEEDED(hr) && bFaceTracked){
@@ -452,15 +839,37 @@ void KinectHDFaceGrabber::processFaces()
 			updateFaceModelStatusOfFaceModelBuilder(&m_pFaceModelBuilder[iFace], m_pFaceModel[iFace]);
 		}
 		
+		        // extract face rotation in degrees as Euler angles
+        int pitch, yaw, roll;
+        m_pDrawDataStreams->extractFaceRotationInDegrees(&m_faceRotation[iFace], &pitch, &yaw, &roll);
+		std::string keyPoints;
+		PointF * pFiveP = m_facePoints[iFace].data();
+		//if (m_recordingConfiguration->isEnabled
+		for(int i=0; i < 5; ++i)
+		{
+			keyPoints += std::to_string((pFiveP+i)->X)  + '\t' +std::to_string((pFiveP+i)->Y)  + "\n";
+		}
+			
+		keyPoints +="BBox : " +std::to_string(m_faceBox[iFace].Left)+ '\t'+std::to_string(m_faceBox[iFace].Top) +'\t'+std::to_string(m_faceBox[iFace].Right)+'\t'+std::to_string(m_faceBox[iFace].Bottom) + "\n";;
+		keyPoints += "FaceYaw : " + std::to_string(yaw) + "\n";
+        keyPoints += "FacePitch : " + std::to_string(pitch) + "\n";
+        keyPoints += "FaceRoll : " + std::to_string(roll) + "\n";
+
+		
 		if (m_outputStreamUpdater){
 			hr = m_outputStreamUpdater->updateOutputStreams(m_pFaceModel[iFace], m_pFaceAlignment[iFace], 
 				std::min(m_HDFaceDetectedPointsCamSpace[iFace].size(), m_HDFaceDetectedPointsColorSpace[iFace].size()), 
-				m_HDFaceDetectedPointsCamSpace[iFace].data(), m_HDFaceDetectedPointsColorSpace[iFace].data());
+				m_HDFaceDetectedPointsCamSpace[iFace].data(), m_HDFaceDetectedPointsColorSpace[iFace].data(),keyPoints);
 			updatedOneFace = true;
 		}
 			
 		if (SUCCEEDED(hr)){
-			m_pDrawDataStreams->drawPoints(m_HDFaceDetectedPointsColorSpace[iFace]);
+			if (m_commonConfiguration->getFacePointsShowOpt() == FacePointsShowOpt::HDFacePoints_Opt &&
+				m_commonConfiguration->getShowOpt() != Depth_Raw &&
+				m_commonConfiguration->getShowOpt() != Infrared_Raw)
+			{
+				m_pDrawDataStreams->drawPoints(m_HDFaceDetectedPointsColorSpace[iFace]);
+			}
 		}		
     }
 	if (updatedOneFace){
@@ -474,6 +883,150 @@ void KinectHDFaceGrabber::processFaces()
         }
     }
 }
+
+HRESULT KinectHDFaceGrabber::getFiveKeyPointsOnFaces(int iFace, IBody* ppBodies,bool bHaveBodyData, bool bFaceTracked)
+{
+    HRESULT hr;
+    //IBody* ppBodies = {0};
+    
+
+
+    // retrieve the latest face frame from this reader
+    IFaceFrame* pFaceFrame = nullptr;
+    hr = m_pFaceFrameReaders[iFace]->AcquireLatestFrame(&pFaceFrame);
+
+    //BOOLEAN bFaceTracked = false;
+    //if (SUCCEEDED(hr) && nullptr != pFaceFrame)
+    //{
+        // check if a valid face is tracked in this face frame
+        //hr = pFaceFrame->get_IsTrackingIdValid(&bFaceTracked);
+    //}
+
+    if (SUCCEEDED(hr))
+    {
+        if (bFaceTracked)
+        {
+            IFaceFrameResult* pFaceFrameResult = nullptr;
+			memset(&m_faceBox[iFace],0,sizeof(RECT));
+            //PointF facePoints[FacePointType::FacePointType_Count];
+			
+            DetectionResult faceProperties[FaceProperty::FaceProperty_Count];
+            D2D1_POINT_2F faceTextLayout;
+
+            hr = pFaceFrame->get_FaceFrameResult(&pFaceFrameResult);
+
+            // need to verify if pFaceFrameResult contains data before trying to access it
+            if (SUCCEEDED(hr) && pFaceFrameResult != nullptr)
+            {
+                hr = pFaceFrameResult->get_FaceBoundingBoxInColorSpace(&m_faceBox[iFace]);
+
+                if (SUCCEEDED(hr))
+                {										
+                    hr = pFaceFrameResult->GetFacePointsInColorSpace(FacePointType::FacePointType_Count, m_facePoints[iFace].data());
+                }
+				
+                if (SUCCEEDED(hr))
+                {
+                    hr = pFaceFrameResult->get_FaceRotationQuaternion(&m_faceRotation[iFace]);
+                }
+
+                if (SUCCEEDED(hr))
+                {
+                    hr = pFaceFrameResult->GetFaceProperties(FaceProperty::FaceProperty_Count, faceProperties);
+                }
+
+                if (SUCCEEDED(hr))
+                {
+                    hr = GetFaceTextPositionInColorSpace(ppBodies, &faceTextLayout);
+                }
+
+                if (SUCCEEDED(hr))
+                {
+					if (m_commonConfiguration->getFacePointsShowOpt() == FacePointsShowOpt::FiveKeyPoints_Opt  &&
+						m_commonConfiguration->getShowOpt() != Depth_Raw &&
+						m_commonConfiguration->getShowOpt() != Infrared_Raw)
+					{
+                    // draw face frame results
+						m_pDrawDataStreams->drawFaceFrameResults(iFace, &m_faceBox[iFace], m_facePoints[iFace].data(), &m_faceRotation[iFace], faceProperties, &faceTextLayout);
+					}
+                }							
+            }
+
+            SafeRelease(pFaceFrameResult);	
+        }
+        else 
+        {	
+            // face tracking is not valid - attempt to fix the issue
+            // a valid body is required to perform this step
+            if (bHaveBodyData)
+            {
+                // check if the corresponding body is tracked 
+                // if this is true then update the face frame source to track this body
+                IBody* pBody = ppBodies;
+                if (pBody != nullptr)
+                {
+                    BOOLEAN bTracked = false;
+                    hr = pBody->get_IsTracked(&bTracked);
+
+                    UINT64 bodyTId;
+                    if (SUCCEEDED(hr) && bTracked)
+                    {
+                        // get the tracking ID of this body
+                        hr = pBody->get_TrackingId(&bodyTId);
+                        if (SUCCEEDED(hr))
+                        {
+                            // update the face frame source with the tracking ID
+                            m_pFaceFrameSources[iFace]->put_TrackingId(bodyTId);
+                        }
+                    }
+                }
+            }
+        }
+    }			
+
+    SafeRelease(pFaceFrame);
+
+	return hr;
+}
+
+HRESULT KinectHDFaceGrabber::GetFaceTextPositionInColorSpace(IBody* pBody, D2D1_POINT_2F* pFaceTextLayout)
+{
+    HRESULT hr = E_FAIL;
+
+    if (pBody != nullptr)
+    {
+        BOOLEAN bTracked = false;
+        hr = pBody->get_IsTracked(&bTracked);
+
+        if (SUCCEEDED(hr) && bTracked)
+        {
+            Joint joints[JointType_Count]; 
+            hr = pBody->GetJoints(_countof(joints), joints);
+            if (SUCCEEDED(hr))
+            {
+                CameraSpacePoint headJoint = joints[JointType_Head].Position;
+                CameraSpacePoint textPoint = 
+                {
+                    headJoint.X + c_FaceTextLayoutOffsetX,
+                    headJoint.Y + c_FaceTextLayoutOffsetY,
+                    headJoint.Z
+                };
+
+                ColorSpacePoint colorPoint = {0};
+                hr = m_pCoordinateMapper->MapCameraPointToColorSpace(textPoint, &colorPoint);
+
+                if (SUCCEEDED(hr))
+                {
+                    pFaceTextLayout->x = colorPoint.X;
+                    pFaceTextLayout->y = colorPoint.Y;
+                }
+            }
+        }
+    }
+
+    return hr;
+}
+
 ICoordinateMapper* KinectHDFaceGrabber::getCoordinateMapper()
 {
 	return m_pCoordinateMapper;

@@ -123,22 +123,17 @@ void Buffer< DataType >::setReleaseDataAfterPull(bool enable)
 }
 
 template < class DataType >
-DataType Buffer< DataType >::pullData(int pos)
+DataType Buffer< DataType >::pullData()
 {
-	if (pos != -1){
-		if (pos < 0 || pos >= m_cloudBuffer.size()){
-			printMessage("Pulling at index out of range");
-			return DataType(nullptr);
-		}
-		m_pullDataPosition = pos;
-	}
+
 	std::unique_lock<std::mutex> cloudBufferLock(*m_cloudBufferMutex);
+	
 	if (!m_bufferingActive || m_bufferFillLevel == 0){
 		//we do not have any data ready?
 		return DataType(nullptr);
 	}
 	//wait until buffer is filled
-	while (m_bufferFillLevel != m_cloudBuffer.size()){
+	 while (m_bufferFillLevel != m_cloudBuffer.size()){
 		if (m_producerFinished){
 			//producer have finished => so we can just
 			// take the left data out
@@ -147,19 +142,19 @@ DataType Buffer< DataType >::pullData(int pos)
 		}
 		m_cloudBufferUpdated->wait(cloudBufferLock);
 	}
-	//retrieve data
-	auto result = m_cloudBuffer[m_pullDataPosition];
+	 //retrieve data
+	 auto result = m_cloudBuffer[m_pullDataPosition];
+	 m_bufferFillLevel--;
 
-	//do we want to clear the data retrieved from the buffer?
-	if (m_releaseDataAfterPull){
-		m_cloudBuffer[m_pullDataPosition].reset();
-		m_bufferFillLevel--;
-	}
+	 //do we want to clear the data retrieved from the buffer?
+	 if (m_releaseDataAfterPull){
+		 m_cloudBuffer[m_pullDataPosition].reset();
+	 }
 
-	//calc next pull index
-	m_pullDataPosition = (m_pullDataPosition + 1) % m_cloudBuffer.size();
-	m_cloudBufferFree->notify_all();
-	return result;
+	 //calc next pull index
+	 m_pullDataPosition = (m_pullDataPosition + 1) % m_cloudBuffer.size();
+	 m_cloudBufferFree->notify_all();
+	 return result;
 }
 
 template < class DataType >

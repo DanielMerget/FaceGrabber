@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
-// Von Microsoft Visual C++ generierte Includedatei.
-// Verwendet durch FaceBasics.rc
+// Microsoft Visual C++ generated include file.
+// Used by FaceBasics.rc
 //
 #define IDI_APP                         100
 #define IDD_DIALOGBAR                   103
@@ -29,14 +29,17 @@
 #define IDC_RADIO1                      1035
 #define IDD_APP1                        1035
 #define IDD_APP_TAB                     1035
+#define IDC_HD2DFACE_RADIO              1035
 #define IDC_SCROLLBAR1                  1036
 #define IDC_TAB_PLAYBACK                1036
 #define IDC_CHECK1                      1037
+#define IDC_INFRARED_RAW_RADIO          1037
 #define IDC_SLIDER1                     1038
-#define IDC_PLAYBACK_SLIDER             1038
+#define IDC_DEPTH_RAW_RADIO             1038
 #define IDC_LIST2                       1039
 #define IDC_RECODINGS_LIST_BOX          1039
 #define IDC_COMBO1                      1040
+#define IDC_3D_POINTS_CLOUDS_FORMAT_COMBOX 1040
 #define IDC_BUTTON2                     1041
 #define IDC_FACE_RAW_DEPTH_COMBO_BOX    1041
 #define IDC_BUTTON3                     1042
@@ -63,6 +66,7 @@
 #define IDC_FULL_RAW_DEPTH_COMBO_BOX_THREADS 1055
 #define IDC_KINECT_RAW_COLOR_EDIT_BOX   1056
 #define IDC_OUTPUT_FOLDER_LABEL         1057
+#define IDC_IMAGE_FORMAT_COMBO          1057
 #define IDC_PLAY_STOP_BUTTON            1058
 #define IDC_KINECT_RAW_COLOR_COMBO_BOX  1058
 #define IDC_HDFACE_STATUS_READ          1059
@@ -71,15 +75,11 @@
 #define IDC_KINECT_RAW_DEPTH_CHECKBOX   1060
 #define IDC_EDIT2                       1061
 #define IDC_LIMIT_FRAMES_EDIT_BOX       1061
-#define IDC_PLAY_PAUSE_BUTTON           1061
 #define IDC_EDIT_BOX_OUTPUT_FOLDER_CONVERT 1062
 #define IDC_KINECT_RAW_DEPTH_EDIT_BOX   1062
-#define IDC_PLAY_PREV_FRAME_BUTTON      1062
 #define IDC_TAB_CONVERT                 1063
 #define IDC_KINECT_DEPTH_COMBO_BOX      1063
 #define IDC_KINECT_RAW_DEPTH_COMBO_BOX  1063
-#define IDC_PLAY_NEXT_FRAME_BUTTON3     1063
-#define IDC_PLAY_NEXT_FRAME_BUTTON      1063
 #define IDC_BUTTON_CONVERT              1064
 #define IDC_CHECK_BOX_SINGLE_THREATED_READING 1064
 #define IDC_KINECT_RAW_DEPTH_COMBO_BOX_THREADS 1064
@@ -90,10 +90,8 @@
 #define IDC_TEXT_LABEL_FOUND_FILES      1067
 #define IDC_HDFACE_EDIT_BOX2            1067
 #define IDC_HDFACE_2D_EDIT_BOX          1067
-#define IDC_LIMIT_PLAYBACK_FRAMRATE_EDIT_BOX 1067
 #define IDC_CHECKBOX_COLOR              1068
 #define IDC_HD_FACE_2D_COMBO_BOX        1068
-#define IDC_LIMIT_PLAYBACK_FRAMERATE_CHECK 1068
 #define IDC_TEXT_LABEL_STATUS_READER    1069
 #define IDC_HD_FACE_2D_COMBO_BOX_THREADS 1069
 #define IDC_TEXT_LABEL_STATUS_WRITER    1070
@@ -104,10 +102,46 @@
 #define IDC_LIMIT_FRAMES_EDIT_BOX2      1072
 #define IDC_LIMIT_FRAMRATE_EDIT_BOX     1072
 #define IDC_OUTPUT_FOLDER_LABEL2        1073
+#define IDC_HD3DFACE_RADIO              1073
 #define IDC_COMBO_OUTPUT_FORMAT         1074
+#define IDC_FACERAW_RADIO               1074
 #define IDC_EDIT_BOX_FILE_NAME          1075
+#define IDC_FACEALL_RADIO               1075
 #define IDC_COMBO_OUTPUT_FORMAT2        1076
 #define IDC_COMBO_BOX_CONVERT_THREADS   1076
+#define IDC_KP_FORMAT                   1076
+#define IDC_SHOW_LABEL                  1077
+#define IDC_COMBO_BOX_SHOW_OPT          1078
+#define IDC_KINECT_ALIGNED_DEPTH_CHECKBOX 1079
+#define IDC_KINECT_REMOVE_BG_CHECKBOX   1080
+#define IDC_KINECT_ALIGHNED_DEPTH_COMBO_BOX_THREADS 1081
+#define IDC_KINECT_ALIGHNED_DEPTH_EDIT_BOX 1082
+#define IDC_KINECT_ALIGHNED_DEPTH_COMBO_BOX 1083
+#define IDC_KINECT_INFRARED_CHECKBOX    1084
+#define IDC_KINECT_REMOVE_BG_COLOR_CHECKBOX 1085
+#define IDC_DEPTH_ALIGNED_RADIO         1085
+#define IDC_INFRARED_ALIGNED_RADIO      1086
+#define IDC_KINECT_INFRARED_EDIT_BOX    1087
+#define IDC_INFRARED_ALL_RADIO          1088
+#define IDC_KINECT_INFRARED_COMBO_BOX   1089
+#define IDC_KINECT_ALIGHNED_DEPTH_STATUS 1090
+#define IDC_KINECT_INFRARED_STATUS      1091
+#define IDC_KINECT_KEYPOINTS_CHECKBOX   1092
+#define IDC_KINECT_KEYPOINTS_STATUS     1093
+#define IDC_KINECT_KEYPOINTS_COMBO_BOX_THREADS 1094
+#define IDC_KINECT_KEYPOINTS_EDIT_BOX   1095
+#define IDC_KINECT_KEYPOINTS_COMBO_BOX  1097
+#define FACE_SHOW_GROUPBOX              1098
+#define IDC_DEPTH_ALL_RADIO             1098
+#define HD_FACE_SHOW_RADIO              1099
+#define FIVE_KEY_POINTS_SHOW_RADIO      1100
+#define IDC_RAW_COLOR_CHECK             1102
+#define IDC_ALL_COM_BOX_THREADS         1103
+#define IDC_RECORDING_OPT_RESET         1104
+#define IDC_KEYPOINTS_CHECK             1106
+#define IDC_PROGRESS1                   1107
+#define IDC_RECORDING_PROGRESS          1107
+#define IDC_KINECT_INFRARED_COMBO_BOX_THREADS 1806
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -117,7 +151,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1069
+#define _APS_NEXT_CONTROL_VALUE         1108
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

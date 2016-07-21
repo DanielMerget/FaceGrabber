@@ -13,11 +13,27 @@ enum RecordingFileFormat{
 	RECORD_FILE_FORMAT_COUNT
 };
 
+enum RecordingShowOpt{
+	Color_Raw,
+	Depth_Raw,
+	Color_Body,
+	Depth_Body,
+	Infrared_Raw,
+	RECORD_SHOW_OPT_COUNT
+};
+
+enum FacePointsShowOpt{
+	HDFacePoints_Opt,
+	FiveKeyPoints_Opt,
+	FACE_POINTS_SHOW_OPT_COUNT
+};
+
 enum RecordCloudType{
 	HDFace,
 	FaceRaw,
 	FullDepthRaw,
 	HDFace2D,
+	//AllCommon,
 	RECORD_CLOUD_TYPE_COUNT
 };
 

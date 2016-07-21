@@ -305,7 +305,7 @@ void ImageRenderer::drawFaceFrameResults(int iFace, const RectI* pFaceBox, const
         }
 
         std::wstring faceText = L"";
-
+#if 0
         // extract each face property information and store it is faceText
         for (int iProperty = 0; iProperty < FaceProperty::FaceProperty_Count; iProperty++)
         {
@@ -360,7 +360,7 @@ void ImageRenderer::drawFaceFrameResults(int iFace, const RectI* pFaceBox, const
 
             faceText += L"\n";
         }
-
+#endif
         // extract face rotation in degrees as Euler angles
         int pitch, yaw, roll;
         extractFaceRotationInDegrees(pFaceRotation, &pitch, &yaw, &roll);
