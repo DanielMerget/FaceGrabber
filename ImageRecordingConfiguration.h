@@ -20,7 +20,6 @@
 *			//outputfolder/timestamp/imagetype/filename.fileformat.
 */
 
-//template <typename RecordType, typename RecordingFileFormat>
 class ImageRecordingConfiguration : public IImageRecordingConfiguration{
 #define UNLIMITED_FRAMES -1;
 #define FRAMES_NOT_SET 0;

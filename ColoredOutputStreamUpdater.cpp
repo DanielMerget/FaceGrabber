@@ -36,8 +36,7 @@ void ColoredOutputStreamUpdater::initialize(ICoordinateMapper* m_pCoordinateMapp
 
 void ColoredOutputStreamUpdater::allocateClouds()
 {
-	//boost::shared_ptr<std::string> tmp("");
-	//m_pFiveKeyPoints = tmp;
+	
 	m_pFiveKeyPoints =  std::shared_ptr<std::string> (new std::string(""));
 	m_HDFacePointCloud = pcl::PointCloud<pcl::PointXYZRGB>::Ptr(new pcl::PointCloud <pcl::PointXYZRGB>());
 	m_HDFacePointCloud->is_dense = false;
@@ -191,7 +190,7 @@ void ColoredOutputStreamUpdater::stopFaceCollection()
 HRESULT ColoredOutputStreamUpdater::updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize,
 	CameraSpacePoint* detectedHDFacePointsCamSpace, ColorSpacePoint* detectedHDFacePointsColorSpace, std::string sKeyPoints)
 {
-	if (m_colorBuffer == nullptr || m_depthBuffer == nullptr  ){
+	if (m_colorBuffer == nullptr || m_depthBuffer == nullptr){
 		return -1;
 	}
 	//create vectices of face

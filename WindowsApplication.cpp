@@ -106,12 +106,15 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	double timedelta;
 	double actualFPS;
 	std::stringstream FPSinfo;
+	CString msgCstring;
+
+	HWND tabControlHandle = GetDlgItem(m_hWnd, IDC_TAB2);
+
+	start = clock();
 
 	// Main message loop
 	while (WM_QUIT != msg.message)
 	{
-		start = clock();
-
 		if (m_isKinectRunning){
 			m_kinectFrameGrabber.update();
 		}
@@ -127,22 +130,42 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 			DispatchMessageW(&msg);
 		}
 
-		if (m_FPSLimit != 0)
-		{
-			// timedelta in seconds
-			timedelta = (double(clock() - start)) / CLOCKS_PER_SEC;
-			// if faster than specified target fps: sleep
-			if (timedelta < (1.0 / m_FPSLimit)) Sleep(((1.0 / m_FPSLimit) - timedelta) * 1000);
+		int sel = TabCtrl_GetCurSel(tabControlHandle);
+
+		// Record Tab active
+		if (sel == 0){
+			/*
+			FPSinfo.str("");
+			FPSinfo.clear();
+			FPSinfo << "Tab Sel: " << sel;
+			msgCstring = CString(FPSinfo.str().c_str());
+			msgCstring += L"\n";
+			OutputDebugString(msgCstring);
+			*/
+
+			if (m_FPSLimit != 0)
+			{
+				// timedelta in seconds
+				timedelta = (double(clock() - start)) / CLOCKS_PER_SEC;
+				// if faster than specified target fps: sleep
+				if (timedelta < (1.0 / m_FPSLimit)) Sleep(((1.0 / m_FPSLimit) - timedelta) * 1000);
+			}
+
+			actualFPS = CLOCKS_PER_SEC / (float(clock() - start));
+			start = clock();
+
+			FPSinfo.str("");
+			FPSinfo.clear();
+			FPSinfo << "UPDATE Loop actual fps: " << actualFPS << " target fps: " << m_FPSLimit;
+			msgCstring = CString(FPSinfo.str().c_str());
+			msgCstring += L"\n";
+			OutputDebugString(msgCstring);
 		}
-
-		actualFPS = CLOCKS_PER_SEC / (float(clock() - start));
-
-		FPSinfo.str("");
-		FPSinfo.clear();
-		FPSinfo << "UPDATE Loop actual fps: " << actualFPS << " target fps: " << m_FPSLimit;
-		auto msgCstring = CString(FPSinfo.str().c_str());
-		msgCstring += L"\n";
-		OutputDebugString(msgCstring);
+		// Playback/Convert Tab active
+		else{
+			// Limit CPU usage from while(WM_QUIT != msg.message)
+			Sleep(10);
+		}
 	}
 
 	return static_cast<int>(msg.wParam);

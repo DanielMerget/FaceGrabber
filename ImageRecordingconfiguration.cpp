@@ -16,9 +16,6 @@ m_fileFormat(format)
 }
 
 
-
-
-
 CString ImageRecordingConfiguration::getFileFormatAsString(ImageRecordingFileFormat fileFormat)
 {
 	switch (fileFormat)
@@ -42,7 +39,6 @@ void ImageRecordingConfiguration::setDefaultFileName()
 
 CString ImageRecordingConfiguration::getDefaultFileName()
 {
-
 	switch (m_imageType){
 	case KinectColorRaw:
 		return CString(L"Kinect_Color_Raw");
@@ -99,8 +95,6 @@ ImageRecordingFileFormat ImageRecordingConfiguration::getRecordFileFormat()
 {
 	return m_fileFormat;
 }
-
-
 
 CString ImageRecordingConfiguration::getFileNameCString()
 {

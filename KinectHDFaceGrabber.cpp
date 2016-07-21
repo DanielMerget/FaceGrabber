@@ -140,10 +140,6 @@ HRESULT KinectHDFaceGrabber::initColorFrameReader()
 		m_colorBuffer.resize(m_colorHeight * m_colorWidth);
 	}
 
-
-
-	
-
 	SafeRelease(pFrameDescription);
 	SafeRelease(pColorFrameSource);
 	
@@ -174,8 +170,6 @@ HRESULT KinectHDFaceGrabber::initDepthFrameReader()
 		m_depthBuffer.resize(m_depthHeight * m_depthWidth);
 	}
 
-	
-
 	SafeRelease(frameDescription);
 	if (SUCCEEDED(hr)){
 		hr = depthFrameSource->OpenReader(&m_pDepthFrameReader);
@@ -193,7 +187,6 @@ HRESULT KinectHDFaceGrabber::initHDFaceReader()
 
 	if (SUCCEEDED(hr)){
 		hr = m_pKinectSensor->get_BodyFrameSource(&pBodyFrameSource);
-		
 	}
 	std::vector<std::vector<float>> deformations(BODY_COUNT, std::vector<float>(FaceShapeDeformations::FaceShapeDeformations_Count));
 
@@ -800,10 +793,9 @@ void KinectHDFaceGrabber::processFaces()
 	HRESULT hr;
     IBody* ppBodies[BODY_COUNT] = {0};
     bool bHaveBodyData = SUCCEEDED( updateBodyData(ppBodies) );
-	
 	if (!bHaveBodyData)
 		return;
-	
+
 	//indicate the start of data providing
 	m_outputStreamUpdater->startFaceCollection(m_colorBuffer.data(), m_depthBuffer.data(),m_alignedRawDepthBuffer.data(),m_infraredBuffer.data(),m_alighedInfraredBuffer.data()); //m_alighedColorBuffer m_alighedDepthBuffer m_infraredBuffer
 	bool updatedOneFace = false;
@@ -815,7 +807,7 @@ void KinectHDFaceGrabber::processFaces()
     {
 		//asociate the faces with the bodies
 		updateHDFaceTrackingID(m_pHDFaceSource[iFace], ppBodies[iFace]);
-		
+
 		IHighDefinitionFaceFrame* pHDFaceFrame = nullptr;
 		hr = m_pHDFaceReader[iFace]->AcquireLatestFrame(&pHDFaceFrame);
 		
