@@ -142,6 +142,16 @@
 #define IDC_KEYPOINTS_CHECK             1106
 #define IDC_PROGRESS1                   1107
 #define IDC_RECORDING_PROGRESS          1107
+#define IDC_HD2D_CHECK                  1108
+#define IDC_HD3D_CHECK                  1109
+#define IDC_FACE_RAW_CHECK              1110
+#define IDC_KEY_POINTS_CHECK            1111
+#define IDC_DEPTH_RAW_CHECK             1112
+#define IDC_ALIGNED_DEPTH_CHECK         1113
+#define IDC_DEPTH_3D_RAW_CHECK          1114
+#define IDC_INRARED_RAW_CHECK           1115
+#define IDC_INFRARED_DEPTH_CHECK2       1116
+#define IDC_ALIGNED_INFRARED_CHECK      1116
 #define IDC_KINECT_INFRARED_COMBO_BOX_THREADS 1806
 #define IDC_PLAY_PAUSE_BUTTON           1807
 #define IDC_PLAY_PAUSE_BUTTON2          1808
@@ -162,7 +172,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1108
+#define _APS_NEXT_CONTROL_VALUE         1109
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

@@ -543,139 +543,79 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 	case IDC_LIMIT_FRAMERATE_CHECK:
 		updateFPSLimit();
 		break;
-	case IDC_HD_FACE_CHECKBOX:
-		m_recordingConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
+	case IDC_RAW_COLOR_CHECK:
+		m_imageRecordingConfiguration[KinectColorRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_RAW_COLOR_CHECK));
+		break;
+
+
+	case IDC_DEPTH_RAW_CHECK:
+		m_imageRecordingConfiguration[KinectDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_DEPTH_RAW_CHECK));
+		break;
+	case IDC_ALIGNED_DEPTH_CHECK:
+		m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_ALIGNED_DEPTH_CHECK));
+		break;
+
+
+	case IDC_HD2D_CHECK:
+		m_recordingConfiguration[HDFace2D]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD2D_CHECK));
+		break;
+	case IDC_HD3D_CHECK:
+		m_recordingConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD3D_CHECK));
+		break;
+	case IDC_FACE_RAW_CHECK:
+		m_recordingConfiguration[FaceRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_CHECK));
+		break;
+	case IDC_KEY_POINTS_CHECK:
+		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_KEY_POINTS_CHECK));
+		break;
+
+	case IDC_INRARED_RAW_CHECK:
+		m_imageRecordingConfiguration[KinectInfrared]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_INRARED_RAW_CHECK));
+		break;
+	case IDC_ALIGNED_INFRARED_CHECK:
+		m_imageRecordingConfiguration[KinectAlignedInfrared]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_ALIGNED_INFRARED_CHECK));
+		break;
+
+
+	case IDC_DEPTH_3D_RAW_CHECK:
+		m_recordingConfiguration[FullDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_DEPTH_3D_RAW_CHECK));
 		break;
 
 
 
-
-	case IDC_FACE_RAW_DEPTH_CHECKBOX:
-		m_recordingConfiguration[FaceRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FACE_RAW_DEPTH_CHECKBOX));
-		break;
-
-	case IDC_HD_FACE_2D_CHECKBOX:
-		m_recordingConfiguration[HDFace2D]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_2D_CHECKBOX));
-		break;
-
-	case IDC_HD3DFACE_RADIO:
-		m_recordingConfiguration[HDFace]->setEnabled(true);
-		m_recordingConfiguration[HDFace2D]->setEnabled(false);
-		m_recordingConfiguration[FaceRaw]->setEnabled(false);
-
-		break;
-	case IDC_HD2DFACE_RADIO:
-		m_recordingConfiguration[HDFace]->setEnabled(false);
-		m_recordingConfiguration[HDFace2D]->setEnabled(true);
-		m_recordingConfiguration[FaceRaw]->setEnabled(false);
-		break;
-	case IDC_FACERAW_RADIO:
-		m_recordingConfiguration[HDFace]->setEnabled(false);
-		m_recordingConfiguration[HDFace2D]->setEnabled(false);
-		m_recordingConfiguration[FaceRaw]->setEnabled(true);
-		break;
-	case IDC_FACEALL_RADIO:
-		m_recordingConfiguration[HDFace]->setEnabled(true);
-		m_recordingConfiguration[HDFace2D]->setEnabled(true);
-		m_recordingConfiguration[FaceRaw]->setEnabled(true);
-		break;
-
-	case IDC_FULL_RAW_DEPTH_CHECKBOX:
-		m_recordingConfiguration[FullDepthRaw]->setEnabled(true);
-		break;
 
 	case IDC_RECORDING_OPT_RESET:
 		
-		CheckDlgButton(m_hWnd, IDC_FACEALL_RADIO, false);
-		CheckDlgButton(m_hWnd, IDC_HD2DFACE_RADIO, false);
-		CheckDlgButton(m_hWnd, IDC_HD3DFACE_RADIO, false);
-		CheckDlgButton(m_hWnd, IDC_FACERAW_RADIO, false);
-				
+		CheckDlgButton(m_hWnd, IDC_HD2D_CHECK, false);
+		CheckDlgButton(m_hWnd, IDC_HD3D_CHECK, false);
+		CheckDlgButton(m_hWnd, IDC_FACE_RAW_CHECK, false);
+		CheckDlgButton(m_hWnd, IDC_KEY_POINTS_CHECK, false);
 		m_recordingConfiguration[HDFace]->setEnabled(false);
 		m_recordingConfiguration[HDFace2D]->setEnabled(false);
 		m_recordingConfiguration[FaceRaw]->setEnabled(false);
+		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setEnabled(false);
 
 		CheckDlgButton(m_hWnd, IDC_RAW_COLOR_CHECK, false);
 		m_imageRecordingConfiguration[KinectColorRaw]->setEnabled(false);
 		
 
-		CheckDlgButton(m_hWnd, IDC_DEPTH_RAW_RADIO, false);
-		CheckDlgButton(m_hWnd, IDC_DEPTH_ALIGNED_RADIO, false);
-		CheckDlgButton(m_hWnd, IDC_DEPTH_ALL_RADIO, false);
+		CheckDlgButton(m_hWnd, IDC_DEPTH_RAW_CHECK, false);
+		CheckDlgButton(m_hWnd, IDC_ALIGNED_DEPTH_CHECK, false);
 		m_imageRecordingConfiguration[KinectDepthRaw]->setEnabled(false);
 		m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setEnabled(false);
 
 
-		CheckDlgButton(m_hWnd, IDC_INFRARED_RAW_RADIO, false);
-		CheckDlgButton(m_hWnd, IDC_INFRARED_ALIGNED_RADIO, false);
-		CheckDlgButton(m_hWnd, IDC_INFRARED_ALL_RADIO, false);
+		CheckDlgButton(m_hWnd, IDC_INRARED_RAW_CHECK, false);
+		CheckDlgButton(m_hWnd, IDC_ALIGNED_INFRARED_CHECK, false);
 		m_imageRecordingConfiguration[KinectInfrared]->setEnabled(false);
-		//m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setEnabled(false);
-
-
-		CheckDlgButton(m_hWnd, IDC_KEYPOINTS_CHECK, false);
-		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setEnabled(false);
-
-
-		//tHandle
-		//this->ui->radiobutton->setAutoExclusive(false);
-		//this->ui->radiobutton->setChecked(false);
-
-		break;
-	case IDC_RAW_COLOR_CHECK:
-		m_imageRecordingConfiguration[KinectColorRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_RAW_COLOR_CHECK));
-		break;
-
-	case IDC_KINECT_RAW_COLOR_CHECKBOX:
-		m_imageRecordingConfiguration[KinectColorRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_RAW_COLOR_CHECKBOX));
-		break;
-
-	case IDC_DEPTH_RAW_RADIO:
-		m_imageRecordingConfiguration[KinectDepthRaw]->setEnabled(true);
-		break;
-	case IDC_DEPTH_ALIGNED_RADIO:
-		m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setEnabled(true);
-		break;
-	case IDC_DEPTH_ALL_RADIO:
-		m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setEnabled(true);
-		m_imageRecordingConfiguration[KinectDepthRaw]->setEnabled(true);
-		break;
-
-	case IDC_INFRARED_RAW_RADIO:
-		m_imageRecordingConfiguration[KinectInfrared]->setEnabled(true);
 		m_imageRecordingConfiguration[KinectAlignedInfrared]->setEnabled(false);
-		break;
-	case IDC_INFRARED_ALIGNED_RADIO:
-		//m_imageRecordingConfiguration[KinectInfraredAligned]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_ALIGNED_DEPTH_CHECKBOX));
-		m_imageRecordingConfiguration[KinectAlignedInfrared]->setEnabled(true);
-		m_imageRecordingConfiguration[KinectInfrared]->setEnabled(false);
-		break;
-	case IDC_INFRARED_ALL_RADIO:
-		m_imageRecordingConfiguration[KinectInfrared]->setEnabled(true);
-		m_imageRecordingConfiguration[KinectAlignedInfrared]->setEnabled(true);
+
+		CheckDlgButton(m_hWnd, IDC_DEPTH_3D_RAW_CHECK, false);
+		m_recordingConfiguration[FullDepthRaw]->setEnabled(false);
 		break;
 
-
-
-	case IDC_KINECT_RAW_DEPTH_CHECKBOX:
-		m_imageRecordingConfiguration[KinectDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_RAW_DEPTH_CHECKBOX));
-		break;
-	case IDC_KINECT_ALIGNED_DEPTH_CHECKBOX:
-		m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_ALIGNED_DEPTH_CHECKBOX));
-		break;
-	case IDC_KINECT_INFRARED_CHECKBOX:
-		m_imageRecordingConfiguration[KinectInfrared]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_INFRARED_CHECKBOX));
-		break;
-
-	case IDC_KEYPOINTS_CHECK:
-		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setEnabled(true);
-
-		break;
+		
 	
-	case IDC_KINECT_KEYPOINTS_CHECKBOX:
-		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_KEYPOINTS_CHECKBOX));
-
-		break;
 	case IDC_KINECT_REMOVE_BG_CHECKBOX:
 		m_commonConfiguration[KinectV2_COMMON]->setKeepBGEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_REMOVE_BG_CHECKBOX));
 		//m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setPointsEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_KEYPOINTS_CHECKBOX));
