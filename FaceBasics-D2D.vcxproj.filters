@@ -77,6 +77,15 @@
     <ClCompile Include="ImageRecordingconfiguration.cpp">
       <Filter>WindowsApp\Model</Filter>
     </ClCompile>
+    <ClCompile Include="StringFileWriter.cpp">
+      <Filter>FileWriter</Filter>
+    </ClCompile>
+    <ClCompile Include="StringFileRecordingConfiguration.cpp">
+      <Filter>WindowsApp\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="CommonConfiguration.cpp">
+      <Filter>WindowsApp\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -167,6 +176,15 @@
       <Filter>WindowsApp\Model</Filter>
     </ClInclude>
     <ClInclude Include="ImageRecordingConfiguration.h">
+      <Filter>WindowsApp\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="StringFileWriter.h">
+      <Filter>FileWriter</Filter>
+    </ClInclude>
+    <ClInclude Include="StringFileRecordingConfiguration.h">
+      <Filter>WindowsApp\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonConfiguration.h">
       <Filter>WindowsApp\Model</Filter>
     </ClInclude>
   </ItemGroup>

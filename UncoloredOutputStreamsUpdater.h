@@ -52,7 +52,7 @@ public:
 	* \return	A hResult.
 	*/
 	HRESULT updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize, CameraSpacePoint* detectedHDFacePointsCamSpace,
-		ColorSpacePoint* detectedHDFacePointsColorSpace);
+		ColorSpacePoint* detectedHDFacePointsColorSpace,std::string sKeyPoints);
 
 
 	/** \brief	The clouds updated. */
@@ -62,8 +62,10 @@ public:
 	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZ>::Ptr cloud)> cloudUpdated[4];
 
 	/** \brief	The image updated */
-	boost::signals2::signal<void(boost::shared_ptr<cv::Mat>)> imageUpdated[2];
+	boost::signals2::signal<void(boost::shared_ptr<cv::Mat>)> imageUpdated[5];
 
+
+	boost::signals2::signal<void(std::shared_ptr<std::string>)> keyPointsUpdated[1];
 	/**
 	 * \fn	void UncoloredOutputStreamsUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer);
 	 *
@@ -71,7 +73,7 @@ public:
 	 * \param [in]	colorBuffer the current color Buffer
 	 * \param [in]	depthBuffer the current depth Buffer
 	 */
-	void startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer);
+	void startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer,UINT16* alignedDepthBuffer,RGBQUAD* infraredBuffer,RGBQUAD* alignedInfraredBuffer);
 
 	/**
 	 * \fn	void UncoloredOutputStreamsUpdater::stopFaceCollection();
@@ -152,6 +154,8 @@ private:
 	/** \brief	The HD face point cloud 2D ColorSpace representation. */
 	pcl::PointCloud<pcl::PointXYZ>::Ptr m_HDFacePointCloud2D;
 
+	std::shared_ptr<std::string> m_pFiveKeyPoints;
+
 	/** \brief	true if this object is valid face frame. */
 	bool m_isValidFaceFrame;
 
@@ -161,8 +165,19 @@ private:
 	/** \brief	Buffer for color data. */
 	RGBQUAD* m_colorBuffer;
 
+		
+	/** \brief	Buffer for color data. */
+	RGBQUAD* m_infraredBuffer;
+
+	/** \brief	Buffer for color data. */
+	RGBQUAD* m_alignedInfraredBuffer;
+
 	/** \brief	Buffer for depth data. */
 	UINT16*	m_depthBuffer;
+
+	/** \brief	Buffer for color data. */
+	UINT16* m_alignedDepthBuffer;
+
 
 };
 

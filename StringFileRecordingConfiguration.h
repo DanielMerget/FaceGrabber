@@ -10,7 +10,7 @@
 #include <regex>
 
 #include "IRecordingConfiguration.h"
-
+#include "IImageRecordingConfiguration.h"
 /**
  * \class	RecordingConfiguration
  *
@@ -20,12 +20,12 @@
  *			//outputfolder/timestamp/cloudtype/filename.fileformat.
  */
 
-class RecordingConfiguration : public IRecordingConfiguration{
+class StringFileRecordingConfiguration {
 #define UNLIMITED_FRAMES -1;
 #define FRAMES_NOT_SET 0;
 
 public:
-	RecordingConfiguration();
+	StringFileRecordingConfiguration();
 
 	/**
 	 * \fn	RecordingConfiguration::RecordingConfiguration(RecordCloudType cloudType, RecordingFileFormat format);
@@ -36,7 +36,7 @@ public:
 	 * \param	format   	Describes the format to use.
 	 */
 
-	RecordingConfiguration(RecordCloudType cloudType, RecordingFileFormat format);
+	StringFileRecordingConfiguration(StringFileRecordType RecordType, StringFileRecordingFileFormat format);
 
 	/**
 	 * \fn	RecordingConfiguration::RecordingConfiguration(RecordingConfiguration& recordingConfiguration);
@@ -46,12 +46,12 @@ public:
 	 * \param [in]	recordingConfiguration	The recording configuration.
 	 */
 
-	RecordingConfiguration(RecordingConfiguration& recordingConfiguration);
+	StringFileRecordingConfiguration(StringFileRecordingConfiguration& recordingConfiguration);
 
 	
-	static CString getFileFormatAsString(RecordingFileFormat fileFormat);
+	static CString getFileFormatAsString(StringFileRecordingFileFormat fileFormat);
 
-	static CString getShowOptAsString(RecordingShowOpt ShowOpt);
+	
 
 	/**
 	 * \fn	bool RecordingConfiguration::isRecordConfigurationValid();
@@ -97,7 +97,7 @@ public:
 	 *
 	 * \return	The record cloud type.
 	 */
-	RecordCloudType getRecordCloudType();
+	StringFileRecordType getRecordType();
 
 	/**
 	 * \fn	RecordingFileFormat RecordingConfiguration::getRecordFileFormat();
@@ -106,16 +106,9 @@ public:
 	 *
 	 * \return	The record file format.
 	 */
-	RecordingFileFormat getRecordFileFormat();
+	StringFileRecordingFileFormat getRecordFileFormat();
 
-	/**
-	 * \fn	RecordingFileFormat RecordingConfiguration::getRecordFileFormat();
-	 *
-	 * \brief	Gets fileformat to record
-	 *
-	 * \return	The show  Option.
-	 */
-	RecordingShowOpt getShowOpt();
+
 
 	/**
 	 * \fn	CString RecordingConfiguration::getFileNameCString();
@@ -199,30 +192,7 @@ public:
 	 *
 	 * \param	fileFormat	The file format in which to record.
 	 */
-	void setFileFormat(RecordingFileFormat fileFormat);
-
-		/**
-	 * \fn	void RecordingConfiguration::setShowOpt(RecordingShowOpt ShowOpt);
-	 *
-	 * \brief	Sets show option.
-	 *
-	 * \param	showOpt	Will show accoding to the ShowOpt.
-	 */
-
-	void setShowOpt(RecordingShowOpt ShowOpt);
-
-	/**
-	 * \fn	void RecordingConfiguration::setFacePointsShowOpt(FacePointsShowOpt FacePointsShowOpt);
-	 *
-	 * \brief	Sets show option for face points.
-	 *
-	 * \param	showOpt	Will show accoding to the ShowOpt.
-	 */
-
-
-	void setFacePointsShowOpt(FacePointsShowOpt FacePointsShowOpt);
-
-	FacePointsShowOpt getFacePointsShowOpt();
+	void setFileFormat(StringFileRecordingFileFormat fileFormat);
 
 
 
@@ -271,10 +241,10 @@ public:
 	 *
 	 * \return	The sub folder name for cloud type.
 	 */
-	static CString getSubFolderNameForCloudType(RecordCloudType cloudType);
+	static CString getSubFolderNameForCloudType(StringFileRecordType cloudType);
 
 	/**
-	 * \fn	static CString RecordingConfiguration::getFullRecordingPathForCloudType(RecordCloudType cloudType, CString outputFolder, CString timeStampFolderName);
+	 * \fn	static CString RecordingConfiguration::getFullRecordingPathForRecordType(RecordCloudType cloudType, CString outputFolder, CString timeStampFolderName);
 	 *
 	 * \brief	Gets full recording path for the given parameters.
 	 *
@@ -284,7 +254,7 @@ public:
 	 *
 	 * \return	The full recording path for the cloud recording parameters.
 	 */
-	static CString getFullRecordingPathForCloudType(RecordCloudType cloudType, CString outputFolder, CString timeStampFolderName);
+	static CString getFullRecordingPathForRecordType(StringFileRecordType cloudType, CString outputFolder, CString timeStampFolderName);
 
 	/**
 	 * \fn	int RecordingConfiguration::getThreadCountToStart();
@@ -304,8 +274,8 @@ public:
 	 */
 	void setThreadCountToStart(int threadsCount);
 
-	boost::signal<void(RecordCloudType, bool)> recordConfigurationStatusChanged;
-	boost::signal<void(RecordCloudType)>	recordPathOrFileNameChanged;
+	boost::signal<void(StringFileRecordType, bool)> recordConfigurationStatusChanged;
+	boost::signal<void(StringFileRecordType)>	recordPathOrFileNameChanged;
 private:
 
 	/**
@@ -334,23 +304,23 @@ private:
 	CString					m_fileName;
 	
 	/** \brief	Type of the cloud to record. */
-	RecordCloudType			m_cloudType;
+	StringFileRecordType			m_recordType;
 
 	/** \brief	The file format. */
-	RecordingFileFormat		m_fileFormat;
+	StringFileRecordingFileFormat		m_fileFormat;
 
-	/** \brief	The Show Option. */
-	RecordingShowOpt         m_ShowOpt;
+	
 
 	/** \brief	The maximum number of frames to record. can be UNLIMITED_FRAMES (-1). */
 	int						m_maxNumberOfFrames;
 
 	/** \brief	true to enable recording, false to disable. */
 	bool					m_enabled;
-	FacePointsShowOpt		m_FacePointsShowOpt;
 
 	/** \brief	Number of threads to start for recording. */
 	int						m_threadsCount;
+	bool					m_points_enabled;
+	bool					m_angles_enabled;
 };
-typedef std::shared_ptr<RecordingConfiguration> RecordingConfigurationPtr;
-typedef std::vector<RecordingConfigurationPtr> SharedRecordingConfiguration;
+typedef std::shared_ptr<StringFileRecordingConfiguration> StringFileRecordingConfigurationPtr;
+typedef std::vector<StringFileRecordingConfigurationPtr> SharedStringFileRecordingConfiguration;

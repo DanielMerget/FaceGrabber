@@ -20,7 +20,8 @@
 #include "BufferSynchronizer.h"
 #include "ConvertTabHandler.h"
 #include <thread>
-
+#include "StringFileWriter.h"
+#include "StringFileRecordingConfiguration.h"
 /**
  * \class	WindowsApplication for the UI, user inputs and management of the model classes
  *
@@ -77,6 +78,8 @@ private:
 	 */
 	SharedRecordingConfiguration initRecordDataModel();
 
+	SharedCommonConfiguration initCommonDataModel();
+
 	/**
 	* \fn	SharedImageRecordingConfiguration WindowsApplication::initImageRecordDataModel();
 	*
@@ -85,6 +88,8 @@ private:
 	* \return	A SharedImageRecordingConfiguration.
 	*/
 	SharedImageRecordingConfiguration initImageRecordDataModel();
+
+	SharedStringFileRecordingConfiguration initStringFileRecordDataModel();
 
 	/**
 	 * \fn	void WindowsApplication::onPlaybackFinished();
@@ -126,7 +131,7 @@ private:
 	* \param	recordingConfigurations			The recording configurations.
 	* \param	imageRecordingConfigurations	The image recording configurations.
 	*/
-	void startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations);
+	void startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations,SharedStringFileRecordingConfiguration KeyPointsRecordingConfiguration);
 
 	/**
 	 * \fn	void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations);
@@ -137,7 +142,7 @@ private:
 	 * \param	recordingConfigurations			The recording configurations.
 	 * \param	imageRecordingConfigurations	The image recording configurations.
 	 */
-	void stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations);
+	void stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations,SharedStringFileRecordingConfiguration KeyPointsRecordingConfiguration);
 
 	/**
 	 * \fn	void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfig, bool isSingleThreatedReading);
@@ -191,6 +196,7 @@ private:
 	*/
 	void initImageWriter();
 
+	void initStringFileWriter();
 	/**
 	 * \fn	void WindowsApplication::initInputReaderBufferAndSynchronizer();
 	 *
@@ -340,6 +346,11 @@ private:
 	/** \brief	The image writer. */
 	std::vector<std::shared_ptr<KinectRawFileWriter>> m_imageOutputWriter;
 	
+
+	std::vector<std::shared_ptr<StringFileWriter>> m_stringFileOutputWriter;
+	/** \brief	The image writer. */
+	//std::vector<std::shared_ptr<KinectRawFileWriter>> m_imageOutputWriter;
+
 	/** \brief	The buffer synchronizer for reading files. */
 	BufferSynchronizer<pcl::PointCloud<pcl::PointXYZRGB>::Ptr> m_bufferSynchronizer;
 

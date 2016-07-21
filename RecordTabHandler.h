@@ -8,7 +8,8 @@
 #include "ImageRecordingConfiguration.h"
 #include <memory>
 #include <boost/signals.hpp>
-
+#include "StringFileRecordingConfiguration.h"
+#include "CommonConfiguration.h"
 /**
  * \class	RecordTabHandler
  *
@@ -48,6 +49,13 @@ public:
 	* \param	imageRecordingConfiguration		The image recording configuration.
 	*/
 	void setSharedImageRecordingConfiguration(SharedImageRecordingConfiguration imageRecordingConfiguration);
+
+
+	void setSharedStringStringRecordingConfiguration(SharedStringFileRecordingConfiguration stringFileRecordingConfiguration);
+
+	void setSharedCommonConfiguration(SharedCommonConfiguration commonConfiguration);
+
+	SharedCommonConfiguration getSharedCommonConfiguration();
 
 	/**
 	 * \fn	SharedRecordingConfiguration RecordTabHandler::getRecordConfiguration();
@@ -111,6 +119,9 @@ public:
 	 */
 	void updateWriterStatus(RecordCloudType type, std::wstring status);
 
+	void updateWriterStatus(StringFileRecordType recordType, std::wstring status);
+
+
 	/**
 	* \fn	void RecordTabHandler::updateWriterStatus(ImageRecordType type, std::wstring status);
 	*
@@ -131,10 +142,10 @@ public:
 	boost::signal<void(bool)> centerConfigurationChanged;
 
 	/** \brief	The start writing signal. */
-	boost::signal<void(bool, SharedRecordingConfiguration, SharedImageRecordingConfiguration)> startWriting;
+	boost::signal<void(bool, SharedRecordingConfiguration, SharedImageRecordingConfiguration,SharedStringFileRecordingConfiguration)> startWriting;
 
 	/** \brief	The stop writing signal. */
-	boost::signal<void(bool, SharedRecordingConfiguration, SharedImageRecordingConfiguration)> stopWriting;
+	boost::signal<void(bool, SharedRecordingConfiguration, SharedImageRecordingConfiguration,SharedStringFileRecordingConfiguration)> stopWriting;
 
 	/**
 	* \fn	void RecordTabHandler::recordPathChanged(RecordCloudType type);
@@ -153,6 +164,9 @@ public:
 	* \param	type	The type of the image which path has changed.
 	*/
 	void recordPathChanged(ImageRecordType type);
+
+	void recordPathChanged(StringFileRecordType type);
+
 
 	/**
 	 * \fn	void RecordTabHandler::recordConfigurationStatusChanged(RecordCloudType type, bool newState);
@@ -173,6 +187,8 @@ public:
 	* \param	newState	true if the configuration is now enabled, otherwise it is disabled.
 	*/
 	void recordConfigurationStatusChanged(ImageRecordType type, bool newState);
+
+	void recordConfigurationStatusChanged(StringFileRecordType type, bool newState);
 private:
 
 	/**
@@ -244,11 +260,16 @@ private:
 
 
 	/** \brief	The recording configuration. */
+	SharedCommonConfiguration m_commonConfiguration;
+
+	/** \brief	The recording configuration. */
 	SharedRecordingConfiguration m_recordingConfiguration;
 
 	/** \brief	The image recording configuration. */
 	SharedImageRecordingConfiguration m_imageRecordingConfiguration;
 
+		/** \brief	The image recording configuration. */
+	SharedStringFileRecordingConfiguration m_KeyPointsRecordingConfiguration;
 
 	/** \brief	true to enable, false to disable the color. */
 	bool m_colorEnabled;

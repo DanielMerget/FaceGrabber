@@ -72,7 +72,16 @@ public:
     /// <param name="pFaceProperties">face properties</param>
     /// <param name="pFaceTextLayout">face result text layout</param>
     void drawFaceFrameResults(int iFace, const RectI* pFaceBox, const PointF* pFacePoints, const Vector4* pFaceRotation, const DetectionResult* pFaceProperties, const D2D1_POINT_2F* pFaceTextLayout);
-
+	   
+	/// <summary>
+    /// Converts rotation quaternion to Euler angles 
+    /// And then maps them to a specified range of values to control the refresh rate
+    /// </summary>
+    /// <param name="pQuaternion">face rotation quaternion</param>
+    /// <param name="pPitch">rotation about the X-axis</param>
+    /// <param name="pYaw">rotation about the Y-axis</param>
+    /// <param name="pRoll">rotation about the Z-axis</param>
+    void extractFaceRotationInDegrees(const Vector4* pQuaternion, int* pPitch, int* pYaw, int* pRoll);
 private:
     /// <summary>
     /// Ensure necessary Direct2d resources are created
@@ -93,15 +102,7 @@ private:
     /// <returns>success or failure</returns>
     bool validateFaceBoxAndPoints(const RectI* pFaceBox, const PointF* pFacePoints);
 
-    /// <summary>
-    /// Converts rotation quaternion to Euler angles 
-    /// And then maps them to a specified range of values to control the refresh rate
-    /// </summary>
-    /// <param name="pQuaternion">face rotation quaternion</param>
-    /// <param name="pPitch">rotation about the X-axis</param>
-    /// <param name="pYaw">rotation about the Y-axis</param>
-    /// <param name="pRoll">rotation about the Z-axis</param>
-    static void extractFaceRotationInDegrees(const Vector4* pQuaternion, int* pPitch, int* pYaw, int* pRoll);
+ 
 
     HWND                     m_hWnd;
 

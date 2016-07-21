@@ -41,7 +41,7 @@ public:
 	* \return	A hResult.
 	*/
 	HRESULT updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize, CameraSpacePoint* detectedHDFacePointsCamSpace,
-		ColorSpacePoint* detectedHDFacePointsColorSpace);
+		ColorSpacePoint* detectedHDFacePointsColorSpace,std::string sKeyPoints);
 
 
 	/** \brief	The clouds updated. */
@@ -51,8 +51,10 @@ public:
 	boost::signals2::signal<void(pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud)> cloudUpdated[4];
 
 	/** \brief	The images updated */
-	boost::signals2::signal<void(boost::shared_ptr<cv::Mat>)> imageUpdated[2];
+	boost::signals2::signal<void(boost::shared_ptr<cv::Mat>)> imageUpdated[5]; // 1 -> color 2 ->depth 3->aligned depth 4-> infrared 5->alignedInfrared
 
+
+	boost::signals2::signal<void(std::shared_ptr<std::string>)> keyPointsUpdated[1];
 	/**
 	 * \fn	void ColoredOutputStreamUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer);
 	 *
@@ -60,7 +62,7 @@ public:
 	 * \param [in]	colorBuffer the current color Buffer
 	 * \param [in]	depthBuffer the current depth Buffer
 	 */
-	void startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer);
+	void startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer,UINT16* alignedDepthBuffer,RGBQUAD* infraredBuffer,RGBQUAD* alignedInfraredBuffer);
 
 	/**
 	 * \fn	void ColoredOutputStreamUpdater::stopFaceCollection();
@@ -165,12 +167,22 @@ private:
 	/** \brief	true if face frame is valid. */
 	bool							m_isValidFaceFrame;
 
+	std::shared_ptr<std::string> m_pFiveKeyPoints;
 	/** \brief	true to enable, false to disable the centering. */
 	bool m_centerEnabled;
 
 	/** \brief	Buffer for color data. */
 	RGBQUAD* m_colorBuffer;
 
+	/** \brief	Buffer for infrared data. */
+	RGBQUAD*  m_infraredBuffer;
+
+	/** \brief	Buffer for infrared data. */
+	RGBQUAD*  m_alignedInfraredBuffer;
+
 	/** \brief	Buffer for depth data. */
 	UINT16*	m_depthBuffer;
+
+	/** \brief	Buffer for alighned depth data. */
+	UINT16* m_alignedDepthBuffer;
 };

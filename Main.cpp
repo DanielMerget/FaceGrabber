@@ -4,7 +4,7 @@
 
 #include "resource.h"
 //#include "KinectHDFaceGrabber.h"
-
+//#include <tchar.h>
 #include <strsafe.h>
 //#include "PCLInputReader.h"
 //#include "PCLViewer.h"

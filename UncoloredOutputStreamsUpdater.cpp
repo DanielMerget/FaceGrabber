@@ -6,7 +6,9 @@
 UncoloredOutputStreamsUpdater::UncoloredOutputStreamsUpdater() :
 m_centerEnabled(false),
 m_colorBuffer(nullptr),
-m_depthBuffer(nullptr)
+m_depthBuffer(nullptr),
+m_alignedDepthBuffer(nullptr),
+m_infraredBuffer(nullptr)
 {
 }
 
@@ -17,6 +19,7 @@ UncoloredOutputStreamsUpdater::~UncoloredOutputStreamsUpdater()
 
 void UncoloredOutputStreamsUpdater::allocateClouds()
 {
+	m_pFiveKeyPoints =  std::shared_ptr<std::string> (new std::string(""));
 	m_HDFacePointCloud = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud <pcl::PointXYZ>());
 	m_HDFacePointCloud->is_dense = false;
 	m_HDFacePointCloud_centered = pcl::PointCloud<pcl::PointXYZ>::Ptr(new pcl::PointCloud <pcl::PointXYZ>());
@@ -34,17 +37,24 @@ void UncoloredOutputStreamsUpdater::setCeterEnabled(bool enable)
 	m_centerEnabled = enable;
 }
 
-void UncoloredOutputStreamsUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer)
+void UncoloredOutputStreamsUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer,UINT16* alignedDepthBuffer,RGBQUAD* infraredBuffer,RGBQUAD* alignedInfraredBuffer)
 {
 	m_colorBuffer = colorBuffer;
 	m_depthBuffer = depthBuffer;
+	m_alignedDepthBuffer = alignedDepthBuffer;
+	/** \brief	Buffer for infrared data. */
+	m_infraredBuffer = infraredBuffer;
+	m_alignedInfraredBuffer = alignedInfraredBuffer;
 	allocateClouds();
 	m_isValidFaceFrame = true;
 }
 void UncoloredOutputStreamsUpdater::stopFaceCollection()
 {	
 	if (!m_isValidFaceFrame){
+		m_colorBuffer = nullptr;
 		m_depthBuffer = nullptr;
+		m_alignedDepthBuffer = nullptr;
+		m_infraredBuffer = nullptr;
 		return;
 	}
 
@@ -110,16 +120,55 @@ void UncoloredOutputStreamsUpdater::stopFaceCollection()
 		*m_depthImagePtr = m_depthImage.clone();
 		imageUpdated[1](m_depthImagePtr);
 	}
+		
+	if (!imageUpdated[2].empty()){
+		// update writer
+		//cv::Mat m_alignedDepthImage = cv::Mat(m_colorHeight, m_colorWidth, CV_8UC4, m_alignedDepthBuffer, cv::Mat::AUTO_STEP);
+		cv::Mat m_alignedDepthImage = cv::Mat(m_colorHeight, m_colorWidth, CV_16UC1, m_alignedDepthBuffer, cv::Mat::AUTO_STEP);  
+		boost::shared_ptr<cv::Mat> m_alignedDepthImagePtr(new cv::Mat());
+		*m_alignedDepthImagePtr = m_alignedDepthImage.clone();
+		imageUpdated[2](m_alignedDepthImagePtr);
+	}
+		
+	if (!imageUpdated[3].empty()){
+		// update writer
+		//cv::Mat m_alignedDepthImage = cv::Mat(m_colorHeight, m_colorWidth, CV_8UC4, m_alignedDepthBuffer, cv::Mat::AUTO_STEP);   
+		cv::Mat m_infraredImage = cv::Mat(m_depthHeight, m_depthWidth, CV_8UC4, m_infraredBuffer, cv::Mat::AUTO_STEP);   
+		boost::shared_ptr<cv::Mat> m_infraredImagePtr(new cv::Mat());
+		*m_infraredImagePtr = m_infraredImage.clone();
+		imageUpdated[3](m_infraredImagePtr);
+	}
+
+			//KinectInfrared
+	if (!imageUpdated[4].empty()){
+		// update writer
+		//cv::Mat m_alignedDepthImage = cv::Mat(m_colorHeight, m_colorWidth, CV_8UC4, m_alignedDepthBuffer, cv::Mat::AUTO_STEP);   
+		cv::Mat m_infraredImage = cv::Mat(m_colorHeight, m_colorWidth, CV_8UC4, m_alignedInfraredBuffer, cv::Mat::AUTO_STEP);   
+		boost::shared_ptr<cv::Mat> m_infraredImagePtr(new cv::Mat());
+		*m_infraredImagePtr = m_infraredImage.clone();
+		imageUpdated[4](m_infraredImagePtr);
+	}
+
+			//KinectInfrared
+	if (!keyPointsUpdated[0].empty()){
+
+		
+		keyPointsUpdated[0](m_pFiveKeyPoints);
+	}
+
 
 	m_depthBuffer = nullptr;
 	m_colorBuffer = nullptr;
+	m_alignedDepthBuffer = nullptr;
+	m_infraredBuffer = nullptr;
 	m_isValidFaceFrame = false;
+
 }
 
 
 
 HRESULT UncoloredOutputStreamsUpdater::updateOutputStreams(IFaceModel* faceModel, IFaceAlignment* faceAlignment, int bufferSize,
-	CameraSpacePoint* detectedHDFacePointsCamSpace, ColorSpacePoint* detectedHDFacePointsColorSpace)
+	CameraSpacePoint* detectedHDFacePointsCamSpace, ColorSpacePoint* detectedHDFacePointsColorSpace,std::string sKeyPoints)
 {
 
 	if (m_depthBuffer == nullptr){
@@ -143,6 +192,9 @@ HRESULT UncoloredOutputStreamsUpdater::updateOutputStreams(IFaceModel* faceModel
 		m_isValidFaceFrame &= extractDepthCloudFromBoundingBox(boundingBoxPointTopLeft, boundingBoxPointBottomRight,
 			hdFacePointsInCamSpaceOpenCV);
 	}
+	
+	m_pFiveKeyPoints->append(sKeyPoints.c_str());
+
 	return hr;
 }
 

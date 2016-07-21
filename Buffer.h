@@ -87,14 +87,14 @@ public:
 	std::shared_ptr<boost::signals2::signal<void(void)>> dataReady;
 
 	/**
-	 * \fn	DataType Buffer::pullData(int pos);
+	 * \fn	DataType Buffer::pullData();
 	 *
 	 * \brief	Pulls the data "oldest" data of the buffer. Blocking until data is available.
 	 *
 	 * \return	The oldest buffered data. Null if the buffer is disabled or empty.
 	 */
 
-	DataType pullData(int pos);
+	DataType pullData();
 
 	/**
 	 * \fn	bool Buffer::isBufferAtIndexSet(const int index);
