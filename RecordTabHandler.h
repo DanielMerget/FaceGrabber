@@ -10,6 +10,7 @@
 #include <boost/signals.hpp>
 #include "StringFileRecordingConfiguration.h"
 #include "CommonConfiguration.h"
+#include "KinectV1Controller.h"
 /**
  * \class	RecordTabHandler
  *
@@ -147,6 +148,13 @@ public:
 	/** \brief	The stop writing signal. */
 	boost::signal<void(bool, SharedRecordingConfiguration, SharedImageRecordingConfiguration,SharedStringFileRecordingConfiguration)> stopWriting;
 
+
+	/** \brief	The fps limit changed signal. */
+	boost::signal<void(RecordingShowOpt)> v1ShowOptChanged;
+
+		/** \brief	The fps limit changed signal. */
+	boost::signal<void(int)> v1ShowResolutionChanged;
+
 	/**
 	* \fn	void RecordTabHandler::recordPathChanged(RecordCloudType type);
 	*
@@ -189,6 +197,9 @@ public:
 	void recordConfigurationStatusChanged(ImageRecordType type, bool newState);
 
 	void recordConfigurationStatusChanged(StringFileRecordType type, bool newState);
+
+
+	void setKinectEnableOpt(bool v1Enabled, bool v2Enabled);
 private:
 
 	/**
@@ -208,7 +219,7 @@ private:
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
-
+	void movieShowOptWindosOfV1();
 
 	/**
 	 * \fn	void RecordTabHandler::setRecording(bool enable);
@@ -281,5 +292,7 @@ private:
 
 	/** \brief	true if recording is running at the moment. */
 	bool m_isRecording;
+
+	BYTE m_KinectEnableOpt; // 0 KinectV2 1 KinectV1 2 both
 };
 

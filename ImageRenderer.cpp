@@ -51,6 +51,22 @@ ImageRenderer::~ImageRenderer()
 }
 
 /// <summary>
+/// Retrieve client area rect and transform into D2D size structure
+/// </summary>
+/// <param name="hWnd">The handle to window</param>
+/// <returns>Client area size in D2D1_SIZE_U structure</returns>
+D2D1_SIZE_U ImageRenderer::GetClientSize(HWND hWnd)
+{
+    RECT rect = {0};
+    if (hWnd)
+    {
+        GetClientRect(hWnd, &rect);
+    }
+
+    return D2D1::SizeU(rect.right, rect.bottom);
+}
+
+/// <summary>
 /// Ensure necessary Direct2d resources are created
 /// </summary>
 /// <returns>indicates success or failure</returns>
@@ -60,11 +76,17 @@ HRESULT ImageRenderer::ensureResources()
 
     if (nullptr == m_pRenderTarget)
     {
-        D2D1_SIZE_U size = D2D1::SizeU(m_sourceWidth, m_sourceHeight);
+        //D2D1_SIZE_U size = D2D1::SizeU(m_sourceWidth, m_sourceHeight);
+		D2D1_SIZE_U imageSize = D2D1::SizeU(m_sourceWidth, m_sourceHeight);
+		
+		D2D1_SIZE_U size = GetClientSize(m_hWnd);
 
         D2D1_RENDER_TARGET_PROPERTIES rtProps = D2D1::RenderTargetProperties();
         rtProps.pixelFormat = D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE);
         rtProps.usage = D2D1_RENDER_TARGET_USAGE_GDI_COMPATIBLE;
+		
+		//rtProps.type        = D2D1_RENDER_TARGET_TYPE_DEFAULT;
+   	    //rtProps.minLevel    = D2D1_FEATURE_LEVEL_DEFAULT;
 
         // Create a hWnd render target, in order to render to the window set in initialize
         hr = m_pD2DFactory->CreateHwndRenderTarget(
@@ -73,11 +95,12 @@ HRESULT ImageRenderer::ensureResources()
             &m_pRenderTarget
             );
 
+
         if (SUCCEEDED(hr))
         {
             // Create a bitmap that we can copy image data into and then render to the target
             hr = m_pRenderTarget->CreateBitmap(
-                size, 
+                imageSize, 
                 D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE)),
                 &m_pBitmap 
                 );
@@ -208,7 +231,11 @@ HRESULT ImageRenderer::beginDrawing()
 
     if (SUCCEEDED(hr))
     {
+		CreateSolidBrushes();
+		CreateTextFormats();
+
         m_pRenderTarget->BeginDraw();
+		m_pRenderTarget->Clear();
     }
 
     return hr;
@@ -249,7 +276,18 @@ HRESULT ImageRenderer::drawBackground(BYTE* pImage, unsigned long cbImage)
     {
         hr = E_INVALIDARG;
     }
+	D2D1_SIZE_U imageSize = D2D1::SizeU(m_sourceWidth,m_sourceHeight);
+	    // Ensure bitmap is created.
+    hr = EnsureBitmap(imageSize);
 
+	    // Get viewer window client rect
+    RECT clientRect;
+    if (!::GetClientRect(m_hWnd, &clientRect))
+    {
+        return E_FAIL;
+    }
+	    // Calculate the area the stream image is to streched to fit
+    D2D1_RECT_F imageRect = GetImageRect(clientRect);
     if (SUCCEEDED(hr))
     {
         // Copy the image that was passed in into the direct2d bitmap
@@ -258,7 +296,7 @@ HRESULT ImageRenderer::drawBackground(BYTE* pImage, unsigned long cbImage)
         if (SUCCEEDED(hr))
         {
             // Draw the bitmap stretched to the size of the window
-            m_pRenderTarget->DrawBitmap(m_pBitmap);	
+            m_pRenderTarget->DrawBitmap(m_pBitmap,imageRect);	
         }
     }
 
@@ -267,13 +305,27 @@ HRESULT ImageRenderer::drawBackground(BYTE* pImage, unsigned long cbImage)
 
 void ImageRenderer::drawPoints(const std::vector<ColorSpacePoint> renderPoints){
 	
+    RECT clientRect;
+    if (!::GetClientRect(m_hWnd, &clientRect))
+    {
+        return ;
+    }
+	    // Calculate the area the stream image is to streched to fit
+    D2D1_RECT_F imageRect = GetImageRect(clientRect);
+
+
 	for (int i = 0; i < renderPoints.size(); i++)
 	{
-		D2D1_ELLIPSE facePoint = D2D1::Ellipse(D2D1::Point2F(renderPoints[i].X, renderPoints[i].Y), c_FacePointRadius, c_FacePointRadius);
+		ColorSpacePoint inImageRectPoints = ToImageRectPoint(renderPoints[i],imageRect);
+		//inImageRectPoints.X = renderPoints[i].X * (imageRect.right  - imageRect.left + 1.0f) / m_sourceWidth + imageRect.left;
+		//inImageRectPoints.Y = renderPoints[i].Y * (imageRect.bottom - imageRect.top  + 1.0f) / m_sourceHeight + imageRect.top;
+		D2D1_ELLIPSE facePoint = D2D1::Ellipse(D2D1::Point2F(inImageRectPoints.X,inImageRectPoints.Y), c_FacePointRadius, c_FacePointRadius); //renderPoints[i].X, renderPoints[i].Y
 		m_pRenderTarget->DrawEllipse(facePoint, m_pFaceBrush[0], c_FacePointThickness);
 		
 	}
 }
+
+
 /// <summary>
 /// Draws face frame results
 /// </summary>
@@ -285,22 +337,47 @@ void ImageRenderer::drawPoints(const std::vector<ColorSpacePoint> renderPoints){
 /// <param name="pFaceTextLayout">face result text layout</param>
 void ImageRenderer::drawFaceFrameResults(int iFace, const RectI* pFaceBox, const PointF* pFacePoints, const Vector4* pFaceRotation, const DetectionResult* pFaceProperties, const D2D1_POINT_2F* pFaceTextLayout)
 {
+	RECT clientRect;
+    if (!::GetClientRect(m_hWnd, &clientRect))
+    {
+        return ;
+    }
+
     // draw the face frame results only if the face bounding box is valid
     if (validateFaceBoxAndPoints(pFaceBox, pFacePoints))
     {
         ID2D1SolidColorBrush* brush = m_pFaceBrush[iFace];
 
         // draw the face bounding box
+		D2D1_RECT_F imageRect = GetImageRect(clientRect);
+		ColorSpacePoint old_left_top;
+		old_left_top.X = (float)pFaceBox->Left;
+		old_left_top.Y = (float)pFaceBox->Top;
+		
+		ColorSpacePoint old_right_bottom;
+		old_right_bottom.X = (float)pFaceBox->Right;
+		old_right_bottom.Y = (float)pFaceBox->Bottom;
+		
+
+		ColorSpacePoint left_top = ToImageRectPoint(old_left_top,imageRect);
+		ColorSpacePoint righ_bottom = ToImageRectPoint(old_right_bottom,imageRect);
+		
+
+		/*
         D2D1_RECT_F faceBox = D2D1::RectF(static_cast<FLOAT>(pFaceBox->Left), 
             static_cast<FLOAT>(pFaceBox->Top),
             static_cast<FLOAT>(pFaceBox->Right),
             static_cast<FLOAT>(pFaceBox->Bottom));
+        m_pRenderTarget->DrawRectangle(faceBox, brush, c_FaceBoxThickness);*/
+				
+        D2D1_RECT_F faceBox = D2D1::RectF(left_top.X, left_top.Y,righ_bottom.X,righ_bottom.Y);
         m_pRenderTarget->DrawRectangle(faceBox, brush, c_FaceBoxThickness);
 
         // draw each face point
         for (int i = 0; i < FacePointType::FacePointType_Count; i++)
         {
-            D2D1_ELLIPSE facePoint= D2D1::Ellipse(D2D1::Point2F(pFacePoints[i].X, pFacePoints[i].Y), c_FacePointRadius, c_FacePointRadius);
+			PointF fp = ToImageRectPoint(pFacePoints[i],imageRect);
+            D2D1_ELLIPSE facePoint= D2D1::Ellipse(D2D1::Point2F(fp.X, fp.Y), c_FacePointRadius, c_FacePointRadius);
             m_pRenderTarget->DrawEllipse(facePoint, brush, c_FacePointThickness);
         }
 
@@ -369,11 +446,22 @@ void ImageRenderer::drawFaceFrameResults(int iFace, const RectI* pFaceBox, const
         faceText += L"FacePitch : " + std::to_wstring(pitch) + L"\n";
         faceText += L"FaceRoll : " + std::to_wstring(roll) + L"\n";
 
-        D2D1_RECT_F layoutRect = D2D1::RectF(pFaceTextLayout->x, pFaceTextLayout->y, 
-            pFaceTextLayout->x + c_TextLayoutWidth, 
-            pFaceTextLayout->y + c_TextLayoutHeight);    
+		ColorSpacePoint tmp;
+		tmp.X = pFaceTextLayout->x;
+		tmp.Y = pFaceTextLayout->y;
+		ColorSpacePoint textLayOut = ToImageRectPoint(tmp,imageRect);
+		
 
+		/*
+        D2D1_RECT_F layoutRect = D2D1::RectF(textLayOut.X, textLayOut.Y, 
+            textLayOut.X + c_TextLayoutWidth, 
+            textLayOut.Y + c_TextLayoutHeight);    
+		*/
+		D2D1_RECT_F layoutRect = D2D1::RectF(textLayOut.X, textLayOut.Y, 
+			textLayOut.X + c_TextLayoutWidth*(clientRect.right-clientRect.left)/m_sourceWidth,
+            textLayOut.Y + c_TextLayoutHeight*(clientRect.bottom-clientRect.top)/m_sourceHeight); 
         // render the face property and face rotation information
+
         m_pRenderTarget->DrawTextW(faceText.c_str(), 
             static_cast<UINT32>(faceText.length()), 
             m_pTextFormat, 
@@ -456,3 +544,242 @@ void ImageRenderer::extractFaceRotationInDegrees(const Vector4* pQuaternion, int
     *pYaw = static_cast<int>(floor((dYaw + increment/2.0 * (dYaw > 0 ? 1.0 : -1.0)) / increment) * increment);
     *pRoll = static_cast<int>(floor((dRoll + increment/2.0 * (dRoll > 0 ? 1.0 : -1.0)) / increment) * increment);
 }
+
+/// <summary>
+/// Ensure bitmap is created
+/// </summary>
+/// <param name=imageSize>Size of bit map</param>
+/// <returns>Indicates success or failure</returns>
+HRESULT ImageRenderer::EnsureBitmap(const D2D1_SIZE_U& imageSize)
+{
+    if (m_pBitmap)
+    {
+        D2D1_SIZE_U size = m_pBitmap->GetPixelSize();
+        if (size.width == imageSize.width && size.height == imageSize.height)
+        {
+            return S_OK;
+        }
+    }
+
+    SafeRelease(m_pBitmap);
+
+    if (m_pRenderTarget)
+    {
+        // Create a bitmap that we can copy image data into it and then render to the target.
+        return m_pRenderTarget->CreateBitmap(imageSize,
+                                             D2D1::BitmapProperties(D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE)),
+                                             &m_pBitmap);
+    }
+
+    return E_FAIL;
+}
+
+
+D2D1_RECT_F ImageRenderer::GetImageRect(const RECT &client)
+{
+    D2D1_RECT_F imageRect = D2D1::RectF();
+
+	float ratio  = static_cast<float>(m_sourceWidth) / static_cast<float>(m_sourceHeight);
+    float width  = static_cast<float>(client.right);
+    float height = width / ratio;
+
+    if (height > client.bottom)
+    {
+        height = static_cast<float>(client.bottom);
+        width  = height * ratio;
+    }
+
+    imageRect.left   = (client.right  - width  + 1) / 2.0f;
+    imageRect.top    = (client.bottom - height + 1) / 2.0f;
+    imageRect.right  = imageRect.left + width;
+    imageRect.bottom = imageRect.top  + height;
+    
+
+    return imageRect;
+}
+
+template<typename T>
+T ImageRenderer::ToImageRectPoint(T point,const D2D1_RECT_F& imageRect)
+{
+   
+
+    FLOAT resultX, resultY;
+	resultX = point.X * (imageRect.right  - imageRect.left + 1.0f) / m_sourceWidth + imageRect.left;
+	resultY = point.Y * (imageRect.bottom - imageRect.top  + 1.0f) / m_sourceHeight + imageRect.top;
+	T result;
+	result.X = resultX;
+	result.Y = resultY;
+    return result;
+}
+
+// <summary>
+/// Draw frame FPS counter
+/// </summary>
+/// <param name="clientRect">Client area of viewer's window</param>
+void ImageRenderer::DrawFPS(UINT16 fps)
+{
+	RECT clientRect;
+    if (!::GetClientRect(m_hWnd, &clientRect))
+    {
+        return;
+    }
+
+    // Get rectangle position and size
+    D2D1_RECT_F rect = D2D1::RectF((FLOAT)clientRect.right - 50.0f, 0.0f, (FLOAT)clientRect.right, (FLOAT)clientRect.top + 50.0f);
+
+    // Fill rectangle
+    FillRectangle(rect, ImageRendererBrushGray);
+
+    // Draw a while circle
+    D2D1_POINT_2F center = D2D1::Point2F((rect.right + rect.left) / 2.0f, (rect.bottom + rect.top) / 2.0f);
+    DrawCircle(center, 23.0f, ImageRendererBrushWhite, 4.0f);
+    
+    // Draw FPS text
+    WCHAR text[256];
+    swprintf_s(text, sizeof(text) / sizeof(WCHAR) - 1, L"%d", fps);
+    UINT cch = (UINT)wcsnlen_s(text, 256);
+    DrawText(text, cch, rect, ImageRendererBrushWhite, ImageRendererTextFormatFps);
+}
+
+
+/// <summary>
+/// Create D2D solid color brushes
+/// </summary>
+void ImageRenderer::CreateSolidBrushes()
+{
+    // Create solid brushes to draw skeleton, fps & resolution text
+    CreateSolidBrush(D2D1::ColorF::LightGreen,  ImageRendererBrushJointTracked);
+    CreateSolidBrush(D2D1::ColorF::Yellow,      ImageRendererBrushJointInferred);
+    CreateSolidBrush(D2D1::ColorF::Green,       ImageRendererBrushBoneTracked);
+    CreateSolidBrush(D2D1::ColorF::Gray,        ImageRendererBrushBoneInferred);
+    CreateSolidBrush(D2D1::ColorF::White,       ImageRendererBrushWhite);
+    CreateSolidBrush(D2D1::ColorF::Gray,        ImageRendererBrushGray);
+    CreateSolidBrush(D2D1::ColorF::Green,       ImageRendererBrushGreen);
+}
+
+
+/// <summary>
+/// Create a specific D2D solid color brush from parameters
+/// </summary>
+/// <param name="color">The color used by brush</param>
+/// <param name="brush">The index of brush</param>
+void ImageRenderer::CreateSolidBrush(D2D1::ColorF::Enum color, ImageRendererBrush brush)
+{
+    m_pRenderTarget->CreateSolidColorBrush(D2D1::ColorF(color, 1.0f), &m_brushes[brush]);
+}
+
+
+/// <summary>
+/// Draw a rectangle and fill it
+/// </summary>
+/// <param name="rect">The rectangle to fill</param>
+/// <param name="brush">The index of brush</param>
+void ImageRenderer::FillRectangle(const D2D1_RECT_F& rect, ImageRendererBrush brush)
+{
+    // Validate brush index
+    if (brush < 0 || brush >= ImageRendererBrushCount)
+    {
+        return;
+    }
+
+    // Select brush
+    ID2D1SolidColorBrush* pBrush = m_brushes[brush];
+
+    // Draw rectangle
+    m_pRenderTarget->FillRectangle(rect, pBrush);
+}
+
+
+/// <summary>
+/// Draw the circle representing the joint
+/// </summary>
+/// <param name="center">The center of the circle</param>
+/// <param name="radius">The radius of the circle</param>
+/// <param name="brush">Index of brush</param>
+/// <param name="strokeWidth">Width of the line</param>
+/// <param name="strokeStyle">Style of the line</param>
+void ImageRenderer::DrawCircle(const D2D1_POINT_2F& center, float radius, ImageRendererBrush brush, float strokeWidth, ID2D1StrokeStyle* strokeStyle)
+{
+    // Validate brush index
+    if (brush < 0 || brush >= ImageRendererBrushCount)
+    {
+        return;
+    }
+
+    // Select created brush
+    ID2D1SolidColorBrush* pBrush = m_brushes[brush];
+
+    // Create ellipse with same radius on both long and short axis. Identical to the circle
+    D2D1_ELLIPSE ellipse = D2D1::Ellipse(center, radius, radius);
+
+    // Draw ellipse
+    m_pRenderTarget->DrawEllipse(ellipse, pBrush, strokeWidth, strokeStyle);
+}
+
+
+/// <summary>
+/// Draw FPS text
+/// </summary>
+/// <param name="pText">Text to draw</param>
+/// <param name="cch">Count of charaters in text</param>
+/// <param name="rect">The area to draw text</param>
+/// <param name="brush">Index of brush</param>
+/// <param name="format">Text format</param>
+void ImageRenderer::DrawText(const WCHAR* pText, UINT cch, const D2D1_RECT_F &rect, ImageRendererBrush brush, ImageRendererTextFormat format)
+{
+    // Validate pointer to text
+    if (!pText)
+    {
+        return;
+    }
+
+    // Validate brush index
+    if (brush < 0 || brush >= ImageRendererBrushCount)
+    {
+        return;
+    }
+
+    // Validate text format index
+    if (format < 0 || format >= ImageRendererTextFormatCount)
+    {
+        return;
+    }
+
+    // Select created text format
+    IDWriteTextFormat* pFormat = m_formats[format];
+
+    // Select created brush
+    ID2D1SolidColorBrush* pBrush = m_brushes[brush];
+
+    // Draw text to rectangle area
+    m_pRenderTarget->DrawText(pText, cch, pFormat, rect, pBrush);
+}
+
+
+/// <summary>
+/// Create text formats to draw FPS and image resolution lable
+/// </summary>
+void ImageRenderer::CreateTextFormats()
+{
+    CreateTextFormat(L"Segoe UI", 25.0f, DWRITE_TEXT_ALIGNMENT_CENTER,  DWRITE_PARAGRAPH_ALIGNMENT_CENTER, &m_formats[ImageRendererTextFormatFps]);        // FPS text format
+    CreateTextFormat(L"Segoe UI", 12.0f, DWRITE_TEXT_ALIGNMENT_LEADING, DWRITE_PARAGRAPH_ALIGNMENT_NEAR,   &m_formats[ImageRendererTextFormatResolution]); // Resolution text format
+}
+
+/// <summary>
+/// Create a specific DWrite text format from parameters
+/// </summary>
+/// <param name="fontFamilyName">Family name of created font</param>
+/// <param name="fontSize">Size of created font</param>
+/// <param name="textAlignment">Alignment of text</param>
+/// <param name="paragraphAlignment">Alignment of paragraph</param>
+/// <param name="ppTextFormat">Created text format</param>
+void ImageRenderer::CreateTextFormat(const WCHAR* fontFamilyName, FLOAT fontSize, DWRITE_TEXT_ALIGNMENT textAlignment, DWRITE_PARAGRAPH_ALIGNMENT paragraphAlignment, IDWriteTextFormat** ppTextFormat)
+{
+    HRESULT hr = m_pDWriteFactory->CreateTextFormat(fontFamilyName, nullptr, DWRITE_FONT_WEIGHT_NORMAL, DWRITE_FONT_STYLE_NORMAL, DWRITE_FONT_STRETCH_NORMAL, fontSize, L"", ppTextFormat);
+    if (SUCCEEDED(hr))
+    {
+        (*ppTextFormat)->SetTextAlignment(textAlignment);
+        (*ppTextFormat)->SetParagraphAlignment(paragraphAlignment);
+    }
+}
+

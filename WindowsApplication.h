@@ -22,6 +22,7 @@
 #include <thread>
 #include "StringFileWriter.h"
 #include "StringFileRecordingConfiguration.h"
+#include "KinectV1Controller.h"
 /**
  * \class	WindowsApplication for the UI, user inputs and management of the model classes
  *
@@ -35,6 +36,12 @@ public:
 	static const int       cColorWidth = 1920;
 	static const int       cColorHeight = 1080;
 
+	static const int       cColorWidthForV1 = 640;
+	static const int       cColorHeightForV1 = 480;
+
+		
+	static const int       cDepthWidthForV1 = 320;
+	static const int       cCDepthHeightForV1 = 240;
 	WindowsApplication();
 	~WindowsApplication();
 
@@ -122,6 +129,7 @@ private:
 	*/
 	void onRecordTabSelected();
 
+	void UpdateStreams(int i);
 	/**
 	* \fn	void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations)
 	*
@@ -219,7 +227,16 @@ private:
 	 * \brief	Initialises the kinect frame grabber, image reader and outputstream updater-stragedy and
 	 * 			connects them.
 	 */
-	void initKinectFrameGrabber();
+	HRESULT initKinectFrameGrabber();
+	
+	
+	/**
+	 * \fn	void WindowsApplication::initKinectV1FrameGrabber();
+	 *
+	 * \brief	Initialises the kinect v1 frame grabber, image reader and outputstream updater-stragedy and
+	 * 			connects them.
+	 */
+	HRESULT initKinectV1FrameGrabber();
 
 	/**
 	 * \fn	void WindowsApplication::connectStreamUpdaterToViewer();
@@ -303,6 +320,8 @@ private:
 	bool setStatusMessage(std::wstring statusString, bool bForce);
 
 
+	
+
 	/** \brief	The handle of the windows app instance. */
 	HINSTANCE m_hInstance;
 
@@ -318,12 +337,19 @@ private:
 	/** \brief	Handle of the live view window. */
 	HWND m_liveViewWindow;
 
+	/** \brief	Handle of the live view window. */
+	HWND m_liveViewWindow_for_v1;
+
 	/** \brief	The min time delay for the next status update. */
 	ULONGLONG m_nNextStatusTime;
 
 	
 	/** \brief	The image renderer for the color stream and HDFace. */
 	ImageRenderer* m_pDrawDataStreams;
+
+		
+	/** \brief	The image renderer for the color stream and HDFace. */
+	ImageRenderer* m_pDrawDataStreamsForV1;
 
 	/** \brief	The d 2D factory. */
 	ID2D1Factory* m_pD2DFactory;
@@ -375,7 +401,19 @@ private:
 	/** \brief	The non colored output stream updater. */
 	std::shared_ptr<UncoloredOutputStreamsUpdater> m_uncoloredOutputStreamUpdater;
 
+	
+
+	bool m_kinectV1Enable;
+	bool m_kinectV2Enable;
 	/** \brief	FPS Limit. */
 	int m_FPSLimit;
+
+	KinectV1Controller m_kinectV1Controller;
+
+public:
+	HANDLE m_hStopStreamEventThread;
+	HWND GetWindow() const;
+
+	static DWORD WINAPI runKinectV1StreamEvent(WindowsApplication * pThis);
 };
 

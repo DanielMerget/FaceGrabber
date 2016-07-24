@@ -71,6 +71,69 @@ WindowsApplication::~WindowsApplication()
 	m_bufferSynchronizerThread.join();
 }
 
+void WindowsApplication::UpdateStreams(int i)
+{
+	if(m_kinectV1Enable)
+	{
+		switch(i)
+		{
+			case 1:
+				m_kinectV1Controller.ProcessColor();
+				break;
+			case 2:
+				m_kinectV1Controller.ProcessDepth();
+				break;
+			default:break;
+		}
+		//m_kinectV1Controller.Update();
+	}
+	return ;
+}
+/// <summary>
+/// Returns the window handle
+/// </summary>
+/// <returns>Handle to the window</returns>
+HWND WindowsApplication::GetWindow() const
+{
+    return m_hWnd;
+}
+
+DWORD WindowsApplication::runKinectV1StreamEvent(WindowsApplication * pThis)
+{
+	
+
+
+	 HANDLE events[] = {
+						pThis->m_hStopStreamEventThread,
+						pThis->m_kinectV1Controller.getCorlorFrameEvent(), 
+						pThis->m_kinectV1Controller.getDepthFrameEvent() } ;
+
+	
+    while (true)
+    {
+        DWORD ret = WaitForMultipleObjects(ARRAYSIZE(events), events, FALSE, INFINITE);
+
+        if (WAIT_OBJECT_0 == ret)
+            break;
+
+        if (WAIT_OBJECT_0 + 1 == ret ) 
+        {
+            SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_COLOR, 0, 0);
+        }
+		else if( WAIT_OBJECT_0 + 2 == ret)
+		{
+			SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_DEPTH, 0, 0);
+		}
+		/*
+        else if(WAIT_OBJECT_0 + 4 >= ret)
+        {
+            SendMessageW(pThis->GetWindow(), WM_STREAMEVENT, 0, 0);
+        }*/
+    }
+
+    return 0;
+}
+
 int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 {
 
@@ -109,14 +172,31 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	CString msgCstring;
 
 	HWND tabControlHandle = GetDlgItem(m_hWnd, IDC_TAB2);
-
+	HANDLE hv1EventThread;
 	start = clock();
+	//Sleep(30);
 
+	HANDLE hEventThread;
+	if(m_kinectV1Enable)
+	{
+		m_hStopStreamEventThread = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+		//hv1EventThread = CreateThread(nullptr, 0, m_kinectV1Controller.Update(), 0, 0, nullptr);
+		//m_kinectV1Controller.Update();
+		//std::async(std::launch::async, &KinectV1Controller::Update, &m_kinectV1Controller);
+		hEventThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)runKinectV1StreamEvent, this, 0, nullptr);
+		
+	}
+	//HANDLE hEventThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)StreamEventThread, this, 0, nullptr);
 	// Main message loop
 	while (WM_QUIT != msg.message)
 	{
-		if (m_isKinectRunning){
-			m_kinectFrameGrabber.update();
+		if (m_isKinectRunning)
+		{
+			if(m_kinectV2Enable)
+			{
+				m_kinectFrameGrabber.update();
+			}
+			
 		}
 		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
 		{
@@ -167,6 +247,8 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 			Sleep(10);
 		}
 	}
+	WaitForSingleObject(hEventThread, INFINITE);
+    CloseHandle(hEventThread);
 
 	return static_cast<int>(msg.wParam);
 }
@@ -183,32 +265,41 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 void WindowsApplication::onCreate()
 {
 
-	// Init Direct2D
-	D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
 
-	// Create and initialize a new Direct2D image renderer 
-	m_pDrawDataStreams = new ImageRenderer();
-
+	HRESULT hr;
 	//Create the pcl viewer
-	m_pclFaceViewer = std::shared_ptr<PCLViewer>(new PCLViewer(2, "Face-Viewer"));
-
 	
-	initKinectFrameGrabber();
-	initTabs();
-	initCloudWriter();
-	initImageWriter();
-	initStringFileWriter();
-	connectStreamUpdaterToViewer();
 
-	initInputReaderBufferAndSynchronizer();
-
-	//set the settings of the views and frames 
-	HRESULT hr = m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
+	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
 
 	if (FAILED(hr))
 	{
 		setStatusMessage(L"Failed to initialize the Direct2D draw device.", true);
 	}
+
+	initKinectFrameGrabber();
+
+	initKinectV1FrameGrabber();
+				
+	m_recordTabHandler.setKinectEnableOpt(m_kinectV1Enable,m_kinectV2Enable);
+
+	initTabs();
+	if(m_kinectV2Enable)
+	{
+		m_pclFaceViewer = std::shared_ptr<PCLViewer>(new PCLViewer(2, "Face-Viewer"));
+		initCloudWriter();
+		initImageWriter();
+		initStringFileWriter();
+		connectStreamUpdaterToViewer();
+
+		
+	}
+
+	initInputReaderBufferAndSynchronizer();
+	
+
+
+
 
 }
 
@@ -299,12 +390,24 @@ void WindowsApplication::connectStreamUpdaterToViewer()
 	m_coloredOutputStreamUpdater->cloudsUpdated.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
 }
 
-void WindowsApplication::initKinectFrameGrabber()
+HRESULT WindowsApplication::initKinectFrameGrabber()
 {
-	m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
+	HRESULT hr;
+
+	m_kinectV2Enable = false;
+	hr = m_kinectFrameGrabber.initializeDefaultSensor();
+	if(FAILED(hr))
+	{
+		return hr;
+	}
+	
+			// Init Direct2D
+	// Create and initialize a new Direct2D image renderer 
+	//set the settings of the views and frames 
+	
 
 	// Get and initialize the default Kinect sensor
-	m_kinectFrameGrabber.initializeDefaultSensor();
+	
 	int depthWidth, depthHeight, colorWidth, colorHeight;
 
 	m_kinectFrameGrabber.getColourAndDepthSize(depthWidth, depthHeight, colorWidth, colorHeight);
@@ -322,6 +425,24 @@ void WindowsApplication::initKinectFrameGrabber()
 	//init the stragedy
 	m_coloredOutputStreamUpdater->initialize(m_kinectFrameGrabber.getCoordinateMapper(), depthWidth, depthHeight, colorWidth, colorHeight);
 	m_uncoloredOutputStreamUpdater->initialize(m_kinectFrameGrabber.getCoordinateMapper(), depthWidth, depthHeight, colorWidth, colorHeight);
+
+	m_kinectV2Enable = true;
+
+	return hr;
+}
+
+HRESULT WindowsApplication::initKinectV1FrameGrabber()
+{
+	HRESULT hr ;
+	m_kinectV1Enable = false;
+
+	if(SUCCEEDED(hr = m_kinectV1Controller.init()))
+	{
+		m_kinectV1Enable = true;
+				
+	}
+
+	return hr;
 }
 
 void WindowsApplication::initTabs()
@@ -353,7 +474,19 @@ void WindowsApplication::initTabs()
 
 	m_plackBackTabHandler.setSharedRecordingConfiguration(recordingConfiguration);
 
-	m_kinectFrameGrabber.SetConfiguration(commonConfiguration[KinectV2_COMMON]);
+	if(m_kinectV2Enable)
+	{
+		m_kinectFrameGrabber.SetConfiguration(commonConfiguration[KinectV2_COMMON]);
+		commonConfiguration[KinectV2_COMMON]->setShowOpt(Color_Raw);
+	}
+	if(m_kinectV1Enable)
+	{
+		m_kinectV1Controller.SetConfiguration(commonConfiguration[KinectV1_COMMON]);
+		m_recordTabHandler.v1ShowOptChanged.connect(boost::bind(&KinectV1Controller::showOptUpdated, &m_kinectV1Controller, _1));
+		m_recordTabHandler.v1ShowResolutionChanged.connect(boost::bind(&KinectV1Controller::showResolutionUpdated, &m_kinectV1Controller, _1));
+
+
+	}
 
 	//init playbackt tab
 	m_playbackTabHandle = CreateDialogParamW(
@@ -393,11 +526,82 @@ void WindowsApplication::initTabs()
 	RECT tabControlRect;
 	GetWindowRect(tabControlHandle, &tabControlRect);
 
-	//create subwindow for the color live stream
-	const int width = 840;
-	const int height = (width / 16) * 9;
-	const int xPos = (windowRect.right - windowRect.left - width) / 2;
-	m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, tabControlRect.top, width, height, m_hWnd, NULL, m_hInstance, NULL);
+	RECT showOptGroupRect;
+	HWND tabShowOPTHandle = GetDlgItem(m_recordTabHandle, IDC_GROUP_SHOW_OPT);
+	//HWND tabShowOPTHandle = GetDlgItem(tabrecordHandle, IDC_GROUP_SHOW_OPT);	
+	GetWindowRect(tabShowOPTHandle, &showOptGroupRect);
+
+
+	if(m_kinectV2Enable && ! m_kinectV1Enable)
+	{
+		const int height = showOptGroupRect.top - tabControlRect.top-40; //(width / 16) * 9;
+		const int width = (height/9)*16; 
+		const int xPos = (windowRect.right - windowRect.left - width) / 2;
+		const int yPos = (showOptGroupRect.top - tabControlRect.top - height) / 2;
+		m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, yPos, width, height, m_hWnd, NULL, m_hInstance, NULL);
+
+		m_pDrawDataStreams = new ImageRenderer();
+		if(m_pD2DFactory)
+			m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
+
+		m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
+		//m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
+
+	}
+
+	else if(!m_kinectV2Enable &&  m_kinectV1Enable)
+	{
+		
+		const int height = showOptGroupRect.top - tabControlRect.top-40; //(width / 16) * 9;
+		const int width = (height/3)*4; 
+		const int xPos = (windowRect.right - windowRect.left - width) / 2;
+		const int yPos = (showOptGroupRect.top - tabControlRect.top - height) / 2;
+
+
+		m_liveViewWindow_for_v1 = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, yPos, width, height, m_hWnd, NULL, m_hInstance, NULL);
+
+		m_pDrawDataStreamsForV1 = new ImageRenderer();
+		if(m_pD2DFactory)
+			m_pDrawDataStreamsForV1->initialize(m_liveViewWindow_for_v1, m_pD2DFactory, cColorWidthForV1, cColorHeightForV1, cColorWidthForV1 * sizeof(RGBQUAD));
+
+		m_kinectV1Controller.setImageRenderer(m_pDrawDataStreamsForV1,m_pD2DFactory);	
+
+		m_kinectV1Controller.SetIcon(m_liveViewWindow_for_v1);
+
+	}
+	else if(m_kinectV2Enable &&  m_kinectV1Enable)
+	{
+		const int height = showOptGroupRect.top - tabControlRect.top-60; //(width / 16) * 9;
+		const int width = (height/9)*16; 
+		const int xPos = 7;
+		//const int yPos = (showOptGroupRect.top - tabControlRect.top - height) / 2;
+		m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, tabControlRect.top, width, height, m_hWnd, NULL, m_hInstance, NULL);
+
+				
+		const int width_v1 = (tabControlRect.right-width -10);
+		const int height_v1 = (width_v1 / 4) * 3;
+		const int xPos_v1 = xPos+width+10;
+		m_liveViewWindow_for_v1 = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos_v1, tabControlRect.top, width_v1, height_v1, m_hWnd, NULL, m_hInstance, NULL);
+		
+		m_pDrawDataStreams = new ImageRenderer();
+		if(m_pD2DFactory)
+			m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
+				
+
+		m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
+
+		m_pDrawDataStreamsForV1 = new ImageRenderer();
+		if(m_pD2DFactory)
+			m_pDrawDataStreamsForV1->initialize(m_liveViewWindow_for_v1, m_pD2DFactory, cColorWidthForV1, cColorHeightForV1, cColorWidthForV1 * sizeof(RGBQUAD));
+				
+				
+
+		
+		m_kinectV1Controller.setImageRenderer(m_pDrawDataStreamsForV1,m_pD2DFactory);	
+
+		m_kinectV1Controller.SetIcon(m_liveViewWindow_for_v1);
+	}
+
 }
 
 
@@ -478,15 +682,22 @@ void WindowsApplication::onRecordTabSelected()
 {
 	m_isKinectRunning = true;
 	m_plackBackTabHandler.playbackStopped();
+	
+	if(m_kinectV2Enable)
+	{
+		
+		connectStreamUpdaterToViewer();
+
+		m_pclFaceViewer->useColoredCloud(m_recordTabHandler.isColorEnabled());
+		m_pclFaceViewer->setNumOfClouds(2);
+
+		ShowWindow(m_liveViewWindow, SW_SHOW);
+	}
+
+	if(m_kinectV1Enable)
+		ShowWindow(m_liveViewWindow_for_v1, SW_SHOW);
 
 	disconnectInputReaderFromViewer();
-	connectStreamUpdaterToViewer();
-
-	m_pclFaceViewer->useColoredCloud(m_recordTabHandler.isColorEnabled());
-	m_pclFaceViewer->setNumOfClouds(2);
-
-	
-	ShowWindow(m_liveViewWindow, SW_SHOW);
 	ShowWindow(m_recordTabHandle, SW_SHOW);
 
 	//hide the other views
@@ -497,7 +708,12 @@ void WindowsApplication::onRecordTabSelected()
 void WindowsApplication::onConvertTabSelected()
 {
 	//hide the other views
-	ShowWindow(m_liveViewWindow, SW_HIDE);
+	
+	if(m_kinectV2Enable)
+		ShowWindow(m_liveViewWindow, SW_HIDE);
+	if(m_kinectV1Enable)
+		ShowWindow(m_liveViewWindow_for_v1, SW_HIDE);
+
 	ShowWindow(m_recordTabHandle, SW_HIDE);
 	ShowWindow(m_playbackTabHandle, SW_HIDE);
 
@@ -510,12 +726,21 @@ void WindowsApplication::onPlaybackSelected()
 	//stop the updating of the kinect frame grabber
 	m_isKinectRunning = false;
 
-	disconnectStreamUpdaterFromViewer();
-	connectInputReaderToViewer();
 
-	//preset to default
-	m_pclFaceViewer->useColoredCloud(true);
-	ShowWindow(m_liveViewWindow, SW_HIDE);
+	if(m_kinectV2Enable)
+	{
+		ShowWindow(m_liveViewWindow, SW_HIDE);
+		disconnectStreamUpdaterFromViewer();
+		
+
+		//preset to default
+		m_pclFaceViewer->useColoredCloud(true);
+	}
+
+	if(m_kinectV1Enable)
+		ShowWindow(m_liveViewWindow_for_v1, SW_HIDE);
+
+	connectInputReaderToViewer();
 
 	m_plackBackTabHandler.resetUIElements();
 	m_plackBackTabHandler.setSharedRecordingConfiguration(m_recordTabHandler.getRecordConfiguration());

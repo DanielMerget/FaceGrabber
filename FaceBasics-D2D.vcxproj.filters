@@ -86,6 +86,21 @@
     <ClCompile Include="CommonConfiguration.cpp">
       <Filter>WindowsApp\Model</Filter>
     </ClCompile>
+    <ClCompile Include="NuiSensorChooser\NuiSensorChooser.cpp">
+      <Filter>NuiSensorChooser</Filter>
+    </ClCompile>
+    <ClCompile Include="NuiSensorChooser\NuiSensorChooserUI.cpp">
+      <Filter>NuiSensorChooser</Filter>
+    </ClCompile>
+    <ClCompile Include="NuiSensorChooser\NuiSensorChooserUIPrivate.cpp">
+      <Filter>NuiSensorChooser</Filter>
+    </ClCompile>
+    <ClCompile Include="KinectV1Controller.cpp">
+      <Filter>KinectV1</Filter>
+    </ClCompile>
+    <ClCompile Include="NuiSensorChooser\NuiImageBuffer.cpp">
+      <Filter>NuiSensorChooser</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -187,6 +202,24 @@
     <ClInclude Include="CommonConfiguration.h">
       <Filter>WindowsApp\Model</Filter>
     </ClInclude>
+    <ClInclude Include="NuiSensorChooser\NuiSensorChooser.h">
+      <Filter>NuiSensorChooser</Filter>
+    </ClInclude>
+    <ClInclude Include="NuiSensorChooser\NuiSensorChooserUI.h">
+      <Filter>NuiSensorChooser</Filter>
+    </ClInclude>
+    <ClInclude Include="NuiSensorChooser\NuiSensorChooserUIPrivate.h">
+      <Filter>NuiSensorChooser</Filter>
+    </ClInclude>
+    <ClInclude Include="NuiSensorChooser\NuiSensorChooserUIResource.h">
+      <Filter>NuiSensorChooser</Filter>
+    </ClInclude>
+    <ClInclude Include="KinectV1Controller.h">
+      <Filter>KinectV1</Filter>
+    </ClInclude>
+    <ClInclude Include="NuiSensorChooser\NuiImageBuffer.h">
+      <Filter>NuiSensorChooser</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Kinect">
@@ -209,6 +242,12 @@
     </Filter>
     <Filter Include="WindowsApp\Model">
       <UniqueIdentifier>{4af2f27f-993d-4b67-8178-6f6e1e61b62e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="NuiSensorChooser">
+      <UniqueIdentifier>{4204f1d3-61d9-4d34-8868-a9a8e3fd4224}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KinectV1">
+      <UniqueIdentifier>{ada3325e-ff87-4d2d-9c1e-2bd6ae09cea6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

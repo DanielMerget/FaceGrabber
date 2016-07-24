@@ -14,6 +14,26 @@
 #include <DirectXMath.h>
 #include <vector>
 #include <Kinect.h>
+#include "./NuiImageBuffer.h"
+
+enum ImageRendererBrush
+{
+    ImageRendererBrushJointTracked = 0,
+    ImageRendererBrushJointInferred,
+    ImageRendererBrushBoneTracked,
+    ImageRendererBrushBoneInferred,
+    ImageRendererBrushWhite,
+    ImageRendererBrushGray,
+    ImageRendererBrushGreen,
+    ImageRendererBrushCount
+};
+
+enum ImageRendererTextFormat
+{
+    ImageRendererTextFormatFps = 0,
+    ImageRendererTextFormatResolution,
+    ImageRendererTextFormatCount
+};
 
 class ImageRenderer
 {
@@ -82,6 +102,15 @@ public:
     /// <param name="pYaw">rotation about the Y-axis</param>
     /// <param name="pRoll">rotation about the Z-axis</param>
     void extractFaceRotationInDegrees(const Vector4* pQuaternion, int* pPitch, int* pYaw, int* pRoll);
+
+	void setSize(int sourceWidth, int sourceHeight, int sourceStride){m_sourceWidth = sourceWidth;m_sourceHeight = sourceHeight;m_sourceStride=sourceStride;}
+
+	// <summary>
+	/// Draw frame FPS counter
+	/// </summary>
+	/// <param name="clientRect">Client area of viewer's window</param>
+	void DrawFPS(UINT16 fps);
+
 private:
     /// <summary>
     /// Ensure necessary Direct2d resources are created
@@ -102,7 +131,66 @@ private:
     /// <returns>success or failure</returns>
     bool validateFaceBoxAndPoints(const RectI* pFaceBox, const PointF* pFacePoints);
 
+	D2D1_SIZE_U GetClientSize(HWND hWnd);
+
+	HRESULT EnsureBitmap(const D2D1_SIZE_U& imageSize);
  
+	D2D1_RECT_F GetImageRect(const RECT &client);
+
+	template<typename T>
+	T ToImageRectPoint(T point,const D2D1_RECT_F& imageRect);
+
+	/// <summary>
+	/// Create D2D solid color brushes
+	/// </summary>
+	void CreateSolidBrushes();
+
+	void CreateSolidBrush(D2D1::ColorF::Enum color, ImageRendererBrush brush);
+
+	
+    /// <summary>
+    /// Draw a rectangle and fill it
+    /// </summary>
+    /// <param name="rect">The rectangle to fill</param>
+    /// <param name="brush">The index of brush</param>
+    void FillRectangle(const D2D1_RECT_F& rect, ImageRendererBrush brush);
+
+
+	/// <summary>
+    /// Draw the circle representing the joint
+    /// </summary>
+    /// <param name="center">The center of the circle</param>
+    /// <param name="radius">The radius of the circle</param>
+    /// <param name="brush">Index of brush</param>
+    /// <param name="strokeWidth">Width of the line</param>
+    /// <param name="strokeStyle">Style of the line</param>
+    void DrawCircle(const D2D1_POINT_2F& center, float radius, ImageRendererBrush brush, float strokeWidth = 1.0f, ID2D1StrokeStyle* strokeStyle = nullptr);
+
+
+	/// <summary>
+    /// Draw FPS text
+    /// </summary>
+    /// <param name="pText">Text to draw</param>
+    /// <param name="cch">Count of charaters in text</param>
+    /// <param name="rect">The area to draw text</param>
+    /// <param name="brush">Index of brush</param>
+    /// <param name="format">Text format</param>
+    void DrawText(const WCHAR* pText, UINT cch, const D2D1_RECT_F &rect, ImageRendererBrush brush, ImageRendererTextFormat format);
+
+	/// <summary>
+    /// Create a specific DWrite text format from parameters
+    /// </summary>
+    /// <param name="fontFamilyName">Family name of created font</param>
+    /// <param name="fontSize">Size of created font</param>
+    /// <param name="textAlignment">Alignment of text</param>
+    /// <param name="paragraphAlignment">Alignment of paragraph</param>
+    /// <param name="ppTextFormat">Created text format</param>
+    void CreateTextFormat(const WCHAR* fontFamilyName, FLOAT fontSize, DWRITE_TEXT_ALIGNMENT textAlignment, DWRITE_PARAGRAPH_ALIGNMENT paragraphAlignment, IDWriteTextFormat** ppTextFormat);
+
+	    /// <summary>
+    /// Create text formats to draw FPS and image resolution lable
+    /// </summary>
+    void CreateTextFormats();
 
     HWND                     m_hWnd;
 
@@ -120,4 +208,7 @@ private:
     // DirectWrite
     IDWriteFactory*		     m_pDWriteFactory;
     IDWriteTextFormat*       m_pTextFormat;    
+
+	IDWriteTextFormat*          m_formats[ImageRendererTextFormatCount];
+	ID2D1SolidColorBrush*       m_brushes[ImageRendererBrushCount];
 };

@@ -42,12 +42,20 @@ LRESULT CALLBACK MessageRouterHelper::DlgProc(HWND hWnd, UINT message, WPARAM wP
 
 	switch (message)
 	{
+
+	case WM_STREAMEVENT_COLOR:
+        UpdateStreams(1);
+        break;
+	case WM_STREAMEVENT_DEPTH:
+        UpdateStreams(2);
+        break;
+
 	case WM_INITDIALOG:
 		// store window handle
 		m_hWnd = hWnd;
 		onCreate();
 		break;
-
+	
 	case WM_CLOSE:
 		DestroyWindow(hWnd);
 		onDestroy();
@@ -126,6 +134,11 @@ void MessageRouterHelper::onDestroy()
 
 }
 void MessageRouterHelper::onCreate()
+{
+
+}
+
+void MessageRouterHelper::UpdateStreams(int i)
 {
 
 }

@@ -31,10 +31,13 @@
 #define IDD_APP1                        1035
 #define IDD_APP_TAB                     1035
 #define IDC_HD2DFACE_RADIO              1035
+#define IDC_V1_COLOR_SHOW_RADIO         1035
 #define IDC_SCROLLBAR1                  1036
 #define IDC_TAB_PLAYBACK                1036
+#define IDC_V1_R640X480_RADIO           1036
 #define IDC_CHECK1                      1037
 #define IDC_INFRARED_RAW_RADIO          1037
+#define IDC_V1_RECORD_DEPTH_CHECK       1037
 #define IDC_SLIDER1                     1038
 #define IDC_DEPTH_RAW_RADIO             1038
 #define IDC_LIST2                       1039
@@ -150,8 +153,29 @@
 #define IDC_ALIGNED_DEPTH_CHECK         1113
 #define IDC_DEPTH_3D_RAW_CHECK          1114
 #define IDC_INRARED_RAW_CHECK           1115
-#define IDC_INFRARED_DEPTH_CHECK2       1116
 #define IDC_ALIGNED_INFRARED_CHECK      1116
+#define IDC_GROUP_SHOW_OPT              1117
+#define IDC_V1_DEPTH_SHOW_RADIO         1118
+#define IDC_V1_INFRARED_SHOW_RADIO      1119
+#define IDC_V1_R320X240_RADIO           1120
+#define IDC_GROUP_SHOW_OPT2             1121
+#define IDC_STATIC_V2_SHOW_             1122
+#define IDC_STATIC_V2_SHOW              1122
+#define IDC_V1_SHOW_TYPE_STATIC         1123
+#define IDC_V1_SHOW_RESOLUTION_STATIC   1124
+#define IDC_V1_RECORD_COLOR_CHECK       1125
+#define IDC_V1_RECORD_INFRARED_CHECK    1126
+#define IDC_V1_RECORDING_ALIGNED_CHECKBOX 1128
+#define IDC_RECORDING_V1_ENABLE_CHECK   1129
+#define IDC_RECORDING_V2_ENABLE_CHECK   1133
+#define IDC_RECORDING_OPT_V1            1135
+#define IDC_RECORDING_OPT_V2            1136
+#define IDC_STATIC_INFRARED_V2          1137
+#define IDC_STATIC_DEPTH_V2             1138
+#define IDC_STATIC_KEYPOINTS_V2         1139
+#define IDC_STATIC_COLOR_INF_V          1140
+#define IDC_COMBO2                      1143
+#define IDC_V1_SHOW_TYPE_COMBO          1143
 #define IDC_KINECT_INFRARED_COMBO_BOX_THREADS 1806
 #define IDC_PLAY_PAUSE_BUTTON           1807
 #define IDC_PLAY_PAUSE_BUTTON2          1808
@@ -172,7 +196,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1109
+#define _APS_NEXT_CONTROL_VALUE         1145
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

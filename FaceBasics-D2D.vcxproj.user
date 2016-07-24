@@ -1,11 +1,11 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <LocalDebuggerEnvironment>PATH=C:\Libraries\Qt\Qt-4.8.5\bin;C:\Libraries\Boost\bin;C:\Libraries\glew-1.10.0\bin\Release\x64;C:\Libraries\flann-1.8.4\bin;C:\Libraries\Eigen\bin;C:\Libraries\pcl-1.7\bin;C:\Libraries\opencv\build\x64\vc11\bin;C:\Libraries\OpenNI\Bin64;%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(THIRD_PARTY_LIB_PATH)\Qt\Qt-4.8.5\bin;$(THIRD_PARTY_LIB_PATH)\Boost\bin;$(THIRD_PARTY_LIB_PATH)\glew-1.10.0\bin\Release\x64;$(THIRD_PARTY_LIB_PATH)\flann-1.8.4\bin;$(THIRD_PARTY_LIB_PATH)\Eigen\bin;$(THIRD_PARTY_LIB_PATH)\pcl-1.7\bin;$(THIRD_PARTY_LIB_PATH)\opencv\build\x64\vc11\bin;$(THIRD_PARTY_LIB_PATH)\OpenNI\Bin64;%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LocalDebuggerEnvironment>PATH=C:\Libraries\Qt\Qt-4.8.5\bin;C:\Libraries\Boost\bin;C:\Libraries\glew-1.10.0\bin\Release\x64;C:\Libraries\flann-1.8.4\bin;C:\Libraries\Eigen\bin;C:\Libraries\pcl-1.7\bin;C:\Libraries\opencv\build\x64\vc11\bin;C:\Libraries\OpenNI\Bin64;%PATH%</LocalDebuggerEnvironment>
+    <LocalDebuggerEnvironment>PATH=$(THIRD_PARTY_LIB_PATH)\Qt\Qt-4.8.5\bin;$(THIRD_PARTY_LIB_PATH)\Boost\bin;$(THIRD_PARTY_LIB_PATH)\glew-1.10.0\bin\Release\x64;$(THIRD_PARTY_LIB_PATH)\flann-1.8.4\bin;$(THIRD_PARTY_LIB_PATH)\Eigen\bin;$(THIRD_PARTY_LIB_PATH)\pcl-1.7\bin;$(THIRD_PARTY_LIB_PATH)\opencv\build\x64\vc11\bin;$(THIRD_PARTY_LIB_PATH)\OpenNI\Bin64;%PATH%</LocalDebuggerEnvironment>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
   </PropertyGroup>
 </Project>

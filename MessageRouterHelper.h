@@ -123,5 +123,7 @@ private:
 	 * \brief	Callback that the Windows is about to be created.
 	 */
 	virtual void onCreate();
+
+	virtual void UpdateStreams(int i);
 };
 

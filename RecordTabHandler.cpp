@@ -8,7 +8,8 @@
 RecordTabHandler::RecordTabHandler() : 
 	m_colorEnabled(true),
 	m_centerEnabled(false),
-	m_isRecording(false)
+	m_isRecording(false),
+	m_KinectEnableOpt(3)
 {
 }
 
@@ -48,8 +49,182 @@ SharedCommonConfiguration RecordTabHandler::getSharedCommonConfiguration()
 }
 
 
+void RecordTabHandler::movieShowOptWindosOfV1()
+{
+	RECT tabRecord;
+	GetWindowRect(m_hWnd, &tabRecord);
+
+	RECT showOptGroupRect;
+	RECT showOptGroupV1Rect;
+	RECT tmpRect;
+	HWND tabShowOPTHandle = GetDlgItem(m_hWnd, IDC_GROUP_SHOW_OPT);
+	HWND tabShowOPTForV1Handle = GetDlgItem(m_hWnd, IDC_GROUP_SHOW_OPT2);	
+	GetWindowRect(tabShowOPTHandle, &showOptGroupRect);
+	GetWindowRect(tabShowOPTForV1Handle, &showOptGroupV1Rect);
+	//GetClientRect(tabShowOPTHandle, &showOptGroupRect);
+
+	/* show opt group*/
+	MoveWindow(GetDlgItem(m_hWnd, IDC_GROUP_SHOW_OPT2),
+					showOptGroupRect.left-tabRecord.left,
+					showOptGroupRect.top-tabRecord.top,
+					showOptGroupRect.right - showOptGroupRect.left,
+					showOptGroupRect.bottom - showOptGroupRect.top,
+					TRUE);
+		
+	HWND v1ShowType = GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_STATIC);
+	GetWindowRect(v1ShowType, &tmpRect);
+			/* show opt group*/
+	MoveWindow(v1ShowType,
+		showOptGroupRect.left-tabRecord.left+tmpRect.left-showOptGroupV1Rect.left,
+		showOptGroupRect.top-tabRecord.top+tmpRect.top-showOptGroupV1Rect.top,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);
+
+	/*
+	HWND v1ShowResolution =GetDlgItem(m_hWnd, IDC_V1_SHOW_RESOLUTION_STATIC);
+	GetWindowRect(v1ShowResolution, &tmpRect);
+	MoveWindow(v1ShowResolution,
+		showOptGroupRect.left-tabRecord.left+tmpRect.left-showOptGroupV1Rect.left,
+		showOptGroupRect.top-tabRecord.top+tmpRect.top-showOptGroupV1Rect.top,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);*/
+
+	HWND v1ColorShow =GetDlgItem(m_hWnd, IDC_V1_COLOR_SHOW_RADIO);
+	GetWindowRect(v1ColorShow, &tmpRect);
+	MoveWindow(v1ColorShow,
+		showOptGroupRect.left-tabRecord.left+tmpRect.left-showOptGroupV1Rect.left,
+		showOptGroupRect.top-tabRecord.top+tmpRect.top-showOptGroupV1Rect.top,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);
+
+	HWND v1DepthShow =GetDlgItem(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO);
+	GetWindowRect(v1DepthShow, &tmpRect);
+	MoveWindow(v1DepthShow,
+		showOptGroupRect.left-tabRecord.left+tmpRect.left-showOptGroupV1Rect.left,
+		showOptGroupRect.top-tabRecord.top+tmpRect.top-showOptGroupV1Rect.top,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);
+	
+	HWND v1IDShowType =GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO);
+	GetWindowRect(v1IDShowType, &tmpRect);
+	MoveWindow(v1IDShowType,
+		showOptGroupRect.left-tabRecord.left+tmpRect.left-showOptGroupV1Rect.left,
+		showOptGroupRect.top-tabRecord.top+tmpRect.top-showOptGroupV1Rect.top,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);
+
+	/*
+	HWND v1InfraredShow =GetDlgItem(m_hWnd, IDC_V1_INFRARED_SHOW_RADIO);
+	GetWindowRect(v1InfraredShow, &tmpRect);
+	MoveWindow(v1InfraredShow,
+		showOptGroupRect.left-tabRecord.left+tmpRect.left-showOptGroupV1Rect.left,
+		showOptGroupRect.top-tabRecord.top+tmpRect.top-showOptGroupV1Rect.top,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);
+					*/
+
+		
+	/*
+	HWND v1R640 =GetDlgItem(m_hWnd, IDC_V1_R640X480_RADIO);
+	GetWindowRect(v1R640, &tmpRect);
+	MoveWindow(v1R640,
+		showOptGroupRect.left-tabRecord.left+tmpRect.left-showOptGroupV1Rect.left,
+		showOptGroupRect.top-tabRecord.top+tmpRect.top-showOptGroupV1Rect.top,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);
+
+	HWND v1R320 =GetDlgItem(m_hWnd, IDC_V1_R320X240_RADIO);
+	GetWindowRect(v1R320, &tmpRect);
+	MoveWindow(v1R320,
+		showOptGroupRect.left-tabRecord.left+tmpRect.left-showOptGroupV1Rect.left,
+		showOptGroupRect.top-tabRecord.top+tmpRect.top-showOptGroupV1Rect.top,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);
+
+	*/
+	HWND recordingOPTV1Handle = GetDlgItem(m_hWnd, IDC_RECORDING_OPT_V1);
+	HWND recordingOPTV2Handle = GetDlgItem(m_hWnd, IDC_RECORDING_OPT_V2);
+	
+	RECT recordingOPTV1Rect;
+	RECT recordingOPTV2Rect;
+	GetWindowRect(recordingOPTV1Handle, &recordingOPTV1Rect);
+	GetWindowRect(recordingOPTV2Handle, &recordingOPTV2Rect);
+
+	MoveWindow(recordingOPTV1Handle,
+					recordingOPTV2Rect.left-tabRecord.left,
+					recordingOPTV2Rect.top-tabRecord.top,
+					recordingOPTV2Rect.right - recordingOPTV2Rect.left,
+					(recordingOPTV1Rect.bottom - recordingOPTV1Rect.top)*2/3,
+					TRUE);
+
+	RECT tmpRect_CIG;
+	HWND v1ColorInfGroup = GetDlgItem(m_hWnd, IDC_STATIC_COLOR_INF_V);
+	GetWindowRect(v1ColorInfGroup, &tmpRect_CIG);
+			/* show opt group*/
+	MoveWindow(v1ColorInfGroup,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect_CIG.left-recordingOPTV1Rect.left,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect_CIG.top-recordingOPTV1Rect.top,
+					tmpRect_CIG.right - tmpRect_CIG.left,
+					tmpRect_CIG.bottom - tmpRect_CIG.top,
+					TRUE);
+
+	HWND v1Color = GetDlgItem(m_hWnd, IDC_V1_RECORD_COLOR_CHECK);
+	GetWindowRect(v1Color, &tmpRect);
+			/* show opt group*/
+	MoveWindow(v1Color,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect.top-recordingOPTV1Rect.top,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);
+
+	
+
+	RECT tmpRect_Infrared;
+	HWND v1Infrared = GetDlgItem(m_hWnd, IDC_V1_RECORD_INFRARED_CHECK);
+	GetWindowRect(v1Infrared, &tmpRect_Infrared);
+			
+	MoveWindow(v1Infrared,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect_Infrared.left-recordingOPTV1Rect.left,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect_Infrared.top-recordingOPTV1Rect.top,
+					tmpRect_Infrared.right - tmpRect_Infrared.left,
+					tmpRect_Infrared.bottom - tmpRect_Infrared.top,
+					TRUE);
+	
+
+	//IDC_V1_RECORD_DEPTH_CHECK
+	HWND v1Depth = GetDlgItem(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK);
+	GetWindowRect(v1Depth, &tmpRect);
+			/* show opt group*/
+	MoveWindow(v1Depth,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left + tmpRect_CIG.right - tmpRect_CIG.left+10,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect.top-recordingOPTV1Rect.top - tmpRect.top + tmpRect_Infrared.top,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);
+
+		//IDC_V1_RECORD_DEPTH_CHECK
+	HWND v1Aligned = GetDlgItem(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX);
+	GetWindowRect(v1Aligned, &tmpRect);
+			/* show opt group*/
+	MoveWindow(v1Aligned,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left + tmpRect_CIG.right - tmpRect_CIG.left+10,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect.top-recordingOPTV1Rect.top - tmpRect.top + tmpRect_Infrared.top,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);
+}
 void RecordTabHandler::onCreate()
 {
+
 	//preset the edit boxes with the values of the model objects
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_recordingConfiguration[    HDFace	   ]->getFileNameCString());
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_recordingConfiguration[   FaceRaw	   ]->getFileNameCString());
@@ -87,10 +262,101 @@ void RecordTabHandler::onCreate()
 	
 	HWND kinectShowOptComboBox = GetDlgItem(m_hWnd, IDC_COMBO_BOX_SHOW_OPT);
 	
+	if(m_KinectEnableOpt == 1)
+	{
+		
+		movieShowOptWindosOfV1();
+		ShowWindow(GetDlgItem(m_hWnd, IDC_GROUP_SHOW_OPT), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_STATIC_V2_SHOW), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_COMBO_BOX_SHOW_OPT), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_KINECT_REMOVE_BG_CHECKBOX), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, HD_FACE_SHOW_RADIO), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, FIVE_KEY_POINTS_SHOW_RADIO), SW_HIDE);
+
+		ShowWindow(GetDlgItem(m_hWnd, IDC_STATIC_INFRARED_V2), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_STATIC_DEPTH_V2), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_STATIC_KEYPOINTS_V2), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_OPT_V2), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_ALIGNED_INFRARED_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_DEPTH_RAW_CHECK), SW_HIDE);
+	
+		ShowWindow(GetDlgItem(m_hWnd, IDC_ALIGNED_DEPTH_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_DEPTH_3D_RAW_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_HD2D_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_HD3D_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_FACE_RAW_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_KEY_POINTS_CHECK), SW_HIDE);
+
+		ShowWindow(GetDlgItem(m_hWnd, IDC_RAW_COLOR_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_OPT_RESET), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_INRARED_RAW_CHECK), SW_HIDE);
+
+
+		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_V1_ENABLE_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_V2_ENABLE_CHECK), SW_HIDE);
+			
+		CheckDlgButton(m_hWnd, IDC_V1_COLOR_SHOW_RADIO, true);
+
+		
+		//CheckDlgButton(m_hWnd, IDC_V1_R640X480_RADIO, true);
+		HWND v1ShowTypeComboBox = GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO);
+		
+		for (int i = 0; i < V1_COLOR_TYPE_COUNT; i++){
+			CString colorType = KinectV1Controller::getColorTypeAsString(static_cast<v1ColorType>( i));
+			ComboBox_AddString(v1ShowTypeComboBox, colorType);
+			if(i==0)
+				ComboBox_SetCurSel(v1ShowTypeComboBox, 0);
+			//ComboBox_ResetContent
+		}
+
+		
+		
+
+	}
+	else if (m_KinectEnableOpt == 0)
+	{
+		ShowWindow(GetDlgItem(m_hWnd, IDC_GROUP_SHOW_OPT2), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_STATIC), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_SHOW_RESOLUTION_STATIC), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_COLOR_SHOW_RADIO), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO), SW_HIDE);
+		//ShowWindow(GetDlgItem(m_hWnd, IDC_V1_INFRARED_SHOW_RADIO), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_R640X480_RADIO), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_R320X240_RADIO), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_OPT_V1), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_STATIC_COLOR_INF_V), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_RECORD_COLOR_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_RECORD_INFRARED_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX), SW_HIDE);
+
+		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_V1_ENABLE_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_V2_ENABLE_CHECK), SW_HIDE);
+
+	}
+	else 
+	{
+		CheckDlgButton(m_hWnd, IDC_V1_COLOR_SHOW_RADIO, true);
+
+		
+		//CheckDlgButton(m_hWnd, IDC_V1_R640X480_RADIO, true);
+
+		HWND v1ShowTypeComboBox = GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO);
+		
+		for (int i = 0; i < V1_COLOR_TYPE_COUNT; i++){
+			CString colorType = KinectV1Controller::getColorTypeAsString(static_cast<v1ColorType>( i));
+			ComboBox_AddString(v1ShowTypeComboBox, colorType);
+			if(i==0)
+				ComboBox_SetCurSel(v1ShowTypeComboBox, 0);
+			//ComboBox_ResetContent
+		}
+	}
+	
 	for (int i = 0; i < RECORD_SHOW_OPT_COUNT; i++){
 		CString ShowOpt = CommonConfiguration::getShowOptAsString(static_cast<RecordingShowOpt>(i));
 		ComboBox_AddString(kinectShowOptComboBox, ShowOpt);
-		ComboBox_SetCurSel(kinectShowOptComboBox, 0);
+		if(i ==0)
+			ComboBox_SetCurSel(kinectShowOptComboBox, 0);
 	}	
 	for (int i = 0; i < RECORD_FILE_FORMAT_COUNT; i++){
 		CString fileFormatName = RecordingConfiguration::getFileFormatAsString(static_cast<RecordingFileFormat>(i));
@@ -365,6 +631,10 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 	case IDC_COMBO_BOX_SHOW_OPT:
 		m_commonConfiguration[KinectV2_COMMON]->setShowOpt(static_cast<RecordingShowOpt>(currentSelection));
 		break;
+	case IDC_V1_SHOW_TYPE_COMBO:
+		v1ShowResolutionChanged(currentSelection);
+		break;
+	default:break;
 	}
 }
 
@@ -522,6 +792,7 @@ void RecordTabHandler::updateFPSLimit()
 
 void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 {
+	
 	switch (LOWORD(wParam))
 	{
 	case IDC_RECORD_COLOR:
@@ -581,7 +852,7 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		m_recordingConfiguration[FullDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_DEPTH_3D_RAW_CHECK));
 		break;
 
-
+	
 
 
 	case IDC_RECORDING_OPT_RESET:
@@ -648,6 +919,56 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		}
 		break;
 	}
+	case IDC_V1_COLOR_SHOW_RADIO:
+		//m_commonConfiguration[KinectV1_COMMON]->setShowOpt(RecordingShowOpt::Color_Raw);
+		HWND v1ShowTypeComboBox;
+		v1ShowTypeComboBox = GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO);
+		ComboBox_ResetContent(v1ShowTypeComboBox);
+		for (int i = 0; i < v1ColorType::V1_COLOR_TYPE_COUNT; i++){
+			CString colorType = KinectV1Controller::getColorTypeAsString(static_cast<v1ColorType>( i));
+			ComboBox_AddString(v1ShowTypeComboBox, colorType);
+			if(i == 0)
+				ComboBox_SetCurSel(v1ShowTypeComboBox, i);
+			//ComboBox_ResetContent
+		}
+		
+
+		v1ShowOptChanged(RecordingShowOpt::Color_Raw);
+		//EnableWindow(GetDlgItem(m_hWnd,IDC_V1_R320X240_RADIO), FALSE);
+		break;
+	case IDC_V1_DEPTH_SHOW_RADIO:
+				//m_commonConfiguration[KinectV1_COMMON]->setShowOpt(RecordingShowOpt::Color_Raw);
+		HWND v1ShowTypeComboBox1;
+		v1ShowTypeComboBox1 = GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO);
+		ComboBox_ResetContent(v1ShowTypeComboBox1);
+		for (int i = 0; i < v1DepthType::V1_DEPTH_TYPE_COUNT; i++){
+		CString depthType = KinectV1Controller::getDepthTypeAsString(static_cast<v1DepthType>( i));
+			ComboBox_AddString(v1ShowTypeComboBox1, depthType);
+			if(i == 0)
+				ComboBox_SetCurSel(v1ShowTypeComboBox1,i);
+			//ComboBox_ResetContent
+		}
+		
+
+		//m_commonConfiguration[KinectV1_COMMON]->setShowOpt(RecordingShowOpt::Depth_Raw);
+		v1ShowOptChanged(RecordingShowOpt::Depth_Raw);
+		//EnableWindow(GetDlgItem(m_hWnd,IDC_V1_R320X240_RADIO), TRUE);
+		break;
+	case IDC_V1_INFRARED_SHOW_RADIO:
+		//v1ShowOptChanged(RecordingShowOpt::Infrared_Raw);
+		//EnableWindow(GetDlgItem(m_hWnd,IDC_V1_R320X240_RADIO), TRUE);
+		//m_commonConfiguration[KinectV1_COMMON]->setShowOpt(RecordingShowOpt::Infrared_Raw);
+		break;
+
+	case IDC_V1_R640X480_RADIO:
+		//v1ShowResolutionChanged(NUI_IMAGE_RESOLUTION_640x480);
+		//m_commonConfiguration[KinectV1_COMMON]->setShowResolution(NUI_IMAGE_RESOLUTION_640x480);
+		break;
+	case IDC_V1_R320X240_RADIO:
+		//v1ShowResolutionChanged(NUI_IMAGE_RESOLUTION_320x240);
+		//m_commonConfiguration[KinectV1_COMMON]->setShowResolution(NUI_IMAGE_RESOLUTION_320x240);
+		break;
+	
 	default:
 		break;
 	}
@@ -817,4 +1138,25 @@ SharedRecordingConfiguration RecordTabHandler::getRecordConfiguration()
 SharedImageRecordingConfiguration RecordTabHandler::getImageRecordConfiguration()
 {
 	return m_imageRecordingConfiguration;
+}
+
+
+void RecordTabHandler::setKinectEnableOpt(bool v1Enabled, bool v2Enabled)
+{
+	if(v1Enabled && v2Enabled)
+	{
+		m_KinectEnableOpt = 2;
+	}
+	else if(!v1Enabled && v2Enabled)
+	{
+		m_KinectEnableOpt = 0;
+	}
+	else if(v1Enabled && !v2Enabled)
+	{
+		m_KinectEnableOpt = 1;
+	}
+	else
+	{
+		m_KinectEnableOpt=3;
+	}
 }
