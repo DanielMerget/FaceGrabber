@@ -194,7 +194,7 @@ CString RecordingConfiguration::getSubFolderNameForCloudType(RecordCloudType clo
 
 CString RecordingConfiguration::getFullRecordingPath()
 {
-	auto result = getFullRecordingPathForCloudType(m_cloudType, m_outputFolder, m_timeStampFolderName);
+	auto result = getFullRecordingPathForCloudType(m_cloudType, m_outputFolder, m_timeStampFolderName,m_kinectVersion);
 	return result;
 }
 
@@ -207,16 +207,29 @@ std::string RecordingConfiguration::getFullRecordingPathString()
 	return strStd;
 }
 
-CString RecordingConfiguration::getFullRecordingPathForCloudType(RecordCloudType cloudType, CString outputFolder, CString timeStampFolderName)
+CString RecordingConfiguration::getFullRecordingPathForCloudType(RecordCloudType cloudType, CString outputFolder, CString timeStampFolderName,KinectVersionType kinectVersion)
 {
 	CString subFolder = getSubFolderNameForCloudType(cloudType);
 	CString fullPath;
 
 	fullPath += outputFolder.GetString();
+
 	auto outputEnding = fullPath.Right(1);
 	if (outputEnding != L"\\"){
 		fullPath += _T("\\");
 	}
+
+	switch(kinectVersion)
+	{
+		case KinectV1:
+			fullPath += _T("KinectV1\\");
+			break;
+		case KinectV2:
+			fullPath += _T("KinectV2\\");
+			break;
+		default:break;
+	}
+
 	fullPath += timeStampFolderName.GetString();
 	outputEnding = fullPath.Right(1);
 	if (outputEnding != L"\\"){
@@ -226,3 +239,7 @@ CString RecordingConfiguration::getFullRecordingPathForCloudType(RecordCloudType
 	return fullPath;
 }
 
+void RecordingConfiguration::setKinectVersion(KinectVersionType	kinectVersion)
+{
+	m_kinectVersion = kinectVersion;
+}

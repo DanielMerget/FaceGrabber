@@ -254,7 +254,7 @@ public:
 	 *
 	 * \return	The full recording path for the cloud recording parameters.
 	 */
-	static CString getFullRecordingPathForRecordType(StringFileRecordType cloudType, CString outputFolder, CString timeStampFolderName);
+	static CString getFullRecordingPathForRecordType(StringFileRecordType cloudType, CString outputFolder, CString timeStampFolderName,KinectVersionType kinectVersion);
 
 	/**
 	 * \fn	int RecordingConfiguration::getThreadCountToStart();
@@ -276,6 +276,8 @@ public:
 
 	boost::signal<void(StringFileRecordType, bool)> recordConfigurationStatusChanged;
 	boost::signal<void(StringFileRecordType)>	recordPathOrFileNameChanged;
+
+	void setKinectVersion(KinectVersionType	kinectVersion);
 private:
 
 	/**
@@ -321,6 +323,8 @@ private:
 	int						m_threadsCount;
 	bool					m_points_enabled;
 	bool					m_angles_enabled;
+
+	KinectVersionType		m_kinectVersion;
 };
 typedef std::shared_ptr<StringFileRecordingConfiguration> StringFileRecordingConfigurationPtr;
 typedef std::vector<StringFileRecordingConfigurationPtr> SharedStringFileRecordingConfiguration;

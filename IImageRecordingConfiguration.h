@@ -25,6 +25,12 @@ enum ImageRecordType{
 	IMAGE_RECORD_TYPE_COUNT
 };
 
+enum KinectV1ImageRecordType{
+	KinectV1ColorRaw,
+	KinectV1DepthRaw,
+	V1_IMAGE_RECORD_TYPE_COUNT
+};
+
 enum StringFileRecordType{
 	FiveKeyPoints,
 	STRING_FILE_RECORD_TYPE_COUNT

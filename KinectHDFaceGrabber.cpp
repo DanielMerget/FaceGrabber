@@ -407,6 +407,7 @@ void KinectHDFaceGrabber::update()
     IColorFrame* pColorFrame = nullptr;
     HRESULT hr = m_pColorFrameReader->AcquireLatestFrame(&pColorFrame);
 	
+
 	IDepthFrame* depthFrame = nullptr;
 	if (SUCCEEDED(hr)){
 		hr = m_pDepthFrameReader->AcquireLatestFrame(&depthFrame);

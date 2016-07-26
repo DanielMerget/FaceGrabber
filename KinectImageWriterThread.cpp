@@ -16,6 +16,7 @@ KinectImageWriterThread::~KinectImageWriterThread()
 
 void KinectImageWriterThread::writeImagesToFile(IImageRecordingConfigurationPtr recordingConfiguration)
 {
+	static int pullCounts = 0;
 	//collect important writing information
 	auto recordingFileFormat = recordingConfiguration->getRecordFileFormat();
 	auto filePath = recordingConfiguration->getFullRecordingPathString();
@@ -65,8 +66,9 @@ void KinectImageWriterThread::writeImagesToFile(IImageRecordingConfigurationPtr 
 		std::stringstream outputFileWithPath;
 		outputFileWithPath << filePath << "\\" << fileName << "_" << std::setfill('0') << std::setw(6) << measurement.index << fileFormatExtension;
 
+		//cv::imshow("test",*measurement.image);
 		cv::imwrite(outputFileWithPath.str(), *measurement.image);
-
+		pullCounts++;
 		if (isDone){
 			OutputDebugString(L"writer finished isDone");
 			return;

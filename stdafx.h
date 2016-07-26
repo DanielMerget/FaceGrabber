@@ -74,6 +74,14 @@ inline void SafeDeleteArray(T*& pArray)
     }
 }
 
+
+enum KinectVersionType{
+	KinectV1,
+	KinectV2,
+	KINECT_VERSION_TYPE_COUNT
+};
+
+
 #define WM_STREAMEVENT_COLOR   WM_USER + 1
 #define WM_STREAMEVENT_DEPTH   WM_USER + 2
 

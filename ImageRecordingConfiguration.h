@@ -251,7 +251,7 @@ public:
 	*
 	* \return	The full recording path for the image recording parameters.
 	*/
-	static CString getFullRecordingPathForImageType(ImageRecordType imageType, CString outputFolder, CString timeStampFolderName);
+	static CString getFullRecordingPathForImageType(ImageRecordType imageType, CString outputFolder, CString timeStampFolderName, KinectVersionType kinectVersion); //static 
 
 	/**
 	* \fn	int ImageRecordingConfiguration::getThreadCountToStart();
@@ -276,6 +276,9 @@ public:
 	//boost::signal<void(StringFileRecordType, bool)> recordConfigurationStatusChanged;
 
 	boost::signal<void(ImageRecordType)>	recordPathOrFileNameChanged;
+
+	void setKinectVersion(KinectVersionType	kinectVersion);
+
 private:
 
 	/**
@@ -306,6 +309,8 @@ private:
 	/** \brief	Type of the image to record. */
 	ImageRecordType			m_imageType;
 
+	KinectVersionType		m_kinectVersion;
+
 	StringFileRecordType			m_stringFileType;
 
 	/** \brief	The file format. */
@@ -321,6 +326,8 @@ private:
 
 	/** \brief	Number of threads to start for recording. */
 	int						m_threadsCount;
+
+	
 };
 typedef std::shared_ptr<ImageRecordingConfiguration> ImageRecordingConfigurationPtr;
 typedef std::vector<ImageRecordingConfigurationPtr> SharedImageRecordingConfiguration;

@@ -100,7 +100,7 @@ void PlaybackTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 		Edit_GetText(GetDlgItem(m_hWnd, IDC_FILE_PATH_EDIT_BOX), inputFolder.GetBuffer(MAX_PATH), MAX_PATH);
 
 		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-			auto fullPath = RecordingConfiguration::getFullRecordingPathForCloudType(static_cast<RecordCloudType>(i), inputFolder, timeStampFolderNameBuffer);
+			auto fullPath = RecordingConfiguration::getFullRecordingPathForCloudType(static_cast<RecordCloudType>(i), inputFolder, timeStampFolderNameBuffer,KinectV2);
 			m_playbackConfiguration[i]->setFullFilePath(fullPath);
 		}
 
@@ -237,7 +237,7 @@ void PlaybackTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		WCHAR szDir[MAX_PATH];
 		if (WindowsAppDialogHelper::openDirectoryDialog(szDir, m_hWnd)){
 			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-				auto fullPath = RecordingConfiguration::getFullRecordingPathForCloudType(static_cast<RecordCloudType>(i), szDir, "");
+				auto fullPath = RecordingConfiguration::getFullRecordingPathForCloudType(static_cast<RecordCloudType>(i), szDir, "",KinectV2);
 				m_playbackConfiguration[i]->setFullFilePath(fullPath);
 			}
 			DlgDirList(m_hWnd,

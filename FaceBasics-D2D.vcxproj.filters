@@ -101,6 +101,9 @@
     <ClCompile Include="NuiSensorChooser\NuiImageBuffer.cpp">
       <Filter>NuiSensorChooser</Filter>
     </ClCompile>
+    <ClCompile Include="KinectV1OutputStreamUpdater.cpp">
+      <Filter>KinectV1</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ImageRenderer.h">
@@ -219,6 +222,9 @@
     </ClInclude>
     <ClInclude Include="NuiSensorChooser\NuiImageBuffer.h">
       <Filter>NuiSensorChooser</Filter>
+    </ClInclude>
+    <ClInclude Include="KinectV1OutputStreamUpdater.h">
+      <Filter>KinectV1</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

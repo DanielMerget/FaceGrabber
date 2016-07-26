@@ -14,6 +14,8 @@
 #include "NuiSensorChooserUI.h"
 #include "NuiImageBuffer.h"
 #include "KinectV1Controller.h"
+#include "KinectV1OutputStreamUpdater.h"
+#include "IImageREcordingConfiguration.h"
 
 //#include "WindowsApplication.h"
 
@@ -79,7 +81,9 @@ public:
 		m_commonConfiguration = commonConfiguration;
 	}
 
-	void showOptUpdated(RecordingShowOpt showOpt);
+	void showOptUpdated(KinectV1ImageRecordType showOpt);
+
+
 	void showResolutionUpdated(int showResolution);
 
 	void showcolorResolutionUpdated(v1ColorType showResolution);
@@ -109,6 +113,21 @@ public:
 	HANDLE getCorlorFrameEvent();
 
 	HANDLE getDepthFrameEvent();
+
+	void setOutPutStreamUpdater(std::shared_ptr<KinectV1OutPutStreamUpdater> KinectV1OutPutStreamUpdater);
+
+	LARGE_INTEGER getLastColorFrameStamp();
+	LARGE_INTEGER getLastDepthFrameStamp();
+
+	void updateWriter();
+
+	void recordingResolutionUpdated(KinectV1ImageRecordType opt,int showResolution);
+
+
+	UINT getDepthFrameFPS();
+	UINT getColorFrameFPS();
+
+	void setLimitedFPS(int fps);
 
 private:
     
@@ -167,7 +186,7 @@ private:
     HRESULT                 CreateFirstConnected();
 
  
-
+	void getRawDepthData(const BYTE* srcpImage, UINT size, USHORT* depthpImage, int width, int height);
 
 
     void                 AlignDepthToColorSpace();
@@ -213,7 +232,7 @@ private:
 
 	NUI_IMAGE_RESOLUTION		m_showResolution;
 
-	RecordingShowOpt			m_showOpt;
+	KinectV1ImageRecordType			m_showOpt;
 
 	HWND m_hWnd; 
 
@@ -228,4 +247,19 @@ private:
     UINT                m_depthFrameCount;
     UINT                m_lastDepthFrameCount;
     DWORD               m_lastDepthTick;
+
+	bool				m_colorFrameArrived;
+	bool				m_depthFrameArrived;
+
+	std::shared_ptr<KinectV1OutPutStreamUpdater> m_outPutStreamUpdater;
+
+	LARGE_INTEGER		m_LastColorTimeStamp;
+	LARGE_INTEGER		m_LastDepthTimeStamp;
+
+	/** \brief	FPS Limit. */
+	int					m_FPSLimit;
+
+	
+	bool  ifDumpColorFrame(NUI_IMAGE_FRAME *frame);
+	bool  ifDumpDepthFrame(NUI_IMAGE_FRAME *frame);
 };

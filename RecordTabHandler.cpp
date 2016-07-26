@@ -9,7 +9,7 @@ RecordTabHandler::RecordTabHandler() :
 	m_colorEnabled(true),
 	m_centerEnabled(false),
 	m_isRecording(false),
-	m_KinectEnableOpt(3)
+	m_KinectEnableOpt(NoneEnable)
 {
 }
 
@@ -32,6 +32,13 @@ void RecordTabHandler::setSharedImageRecordingConfiguration(SharedImageRecording
 {
 	m_imageRecordingConfiguration = imageRecordingConfiguration;
 }
+
+void RecordTabHandler::setSharedImageRecordingConfigurationForKinectV1(SharedImageRecordingConfiguration imageRecordingConfiguration)
+{
+	m_imageRecordingConfigurationForKinectV1 = imageRecordingConfiguration;
+}
+
+
 
 void RecordTabHandler::setSharedStringStringRecordingConfiguration(SharedStringFileRecordingConfiguration stringFileRecordingConfiguration)
 {
@@ -162,69 +169,84 @@ void RecordTabHandler::movieShowOptWindosOfV1()
 					recordingOPTV2Rect.left-tabRecord.left,
 					recordingOPTV2Rect.top-tabRecord.top,
 					recordingOPTV2Rect.right - recordingOPTV2Rect.left,
-					(recordingOPTV1Rect.bottom - recordingOPTV1Rect.top)*2/3,
+					(recordingOPTV1Rect.bottom - recordingOPTV1Rect.top),
 					TRUE);
 
-	RECT tmpRect_CIG;
+	
+	/*
 	HWND v1ColorInfGroup = GetDlgItem(m_hWnd, IDC_STATIC_COLOR_INF_V);
 	GetWindowRect(v1ColorInfGroup, &tmpRect_CIG);
-			/* show opt group*/
+			
 	MoveWindow(v1ColorInfGroup,
 		recordingOPTV2Rect.left-tabRecord.left+tmpRect_CIG.left-recordingOPTV1Rect.left,
 		recordingOPTV2Rect.top-tabRecord.top+tmpRect_CIG.top-recordingOPTV1Rect.top,
 					tmpRect_CIG.right - tmpRect_CIG.left,
 					tmpRect_CIG.bottom - tmpRect_CIG.top,
 					TRUE);
+	*/
 
-	HWND v1Color = GetDlgItem(m_hWnd, IDC_V1_RECORD_COLOR_CHECK);
-	GetWindowRect(v1Color, &tmpRect);
+	RECT tmpRect_color;
+	HWND v1Color = GetDlgItem(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK);
+	GetWindowRect(v1Color, &tmpRect_color);
 			/* show opt group*/
 	MoveWindow(v1Color,
-		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left,
-		recordingOPTV2Rect.top-tabRecord.top+tmpRect.top-recordingOPTV1Rect.top,
-					tmpRect.right - tmpRect.left,
-					tmpRect.bottom - tmpRect.top,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect_color.left-recordingOPTV1Rect.left,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect_color.top-recordingOPTV1Rect.top,
+					tmpRect_color.right - tmpRect_color.left,
+					tmpRect_color.bottom - tmpRect_color.top,
 					TRUE);
 
 	
 
-	RECT tmpRect_Infrared;
-	HWND v1Infrared = GetDlgItem(m_hWnd, IDC_V1_RECORD_INFRARED_CHECK);
-	GetWindowRect(v1Infrared, &tmpRect_Infrared);
-			
-	MoveWindow(v1Infrared,
-		recordingOPTV2Rect.left-tabRecord.left+tmpRect_Infrared.left-recordingOPTV1Rect.left,
-		recordingOPTV2Rect.top-tabRecord.top+tmpRect_Infrared.top-recordingOPTV1Rect.top,
-					tmpRect_Infrared.right - tmpRect_Infrared.left,
-					tmpRect_Infrared.bottom - tmpRect_Infrared.top,
-					TRUE);
-	
 
 	//IDC_V1_RECORD_DEPTH_CHECK
+	RECT tmpRect_depth;
 	HWND v1Depth = GetDlgItem(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK);
-	GetWindowRect(v1Depth, &tmpRect);
+	GetWindowRect(v1Depth, &tmpRect_depth);
 			/* show opt group*/
 	MoveWindow(v1Depth,
-		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left + tmpRect_CIG.right - tmpRect_CIG.left+10,
-		recordingOPTV2Rect.top-tabRecord.top+tmpRect.top-recordingOPTV1Rect.top - tmpRect.top + tmpRect_Infrared.top,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect_depth.left-recordingOPTV1Rect.left,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect_depth.top-recordingOPTV1Rect.top,
+					tmpRect_depth.right - tmpRect_depth.left,
+					tmpRect_depth.bottom - tmpRect_depth.top,
+					TRUE);
+
+
+	HWND v1ColrCombox = GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO);
+	GetWindowRect(v1ColrCombox, &tmpRect);
+			/* show opt group*/
+	MoveWindow(v1ColrCombox,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect_color.top-recordingOPTV1Rect.top,
 					tmpRect.right - tmpRect.left,
 					tmpRect.bottom - tmpRect.top,
 					TRUE);
+	
+	HWND v1DepthCombox = GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO);
+	GetWindowRect(v1DepthCombox, &tmpRect);
+			/* show opt group*/
+	MoveWindow(v1DepthCombox,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect_depth.top-recordingOPTV1Rect.top+20,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);
+
 
 		//IDC_V1_RECORD_DEPTH_CHECK
 	HWND v1Aligned = GetDlgItem(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX);
 	GetWindowRect(v1Aligned, &tmpRect);
 			/* show opt group*/
 	MoveWindow(v1Aligned,
-		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left + tmpRect_CIG.right - tmpRect_CIG.left+10,
-		recordingOPTV2Rect.top-tabRecord.top+tmpRect.top-recordingOPTV1Rect.top - tmpRect.top + tmpRect_Infrared.top,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect.top-recordingOPTV1Rect.top,
 					tmpRect.right - tmpRect.left,
 					tmpRect.bottom - tmpRect.top,
 					TRUE);
 }
 void RecordTabHandler::onCreate()
 {
-
+	/*
 	//preset the edit boxes with the values of the model objects
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_HDFACE_EDIT_BOX),			m_recordingConfiguration[    HDFace	   ]->getFileNameCString());
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_FACE_RAW_EDIT_BOX),			m_recordingConfiguration[   FaceRaw	   ]->getFileNameCString());
@@ -236,7 +258,7 @@ void RecordTabHandler::onCreate()
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_KINECT_INFRARED_EDIT_BOX), m_imageRecordingConfiguration[KinectInfrared]->getFileNameCString());
 
 	Edit_SetText(GetDlgItem(m_hWnd, IDC_KINECT_KEYPOINTS_EDIT_BOX), m_KeyPointsRecordingConfiguration[FiveKeyPoints]->getFileNameCString());
-
+	*/
 	CheckDlgButton(m_hWnd, IDC_RECORD_COLOR, m_colorEnabled);
 	CheckDlgButton(m_hWnd, IDC_CENTER_CLOUDS, m_centerEnabled);
 
@@ -262,7 +284,7 @@ void RecordTabHandler::onCreate()
 	
 	HWND kinectShowOptComboBox = GetDlgItem(m_hWnd, IDC_COMBO_BOX_SHOW_OPT);
 	
-	if(m_KinectEnableOpt == 1)
+	if(m_KinectEnableOpt == OnlyKinectV1Enabled)
 	{
 		
 		movieShowOptWindosOfV1();
@@ -295,10 +317,7 @@ void RecordTabHandler::onCreate()
 		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_V1_ENABLE_CHECK), SW_HIDE);
 		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_V2_ENABLE_CHECK), SW_HIDE);
 			
-		CheckDlgButton(m_hWnd, IDC_V1_COLOR_SHOW_RADIO, true);
 
-		
-		//CheckDlgButton(m_hWnd, IDC_V1_R640X480_RADIO, true);
 		HWND v1ShowTypeComboBox = GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO);
 		
 		for (int i = 0; i < V1_COLOR_TYPE_COUNT; i++){
@@ -309,11 +328,41 @@ void RecordTabHandler::onCreate()
 			//ComboBox_ResetContent
 		}
 
+
+		CheckDlgButton(m_hWnd, IDC_V1_COLOR_SHOW_RADIO, true);
+
+		
+		
+		HWND v1RecordingColorTypeComboBox = GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO);
+		
+		for (int i = 0; i < V1_COLOR_TYPE_COUNT; i++){
+			CString colorType = KinectV1Controller::getColorTypeAsString(static_cast<v1ColorType>( i));
+			ComboBox_AddString(v1RecordingColorTypeComboBox, colorType);
+			if(i==0)
+				ComboBox_SetCurSel(v1RecordingColorTypeComboBox, 0);
+			//ComboBox_ResetContent
+		}
+
+		ComboBox_Enable(v1RecordingColorTypeComboBox, false);
+		
+
+		HWND v1RecordingDepthTypeComboBox = GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO);
+		
+		for (int i = 0; i < V1_DEPTH_TYPE_COUNT; i++){
+			CString depthType = KinectV1Controller::getDepthTypeAsString(static_cast<v1DepthType>( i));
+			ComboBox_AddString(v1RecordingDepthTypeComboBox, depthType);
+			if(i==0)
+				ComboBox_SetCurSel(v1RecordingDepthTypeComboBox, 0);
+			//ComboBox_ResetContent
+		}
+		
+		ComboBox_Enable(v1RecordingDepthTypeComboBox, false);
+
 		
 		
 
 	}
-	else if (m_KinectEnableOpt == 0)
+	else if (m_KinectEnableOpt == OnlyKinectV2Enabled)
 	{
 		ShowWindow(GetDlgItem(m_hWnd, IDC_GROUP_SHOW_OPT2), SW_HIDE);
 		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_STATIC), SW_HIDE);
@@ -324,9 +373,10 @@ void RecordTabHandler::onCreate()
 		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_R640X480_RADIO), SW_HIDE);
 		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_R320X240_RADIO), SW_HIDE);
 		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_OPT_V1), SW_HIDE);
-		ShowWindow(GetDlgItem(m_hWnd, IDC_STATIC_COLOR_INF_V), SW_HIDE);
-		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_RECORD_COLOR_CHECK), SW_HIDE);
-		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_RECORD_INFRARED_CHECK), SW_HIDE);
+		//ShowWindow(GetDlgItem(m_hWnd, IDC_STATIC_COLOR_INF_V), SW_HIDE);
+		//ShowWindow(GetDlgItem(m_hWnd, IDC_V1_RECORD_COLOR_CHECK), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK), SW_HIDE);
+		//ShowWindow(GetDlgItem(m_hWnd, IDC_V1_RECORD_INFRARED_CHECK), SW_HIDE);
 		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK), SW_HIDE);
 		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX), SW_HIDE);
 
@@ -334,13 +384,11 @@ void RecordTabHandler::onCreate()
 		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_V2_ENABLE_CHECK), SW_HIDE);
 
 	}
-	else 
+	
+	else if(m_KinectEnableOpt == BothKinectEnabled)
 	{
-		CheckDlgButton(m_hWnd, IDC_V1_COLOR_SHOW_RADIO, true);
 
-		
-		//CheckDlgButton(m_hWnd, IDC_V1_R640X480_RADIO, true);
-
+				//CheckDlgButton(m_hWnd, IDC_V1_R640X480_RADIO, true);
 		HWND v1ShowTypeComboBox = GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO);
 		
 		for (int i = 0; i < V1_COLOR_TYPE_COUNT; i++){
@@ -350,6 +398,39 @@ void RecordTabHandler::onCreate()
 				ComboBox_SetCurSel(v1ShowTypeComboBox, 0);
 			//ComboBox_ResetContent
 		}
+
+
+		CheckDlgButton(m_hWnd, IDC_V1_COLOR_SHOW_RADIO, true);
+
+		
+		
+		HWND v1RecordingColorTypeComboBox = GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO);
+		
+		for (int i = 0; i < V1_COLOR_TYPE_COUNT; i++){
+			CString colorType = KinectV1Controller::getColorTypeAsString(static_cast<v1ColorType>( i));
+			ComboBox_AddString(v1RecordingColorTypeComboBox, colorType);
+			if(i==0)
+				ComboBox_SetCurSel(v1RecordingColorTypeComboBox, 0);
+			//ComboBox_ResetContent
+		}
+
+		ComboBox_Enable(v1RecordingColorTypeComboBox, false);
+		
+
+		HWND v1RecordingDepthTypeComboBox = GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO);
+		
+		for (int i = 0; i < V1_DEPTH_TYPE_COUNT; i++){
+			CString depthType = KinectV1Controller::getDepthTypeAsString(static_cast<v1DepthType>( i));
+			ComboBox_AddString(v1RecordingDepthTypeComboBox, depthType);
+			if(i==0)
+				ComboBox_SetCurSel(v1RecordingDepthTypeComboBox, 0);
+			//ComboBox_ResetContent
+		}
+		
+		ComboBox_Enable(v1RecordingDepthTypeComboBox, false);
+		//Edit_Enable(v1RecordingDepthTypeComboBox,false);
+
+
 	}
 	
 	for (int i = 0; i < RECORD_SHOW_OPT_COUNT; i++){
@@ -397,6 +478,32 @@ void RecordTabHandler::onCreate()
 
 		}
 	}
+	if(m_KinectEnableOpt == OnlyKinectV2Enabled )
+	{
+		m_imageRecordingConfiguration[KinectColorRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(0));
+		m_imageRecordingConfiguration[KinectDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(0));
+		m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(0));
+		m_imageRecordingConfiguration[KinectInfrared]->setFileFormat(static_cast<ImageRecordingFileFormat>(0));
+		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setFileFormat(static_cast<StringFileRecordingFileFormat>(0));
+	}
+	else if(m_KinectEnableOpt == OnlyKinectV1Enabled)
+	{
+		m_imageRecordingConfigurationForKinectV1[KinectColorRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(0));
+		m_imageRecordingConfigurationForKinectV1[KinectDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(0));
+	}
+	else if(m_KinectEnableOpt == BothKinectEnabled)
+	{
+		m_imageRecordingConfiguration[KinectColorRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(0));
+		m_imageRecordingConfiguration[KinectDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(0));
+		m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(0));
+		m_imageRecordingConfiguration[KinectInfrared]->setFileFormat(static_cast<ImageRecordingFileFormat>(0));
+		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setFileFormat(static_cast<StringFileRecordingFileFormat>(0));
+
+		m_imageRecordingConfigurationForKinectV1[KinectColorRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(0));
+		m_imageRecordingConfigurationForKinectV1[KinectDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(0));
+	}
+		
+
 
 	for (int i = 0; i < STRING_FILE_RECORD_FILE_FORMAT_COUNT; i++){
 		CString fileFormatName = StringFileRecordingConfiguration::getFileFormatAsString(static_cast<StringFileRecordingFileFormat>(i));
@@ -438,6 +545,7 @@ void RecordTabHandler::onCreate()
 		ComboBox_AddString(allComboboxThreads, counter);
 		
 	}
+	/*
 	ComboBox_SetCurSel(hdFaceComboBoxThreads,			m_recordingConfiguration[HDFace]->getThreadCountToStart() - 1);
 	ComboBox_SetCurSel(facerawDepthComboBoxThreads,		m_recordingConfiguration[FaceRaw]->getThreadCountToStart() - 1);
 	ComboBox_SetCurSel(fullRawDepthComboboxThreads,		m_recordingConfiguration[FullDepthRaw]->getThreadCountToStart() - 1);
@@ -448,10 +556,10 @@ void RecordTabHandler::onCreate()
 	ComboBox_SetCurSel(kinectInfraredComboboxThreads,	m_imageRecordingConfiguration[KinectInfrared]->getThreadCountToStart() - 1);
 	ComboBox_SetCurSel(kinectKeyPointsComboboxThreads,	m_KeyPointsRecordingConfiguration[FiveKeyPoints]->getThreadCountToStart() - 1);
 
-
+	
 	ComboBox_SetCurSel(allComboboxThreads,			m_recordingConfiguration[HDFace]->getThreadCountToStart() - 1);
-
-
+	*/
+	ComboBox_SetCurSel(allComboboxThreads,1); //
 	CheckDlgButton(m_hWnd, HD_FACE_SHOW_RADIO, true);
 	m_commonConfiguration[KinectV2_COMMON]->setFacePointsShowOpt(FacePointsShowOpt::HDFacePoints_Opt);
 
@@ -540,13 +648,16 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 	switch (LOWORD(wParam))
 	{
 	case IDC_3D_POINTS_CLOUDS_FORMAT_COMBOX:
-		m_recordingConfiguration[HDFace]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
-		m_recordingConfiguration[FaceRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
-		m_recordingConfiguration[HDFace2D]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
-		m_recordingConfiguration[FullDepthRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+		if(m_KinectEnableOpt == OnlyKinectV2Enabled || m_KinectEnableOpt == BothKinectEnabled)
+		{
+			m_recordingConfiguration[HDFace]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+			m_recordingConfiguration[FaceRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+			m_recordingConfiguration[HDFace2D]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+			m_recordingConfiguration[FullDepthRaw]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
+		}
 		break;
 
-
+	/*
 	case IDC_HD_FACE_COMBO_BOX:
 		m_recordingConfiguration[HDFace]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
 		break;
@@ -559,15 +670,35 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 	case IDC_HD_FACE_2D_COMBO_BOX:
 		m_recordingConfiguration[HDFace2D]->setFileFormat(static_cast<RecordingFileFormat>(currentSelection));
 		break;
-
+	*/
 	case IDC_IMAGE_FORMAT_COMBO:
-		m_imageRecordingConfiguration[KinectColorRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
-		m_imageRecordingConfiguration[KinectDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
-		m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
-		m_imageRecordingConfiguration[KinectInfrared]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
-		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setFileFormat(static_cast<StringFileRecordingFileFormat>(currentSelection));
+		if(m_KinectEnableOpt == OnlyKinectV2Enabled  )
+		{
+			m_imageRecordingConfiguration[KinectColorRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
+			m_imageRecordingConfiguration[KinectDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
+			m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
+			m_imageRecordingConfiguration[KinectInfrared]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
+			m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setFileFormat(static_cast<StringFileRecordingFileFormat>(currentSelection));
+		}
+		else if(m_KinectEnableOpt == OnlyKinectV1Enabled)
+		{
+			m_imageRecordingConfigurationForKinectV1[KinectColorRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
+			m_imageRecordingConfigurationForKinectV1[KinectDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
+		}
+		else if(m_KinectEnableOpt == BothKinectEnabled)
+		{
+			m_imageRecordingConfiguration[KinectColorRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
+			m_imageRecordingConfiguration[KinectDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
+			m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
+			m_imageRecordingConfiguration[KinectInfrared]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
+			m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setFileFormat(static_cast<StringFileRecordingFileFormat>(currentSelection));
+
+			m_imageRecordingConfigurationForKinectV1[KinectColorRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
+			m_imageRecordingConfigurationForKinectV1[KinectDepthRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
+		}
 		break;
 
+		/*
 	case IDC_KINECT_RAW_COLOR_COMBO_BOX:
 		m_imageRecordingConfiguration[KinectColorRaw]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
 		break;
@@ -580,25 +711,57 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 	case IDC_KINECT_INFRARED_COMBO_BOX:
 		m_imageRecordingConfiguration[KinectInfrared]->setFileFormat(static_cast<ImageRecordingFileFormat>(currentSelection));
 		break;
-
+		*/
 	case IDC_KP_FORMAT:
-		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setFileFormat(static_cast<StringFileRecordingFileFormat>(currentSelection));
+		if(m_KinectEnableOpt == OnlyKinectV2Enabled || m_KinectEnableOpt == BothKinectEnabled)
+		{
+			m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setFileFormat(static_cast<StringFileRecordingFileFormat>(currentSelection));
+		}
 		break;
 
+		/*
 	case IDC_KINECT_KEYPOINTS_COMBO_BOX:
-		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setFileFormat(static_cast<StringFileRecordingFileFormat>(currentSelection));
+		if(m_KinectEnableOpt == OnlyKinectV2Enabled || m_KinectEnableOpt == BothKinectEnabled)
+		{
+			m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setFileFormat(static_cast<StringFileRecordingFileFormat>(currentSelection));
+		}
 		break;
-		
+		*/
 	case IDC_ALL_COM_BOX_THREADS:
-		m_recordingConfiguration[HDFace]->setThreadCountToStart(currentSelection+1);
-		m_recordingConfiguration[FaceRaw]->setThreadCountToStart(currentSelection + 1);
-		m_recordingConfiguration[FullDepthRaw]->setThreadCountToStart(currentSelection+1);
-		m_recordingConfiguration[HDFace2D]->setThreadCountToStart(currentSelection + 1);
-		m_imageRecordingConfiguration[KinectColorRaw]->setThreadCountToStart(currentSelection + 1);
-		m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setThreadCountToStart(currentSelection + 1);
-		m_imageRecordingConfiguration[KinectInfrared]->setThreadCountToStart(currentSelection + 1);
-		m_imageRecordingConfiguration[KinectInfrared]->setThreadCountToStart(currentSelection + 1);
-		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setThreadCountToStart(currentSelection + 1);
+		if(m_KinectEnableOpt == OnlyKinectV2Enabled)
+		{
+			m_recordingConfiguration[HDFace]->setThreadCountToStart(currentSelection+1);
+			m_recordingConfiguration[FaceRaw]->setThreadCountToStart(currentSelection + 1);
+			m_recordingConfiguration[FullDepthRaw]->setThreadCountToStart(currentSelection+1);
+			m_recordingConfiguration[HDFace2D]->setThreadCountToStart(currentSelection + 1);
+			m_imageRecordingConfiguration[KinectColorRaw]->setThreadCountToStart(currentSelection + 1);
+			m_imageRecordingConfiguration[KinectDepthRaw]->setThreadCountToStart(currentSelection + 1);
+			m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setThreadCountToStart(currentSelection + 1);
+			m_imageRecordingConfiguration[KinectInfrared]->setThreadCountToStart(currentSelection + 1);
+			m_imageRecordingConfiguration[KinectInfrared]->setThreadCountToStart(currentSelection + 1);
+			m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setThreadCountToStart(currentSelection + 1);
+		}
+		else if(m_KinectEnableOpt == OnlyKinectV1Enabled)
+		{
+			m_imageRecordingConfigurationForKinectV1[KinectColorRaw]->setThreadCountToStart(currentSelection + 1);
+			m_imageRecordingConfigurationForKinectV1[KinectDepthRaw]->setThreadCountToStart(currentSelection + 1);
+		}
+		else if(m_KinectEnableOpt == BothKinectEnabled)
+		{
+						m_recordingConfiguration[HDFace]->setThreadCountToStart(currentSelection+1);
+			m_recordingConfiguration[FaceRaw]->setThreadCountToStart(currentSelection + 1);
+			m_recordingConfiguration[FullDepthRaw]->setThreadCountToStart(currentSelection+1);
+			m_recordingConfiguration[HDFace2D]->setThreadCountToStart(currentSelection + 1);
+			m_imageRecordingConfiguration[KinectColorRaw]->setThreadCountToStart(currentSelection + 1);
+			m_imageRecordingConfiguration[KinectDepthRaw]->setThreadCountToStart(currentSelection + 1);
+			m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setThreadCountToStart(currentSelection + 1);
+			m_imageRecordingConfiguration[KinectInfrared]->setThreadCountToStart(currentSelection + 1);
+			m_imageRecordingConfiguration[KinectInfrared]->setThreadCountToStart(currentSelection + 1);
+			m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setThreadCountToStart(currentSelection + 1);
+						
+			m_imageRecordingConfigurationForKinectV1[KinectColorRaw]->setThreadCountToStart(currentSelection + 1);
+			m_imageRecordingConfigurationForKinectV1[KinectDepthRaw]->setThreadCountToStart(currentSelection + 1);
+		}
 		break;
 
 	case IDC_HD_FACE_COMBO_BOX_THREADS:
@@ -613,6 +776,7 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 	case IDC_HD_FACE_2D_COMBO_BOX_THREADS:
 		m_recordingConfiguration[HDFace2D]->setThreadCountToStart(currentSelection + 1);
 		break;
+		/*
 	case IDC_KINECT_RAW_COLOR_COMBO_BOX_THREADS:
 		m_imageRecordingConfiguration[KinectColorRaw]->setThreadCountToStart(currentSelection + 1);
 		break;
@@ -628,11 +792,18 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 	case IDC_KINECT_KEYPOINTS_COMBO_BOX_THREADS:
 		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setThreadCountToStart(currentSelection + 1);
 		break;
+		*/
 	case IDC_COMBO_BOX_SHOW_OPT:
 		m_commonConfiguration[KinectV2_COMMON]->setShowOpt(static_cast<RecordingShowOpt>(currentSelection));
 		break;
 	case IDC_V1_SHOW_TYPE_COMBO:
 		v1ShowResolutionChanged(currentSelection);
+		break;
+	case IDC_V1_COLOR_RECORDING_TYPE_COMBO:
+		v1RecordingResolutionChanged(KinectV1ColorRaw,currentSelection);
+		break;
+	case IDC_V1_DEPTH_RECORDING_TYPE_COMBO:
+		v1RecordingResolutionChanged(KinectV1DepthRaw,currentSelection);
 		break;
 	default:break;
 	}
@@ -643,13 +814,41 @@ void RecordTabHandler::checkRecordingConfigurationPossible()
 {
 	bool oneEnabled = false;
 	bool allValid = true;
-	for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-		oneEnabled |=	m_recordingConfiguration[i]->isEnabled();
-		allValid &=		m_recordingConfiguration[i]->isRecordConfigurationValid();
+	if(m_KinectEnableOpt == OnlyKinectV2Enabled )
+	{
+		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+			oneEnabled |=	m_recordingConfiguration[i]->isEnabled();
+			allValid &=		m_recordingConfiguration[i]->isRecordConfigurationValid();
+		}
+		for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+			oneEnabled |= m_imageRecordingConfiguration[i]->isEnabled();
+			allValid &= m_imageRecordingConfiguration[i]->isRecordConfigurationValid();
+		}
+
+
 	}
-	for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
-		oneEnabled |= m_imageRecordingConfiguration[i]->isEnabled();
-		allValid &= m_imageRecordingConfiguration[i]->isRecordConfigurationValid();
+	else if(m_KinectEnableOpt == OnlyKinectV1Enabled)
+	{
+		for (int i = 0; i < V1_IMAGE_RECORD_TYPE_COUNT; i++){
+			oneEnabled |= m_imageRecordingConfigurationForKinectV1[i]->isEnabled();
+			allValid &= m_imageRecordingConfigurationForKinectV1[i]->isRecordConfigurationValid();
+		}
+	}
+	else
+	{
+		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+			oneEnabled |=	m_recordingConfiguration[i]->isEnabled();
+			allValid &=		m_recordingConfiguration[i]->isRecordConfigurationValid();
+		}
+		for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+			oneEnabled |= m_imageRecordingConfiguration[i]->isEnabled();
+			allValid &= m_imageRecordingConfiguration[i]->isRecordConfigurationValid();
+		}
+
+		for (int i = 0; i < V1_IMAGE_RECORD_TYPE_COUNT; i++){
+			oneEnabled |= m_imageRecordingConfigurationForKinectV1[i]->isEnabled();
+			allValid &= m_imageRecordingConfigurationForKinectV1[i]->isRecordConfigurationValid();
+		}
 	}
 
 	if (!oneEnabled || !allValid){
@@ -658,7 +857,6 @@ void RecordTabHandler::checkRecordingConfigurationPossible()
 	else{
 		Button_Enable(GetDlgItem(m_hWnd, IDC_RECORD_BUTTON), true);
 	}
-
 }
 
 CString getRecordTimeStamp()
@@ -683,35 +881,89 @@ void RecordTabHandler::setupRecording()
 {
 	//set the full recording path & timestamp
 	auto timeStamp = getRecordTimeStamp();
-	for (auto& recordConfig : m_recordingConfiguration){
-		recordConfig->setTimeStampFolderName(timeStamp);
-		if (recordConfig->isEnabled()){
-			auto fullRecordingPath = recordConfig->getFullRecordingPath();
-			SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
+	if(m_KinectEnableOpt == OnlyKinectV2Enabled )
+	{
+		for (auto& recordConfig : m_recordingConfiguration){
+			recordConfig->setTimeStampFolderName(timeStamp);
+			if (recordConfig->isEnabled()){
+				auto fullRecordingPath = recordConfig->getFullRecordingPath();
+				SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
+			}
+		}
+
+		for (auto& recordConfig : m_imageRecordingConfiguration){
+			recordConfig->setTimeStampFolderName(timeStamp);
+			if (recordConfig->isEnabled()){
+				auto fullRecordingPath = recordConfig->getFullRecordingPath();
+				SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
+			}
+		}
+
+		for (auto& recordConfig : m_KeyPointsRecordingConfiguration){
+			recordConfig->setTimeStampFolderName(timeStamp);
+			if (recordConfig->isEnabled()){
+				auto fullRecordingPath = recordConfig->getFullRecordingPath();
+				SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
+			}
+		}
+
+
+	}
+	else if(m_KinectEnableOpt == OnlyKinectV1Enabled)
+	{
+		for (auto& recordConfig : m_imageRecordingConfigurationForKinectV1){
+			recordConfig->setTimeStampFolderName(timeStamp);
+			if (recordConfig->isEnabled()){
+				auto fullRecordingPath = recordConfig->getFullRecordingPath();
+				SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
+			}
+		}
+	}
+	else 
+	{
+			for (auto& recordConfig : m_recordingConfiguration){
+			recordConfig->setTimeStampFolderName(timeStamp);
+			if (recordConfig->isEnabled()){
+				auto fullRecordingPath = recordConfig->getFullRecordingPath();
+				SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
+			}
+		}
+
+		for (auto& recordConfig : m_imageRecordingConfiguration){
+			recordConfig->setTimeStampFolderName(timeStamp);
+			if (recordConfig->isEnabled()){
+				auto fullRecordingPath = recordConfig->getFullRecordingPath();
+				SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
+			}
+		}
+
+		for (auto& recordConfig : m_KeyPointsRecordingConfiguration){
+			recordConfig->setTimeStampFolderName(timeStamp);
+			if (recordConfig->isEnabled()){
+				auto fullRecordingPath = recordConfig->getFullRecordingPath();
+				SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
+			}
+		}
+				
+		for (auto& recordConfig : m_imageRecordingConfigurationForKinectV1){
+			recordConfig->setTimeStampFolderName(timeStamp);
+			if (recordConfig->isEnabled()){
+				auto fullRecordingPath = recordConfig->getFullRecordingPath();
+				SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
+			}
 		}
 	}
 
-	for (auto& recordConfig : m_imageRecordingConfiguration){
-		recordConfig->setTimeStampFolderName(timeStamp);
-		if (recordConfig->isEnabled()){
-			auto fullRecordingPath = recordConfig->getFullRecordingPath();
-			SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
-		}
-	}
 
-	for (auto& recordConfig : m_KeyPointsRecordingConfiguration){
-		recordConfig->setTimeStampFolderName(timeStamp);
-		if (recordConfig->isEnabled()){
-			auto fullRecordingPath = recordConfig->getFullRecordingPath();
-			SHCreateDirectoryEx(m_hWnd, fullRecordingPath, NULL);
-		}
-	}
 }
 
+//void RecordTabHandler::recordingStopped()
 void RecordTabHandler::recordingStopped()
 {
 	SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Record");
 	m_isRecording = false;
+	// bug should be fixed, thinking.... ... here should  disconnect all slots of image updater
+	//stopWriting(m_colorEnabled, m_recordingConfiguration, m_imageRecordingConfiguration,m_KeyPointsRecordingConfiguration,m_imageRecordingConfigurationForKinectV1);
 }
 
 void RecordTabHandler::setRecording(bool enable)
@@ -724,11 +976,11 @@ void RecordTabHandler::setRecording(bool enable)
 	
 	if (enable){
 		setupRecording();
-		startWriting(m_colorEnabled, m_recordingConfiguration, m_imageRecordingConfiguration,m_KeyPointsRecordingConfiguration);
+		startWriting(m_colorEnabled, m_recordingConfiguration, m_imageRecordingConfiguration,m_KeyPointsRecordingConfiguration,m_imageRecordingConfigurationForKinectV1);
 		SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Stop");
 	}
 	else{
-		stopWriting(m_colorEnabled, m_recordingConfiguration, m_imageRecordingConfiguration,m_KeyPointsRecordingConfiguration);
+		stopWriting(m_colorEnabled, m_recordingConfiguration, m_imageRecordingConfiguration,m_KeyPointsRecordingConfiguration,m_imageRecordingConfigurationForKinectV1);
 	}	
 }
 
@@ -758,17 +1010,44 @@ void RecordTabHandler::updateFrameLimit()
 		Edit_GetText(editBoxHandle, buffer.data(), buffer.size());
 		limitAsInt = _tstoi(buffer.data());
 	}
+	if(m_KinectEnableOpt == OnlyKinectV2Enabled )
+	{
+		//store the limit in each config
+		for (auto recordConfig : m_recordingConfiguration){
+			recordConfig->setMaxNumberOfFrames(limitAsInt);
+		}
+		for (auto recordConfig : m_imageRecordingConfiguration){
+			recordConfig->setMaxNumberOfFrames(limitAsInt);
+		}
 
-	//store the limit in each config
-	for (auto recordConfig : m_recordingConfiguration){
-		recordConfig->setMaxNumberOfFrames(limitAsInt);
+		for (auto recordConfig : m_KeyPointsRecordingConfiguration){
+			recordConfig->setMaxNumberOfFrames(limitAsInt);
+		}
 	}
-	for (auto recordConfig : m_imageRecordingConfiguration){
-		recordConfig->setMaxNumberOfFrames(limitAsInt);
+	else if(m_KinectEnableOpt == OnlyKinectV1Enabled)
+	{
+		for (auto recordConfig : m_imageRecordingConfigurationForKinectV1){
+			recordConfig->setMaxNumberOfFrames(limitAsInt);
+		}
+
 	}
 
-	for (auto recordConfig : m_KeyPointsRecordingConfiguration){
-		recordConfig->setMaxNumberOfFrames(limitAsInt);
+	else if(m_KinectEnableOpt == BothKinectEnabled)
+	{
+				//store the limit in each config
+		for (auto recordConfig : m_recordingConfiguration){
+			recordConfig->setMaxNumberOfFrames(limitAsInt);
+		}
+		for (auto recordConfig : m_imageRecordingConfiguration){
+			recordConfig->setMaxNumberOfFrames(limitAsInt);
+		}
+
+		for (auto recordConfig : m_KeyPointsRecordingConfiguration){
+			recordConfig->setMaxNumberOfFrames(limitAsInt);
+		}
+		for (auto recordConfig : m_imageRecordingConfigurationForKinectV1){
+			recordConfig->setMaxNumberOfFrames(limitAsInt);
+		}
 	}
 }
 
@@ -814,6 +1093,7 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 	case IDC_LIMIT_FRAMERATE_CHECK:
 		updateFPSLimit();
 		break;
+		
 	case IDC_RAW_COLOR_CHECK:
 		m_imageRecordingConfiguration[KinectColorRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_RAW_COLOR_CHECK));
 		break;
@@ -856,39 +1136,46 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 
 
 	case IDC_RECORDING_OPT_RESET:
+		if(m_KinectEnableOpt == OnlyKinectV2Enabled || m_KinectEnableOpt == BothKinectEnabled)
+		{
+	
+			CheckDlgButton(m_hWnd, IDC_HD2D_CHECK, false);
+			CheckDlgButton(m_hWnd, IDC_HD3D_CHECK, false);
+			CheckDlgButton(m_hWnd, IDC_FACE_RAW_CHECK, false);
+			CheckDlgButton(m_hWnd, IDC_KEY_POINTS_CHECK, false);
+			m_recordingConfiguration[HDFace]->setEnabled(false);
+			m_recordingConfiguration[HDFace2D]->setEnabled(false);
+			m_recordingConfiguration[FaceRaw]->setEnabled(false);
+			m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setEnabled(false);
+
+			CheckDlgButton(m_hWnd, IDC_RAW_COLOR_CHECK, false);
+			m_imageRecordingConfiguration[KinectColorRaw]->setEnabled(false);
 		
-		CheckDlgButton(m_hWnd, IDC_HD2D_CHECK, false);
-		CheckDlgButton(m_hWnd, IDC_HD3D_CHECK, false);
-		CheckDlgButton(m_hWnd, IDC_FACE_RAW_CHECK, false);
-		CheckDlgButton(m_hWnd, IDC_KEY_POINTS_CHECK, false);
-		m_recordingConfiguration[HDFace]->setEnabled(false);
-		m_recordingConfiguration[HDFace2D]->setEnabled(false);
-		m_recordingConfiguration[FaceRaw]->setEnabled(false);
-		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setEnabled(false);
 
-		CheckDlgButton(m_hWnd, IDC_RAW_COLOR_CHECK, false);
-		m_imageRecordingConfiguration[KinectColorRaw]->setEnabled(false);
-		
-
-		CheckDlgButton(m_hWnd, IDC_DEPTH_RAW_CHECK, false);
-		CheckDlgButton(m_hWnd, IDC_ALIGNED_DEPTH_CHECK, false);
-		m_imageRecordingConfiguration[KinectDepthRaw]->setEnabled(false);
-		m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setEnabled(false);
+			CheckDlgButton(m_hWnd, IDC_DEPTH_RAW_CHECK, false);
+			CheckDlgButton(m_hWnd, IDC_ALIGNED_DEPTH_CHECK, false);
+			m_imageRecordingConfiguration[KinectDepthRaw]->setEnabled(false);
+			m_imageRecordingConfiguration[KinectAlignedDepthRaw]->setEnabled(false);
 
 
-		CheckDlgButton(m_hWnd, IDC_INRARED_RAW_CHECK, false);
-		CheckDlgButton(m_hWnd, IDC_ALIGNED_INFRARED_CHECK, false);
-		m_imageRecordingConfiguration[KinectInfrared]->setEnabled(false);
-		m_imageRecordingConfiguration[KinectAlignedInfrared]->setEnabled(false);
+			CheckDlgButton(m_hWnd, IDC_INRARED_RAW_CHECK, false);
+			CheckDlgButton(m_hWnd, IDC_ALIGNED_INFRARED_CHECK, false);
+			m_imageRecordingConfiguration[KinectInfrared]->setEnabled(false);
+			m_imageRecordingConfiguration[KinectAlignedInfrared]->setEnabled(false);
 
-		CheckDlgButton(m_hWnd, IDC_DEPTH_3D_RAW_CHECK, false);
-		m_recordingConfiguration[FullDepthRaw]->setEnabled(false);
+			CheckDlgButton(m_hWnd, IDC_DEPTH_3D_RAW_CHECK, false);
+			m_recordingConfiguration[FullDepthRaw]->setEnabled(false);
+		}
 		break;
 
 		
 	
 	case IDC_KINECT_REMOVE_BG_CHECKBOX:
-		m_commonConfiguration[KinectV2_COMMON]->setKeepBGEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_REMOVE_BG_CHECKBOX));
+		if(m_KinectEnableOpt == OnlyKinectV2Enabled || m_KinectEnableOpt == BothKinectEnabled)
+		{
+	
+			m_commonConfiguration[KinectV2_COMMON]->setKeepBGEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_REMOVE_BG_CHECKBOX));
+		}
 		//m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setPointsEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_KEYPOINTS_CHECKBOX));
 		break;
 
@@ -906,16 +1193,42 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		WCHAR szDir[MAX_PATH];
 		if (WindowsAppDialogHelper::openDirectoryDialog(szDir, m_hWnd)){
 			SetDlgItemText(m_hWnd, IDC_FILE_PATH_EDIT_BOX, szDir);
-			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-				m_recordingConfiguration[i]->setFilePath(szDir);
-			}
-			for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
-				m_imageRecordingConfiguration[i]->setFilePath(szDir);
-			}
+			if(m_KinectEnableOpt == OnlyKinectV2Enabled )
+			{
+				for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+					m_recordingConfiguration[i]->setFilePath(szDir);
+				}
+				for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+					m_imageRecordingConfiguration[i]->setFilePath(szDir);
+				}
 					
-			for (auto recordConfig : m_KeyPointsRecordingConfiguration){
-					recordConfig->setFilePath(szDir);
+				for (auto recordConfig : m_KeyPointsRecordingConfiguration){
+						recordConfig->setFilePath(szDir);
+				}
 			}
+			else if(m_KinectEnableOpt == OnlyKinectV1Enabled )
+			{
+				for (int i = 0; i < V1_IMAGE_RECORD_TYPE_COUNT; i++){
+					m_imageRecordingConfigurationForKinectV1[i]->setFilePath(szDir);
+				}
+			}
+			else if(m_KinectEnableOpt == BothKinectEnabled)
+			{
+				for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+					m_recordingConfiguration[i]->setFilePath(szDir);
+				}
+				for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+					m_imageRecordingConfiguration[i]->setFilePath(szDir);
+				}
+					
+				for (auto recordConfig : m_KeyPointsRecordingConfiguration){
+						recordConfig->setFilePath(szDir);
+				}
+				for (int i = 0; i < V1_IMAGE_RECORD_TYPE_COUNT; i++){
+					m_imageRecordingConfigurationForKinectV1[i]->setFilePath(szDir);
+				}
+			}
+
 		}
 		break;
 	}
@@ -933,7 +1246,7 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		}
 		
 
-		v1ShowOptChanged(RecordingShowOpt::Color_Raw);
+		v1ShowOptChanged(KinectV1ColorRaw);
 		//EnableWindow(GetDlgItem(m_hWnd,IDC_V1_R320X240_RADIO), FALSE);
 		break;
 	case IDC_V1_DEPTH_SHOW_RADIO:
@@ -951,25 +1264,132 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		
 
 		//m_commonConfiguration[KinectV1_COMMON]->setShowOpt(RecordingShowOpt::Depth_Raw);
-		v1ShowOptChanged(RecordingShowOpt::Depth_Raw);
+		v1ShowOptChanged(KinectV1DepthRaw);
 		//EnableWindow(GetDlgItem(m_hWnd,IDC_V1_R320X240_RADIO), TRUE);
-		break;
-	case IDC_V1_INFRARED_SHOW_RADIO:
-		//v1ShowOptChanged(RecordingShowOpt::Infrared_Raw);
-		//EnableWindow(GetDlgItem(m_hWnd,IDC_V1_R320X240_RADIO), TRUE);
-		//m_commonConfiguration[KinectV1_COMMON]->setShowOpt(RecordingShowOpt::Infrared_Raw);
 		break;
 
-	case IDC_V1_R640X480_RADIO:
-		//v1ShowResolutionChanged(NUI_IMAGE_RESOLUTION_640x480);
-		//m_commonConfiguration[KinectV1_COMMON]->setShowResolution(NUI_IMAGE_RESOLUTION_640x480);
+	case IDC_V1_RECORDING_COLOR_CHECK:
+		HWND v1RecordingColorTypeComboBox ;
+		v1RecordingColorTypeComboBox= GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO);
+		/*
+		for (int i = 0; i < V1_COLOR_TYPE_COUNT; i++){
+			CString colorType = KinectV1Controller::getColorTypeAsString(static_cast<v1ColorType>( i));
+			ComboBox_AddString(v1RecordingColorTypeComboBox, colorType);
+			if(i==0)
+				ComboBox_SetCurSel(v1RecordingColorTypeComboBox, 0);
+			//ComboBox_ResetContent
+		}
+		*/
+		ComboBox_Enable(v1RecordingColorTypeComboBox, IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK));
+
+
+		m_imageRecordingConfigurationForKinectV1[KinectColorRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK));
+		
+
+		Button_Enable(GetDlgItem(m_hWnd, IDC_V1_COLOR_SHOW_RADIO),!(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) || IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX)));
+		Button_Enable(GetDlgItem(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO),!(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) || IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX)));
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO), !(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) || IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX) ));
+		
+		if(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) || IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX) )
+		{
+			int cur;
+			if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
+			{
+				v1ShowOptChanged(KinectV1ColorRaw); //IDC_V1_SHOW_TYPE_COMBO
+				cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
+				ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO),cur);
+			}
+			else if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
+			{
+				v1ShowOptChanged(KinectV1DepthRaw); //IDC_V1_SHOW_TYPE_COMBO
+				cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
+
+			}
+			v1ShowResolutionChanged(cur);
+		}
 		break;
-	case IDC_V1_R320X240_RADIO:
-		//v1ShowResolutionChanged(NUI_IMAGE_RESOLUTION_320x240);
-		//m_commonConfiguration[KinectV1_COMMON]->setShowResolution(NUI_IMAGE_RESOLUTION_320x240);
+	case IDC_V1_RECORD_DEPTH_CHECK:
+		HWND v1RecordingDepthTypeComboBox ;
+		v1RecordingDepthTypeComboBox= GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO);
+		
+		/*
+		for (int i = 0; i < V1_COLOR_TYPE_COUNT; i++){
+			CString colorType = KinectV1Controller::getDepthTypeAsString(static_cast<v1DepthType>( i));
+			ComboBox_AddString(v1RecordingDepthTypeComboBox, colorType);
+			if(i==0)
+				ComboBox_SetCurSel(v1RecordingDepthTypeComboBox, 0);
+			//ComboBox_ResetContent
+		}
+		*/
+		ComboBox_Enable(v1RecordingDepthTypeComboBox, IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK));
+		m_imageRecordingConfigurationForKinectV1[KinectDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK));
+
+		
+		Button_Enable(GetDlgItem(m_hWnd, IDC_V1_COLOR_SHOW_RADIO),!(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) || IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX)));
+		Button_Enable(GetDlgItem(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO),!(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) || IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX)));
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO), !(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) || IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX) ));
+		
+		if(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) || IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX) )
+		{
+			int cur;
+			if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
+			{
+				v1ShowOptChanged(KinectV1ColorRaw); //IDC_V1_SHOW_TYPE_COMBO
+				cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
+			}
+			else if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
+			{
+				v1ShowOptChanged(KinectV1DepthRaw); //IDC_V1_SHOW_TYPE_COMBO
+				cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
+				ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO),cur);
+
+			}
+			v1ShowResolutionChanged(cur);
+		}
 		break;
-	
+	case IDC_V1_RECORDING_ALIGNED_CHECKBOX:
+		CheckDlgButton(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK, IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX));
+		CheckDlgButton(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK, IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX));
+		Button_Enable(GetDlgItem(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK),!IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX));
+		Button_Enable(GetDlgItem(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK),!IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX));
+
+
+		Button_Enable(GetDlgItem(m_hWnd, IDC_V1_COLOR_SHOW_RADIO), !IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX));
+		Button_Enable(GetDlgItem(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO),!IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX));
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO), !IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX));
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO), !IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX));
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO), !IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX));
+		if(!IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_ALIGNED_CHECKBOX) )
+		{
+			int cur;
+			if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
+			{
+				v1ShowOptChanged(KinectV1ColorRaw); //IDC_V1_SHOW_TYPE_COMBO
+				cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
+			}
+			else if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
+			{
+				v1ShowOptChanged(KinectV1DepthRaw); //IDC_V1_SHOW_TYPE_COMBO
+				cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
+
+			}
+			v1ShowResolutionChanged(cur);
+			m_imageRecordingConfigurationForKinectV1[KinectColorRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK));
+			m_imageRecordingConfigurationForKinectV1[KinectDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK));
+		}
+		else 
+		{
+			m_imageRecordingConfigurationForKinectV1[KinectColorRaw]->setEnabled(true);
+			m_imageRecordingConfigurationForKinectV1[KinectDepthRaw]->setEnabled(true);
+			v1ShowOptChanged(KinectV1ColorRaw); 
+			v1ShowResolutionChanged(0);
+			ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO),0);
+			ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO),0);
+		}
+		break;
 	default:
+		
+
 		break;
 	}
 }
@@ -982,6 +1402,7 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 	
 	Edit_GetText(editBoxHandle, editBoxText.GetBuffer(MAX_PATH), MAX_PATH);
 	switch (LOWORD(wParam)){
+		/*
 	case IDC_FACE_RAW_EDIT_BOX:
 		m_recordingConfiguration[FaceRaw]->setFileName(editBoxText);
 		break;
@@ -994,6 +1415,7 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 	case IDC_HDFACE_2D_EDIT_BOX:
 		m_recordingConfiguration[HDFace2D]->setFileName(editBoxText);
 		break;
+		
 	case IDC_KINECT_RAW_COLOR_EDIT_BOX:
 		m_imageRecordingConfiguration[KinectColorRaw]->setFileName(editBoxText);
 		break;
@@ -1006,9 +1428,11 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 	case IDC_KINECT_INFRARED_EDIT_BOX:
 		m_imageRecordingConfiguration[KinectInfrared]->setFileName(editBoxText);
 		break;
+		
 	case IDC_KINECT_KEYPOINTS_EDIT_BOX:
 		m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setFileName(editBoxText);
 		break;
+		*/
 	case IDC_LIMIT_FRAMES_EDIT_BOX:
 		updateFrameLimit();
 		break;
@@ -1017,16 +1441,42 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 		break;
 	case IDC_FILE_PATH_EDIT_BOX:
 	{
-		for (auto recordConfig : m_recordingConfiguration){
-			recordConfig->setFilePath(editBoxText);
+		if(m_KinectEnableOpt == OnlyKinectV2Enabled )
+		{
+			for (auto recordConfig : m_recordingConfiguration){
+				recordConfig->setFilePath(editBoxText);
+			}
+			for (auto recordConfig : m_imageRecordingConfiguration){
+				recordConfig->setFilePath(editBoxText);
+			}
+
+			for (auto recordConfig : m_KeyPointsRecordingConfiguration){
+				recordConfig->setFilePath(editBoxText);
+			}
 		}
-		for (auto recordConfig : m_imageRecordingConfiguration){
-			recordConfig->setFilePath(editBoxText);
+		else if(m_KinectEnableOpt == OnlyKinectV1Enabled)
+		{
+			for (auto recordConfig : m_imageRecordingConfigurationForKinectV1){
+				recordConfig->setFilePath(editBoxText);
+			}
+		}
+		else if(m_KinectEnableOpt == BothKinectEnabled)
+		{
+			for (auto recordConfig : m_recordingConfiguration){
+				recordConfig->setFilePath(editBoxText);
+			}
+			for (auto recordConfig : m_imageRecordingConfiguration){
+				recordConfig->setFilePath(editBoxText);
+			}
+
+			for (auto recordConfig : m_KeyPointsRecordingConfiguration){
+				recordConfig->setFilePath(editBoxText);
+			}
+			for (auto recordConfig : m_imageRecordingConfigurationForKinectV1){
+				recordConfig->setFilePath(editBoxText);
+			}
 		}
 
-		for (auto recordConfig : m_KeyPointsRecordingConfiguration){
-			recordConfig->setFilePath(editBoxText);
-		}
 		break;
 	}
 	default:
@@ -1036,6 +1486,7 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 
 void RecordTabHandler::recordConfigurationStatusChanged(RecordCloudType type, bool newState)
 {
+	/*
 	switch (type)
 	{
 	case HDFace:
@@ -1063,12 +1514,13 @@ void RecordTabHandler::recordConfigurationStatusChanged(RecordCloudType type, bo
 	default:
 		break;
 	}
-
+	*/
 	checkRecordingConfigurationPossible();
 }
 
 void RecordTabHandler::recordConfigurationStatusChanged(ImageRecordType type, bool newState)
 {
+	/*
 	switch (type)
 	{
 	case KinectColorRaw:
@@ -1094,12 +1546,13 @@ void RecordTabHandler::recordConfigurationStatusChanged(ImageRecordType type, bo
 	default:
 		break;
 	}
-
+	*/
 	checkRecordingConfigurationPossible();
 }
 
 void RecordTabHandler::recordConfigurationStatusChanged(StringFileRecordType type, bool newState)
 {
+	/*
 	switch (type)
 	{
 	case FiveKeyPoints:
@@ -1111,7 +1564,7 @@ void RecordTabHandler::recordConfigurationStatusChanged(StringFileRecordType typ
 	default:
 		break;
 	}
-
+	*/
 	checkRecordingConfigurationPossible();
 }
 
@@ -1145,18 +1598,18 @@ void RecordTabHandler::setKinectEnableOpt(bool v1Enabled, bool v2Enabled)
 {
 	if(v1Enabled && v2Enabled)
 	{
-		m_KinectEnableOpt = 2;
+		m_KinectEnableOpt = BothKinectEnabled;
 	}
 	else if(!v1Enabled && v2Enabled)
 	{
-		m_KinectEnableOpt = 0;
+		m_KinectEnableOpt = OnlyKinectV2Enabled;
 	}
 	else if(v1Enabled && !v2Enabled)
 	{
-		m_KinectEnableOpt = 1;
+		m_KinectEnableOpt = OnlyKinectV1Enabled;
 	}
 	else
 	{
-		m_KinectEnableOpt=3;
+		m_KinectEnableOpt=NoneEnable;
 	}
 }

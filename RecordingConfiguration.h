@@ -248,7 +248,7 @@ public:
 	 *
 	 * \return	The full recording path for the cloud recording parameters.
 	 */
-	static CString getFullRecordingPathForCloudType(RecordCloudType cloudType, CString outputFolder, CString timeStampFolderName);
+	 static CString getFullRecordingPathForCloudType(RecordCloudType cloudType, CString outputFolder, CString timeStampFolderName,KinectVersionType kinectVersion); //
 
 	/**
 	 * \fn	int RecordingConfiguration::getThreadCountToStart();
@@ -267,6 +267,9 @@ public:
 	 * \param	threadsCount	Number of threads.
 	 */
 	void setThreadCountToStart(int threadsCount);
+
+
+	void setKinectVersion(KinectVersionType	kinectVersion);
 
 	boost::signal<void(RecordCloudType, bool)> recordConfigurationStatusChanged;
 	boost::signal<void(RecordCloudType)>	recordPathOrFileNameChanged;
@@ -311,6 +314,8 @@ private:
 
 	/** \brief	Number of threads to start for recording. */
 	int						m_threadsCount;
+
+	KinectVersionType		m_kinectVersion;
 };
 typedef std::shared_ptr<RecordingConfiguration> RecordingConfigurationPtr;
 typedef std::vector<RecordingConfigurationPtr> SharedRecordingConfiguration;
