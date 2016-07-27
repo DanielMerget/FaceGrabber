@@ -52,6 +52,39 @@ inline void SafeRelease(Interface *& pInterfaceToRelease)
         pInterfaceToRelease = nullptr;
     }
 }
+
+template<class T>
+inline void SafeDelete(T*& ptr)
+{
+    if(ptr)
+    {
+        delete ptr;
+        ptr = nullptr;
+    }
+}
+
+// Safe delete array
+template<class T>
+inline void SafeDeleteArray(T*& pArray)
+{
+    if(pArray)
+    {
+        delete[] pArray;
+        pArray = nullptr;
+    }
+}
+
+
+enum KinectVersionType{
+	KinectV1,
+	KinectV2,
+	KINECT_VERSION_TYPE_COUNT
+};
+
+
+#define WM_STREAMEVENT_COLOR   WM_USER + 1
+#define WM_STREAMEVENT_DEPTH   WM_USER + 2
+
 #pragma warning ( disable: 4996 )
 #pragma warning ( disable: 4503 )
 

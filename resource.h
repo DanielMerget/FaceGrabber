@@ -17,6 +17,7 @@
 #define IDC_NEXT_FRAME_BUTTON           1005
 #define IDC_FACE_RAW_DEPTH_STATUS       1005
 #define IDC_FULL_RAW_DEPTH_STATUS       1006
+#define IDC_NEXT_FRAME_BUTTON2          1006
 #define IDC_BUTTON1                     1007
 #define IDC_KINECT_RAW_COLOR_STATUS     1007
 #define IDC_KINECT_RAW_DEPTH_STATUS     1008
@@ -30,10 +31,13 @@
 #define IDD_APP1                        1035
 #define IDD_APP_TAB                     1035
 #define IDC_HD2DFACE_RADIO              1035
+#define IDC_V1_COLOR_SHOW_RADIO         1035
 #define IDC_SCROLLBAR1                  1036
 #define IDC_TAB_PLAYBACK                1036
+#define IDC_V1_R640X480_RADIO           1036
 #define IDC_CHECK1                      1037
 #define IDC_INFRARED_RAW_RADIO          1037
+#define IDC_V1_RECORD_DEPTH_CHECK       1037
 #define IDC_SLIDER1                     1038
 #define IDC_DEPTH_RAW_RADIO             1038
 #define IDC_LIST2                       1039
@@ -141,7 +145,48 @@
 #define IDC_KEYPOINTS_CHECK             1106
 #define IDC_PROGRESS1                   1107
 #define IDC_RECORDING_PROGRESS          1107
+#define IDC_HD2D_CHECK                  1108
+#define IDC_HD3D_CHECK                  1109
+#define IDC_FACE_RAW_CHECK              1110
+#define IDC_KEY_POINTS_CHECK            1111
+#define IDC_DEPTH_RAW_CHECK             1112
+#define IDC_ALIGNED_DEPTH_CHECK         1113
+#define IDC_DEPTH_3D_RAW_CHECK          1114
+#define IDC_INRARED_RAW_CHECK           1115
+#define IDC_ALIGNED_INFRARED_CHECK      1116
+#define IDC_GROUP_SHOW_OPT              1117
+#define IDC_V1_DEPTH_SHOW_RADIO         1118
+#define IDC_V1_INFRARED_SHOW_RADIO      1119
+#define IDC_V1_R320X240_RADIO           1120
+#define IDC_GROUP_SHOW_OPT2             1121
+#define IDC_STATIC_V2_SHOW_             1122
+#define IDC_STATIC_V2_SHOW              1122
+#define IDC_V1_SHOW_TYPE_STATIC         1123
+#define IDC_V1_SHOW_RESOLUTION_STATIC   1124
+#define IDC_V1_RECORD_INFRARED_CHECK    1126
+#define IDC_V1_RECORDING_ALIGNED_CHECKBOX 1128
+#define IDC_RECORDING_V1_ENABLE_CHECK   1129
+#define IDC_RECORDING_V2_ENABLE_CHECK   1133
+#define IDC_RECORDING_OPT_V1            1135
+#define IDC_RECORDING_OPT_V2            1136
+#define IDC_STATIC_INFRARED_V2          1137
+#define IDC_STATIC_DEPTH_V2             1138
+#define IDC_STATIC_KEYPOINTS_V2         1139
+#define IDC_V1_SHOW_TYPE_COMBO          1143
+#define IDC_V1_COLOR_RECORDING_TYPE_COMBO 1144
+#define IDC_V1_RECORDING_COLOR_CHECK    1145
+#define IDC_V1_DEPTH_RECORDING_TYPE_COMBO 1146
 #define IDC_KINECT_INFRARED_COMBO_BOX_THREADS 1806
+#define IDC_PLAY_PAUSE_BUTTON           1807
+#define IDC_PLAY_PAUSE_BUTTON2          1808
+#define IDC_PLAY_PREV_FRAME_BUTTON      1809
+#define IDC_PLAY_NEXT_FRAME_BUTTON3     1810
+#define IDC_PLAY_PREV_FRAME_BUTTON2     1810
+#define IDC_PLAY_NEXT_FRAME_BUTTON      1811
+#define IDC_LIMIT_PLAYBACK_FRAMRATE_EDIT_BOX 1812
+#define IDC_LIMIT_PLAYBACK_FRAMERATE_CHECK 1813
+#define IDC_PLAYBACK_SLIDER             1814
+#define IDC_PLAY_NEXT_FRAME_BUTTON2     1815
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -151,7 +196,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1108
+#define _APS_NEXT_CONTROL_VALUE         1146
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

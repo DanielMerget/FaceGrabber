@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "MessageRouterHelper.h"
 
-
 MessageRouterHelper::MessageRouterHelper()
 {
 }
@@ -43,12 +42,20 @@ LRESULT CALLBACK MessageRouterHelper::DlgProc(HWND hWnd, UINT message, WPARAM wP
 
 	switch (message)
 	{
+
+	case WM_STREAMEVENT_COLOR:
+        UpdateStreams(1);
+        break;
+	case WM_STREAMEVENT_DEPTH:
+        UpdateStreams(2);
+        break;
+
 	case WM_INITDIALOG:
 		// store window handle
 		m_hWnd = hWnd;
 		onCreate();
 		break;
-
+	
 	case WM_CLOSE:
 		DestroyWindow(hWnd);
 		onDestroy();
@@ -59,6 +66,9 @@ LRESULT CALLBACK MessageRouterHelper::DlgProc(HWND hWnd, UINT message, WPARAM wP
 		break;
 	case WM_COMMAND:
 		processUIMessage(wParam, lParam);
+		break;
+	case WM_HSCROLL:
+		onSliderChanged(wParam, lParam);
 		break;
 	case WM_NOTIFY:
 		switch (((LPNMHDR)lParam)->code)
@@ -99,7 +109,10 @@ void MessageRouterHelper::processUIMessage(WPARAM wParam, LPARAM handle)
 	}
 }
 
+void MessageRouterHelper::onSliderChanged(WPARAM wParam, LPARAM handle)
+{
 
+}
 void MessageRouterHelper::onSelectionChanged(WPARAM wParam, LPARAM handle)
 {
 
@@ -121,6 +134,11 @@ void MessageRouterHelper::onDestroy()
 
 }
 void MessageRouterHelper::onCreate()
+{
+
+}
+
+void MessageRouterHelper::UpdateStreams(int i)
 {
 
 }

@@ -2,16 +2,16 @@
 #include "stdafx.h"
 
 #include <string>
-#include "stdafx.h"
 #include <boost/signal.hpp>
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
 #include <atlstr.h>
 #include <regex>
 #include "IRecordingConfiguration.h"
-
+#include "NuiApi.h"
 
 enum CommonConfigurationType{
+	KinectV1_COMMON,
 	KinectV2_COMMON,
 	COMMON_CONFIGURATION_TYPE_COUNT
 };
@@ -93,6 +93,7 @@ public:
 
 	void setFacePointsShowOpt(FacePointsShowOpt FacePointsShowOpt);
 
+	void setShowResolution(NUI_IMAGE_RESOLUTION	showResolution);
 
 	FacePointsShowOpt getFacePointsShowOpt();
 
@@ -116,6 +117,7 @@ private:
 
 	/** \brief	Number of threads to start for recording. */
 	int						m_threadsCount;
+	NUI_IMAGE_RESOLUTION	m_showResolution;						
 };
 
 typedef std::shared_ptr<CommonConfiguration> CommonConfigurationPtr;

@@ -60,9 +60,17 @@ public:
 	/** \brief	signal to start the playback. */
 	boost::signal<void(SharedPlaybackConfiguration,  bool)> startPlayback;
 
-
 	/** \brief	signal to stop the playback. */
 	boost::signal<void(void)> stopPlayback;
+
+	/** \brief	signal to pause the playback. */
+	boost::signal<void(bool)> pausePlayback;
+
+	/** \brief	The fps limit changed signal. */
+	boost::signal<void(int)> fpsLimitUpdated;
+
+	/** \brief	The playback slider moved. */
+	boost::signal<void(int)> playbackSliderMoved;
 
 	/**
 	 * \fn	void PlaybackTabHandler::updateReaderStatus(RecordCloudType type, std::wstring status);
@@ -82,6 +90,20 @@ public:
 	 * \return	true if playback running, false if not.
 	 */
 	bool isPlaybackRunning();
+
+	/**
+	* \fn	void RecordTabHandler::updatePlaybackSliderPos();
+	*
+	* \brief	Updates the position of the playback slider
+	*/
+	void updatePlaybackSliderPos(int pos);
+
+	/**
+	* \fn	void RecordTabHandler::updatePlaybackSliderRange();
+	*
+	* \brief	Updates the range of the playback slider
+	*/
+	void updatePlaybackSliderRange(int min, int max);
 private:
 
 	/**
@@ -94,15 +116,33 @@ private:
 	void setPlaybackStatus(bool enable);
 
 	/**
+	* \fn	void PlaybackTabHandler::setPlaybackPaused(bool enable);
+	*
+	* \brief	Sets playback paused.
+	*
+	* \param	enable	true to enable, false to disable.
+	*/
+	void setPlaybackPaused(bool enable);
+
+	/**
 	 * \fn	void PlaybackTabHandler::onCreate();
 	 *
 	 * \brief	Executes the creates the user interface with preset/standard values
 	 */
 	void onCreate();
 
+	void onSliderChanged(WPARAM wParam, LPARAM handle);
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
+
+	/**
+	* \fn	void RecordTabHandler::updateFPSLimit();
+	*
+	* \brief	Updates the fps limit according to the new values in the UI
+	* 			which has changed by the user.
+	*/
+	void updateFPSLimit();
 
 	/** \brief	The playback configuration. */
 	SharedPlaybackConfiguration m_playbackConfiguration;
@@ -110,6 +150,8 @@ private:
 	/** \brief	true if the Playback is running. */
 	bool m_isPlaybackRunning;
 
+	/** \brief	true if the Playback is paused. */
+	bool m_isPlaybackPaused;
 
 	/** \brief	true if the reading is done is single threaded. */
 	bool m_isSingleThreadedReading;

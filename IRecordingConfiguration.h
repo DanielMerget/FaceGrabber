@@ -33,7 +33,6 @@ enum RecordCloudType{
 	FaceRaw,
 	FullDepthRaw,
 	HDFace2D,
-	//AllCommon,
 	RECORD_CLOUD_TYPE_COUNT
 };
 

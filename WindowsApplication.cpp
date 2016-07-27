@@ -21,6 +21,7 @@ SharedRecordingConfiguration WindowsApplication::initRecordDataModel()
 		recordingConfigurations[i]->recordConfigurationStatusChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(RecordCloudType, bool)>(&RecordTabHandler::recordConfigurationStatusChanged), &m_recordTabHandler, _1, _2));
 		recordingConfigurations[i]->recordPathOrFileNameChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(RecordCloudType)>(&RecordTabHandler::recordPathChanged), &m_recordTabHandler, _1));
 		recordingConfigurations[i]->setThreadCountToStart(2);
+		recordingConfigurations[i]->setKinectVersion(KinectV2);
 	}
 	return recordingConfigurations;
 }
@@ -46,9 +47,24 @@ SharedImageRecordingConfiguration WindowsApplication::initImageRecordDataModel()
 		recordingConfigurations[i]->recordConfigurationStatusChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType, bool)>(&RecordTabHandler::recordConfigurationStatusChanged), &m_recordTabHandler, _1, _2));
 		recordingConfigurations[i]->recordPathOrFileNameChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType)>(&RecordTabHandler::recordPathChanged), &m_recordTabHandler, _1));
 		recordingConfigurations[i]->setThreadCountToStart(2);
+		recordingConfigurations[i]->setKinectVersion(KinectV2);
 	}
 	return recordingConfigurations;
 }
+
+SharedImageRecordingConfiguration WindowsApplication::initImageRecordDataModelForKinectV1()
+{
+	SharedImageRecordingConfiguration recordingConfigurations(V1_IMAGE_RECORD_TYPE_COUNT);
+	for (int i = 0; i < V1_IMAGE_RECORD_TYPE_COUNT; i++){
+		recordingConfigurations[i] = std::shared_ptr<ImageRecordingConfiguration>(new ImageRecordingConfiguration(static_cast<ImageRecordType>(i), PNG));
+		recordingConfigurations[i]->recordConfigurationStatusChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType, bool)>(&RecordTabHandler::recordConfigurationStatusChanged), &m_recordTabHandler, _1, _2));
+		recordingConfigurations[i]->recordPathOrFileNameChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType)>(&RecordTabHandler::recordPathChanged), &m_recordTabHandler, _1));
+		recordingConfigurations[i]->setThreadCountToStart(2);
+		recordingConfigurations[i]->setKinectVersion(KinectV1);
+	}
+	return recordingConfigurations;
+}
+
 
 SharedStringFileRecordingConfiguration WindowsApplication::initStringFileRecordDataModel()
 {
@@ -59,6 +75,7 @@ SharedStringFileRecordingConfiguration WindowsApplication::initStringFileRecordD
 		recordingConfigurations[i]->recordConfigurationStatusChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(StringFileRecordType, bool)>(&RecordTabHandler::recordConfigurationStatusChanged), &m_recordTabHandler, _1, _2));
 		recordingConfigurations[i]->recordPathOrFileNameChanged.connect(boost::bind(static_cast<void (RecordTabHandler::*)(StringFileRecordType)>(&RecordTabHandler::recordPathChanged), &m_recordTabHandler, _1));
 		recordingConfigurations[i]->setThreadCountToStart(2);
+		recordingConfigurations[i]->setKinectVersion(KinectV2);
 	}
 	return recordingConfigurations;
 }
@@ -69,6 +86,162 @@ WindowsApplication::~WindowsApplication()
 	SafeRelease(m_pD2DFactory);
 	m_bufferSynchronizer.onApplicationQuit();
 	m_bufferSynchronizerThread.join();
+}
+
+void WindowsApplication::UpdateStreams(int i)
+{
+	if(m_kinectV1Enable)
+	{
+		switch(i)
+		{
+			case 1:
+				m_kinectV1Controller.ProcessColor();
+				break;
+			case 2:
+				m_kinectV1Controller.ProcessDepth();
+				break;
+			default:break;
+		}
+		//m_kinectV1Controller.Update();
+	}
+
+	const int depthFps =  30;//30;
+    const int halfADepthFrameMs = (1000 / depthFps) / 2;
+	const LARGE_INTEGER lastColorFrameStampp = m_kinectV1Controller.getLastColorFrameStamp();
+	const LARGE_INTEGER lastDepthFrameStampp = m_kinectV1Controller.getLastDepthFrameStamp();
+	bool needUpdateWriter = true;
+    // If we have not yet received any data for either color or depth since we started up, we shouldn't draw
+    if (lastColorFrameStampp.QuadPart == 0 || lastDepthFrameStampp.QuadPart == 0)
+    {
+        needUpdateWriter = false;
+    }
+
+    // If the color frame is more than half a depth frame ahead of the depth frame we have,
+    // then we should wait for another depth frame.  Otherwise, just go with what we have.
+    if (lastDepthFrameStampp.QuadPart - lastDepthFrameStampp.QuadPart > halfADepthFrameMs)
+    {
+        needUpdateWriter = false;
+    }
+	
+	if(needUpdateWriter)
+	{
+		m_kinectV1DataUpdateMutex.lock();
+		m_kinectV1Controller.updateWriter();
+		m_kinectV1DataUpdateMutex.unlock();
+	}
+	//Sleep(halfADepthFrameMs);
+	return ;
+}
+/// <summary>
+/// Returns the window handle
+/// </summary>
+/// <returns>Handle to the window</returns>
+HWND WindowsApplication::GetWindow() const
+{
+    return m_hWnd;
+}
+
+DWORD WindowsApplication::runKinectV2Update(WindowsApplication * pThis)
+{
+	
+	while(pThis->m_kinectV2Enable)
+	{
+		if (pThis->m_isKinectRunning)
+		{
+			pThis->m_kinectFrameGrabber.update();
+		}
+	}
+	
+	return 0;
+}
+
+
+DWORD WindowsApplication::runKinectV1StreamEvent(WindowsApplication * pThis)
+{
+	
+	clock_t start;
+	double timedelta;
+
+	 HANDLE events[] = {
+						pThis->m_hStopStreamEventThread,
+						pThis->m_kinectV1Controller.getCorlorFrameEvent(),
+						pThis->m_kinectV1Controller.getDepthFrameEvent(),						 
+						pThis->m_hPauseStreamEventThread} ;
+
+	int colorDepth = 0;
+	clock_t color_arrived;
+	clock_t last_color_arrived=clock();;
+	clock_t depth_arrived;
+	clock_t last_depth_arrived=clock();;
+    while (true)
+    {
+		
+		start = clock();
+		
+        DWORD ret = WaitForMultipleObjects(ARRAYSIZE(events), events, FALSE, INFINITE);
+		
+        if (WAIT_OBJECT_0 == ret)
+            break;
+				
+		else if( WAIT_OBJECT_0 + 3 == ret)
+		{
+			
+			//Sleep(pThis->);
+		}
+		else {
+			if( WAIT_OBJECT_0 == WaitForSingleObject(pThis->m_kinectV1Controller.getDepthFrameEvent(), 0))
+			{
+				//if(pThis->m_kinectV2Enable)
+				//{
+				
+					pThis->UpdateStreams(2);
+				//}
+				//else
+				//{
+					//SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_DEPTH, 0, 0);
+				//}
+
+				//pThis->UpdateStreams(2);
+			
+
+			}
+			if (WAIT_OBJECT_0 == WaitForSingleObject(pThis->m_kinectV1Controller.getCorlorFrameEvent(), 0) )  //+ 1 
+			{
+				//if(pThis->m_kinectV2Enable)
+				//{
+				
+					pThis->UpdateStreams(1);
+					
+				//}
+				//else
+				//{
+					//SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_COLOR, 0, 0);
+				//}
+				//
+			
+			
+			}
+		}
+
+		/*
+		const int depthFps =  pThis->m_kinectV1Controller.getDepthFrameFPS();//30;
+		const int halfADepthFrameMs = (1000 / depthFps) / 2;
+		if (pThis->m_FPSLimit)
+		{
+			// timedelta in seconds
+			timedelta = (double(clock() - start)) / CLOCKS_PER_SEC;
+			// if faster than specified target fps: sleep
+			if (timedelta < (1.0 / pThis->m_FPSLimit)) Sleep(((1.0 / pThis->m_FPSLimit) - timedelta) * 1000);
+		}
+		*/
+		/*
+        else if(WAIT_OBJECT_0 + 4 >= ret)
+        {
+            SendMessageW(pThis->GetWindow(), WM_STREAMEVENT, 0, 0);
+        }*/
+    }
+
+    return 0;
 }
 
 int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
@@ -106,15 +279,32 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	double timedelta;
 	double actualFPS;
 	std::stringstream FPSinfo;
+	CString msgCstring;
 
+	HWND tabControlHandle = GetDlgItem(m_hWnd, IDC_TAB2);
+	HANDLE hv1EventThread;
+	
+	//Sleep(30);
+
+	HANDLE hEventThread;
+	HANDLE hEventThread1;
+	if(m_kinectV1Enable)
+	{
+		m_hStopStreamEventThread = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+		m_hPauseStreamEventThread = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+		//hv1EventThread = CreateThread(nullptr, 0, m_kinectV1Controller.Update(), 0, 0, nullptr);
+		//m_kinectV1Controller.Update();
+		//std::async(std::launch::async, &KinectV1Controller::Update, &m_kinectV1Controller);
+		hEventThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)runKinectV1StreamEvent, this, 0, nullptr); //
+		
+	}
+
+	//HANDLE hEventThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)StreamEventThread, this, 0, nullptr);
 	// Main message loop
 	while (WM_QUIT != msg.message)
 	{
 		start = clock();
-
-		if (m_isKinectRunning){
-			m_kinectFrameGrabber.update();
-		}
+		
 		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
 		{
 			// If a dialog message will be taken care of by the dialog proc
@@ -126,25 +316,68 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
 		}
-
-		if (m_FPSLimit != 0)
+		if (m_isKinectRunning)
 		{
-			// timedelta in seconds
-			timedelta = (double(clock() - start)) / CLOCKS_PER_SEC;
-			// if faster than specified target fps: sleep
-			if (timedelta < (1.0 / m_FPSLimit)) Sleep(((1.0 / m_FPSLimit) - timedelta) * 1000);
+			if(m_kinectV2Enable)
+			{
+				m_kinectFrameGrabber.update();
+			}
+			else
+			{
+				Sleep(5);
+			}
+
+			
 		}
 
-		actualFPS = CLOCKS_PER_SEC / (float(clock() - start));
+		int sel = TabCtrl_GetCurSel(tabControlHandle);
 
-		FPSinfo.str("");
-		FPSinfo.clear();
-		FPSinfo << "UPDATE Loop actual fps: " << actualFPS << " target fps: " << m_FPSLimit;
-		auto msgCstring = CString(FPSinfo.str().c_str());
-		msgCstring += L"\n";
-		OutputDebugString(msgCstring);
+		// Record Tab active
+		if (sel == 0){
+			/*
+			FPSinfo.str("");
+			FPSinfo.clear();
+			FPSinfo << "Tab Sel: " << sel;
+			msgCstring = CString(FPSinfo.str().c_str());
+			msgCstring += L"\n";
+			OutputDebugString(msgCstring);
+			*/
+
+			if (m_FPSLimit != 0)
+			{
+				// timedelta in seconds
+				timedelta = (double(clock() - start)) / CLOCKS_PER_SEC;
+				// if faster than specified target fps: sleep
+				if (timedelta < (1.0 / m_FPSLimit)) Sleep(((1.0 / m_FPSLimit) - timedelta) * 1000);
+			}
+
+			actualFPS = CLOCKS_PER_SEC / (float(clock() - start));
+			start = clock();
+
+			FPSinfo.str("");
+			FPSinfo.clear();
+			FPSinfo << "UPDATE Loop actual fps: " << actualFPS << " target fps: " << m_FPSLimit;
+			msgCstring = CString(FPSinfo.str().c_str());
+			msgCstring += L"\n";
+			OutputDebugString(msgCstring);
+		}
+		// Playback/Convert Tab active
+		else{
+			// Limit CPU usage from while(WM_QUIT != msg.message)
+			Sleep(10);
+		}
 	}
+	if(m_kinectV1Enable)
+	{
+		WaitForSingleObject(hEventThread, INFINITE);
 
+		SetEvent(m_hStopStreamEventThread);
+
+		CloseHandle(hEventThread);
+	}
+	//CloseHandle(hEventThread1);
+	
+	
 	return static_cast<int>(msg.wParam);
 }
 
@@ -160,32 +393,42 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 void WindowsApplication::onCreate()
 {
 
-	// Init Direct2D
-	D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
 
-	// Create and initialize a new Direct2D image renderer 
-	m_pDrawDataStreams = new ImageRenderer();
-
+	HRESULT hr;
 	//Create the pcl viewer
-	m_pclFaceViewer = std::shared_ptr<PCLViewer>(new PCLViewer(2, "Face-Viewer"));
-
 	
-	initKinectFrameGrabber();
-	initTabs();
-	initCloudWriter();
-	initImageWriter();
-	initStringFileWriter();
-	connectStreamUpdaterToViewer();
 
-	initInputReaderBufferAndSynchronizer();
-
-	//set the settings of the views and frames 
-	HRESULT hr = m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
-
+	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
+	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactoryForKinectV1);
 	if (FAILED(hr))
 	{
 		setStatusMessage(L"Failed to initialize the Direct2D draw device.", true);
 	}
+
+	initKinectFrameGrabber();
+
+	initKinectV1FrameGrabber();
+				
+	m_recordTabHandler.setKinectEnableOpt(m_kinectV1Enable,m_kinectV2Enable);
+
+	initTabs();
+	if(m_kinectV2Enable)
+	{
+		m_pclFaceViewer = std::shared_ptr<PCLViewer>(new PCLViewer(2, "Face-Viewer"));
+		initCloudWriter();
+		
+		initStringFileWriter();
+		connectStreamUpdaterToViewer();
+
+		
+	}
+
+	initImageWriter();
+	initInputReaderBufferAndSynchronizer();
+	
+
+
+
 
 }
 
@@ -233,14 +476,30 @@ void WindowsApplication::initCloudWriter()
 
 void WindowsApplication::initImageWriter()
 {
-	for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
-		//init
-		auto imageWriter = std::shared_ptr<KinectRawFileWriter>(new KinectRawFileWriter);
-		//register for events
-		imageWriter->updateStatus.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType, std::wstring)>(&RecordTabHandler::updateWriterStatus), &m_recordTabHandler, static_cast<ImageRecordType>(i), _1));
-		imageWriter->writingWasStopped.connect(boost::bind(&RecordTabHandler::recordingStopped, &m_recordTabHandler));
+	if(m_kinectV2Enable)
+	{
+		for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+			//init
+			auto imageWriter = std::shared_ptr<KinectRawFileWriter>(new KinectRawFileWriter);
+			//register for events
+			imageWriter->updateStatus.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType, std::wstring)>(&RecordTabHandler::updateWriterStatus), &m_recordTabHandler, static_cast<ImageRecordType>(i), _1));
+			imageWriter->writingWasStopped.connect(boost::bind(&RecordTabHandler::recordingStopped, &m_recordTabHandler));
 
-		m_imageOutputWriter.push_back(imageWriter);
+			m_imageOutputWriter.push_back(imageWriter);
+		}
+	}
+	if(m_kinectV1Enable)
+	{
+		for (int i = 0; i < V1_IMAGE_RECORD_TYPE_COUNT; i++)
+		{
+			//init
+			auto imageWriter = std::shared_ptr<KinectRawFileWriter>(new KinectRawFileWriter);
+			//register for events
+			//imageWriter->updateStatus.connect(boost::bind(static_cast<void (RecordTabHandler::*)(ImageRecordType, std::wstring)>(&RecordTabHandler::updateWriterStatus), &m_recordTabHandler, static_cast<ImageRecordType>(i), _1));
+			imageWriter->writingWasStopped.connect(boost::bind(&RecordTabHandler::recordingStopped, &m_recordTabHandler));
+
+			m_kinectV1ImageOutputWriter.push_back(imageWriter);
+		}	
 	}
 }
 void WindowsApplication::initStringFileWriter()
@@ -276,12 +535,24 @@ void WindowsApplication::connectStreamUpdaterToViewer()
 	m_coloredOutputStreamUpdater->cloudsUpdated.connect(boost::bind(&PCLViewer::updateColoredClouds, m_pclFaceViewer, _1));
 }
 
-void WindowsApplication::initKinectFrameGrabber()
+HRESULT WindowsApplication::initKinectFrameGrabber()
 {
-	m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
+	HRESULT hr;
+
+	m_kinectV2Enable = false;
+	hr = m_kinectFrameGrabber.initializeDefaultSensor();
+	if(FAILED(hr))
+	{
+		return hr;
+	}
+	
+			// Init Direct2D
+	// Create and initialize a new Direct2D image renderer 
+	//set the settings of the views and frames 
+	
 
 	// Get and initialize the default Kinect sensor
-	m_kinectFrameGrabber.initializeDefaultSensor();
+	
 	int depthWidth, depthHeight, colorWidth, colorHeight;
 
 	m_kinectFrameGrabber.getColourAndDepthSize(depthWidth, depthHeight, colorWidth, colorHeight);
@@ -299,20 +570,51 @@ void WindowsApplication::initKinectFrameGrabber()
 	//init the stragedy
 	m_coloredOutputStreamUpdater->initialize(m_kinectFrameGrabber.getCoordinateMapper(), depthWidth, depthHeight, colorWidth, colorHeight);
 	m_uncoloredOutputStreamUpdater->initialize(m_kinectFrameGrabber.getCoordinateMapper(), depthWidth, depthHeight, colorWidth, colorHeight);
+
+	m_kinectV2Enable = true;
+
+	return hr;
+}
+
+HRESULT WindowsApplication::initKinectV1FrameGrabber()
+{
+	HRESULT hr ;
+	m_kinectV1Enable = false;
+	
+
+	if(SUCCEEDED(hr = m_kinectV1Controller.init()))
+	{
+		m_kinectV1Enable = true;
+		m_kinectV1OutputStreamUpdater = std::shared_ptr<KinectV1OutPutStreamUpdater>(new KinectV1OutPutStreamUpdater);
+		m_kinectV1Controller.setOutPutStreamUpdater(m_kinectV1OutputStreamUpdater);
+				
+	}
+
+	return hr;
 }
 
 void WindowsApplication::initTabs()
 {
 	auto recordingConfiguration = initRecordDataModel();
-	auto imageRecordingConfiguration = initImageRecordDataModel();
-	auto stringFileRecordingConfiguration = initStringFileRecordDataModel();
 	auto commonConfiguration = initCommonDataModel();
-
-	m_recordTabHandler.setSharedRecordingConfiguration(recordingConfiguration);
-	m_recordTabHandler.setSharedImageRecordingConfiguration(imageRecordingConfiguration);
-	m_recordTabHandler.setSharedStringStringRecordingConfiguration(stringFileRecordingConfiguration);
 	m_recordTabHandler.setSharedCommonConfiguration(commonConfiguration);
 
+	m_recordTabHandler.setSharedRecordingConfiguration(recordingConfiguration);
+	if(m_kinectV2Enable)
+	{
+		
+		auto imageRecordingConfiguration = initImageRecordDataModel();
+		auto stringFileRecordingConfiguration = initStringFileRecordDataModel();
+				
+		m_recordTabHandler.setSharedImageRecordingConfiguration(imageRecordingConfiguration);
+		m_recordTabHandler.setSharedStringStringRecordingConfiguration(stringFileRecordingConfiguration);
+		
+	}
+	if(m_kinectV1Enable)
+	{
+		auto recordingConfiguration =initImageRecordDataModelForKinectV1();
+		m_recordTabHandler.setSharedImageRecordingConfigurationForKinectV1(recordingConfiguration);
+	}
 	//record, playback and convert are "subdialogs" with own message routers. They process their UI messages on their own
 	//we will show only one of those subdialogs once
 	//init record tab
@@ -325,12 +627,26 @@ void WindowsApplication::initTabs()
 	m_recordTabHandler.colorConfigurationChanged.connect(boost::bind(&WindowsApplication::colorStreamingChangedTo, this, _1));
 	m_recordTabHandler.centerConfigurationChanged.connect(boost::bind(&WindowsApplication::centerRecordingChangedTo, this, _1));
 	m_recordTabHandler.fpsLimitUpdated.connect(boost::bind(&WindowsApplication::setFPSLimit, this, _1));
-	m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1, _2, _3,_4));
-	m_recordTabHandler.stopWriting.connect(boost::bind(&WindowsApplication::stopRecording, this, _1, _2, _3,_4));
+
+	m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1, _2, _3,_4,_5));
+
+	m_recordTabHandler.stopWriting.connect(boost::bind(&WindowsApplication::stopRecording, this, _1, _2, _3,_4,_5));
 
 	m_plackBackTabHandler.setSharedRecordingConfiguration(recordingConfiguration);
 
-	m_kinectFrameGrabber.SetConfiguration(commonConfiguration[KinectV2_COMMON]);
+	if(m_kinectV2Enable)
+	{
+		m_kinectFrameGrabber.SetConfiguration(commonConfiguration[KinectV2_COMMON]);
+		commonConfiguration[KinectV2_COMMON]->setShowOpt(Color_Raw);
+	}
+	if(m_kinectV1Enable)
+	{
+		m_kinectV1Controller.SetConfiguration(commonConfiguration[KinectV1_COMMON]);
+		m_recordTabHandler.v1ShowOptChanged.connect(boost::bind(&KinectV1Controller::showOptUpdated, &m_kinectV1Controller, _1));
+		m_recordTabHandler.v1ShowResolutionChanged.connect(boost::bind(&KinectV1Controller::showResolutionUpdated, &m_kinectV1Controller, _1));
+		m_recordTabHandler.v1RecordingResolutionChanged.connect(boost::bind(&KinectV1Controller::recordingResolutionUpdated, &m_kinectV1Controller, _1,_2)); 
+		m_recordTabHandler.kinectV1AlignmentEnable.connect(boost::bind(&WindowsApplication::setKinectV1AlignmentEnable, this, _1));
+	}
 
 	//init playbackt tab
 	m_playbackTabHandle = CreateDialogParamW(
@@ -370,11 +686,93 @@ void WindowsApplication::initTabs()
 	RECT tabControlRect;
 	GetWindowRect(tabControlHandle, &tabControlRect);
 
-	//create subwindow for the color live stream
-	const int width = 840;
-	const int height = (width / 16) * 9;
-	const int xPos = (windowRect.right - windowRect.left - width) / 2;
-	m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, tabControlRect.top, width, height, m_hWnd, NULL, m_hInstance, NULL);
+	RECT showOptGroupRect;
+	HWND tabShowOPTHandle = GetDlgItem(m_recordTabHandle, IDC_GROUP_SHOW_OPT);
+	//HWND tabShowOPTHandle = GetDlgItem(tabrecordHandle, IDC_GROUP_SHOW_OPT);	
+	GetWindowRect(tabShowOPTHandle, &showOptGroupRect);
+
+
+	if(m_kinectV2Enable && ! m_kinectV1Enable)
+	{
+		const int height = showOptGroupRect.top - tabControlRect.top-40; //(width / 16) * 9;
+		const int width = (height/9)*16; 
+		const int xPos = (windowRect.right - windowRect.left - width) / 2;
+		const int yPos = (showOptGroupRect.top - tabControlRect.top - height) / 2;
+		m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, yPos, width, height, m_hWnd, NULL, m_hInstance, NULL);
+
+		m_pDrawDataStreams = new ImageRenderer();
+		if(m_pD2DFactory)
+			m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
+
+		m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
+		//m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
+
+	}
+
+	else if(!m_kinectV2Enable &&  m_kinectV1Enable)
+	{
+		
+		const int height = showOptGroupRect.top - tabControlRect.top-40; //(width / 16) * 9;
+		const int width = (height/3)*4; 
+		const int xPos = (windowRect.right - windowRect.left - width) / 2;
+		const int yPos = (showOptGroupRect.top - tabControlRect.top - height) / 2;
+
+
+		m_liveViewWindow_for_v1 = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, yPos, width, height, m_hWnd, NULL, m_hInstance, NULL);
+
+		m_pDrawDataStreamsForV1 = new ImageRenderer();
+		if(m_pD2DFactory)
+			m_pDrawDataStreamsForV1->initialize(m_liveViewWindow_for_v1, m_pD2DFactory, cColorWidthForV1, cColorHeightForV1, cColorWidthForV1 * sizeof(RGBQUAD));
+
+		m_kinectV1Controller.setImageRenderer(m_pDrawDataStreamsForV1,m_pD2DFactory);	
+
+		m_kinectV1Controller.SetIcon(m_liveViewWindow_for_v1);
+
+	}
+	else if(m_kinectV2Enable &&  m_kinectV1Enable)
+	{
+		const int height = showOptGroupRect.top - tabControlRect.top-60; //(width / 16) * 9;
+		const int width = (height/9)*16; 
+		const int xPos = 7;
+		//const int yPos = (showOptGroupRect.top - tabControlRect.top - height) / 2;
+		m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, tabControlRect.top, width, height, m_hWnd, NULL, m_hInstance, NULL);
+
+				
+		const int width_v1 = (tabControlRect.right-width -10);
+		const int height_v1 = (width_v1 / 4) * 3;
+		const int xPos_v1 = xPos+width+10;
+		m_liveViewWindow_for_v1 = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos_v1, tabControlRect.top, width_v1, height_v1, m_hWnd, NULL, m_hInstance, NULL);
+		
+		m_pDrawDataStreams = new ImageRenderer();
+		if(m_pDrawDataStreams && m_pD2DFactory)
+		{
+			m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
+		}
+		else
+		{
+			return ;
+		}
+				
+
+		m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
+
+		m_pDrawDataStreamsForV1 = new ImageRenderer();
+		if(m_pDrawDataStreamsForV1 && m_pD2DFactoryForKinectV1)
+		{
+			m_pDrawDataStreamsForV1->initialize(m_liveViewWindow_for_v1, m_pD2DFactoryForKinectV1, cColorWidthForV1, cColorHeightForV1, cColorWidthForV1 * sizeof(RGBQUAD));
+		}
+		else 
+		{
+			return;
+		}
+				
+
+		
+		m_kinectV1Controller.setImageRenderer(m_pDrawDataStreamsForV1,m_pD2DFactory);	
+
+		m_kinectV1Controller.SetIcon(m_liveViewWindow_for_v1);
+	}
+
 }
 
 
@@ -455,15 +853,22 @@ void WindowsApplication::onRecordTabSelected()
 {
 	m_isKinectRunning = true;
 	m_plackBackTabHandler.playbackStopped();
+	
+	if(m_kinectV2Enable)
+	{
+		
+		connectStreamUpdaterToViewer();
+
+		m_pclFaceViewer->useColoredCloud(m_recordTabHandler.isColorEnabled());
+		m_pclFaceViewer->setNumOfClouds(2);
+
+		ShowWindow(m_liveViewWindow, SW_SHOW);
+	}
+
+	if(m_kinectV1Enable)
+		ShowWindow(m_liveViewWindow_for_v1, SW_SHOW);
 
 	disconnectInputReaderFromViewer();
-	connectStreamUpdaterToViewer();
-
-	m_pclFaceViewer->useColoredCloud(m_recordTabHandler.isColorEnabled());
-	m_pclFaceViewer->setNumOfClouds(2);
-
-	
-	ShowWindow(m_liveViewWindow, SW_SHOW);
 	ShowWindow(m_recordTabHandle, SW_SHOW);
 
 	//hide the other views
@@ -474,7 +879,12 @@ void WindowsApplication::onRecordTabSelected()
 void WindowsApplication::onConvertTabSelected()
 {
 	//hide the other views
-	ShowWindow(m_liveViewWindow, SW_HIDE);
+	
+	if(m_kinectV2Enable)
+		ShowWindow(m_liveViewWindow, SW_HIDE);
+	if(m_kinectV1Enable)
+		ShowWindow(m_liveViewWindow_for_v1, SW_HIDE);
+
 	ShowWindow(m_recordTabHandle, SW_HIDE);
 	ShowWindow(m_playbackTabHandle, SW_HIDE);
 
@@ -487,12 +897,21 @@ void WindowsApplication::onPlaybackSelected()
 	//stop the updating of the kinect frame grabber
 	m_isKinectRunning = false;
 
-	disconnectStreamUpdaterFromViewer();
-	connectInputReaderToViewer();
 
-	//preset to default
-	m_pclFaceViewer->useColoredCloud(true);
-	ShowWindow(m_liveViewWindow, SW_HIDE);
+	if(m_kinectV2Enable)
+	{
+		ShowWindow(m_liveViewWindow, SW_HIDE);
+		disconnectStreamUpdaterFromViewer();
+		
+
+		//preset to default
+		m_pclFaceViewer->useColoredCloud(true);
+	}
+
+	if(m_kinectV1Enable)
+		ShowWindow(m_liveViewWindow_for_v1, SW_HIDE);
+
+	connectInputReaderToViewer();
 
 	m_plackBackTabHandler.resetUIElements();
 	m_plackBackTabHandler.setSharedRecordingConfiguration(m_recordTabHandler.getRecordConfiguration());
@@ -504,82 +923,110 @@ void WindowsApplication::onPlaybackSelected()
 }
 
 
-void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations, SharedStringFileRecordingConfiguration KeyPointsRecordingConfiguration)
+void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations, SharedStringFileRecordingConfiguration KeyPointsRecordingConfiguration, SharedImageRecordingConfiguration imageRecordingConfigurationsForV1)
 {
-	for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
-		auto recordingConfig = imageRecordingConfigurations[i];
-		auto imageWriter = m_imageOutputWriter[i];
-		imageWriter->setRecordingConfiguration(recordingConfig);
+	if(m_kinectV2Enable)
+	{
+		for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+			auto recordingConfig = imageRecordingConfigurations[i];
+			auto imageWriter = m_imageOutputWriter[i];
+			imageWriter->setRecordingConfiguration(recordingConfig);
 
-		//disconnect all connected signals
-		m_coloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
-		m_uncoloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
+			//disconnect all connected signals
+			m_coloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
+			m_uncoloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
 
-		if (recordingConfig->isEnabled()){
-			//we agreed on manually enabling the Raw image writer, so we do not that image creation if not required
-			if (isColoredStream) m_coloredOutputStreamUpdater->imageUpdated[i].connect(boost::bind(&KinectRawFileWriter::pushImageAsync, imageWriter, _1));
-			else m_uncoloredOutputStreamUpdater->imageUpdated[i].connect(boost::bind(&KinectRawFileWriter::pushImageAsync, imageWriter, _1));
-			imageWriter->startWriting();
-		}
-	}
-
-	for (int i = 0; i < STRING_FILE_RECORD_TYPE_COUNT; i++){
-		auto recordingConfig = KeyPointsRecordingConfiguration[i]; //
-		auto stringFileWriter = m_stringFileOutputWriter[i];
-		stringFileWriter->setRecordingConfiguration(recordingConfig);
-
-		//disconnect all connected signals
-		m_coloredOutputStreamUpdater->keyPointsUpdated[i].disconnect_all_slots();
-		m_uncoloredOutputStreamUpdater->keyPointsUpdated[i].disconnect_all_slots();
-
-		if (recordingConfig->isEnabled()){
-			//we agreed on manually enabling the Raw image writer, so we do not that image creation if not required
-			if (isColoredStream) m_coloredOutputStreamUpdater->keyPointsUpdated[i].connect(boost::bind(&StringFileWriter::pushStringFileAsync, stringFileWriter, _1));
-			else m_uncoloredOutputStreamUpdater->keyPointsUpdated[i].connect(boost::bind(&StringFileWriter::pushStringFileAsync, stringFileWriter, _1));
-			stringFileWriter->startWriting();
-		}
-	}
-
-	//use the correct recoder & updater
-	if (isColoredStream){
-		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-			auto recordingConfig = recordingConfigurations[i];
-			auto cloudWriter = m_colorCloudOutputWriter[i];
-			if (i == FullDepthRaw || i == HDFace2D){
-				//make sure the FullDepthRaw and HDFace2D was disconnected from last recording session
-				//we only want to do that point cloud creation if required
-				m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
-				m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
-			}
-			cloudWriter->setRecordingConfiguration(recordingConfig);
 			if (recordingConfig->isEnabled()){
-				//we agreed on manually enabling the FullDepthRaw and HDFace2D file writer, so we do not that cloud if not required
+				//we agreed on manually enabling the Raw image writer, so we do not that image creation if not required
+				if (isColoredStream) m_coloredOutputStreamUpdater->imageUpdated[i].connect(boost::bind(&KinectRawFileWriter::pushImageAsync, imageWriter, _1));
+				else m_uncoloredOutputStreamUpdater->imageUpdated[i].connect(boost::bind(&KinectRawFileWriter::pushImageAsync, imageWriter, _1));
+				imageWriter->startWriting();
+			}
+		}
+
+		for (int i = 0; i < STRING_FILE_RECORD_TYPE_COUNT; i++){
+			auto recordingConfig = KeyPointsRecordingConfiguration[i]; //
+			auto stringFileWriter = m_stringFileOutputWriter[i];
+			stringFileWriter->setRecordingConfiguration(recordingConfig);
+
+			//disconnect all connected signals
+			m_coloredOutputStreamUpdater->keyPointsUpdated[i].disconnect_all_slots();
+			m_uncoloredOutputStreamUpdater->keyPointsUpdated[i].disconnect_all_slots();
+
+			if (recordingConfig->isEnabled()){
+				//we agreed on manually enabling the Raw image writer, so we do not that image creation if not required
+				if (isColoredStream) m_coloredOutputStreamUpdater->keyPointsUpdated[i].connect(boost::bind(&StringFileWriter::pushStringFileAsync, stringFileWriter, _1));
+				else m_uncoloredOutputStreamUpdater->keyPointsUpdated[i].connect(boost::bind(&StringFileWriter::pushStringFileAsync, stringFileWriter, _1));
+				stringFileWriter->startWriting();
+			}
+		}
+
+		//use the correct recoder & updater
+		if (isColoredStream){
+			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+				auto recordingConfig = recordingConfigurations[i];
+				auto cloudWriter = m_colorCloudOutputWriter[i];
 				if (i == FullDepthRaw || i == HDFace2D){
-					m_coloredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZRGB>::pushCloudAsync, cloudWriter, _1));
+					//make sure the FullDepthRaw and HDFace2D was disconnected from last recording session
+					//we only want to do that point cloud creation if required
+					m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+					m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
 				}
-				cloudWriter->startWriting();
+				cloudWriter->setRecordingConfiguration(recordingConfig);
+				if (recordingConfig->isEnabled()){
+					//we agreed on manually enabling the FullDepthRaw and HDFace2D file writer, so we do not that cloud if not required
+					if (i == FullDepthRaw || i == HDFace2D){
+						m_coloredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZRGB>::pushCloudAsync, cloudWriter, _1));
+					}
+					cloudWriter->startWriting();
+				}
+			}
+		}
+		else{
+			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+				auto recordingConfig = recordingConfigurations[i];
+				auto cloudWriter = m_uncoloredCloudOutputWriter[i];
+				if (i == FullDepthRaw || i == HDFace2D){
+					//make sure the FullDepthRaw and HDFace2D was disconnected from last recording session
+					//we only want to do that point cloud creation if required
+					m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+					m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+				}
+				cloudWriter->setRecordingConfiguration(recordingConfig);
+				if (recordingConfig->isEnabled()){
+					//we agreed on manually enabling the FullDepthRaw and HDFace2D file writer, so we do not that cloud if not required
+					if (i == FullDepthRaw || i == HDFace2D){
+						m_uncoloredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZ>::pushCloudAsync, cloudWriter, _1));
+					}
+					cloudWriter->startWriting();
+				}
 			}
 		}
 	}
-	else{
-		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-			auto recordingConfig = recordingConfigurations[i];
-			auto cloudWriter = m_uncoloredCloudOutputWriter[i];
-			if (i == FullDepthRaw || i == HDFace2D){
-				//make sure the FullDepthRaw and HDFace2D was disconnected from last recording session
-				//we only want to do that point cloud creation if required
-				m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
-				m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+	if(m_kinectV1Enable)
+	{
+		m_kinectV1DataUpdateMutex.lock();
+		for (int i = 0; i < V1_IMAGE_RECORD_TYPE_COUNT; i++){
+			
+			if(!m_kinectV1Controller.getAlignmentEnable() && i == KinectAlignedDepthRaw)
+			{
+				continue;
 			}
-			cloudWriter->setRecordingConfiguration(recordingConfig);
+			auto recordingConfig = imageRecordingConfigurationsForV1[i];
+			auto imageWriter = m_kinectV1ImageOutputWriter[i];
+			imageWriter->setRecordingConfiguration(recordingConfig);
+
+
+			m_kinectV1OutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
+
 			if (recordingConfig->isEnabled()){
-				//we agreed on manually enabling the FullDepthRaw and HDFace2D file writer, so we do not that cloud if not required
-				if (i == FullDepthRaw || i == HDFace2D){
-					m_uncoloredOutputStreamUpdater->cloudUpdated[i].connect(boost::bind(&KinectCloudFileWriter<pcl::PointXYZ>::pushCloudAsync, cloudWriter, _1));
-				}
-				cloudWriter->startWriting();
+				//we agreed on manually enabling the Raw image writer, so we do not that image creation if not required
+				m_kinectV1OutputStreamUpdater->imageUpdated[i].connect(boost::bind(&KinectRawFileWriter::pushImageAsync, imageWriter, _1));
+				imageWriter->startWriting();
 			}
 		}
+		m_kinectV1DataUpdateMutex.unlock();
+		
 	}
 }
 
@@ -642,61 +1089,87 @@ void WindowsApplication::stopPlayback()
 	}
 }
 
-void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations,SharedStringFileRecordingConfiguration KeyPointsRecordingConfiguration)
+void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations,
+									   SharedImageRecordingConfiguration imageRecordingConfigurations,
+									   SharedStringFileRecordingConfiguration KeyPointsRecordingConfiguration,
+									   SharedImageRecordingConfiguration imageRecordingConfigurationsForV1)
 {
-	for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
-		auto recordingConfig = imageRecordingConfigurations[i];
-		auto imageWriter = m_imageOutputWriter[i];
-		if (recordingConfig->isEnabled()){
-			imageWriter->stopWriting();
+	if(m_kinectV2Enable)
+	{
+		for (int i = 0; i < IMAGE_RECORD_TYPE_COUNT; i++){
+			auto recordingConfig = imageRecordingConfigurations[i];
+			auto imageWriter = m_imageOutputWriter[i];
+			if (recordingConfig->isEnabled() ){
+				imageWriter->stopWriting();
+			}
+			//disconnect all connected signals
+			m_coloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
+			m_uncoloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
 		}
-		//disconnect all connected signals
-		m_coloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
-		m_uncoloredOutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
+
+		for (int i = 0; i < STRING_FILE_RECORD_TYPE_COUNT; i++){
+			auto recordingConfig = KeyPointsRecordingConfiguration[i];
+			auto stringFileWriter = m_stringFileOutputWriter[i];
+			if (recordingConfig->isEnabled() ){
+				stringFileWriter->stopWriting();
+			}
+			//disconnect all connected signals
+			m_coloredOutputStreamUpdater->keyPointsUpdated[i].disconnect_all_slots();
+			m_uncoloredOutputStreamUpdater->keyPointsUpdated[i].disconnect_all_slots();
+		}
+
+		//stop the correct writer
+		if (isColoredStream){
+			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+				auto recordingConfig = recordingConfigurations[i];
+				auto cloudWriter = m_colorCloudOutputWriter[i];
+
+				//stop those which were enabled/started
+				if (recordingConfig->isEnabled() ){
+					cloudWriter->stopWriting();
+				}
+
+				//disconect again so FullDepthRaw and HDFace2D is not created anymore
+				if (i == FullDepthRaw || i == HDFace2D){
+					m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+				}
+			}
+		}
+		else{
+			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
+				auto recordingConfig = recordingConfigurations[i];
+				auto cloudWriter = m_uncoloredCloudOutputWriter[i];
+
+				//stop those which were enabled/started
+				if (recordingConfig->isEnabled()){
+					cloudWriter->stopWriting();
+				}
+				//disconect again so FullDepthRaw and HDFace2D is not created anymore
+				if (i == FullDepthRaw || i == HDFace2D){
+					m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
+				}
+			}
+		}
 	}
 
-	for (int i = 0; i < STRING_FILE_RECORD_TYPE_COUNT; i++){
-		auto recordingConfig = KeyPointsRecordingConfiguration[i];
-		auto stringFileWriter = m_stringFileOutputWriter[i];
-		if (recordingConfig->isEnabled()){
-			stringFileWriter->stopWriting();
+	if(m_kinectV1Enable)
+	{
+		m_kinectV1DataUpdateMutex.lock();
+		for (int i = 0; i < V1_IMAGE_RECORD_TYPE_COUNT; i++){
+			if(!m_kinectV1Controller.getAlignmentEnable() && i == KinectAlignedDepthRaw)
+			{
+				continue;
+			}
+			auto recordingConfig = imageRecordingConfigurationsForV1[i];
+			auto imageWriter = m_kinectV1ImageOutputWriter[i];
+			if (recordingConfig->isEnabled() ){
+				imageWriter->stopWriting();
+			}
+			//disconnect all connected signals
+			m_kinectV1OutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
+			
 		}
-		//disconnect all connected signals
-		m_coloredOutputStreamUpdater->keyPointsUpdated[i].disconnect_all_slots();
-		m_uncoloredOutputStreamUpdater->keyPointsUpdated[i].disconnect_all_slots();
-	}
-
-	//stop the correct writer
-	if (isColoredStream){
-		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-			auto recordingConfig = recordingConfigurations[i];
-			auto cloudWriter = m_colorCloudOutputWriter[i];
-
-			//stop those which were enabled/started
-			if (recordingConfig->isEnabled()){
-				cloudWriter->stopWriting();
-			}
-
-			//disconect again so FullDepthRaw and HDFace2D is not created anymore
-			if (i == FullDepthRaw || i == HDFace2D){
-				m_coloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
-			}
-		}
-	}
-	else{
-		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-			auto recordingConfig = recordingConfigurations[i];
-			auto cloudWriter = m_uncoloredCloudOutputWriter[i];
-
-			//stop those which were enabled/started
-			if (recordingConfig->isEnabled()){
-				cloudWriter->stopWriting();
-			}
-			//disconect again so FullDepthRaw and HDFace2D is not created anymore
-			if (i == FullDepthRaw || i == HDFace2D){
-				m_uncoloredOutputStreamUpdater->cloudUpdated[i].disconnect_all_slots();
-			}
-		}
+		m_kinectV1DataUpdateMutex.unlock();
 	}
 }
 
@@ -716,13 +1189,23 @@ void WindowsApplication::colorStreamingChangedTo(bool enable)
 
 void WindowsApplication::centerRecordingChangedTo(bool enable)
 {
-	m_coloredOutputStreamUpdater->setCeterEnabled(enable);
-	m_uncoloredOutputStreamUpdater->setCeterEnabled(enable);
+	if(m_kinectV2Enable)
+	{
+		m_coloredOutputStreamUpdater->setCeterEnabled(enable);
+		m_uncoloredOutputStreamUpdater->setCeterEnabled(enable);
+	}
 }
 
 void WindowsApplication::setFPSLimit(int fps)
 {
 	m_FPSLimit = fps;
+	m_kinectV1Controller.setLimitedFPS(fps);
+}
+
+void WindowsApplication::setKinectV1AlignmentEnable(bool enable)
+{
+
+	m_kinectV1Controller.setAlignmentEnable(enable);
 }
 
 bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce)

@@ -22,6 +22,7 @@
 #include <thread>
 #include "StringFileWriter.h"
 #include "StringFileRecordingConfiguration.h"
+#include "KinectV1Controller.h"
 /**
  * \class	WindowsApplication for the UI, user inputs and management of the model classes
  *
@@ -35,6 +36,12 @@ public:
 	static const int       cColorWidth = 1920;
 	static const int       cColorHeight = 1080;
 
+	static const int       cColorWidthForV1 = 640;
+	static const int       cColorHeightForV1 = 480;
+
+		
+	static const int       cDepthWidthForV1 = 320;
+	static const int       cCDepthHeightForV1 = 240;
 	WindowsApplication();
 	~WindowsApplication();
 
@@ -122,6 +129,7 @@ private:
 	*/
 	void onRecordTabSelected();
 
+	void UpdateStreams(int i);
 	/**
 	* \fn	void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations)
 	*
@@ -131,7 +139,10 @@ private:
 	* \param	recordingConfigurations			The recording configurations.
 	* \param	imageRecordingConfigurations	The image recording configurations.
 	*/
-	void startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations,SharedStringFileRecordingConfiguration KeyPointsRecordingConfiguration);
+	void startRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, 
+		SharedImageRecordingConfiguration imageRecordingConfigurations,
+		SharedStringFileRecordingConfiguration KeyPointsRecordingConfiguration,
+		SharedImageRecordingConfiguration imageRecordingConfigurationsForV1);
 
 	/**
 	 * \fn	void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations);
@@ -142,7 +153,10 @@ private:
 	 * \param	recordingConfigurations			The recording configurations.
 	 * \param	imageRecordingConfigurations	The image recording configurations.
 	 */
-	void stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, SharedImageRecordingConfiguration imageRecordingConfigurations,SharedStringFileRecordingConfiguration KeyPointsRecordingConfiguration);
+	void stopRecording(bool isColoredStream, SharedRecordingConfiguration recordingConfigurations, 
+		SharedImageRecordingConfiguration imageRecordingConfigurations,
+		SharedStringFileRecordingConfiguration KeyPointsRecordingConfiguration,
+		SharedImageRecordingConfiguration imageRecordingConfigurationsForV1);
 
 	/**
 	 * \fn	void WindowsApplication::startPlayback(SharedPlaybackConfiguration playbackConfig, bool isSingleThreatedReading);
@@ -219,7 +233,16 @@ private:
 	 * \brief	Initialises the kinect frame grabber, image reader and outputstream updater-stragedy and
 	 * 			connects them.
 	 */
-	void initKinectFrameGrabber();
+	HRESULT initKinectFrameGrabber();
+	
+	
+	/**
+	 * \fn	void WindowsApplication::initKinectV1FrameGrabber();
+	 *
+	 * \brief	Initialises the kinect v1 frame grabber, image reader and outputstream updater-stragedy and
+	 * 			connects them.
+	 */
+	HRESULT initKinectV1FrameGrabber();
 
 	/**
 	 * \fn	void WindowsApplication::connectStreamUpdaterToViewer();
@@ -277,6 +300,15 @@ private:
 	*/
 	void setFPSLimit(int fps);
 
+	
+	/**
+	* \fn	void WindowsApplication::setKinectV1AlignmentEnable(bool enable);
+	*
+	* \brief	enable or disable alignment of KinectV1
+	*
+	* \param	enable.
+	*/
+	void setKinectV1AlignmentEnable(bool enable);
 	/**
 	 * \fn	int WindowsApplication::insertTabItem(HWND tab, LPTSTR text, int tabid);
 	 *
@@ -302,6 +334,16 @@ private:
 	 */
 	bool setStatusMessage(std::wstring statusString, bool bForce);
 
+	
+	/**
+	* \fn	SharedImageRecordingConfiguration WindowsApplication::initImageRecordDataModelForKinectV1();
+	*
+	* \brief	Initialises the ImageRecordingConfiguration of KinectV1 for the RecordTabHandler class.
+	*
+	* \return	A SharedImageRecordingConfiguration.
+	*/
+	SharedImageRecordingConfiguration initImageRecordDataModelForKinectV1();
+	
 
 	/** \brief	The handle of the windows app instance. */
 	HINSTANCE m_hInstance;
@@ -318,6 +360,9 @@ private:
 	/** \brief	Handle of the live view window. */
 	HWND m_liveViewWindow;
 
+	/** \brief	Handle of the live view window. */
+	HWND m_liveViewWindow_for_v1;
+
 	/** \brief	The min time delay for the next status update. */
 	ULONGLONG m_nNextStatusTime;
 
@@ -325,8 +370,15 @@ private:
 	/** \brief	The image renderer for the color stream and HDFace. */
 	ImageRenderer* m_pDrawDataStreams;
 
+		
+	/** \brief	The image renderer for the color stream and HDFace. */
+	ImageRenderer* m_pDrawDataStreamsForV1;
+
 	/** \brief	The d 2D factory. */
 	ID2D1Factory* m_pD2DFactory;
+
+		/** \brief	The d 2D factory. */
+	ID2D1Factory* m_pD2DFactoryForKinectV1;
 
 	/** \brief	The kinect frame grabber. */
 	KinectHDFaceGrabber			m_kinectFrameGrabber;
@@ -343,9 +395,11 @@ private:
 	/** \brief	The non colored cloud writer. */
 	std::vector<std::shared_ptr<KinectCloudFileWriter<pcl::PointXYZ>>> m_uncoloredCloudOutputWriter;
 
-	/** \brief	The image writer. */
+	/** \brief	The image writer for kinect v2. */
 	std::vector<std::shared_ptr<KinectRawFileWriter>> m_imageOutputWriter;
-	
+
+	/** \brief	The image writer for kinect v1. */
+	std::vector<std::shared_ptr<KinectRawFileWriter>> m_kinectV1ImageOutputWriter;
 
 	std::vector<std::shared_ptr<StringFileWriter>> m_stringFileOutputWriter;
 	/** \brief	The image writer. */
@@ -375,7 +429,25 @@ private:
 	/** \brief	The non colored output stream updater. */
 	std::shared_ptr<UncoloredOutputStreamsUpdater> m_uncoloredOutputStreamUpdater;
 
+	std::shared_ptr<KinectV1OutPutStreamUpdater> m_kinectV1OutputStreamUpdater;
+	
+
+	bool m_kinectV1Enable;
+	bool m_kinectV2Enable;
 	/** \brief	FPS Limit. */
 	int m_FPSLimit;
+
+	KinectV1Controller m_kinectV1Controller;
+	//UINT m_v1SleepMillsecond;
+public:
+	HANDLE m_hStopStreamEventThread;
+	HANDLE m_hPauseStreamEventThread;
+	HWND GetWindow() const;
+
+	static DWORD WINAPI runKinectV1StreamEvent(WindowsApplication * pThis);
+	static DWORD WINAPI runKinectV2Update(WindowsApplication * pThis);
+
+	std::mutex m_kinectV1DataUpdateMutex;
+	
 };
 

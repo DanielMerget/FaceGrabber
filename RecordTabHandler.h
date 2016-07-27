@@ -10,6 +10,14 @@
 #include <boost/signals.hpp>
 #include "StringFileRecordingConfiguration.h"
 #include "CommonConfiguration.h"
+#include "KinectV1Controller.h"
+
+enum kinectEnabledOpt{
+	OnlyKinectV2Enabled,
+	OnlyKinectV1Enabled,
+	BothKinectEnabled,
+	NoneEnable
+};
 /**
  * \class	RecordTabHandler
  *
@@ -50,6 +58,14 @@ public:
 	*/
 	void setSharedImageRecordingConfiguration(SharedImageRecordingConfiguration imageRecordingConfiguration);
 
+		/**
+	* \fn	void RecordTabHandler::setSharedImageRecordingConfiguration(SharedImageRecordingConfiguration imageRecordingConfiguration);
+	*
+	* \brief	Sets shared image recording configuration.
+	*
+	* \param	imageRecordingConfiguration		The image recording configuration.
+	*/
+	void setSharedImageRecordingConfigurationForKinectV1(SharedImageRecordingConfiguration imageRecordingConfiguration);
 
 	void setSharedStringStringRecordingConfiguration(SharedStringFileRecordingConfiguration stringFileRecordingConfiguration);
 
@@ -135,6 +151,9 @@ public:
 	/** \brief	The fps limit changed signal. */
 	boost::signal<void(int)> fpsLimitUpdated;
 
+		/** \brief	enbale aligment of kinect v1 signal. */
+	boost::signal<void(bool)> kinectV1AlignmentEnable;
+
 	/** \brief	The color configuration changed signal: color is now enabled or not. */
 	boost::signal<void(bool)> colorConfigurationChanged;
 
@@ -142,10 +161,22 @@ public:
 	boost::signal<void(bool)> centerConfigurationChanged;
 
 	/** \brief	The start writing signal. */
-	boost::signal<void(bool, SharedRecordingConfiguration, SharedImageRecordingConfiguration,SharedStringFileRecordingConfiguration)> startWriting;
+	boost::signal<void(bool, SharedRecordingConfiguration, SharedImageRecordingConfiguration,SharedStringFileRecordingConfiguration,SharedImageRecordingConfiguration)> startWriting;
+
+		/** \brief	The start writing signal. */
+	boost::signal<void(bool, SharedRecordingConfiguration, SharedImageRecordingConfiguration)> startKinectV1Writing;
+
 
 	/** \brief	The stop writing signal. */
-	boost::signal<void(bool, SharedRecordingConfiguration, SharedImageRecordingConfiguration,SharedStringFileRecordingConfiguration)> stopWriting;
+	boost::signal<void(bool, SharedRecordingConfiguration, SharedImageRecordingConfiguration,SharedStringFileRecordingConfiguration,SharedImageRecordingConfiguration)> stopWriting;
+
+
+	/** \brief	The fps limit changed signal. */
+	boost::signal<void(KinectV1ImageRecordType)> v1ShowOptChanged;
+
+		/** \brief	The fps limit changed signal. */
+	boost::signal<void(int)> v1ShowResolutionChanged;
+	boost::signal<void(KinectV1ImageRecordType,int)> v1RecordingResolutionChanged;
 
 	/**
 	* \fn	void RecordTabHandler::recordPathChanged(RecordCloudType type);
@@ -189,6 +220,9 @@ public:
 	void recordConfigurationStatusChanged(ImageRecordType type, bool newState);
 
 	void recordConfigurationStatusChanged(StringFileRecordType type, bool newState);
+
+
+	void setKinectEnableOpt(bool v1Enabled, bool v2Enabled);
 private:
 
 	/**
@@ -208,7 +242,7 @@ private:
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
-
+	void movieShowOptWindosOfV1();
 
 	/**
 	 * \fn	void RecordTabHandler::setRecording(bool enable);
@@ -269,6 +303,9 @@ private:
 	SharedImageRecordingConfiguration m_imageRecordingConfiguration;
 
 		/** \brief	The image recording configuration. */
+	SharedImageRecordingConfiguration m_imageRecordingConfigurationForKinectV1;
+
+		/** \brief	The image recording configuration. */
 	SharedStringFileRecordingConfiguration m_KeyPointsRecordingConfiguration;
 
 	/** \brief	true to enable, false to disable the color. */
@@ -281,5 +318,7 @@ private:
 
 	/** \brief	true if recording is running at the moment. */
 	bool m_isRecording;
+
+	kinectEnabledOpt m_KinectEnableOpt; // 0 KinectV2 1 KinectV1 2 both
 };
 

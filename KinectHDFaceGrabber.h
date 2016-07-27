@@ -416,5 +416,12 @@ private:
 
 
 	CommonConfigurationPtr m_commonConfiguration;
+
+
+	void UpdateFrameRate();
+	UINT                m_fps;
+    UINT                m_frameCount;
+    UINT                m_lastFrameCount;
+    DWORD               m_lastTick;
 };
 

@@ -112,6 +112,7 @@ void KinectRawFileWriter::pushImage(boost::shared_ptr<cv::Mat> imageToPush)
 	//check whether we captured enough frames
 	if (isMaximumFramesReached()){
 		stopWriting();
+
 	}
 	else{
 		m_checkImage.notify_all();
@@ -130,6 +131,7 @@ void KinectRawFileWriter::pushImageAsync(boost::shared_ptr<cv::Mat> image)
 	if (!m_running){
 		return;
 	}
+			
 	std::async(std::launch::async, &KinectRawFileWriter::pushImage, this, image);
 }
 

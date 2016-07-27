@@ -28,7 +28,10 @@ void CommonConfiguration::setFacePointsShowOpt(FacePointsShowOpt FacePointsShowO
 {
 	m_FacePointsShowOpt = FacePointsShowOpt;
 }
-
+void CommonConfiguration::setShowResolution(NUI_IMAGE_RESOLUTION	showResolution)
+{
+	m_showResolution = showResolution;
+}
 
 FacePointsShowOpt CommonConfiguration::getFacePointsShowOpt()
 {

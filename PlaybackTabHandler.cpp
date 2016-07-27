@@ -5,6 +5,7 @@
 PlaybackTabHandler::PlaybackTabHandler() :
 	m_playbackConfiguration(RECORD_CLOUD_TYPE_COUNT),
 	m_isPlaybackRunning(false),
+	m_isPlaybackPaused(false),
 	m_isSingleThreadedReading(true)
 {
 }
@@ -99,7 +100,7 @@ void PlaybackTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 		Edit_GetText(GetDlgItem(m_hWnd, IDC_FILE_PATH_EDIT_BOX), inputFolder.GetBuffer(MAX_PATH), MAX_PATH);
 
 		for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-			auto fullPath = RecordingConfiguration::getFullRecordingPathForCloudType(static_cast<RecordCloudType>(i), inputFolder, timeStampFolderNameBuffer);
+			auto fullPath = RecordingConfiguration::getFullRecordingPathForCloudType(static_cast<RecordCloudType>(i), inputFolder, timeStampFolderNameBuffer,KINECT_VERSION_TYPE_COUNT);
 			m_playbackConfiguration[i]->setFullFilePath(fullPath);
 		}
 
@@ -116,10 +117,27 @@ void PlaybackTabHandler::setPlaybackStatus(bool enable)
 	if (enable){
 		startPlayback(m_playbackConfiguration, m_isSingleThreadedReading);
 		SetDlgItemText(m_hWnd, IDC_PLAY_STOP_BUTTON, L"Stop");
+		Button_Enable(GetDlgItem(m_hWnd, IDC_PLAY_PAUSE_BUTTON), true);
+		Button_Enable(GetDlgItem(m_hWnd, IDC_PLAY_NEXT_FRAME_BUTTON), true);
+		Button_Enable(GetDlgItem(m_hWnd, IDC_PLAY_PREV_FRAME_BUTTON), true);
 	}
 	else{
 		stopPlayback();
 		playbackStopped();
+	}
+	setPlaybackPaused(false);
+}
+
+void PlaybackTabHandler::setPlaybackPaused(bool enable)
+{
+	m_isPlaybackPaused = enable;
+	if (enable){
+		pausePlayback(true);
+		SetDlgItemText(m_hWnd, IDC_PLAY_PAUSE_BUTTON, L"Play");
+	}
+	else{
+		pausePlayback(false);
+		SetDlgItemText(m_hWnd, IDC_PLAY_PAUSE_BUTTON, L"Pause");
 	}
 }
 
@@ -131,7 +149,29 @@ bool PlaybackTabHandler::isPlaybackRunning()
 void PlaybackTabHandler::playbackStopped()
 {
 	SetDlgItemText(m_hWnd, IDC_PLAY_STOP_BUTTON, L"Play");
+	Button_Enable(GetDlgItem(m_hWnd, IDC_PLAY_PAUSE_BUTTON), false);
+	Button_Enable(GetDlgItem(m_hWnd, IDC_PLAY_NEXT_FRAME_BUTTON), false);
+	Button_Enable(GetDlgItem(m_hWnd, IDC_PLAY_PREV_FRAME_BUTTON), false);
+	updatePlaybackSliderPos(SendMessage(GetDlgItem(m_hWnd, IDC_PLAYBACK_SLIDER), TBM_GETRANGEMIN, (WPARAM)TRUE, 0));
 	m_isPlaybackRunning = false;
+}
+
+void PlaybackTabHandler::updateFPSLimit()
+{
+	bool isLimited = IsDlgButtonChecked(m_hWnd, IDC_LIMIT_PLAYBACK_FRAMERATE_CHECK);
+	Edit_Enable(GetDlgItem(m_hWnd, IDC_LIMIT_PLAYBACK_FRAMRATE_EDIT_BOX), isLimited);
+
+	int fps = 0;
+
+	//if the user has set an limit it is now parsed and overridden
+	if (isLimited){
+		auto editBoxHandle = GetDlgItem(m_hWnd, IDC_LIMIT_PLAYBACK_FRAMRATE_EDIT_BOX);
+		std::vector<wchar_t> buffer(MAX_PATH);
+		Edit_GetText(editBoxHandle, buffer.data(), buffer.size());
+		fps = _tstoi(buffer.data());
+	}
+
+	fpsLimitUpdated(fps);
 }
 
 void PlaybackTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
@@ -145,6 +185,17 @@ void PlaybackTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 	case IDC_PLAY_STOP_BUTTON:
 		setPlaybackStatus(!m_isPlaybackRunning);
 		break;
+	case IDC_PLAY_PAUSE_BUTTON:
+		setPlaybackPaused(!m_isPlaybackPaused);
+		break;
+	case IDC_PLAY_NEXT_FRAME_BUTTON:
+		setPlaybackPaused(true);
+		playbackSliderMoved(SendMessage(GetDlgItem(m_hWnd, IDC_PLAYBACK_SLIDER), TBM_GETPOS, (WPARAM)TRUE, 0) + 1);
+		break;
+	case IDC_PLAY_PREV_FRAME_BUTTON:
+		setPlaybackPaused(true);
+		playbackSliderMoved(SendMessage(GetDlgItem(m_hWnd, IDC_PLAYBACK_SLIDER), TBM_GETPOS, (WPARAM)TRUE, 0) - 1);
+		break;
 	case IDC_HD_FACE_CHECKBOX:
 		m_playbackConfiguration[HDFace]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_HD_FACE_CHECKBOX));
 		break;
@@ -153,6 +204,9 @@ void PlaybackTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		break;
 	case IDC_FULL_RAW_DEPTH_CHECKBOX:
 		m_playbackConfiguration[FullDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_FULL_RAW_DEPTH_CHECKBOX));
+		break;
+	case IDC_LIMIT_PLAYBACK_FRAMERATE_CHECK:
+		updateFPSLimit();
 		break;
 	case IDC_FULL_RAW_DEPTH_BUTTON_CHOOSE_INPUT:
 	{
@@ -183,7 +237,7 @@ void PlaybackTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		WCHAR szDir[MAX_PATH];
 		if (WindowsAppDialogHelper::openDirectoryDialog(szDir, m_hWnd)){
 			for (int i = 0; i < RECORD_CLOUD_TYPE_COUNT; i++){
-				auto fullPath = RecordingConfiguration::getFullRecordingPathForCloudType(static_cast<RecordCloudType>(i), szDir, "");
+				auto fullPath = RecordingConfiguration::getFullRecordingPathForCloudType(static_cast<RecordCloudType>(i), szDir, "",KINECT_VERSION_TYPE_COUNT);
 				m_playbackConfiguration[i]->setFullFilePath(fullPath);
 			}
 			DlgDirList(m_hWnd,
@@ -198,9 +252,53 @@ void PlaybackTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		break;
 	}
 }
+
 void PlaybackTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 {
+	HWND editBoxHandle = GetDlgItem(m_hWnd, LOWORD(wParam));
+	CString editBoxText;
 
+	Edit_GetText(editBoxHandle, editBoxText.GetBuffer(MAX_PATH), MAX_PATH);
+	switch (LOWORD(wParam)){
+	case IDC_LIMIT_PLAYBACK_FRAMRATE_EDIT_BOX:
+		updateFPSLimit();
+		break;
+	}
+}
+
+void PlaybackTabHandler::onSliderChanged(WPARAM wParam, LPARAM handle)
+{
+	// trigger playbackSlierMoved only when slider is released?
+	int ctrlID = GetDlgCtrlID((HWND)handle);
+	switch (ctrlID)
+	{
+	case IDC_PLAYBACK_SLIDER:
+		if (m_isPlaybackRunning){
+			playbackSliderMoved(SendMessage((HWND)handle, TBM_GETPOS, (WPARAM)TRUE, 0));
+		}
+		else
+		{
+			updatePlaybackSliderPos(SendMessage((HWND)handle, TBM_GETRANGEMIN, (WPARAM)TRUE, 0));
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void PlaybackTabHandler::updatePlaybackSliderPos(int pos)
+{
+	HWND slider = GetDlgItem(m_hWnd, IDC_PLAYBACK_SLIDER);
+	if (pos >= SendMessage(slider, TBM_GETRANGEMIN, (WPARAM)TRUE, 0) && pos <= SendMessage(slider, TBM_GETRANGEMAX, (WPARAM)TRUE, 0)){
+		SendMessage(slider, TBM_SETPOS, (WPARAM)TRUE, pos);
+	}
+}
+
+void PlaybackTabHandler::updatePlaybackSliderRange(int min, int max)
+{
+	HWND slider = GetDlgItem(m_hWnd, IDC_PLAYBACK_SLIDER);
+	SendMessage(slider, TBM_SETRANGEMIN, (WPARAM)TRUE, min);
+	SendMessage(slider, TBM_SETRANGEMAX, (WPARAM)TRUE, max);
 }
 
 void PlaybackTabHandler::playbackConfigurationChanged()

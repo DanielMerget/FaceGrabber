@@ -13,10 +13,8 @@ m_fileFormat(format)
 {
 	m_maxNumberOfFrames = UNLIMITED_FRAMES;
 	setDefaultFileName();
+	m_kinectVersion = KINECT_VERSION_TYPE_COUNT;
 }
-
-
-
 
 
 CString ImageRecordingConfiguration::getFileFormatAsString(ImageRecordingFileFormat fileFormat)
@@ -42,7 +40,6 @@ void ImageRecordingConfiguration::setDefaultFileName()
 
 CString ImageRecordingConfiguration::getDefaultFileName()
 {
-
 	switch (m_imageType){
 	case KinectColorRaw:
 		return CString(L"Kinect_Color_Raw");
@@ -99,8 +96,6 @@ ImageRecordingFileFormat ImageRecordingConfiguration::getRecordFileFormat()
 {
 	return m_fileFormat;
 }
-
-
 
 CString ImageRecordingConfiguration::getFileNameCString()
 {
@@ -201,7 +196,7 @@ CString ImageRecordingConfiguration::getSubFolderNameForImageType(ImageRecordTyp
 
 CString ImageRecordingConfiguration::getFullRecordingPath()
 {
-	auto result = getFullRecordingPathForImageType(m_imageType, m_outputFolder, m_timeStampFolderName);
+	auto result = getFullRecordingPathForImageType(m_imageType, m_outputFolder, m_timeStampFolderName,m_kinectVersion);
 	return result;
 }
 
@@ -214,7 +209,7 @@ std::string ImageRecordingConfiguration::getFullRecordingPathString()
 	return strStd;
 }
 
-CString ImageRecordingConfiguration::getFullRecordingPathForImageType(ImageRecordType imageType, CString outputFolder, CString timeStampFolderName)
+CString ImageRecordingConfiguration::getFullRecordingPathForImageType(ImageRecordType imageType, CString outputFolder, CString timeStampFolderName,KinectVersionType kinectVersion)
 {
 	CString subFolder = getSubFolderNameForImageType(imageType);
 	CString fullPath;
@@ -224,6 +219,19 @@ CString ImageRecordingConfiguration::getFullRecordingPathForImageType(ImageRecor
 	if (outputEnding != L"\\"){
 		fullPath += _T("\\");
 	}
+
+	if(kinectVersion == KinectVersionType::KinectV1)
+	{
+		fullPath += _T("KinectV1\\");
+	}
+	else if(kinectVersion== KinectVersionType::KinectV2)
+	{
+		fullPath += _T("KinectV2\\");
+	}
+		
+		
+	
+
 	fullPath += timeStampFolderName.GetString();
 	outputEnding = fullPath.Right(1);
 	if (outputEnding != L"\\"){
@@ -233,3 +241,7 @@ CString ImageRecordingConfiguration::getFullRecordingPathForImageType(ImageRecor
 	return fullPath;
 }
 
+void ImageRecordingConfiguration::setKinectVersion(KinectVersionType kinectVersion)
+{
+	m_kinectVersion = kinectVersion;
+}
