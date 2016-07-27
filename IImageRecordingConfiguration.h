@@ -28,6 +28,7 @@ enum ImageRecordType{
 enum KinectV1ImageRecordType{
 	KinectV1ColorRaw,
 	KinectV1DepthRaw,
+	KinectV1AlignedDepthRaw,
 	V1_IMAGE_RECORD_TYPE_COUNT
 };
 

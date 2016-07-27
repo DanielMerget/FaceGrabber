@@ -125,7 +125,9 @@ void WindowsApplication::UpdateStreams(int i)
 	
 	if(needUpdateWriter)
 	{
+		m_kinectV1DataUpdateMutex.lock();
 		m_kinectV1Controller.updateWriter();
+		m_kinectV1DataUpdateMutex.unlock();
 	}
 	//Sleep(halfADepthFrameMs);
 	return ;
@@ -162,8 +164,8 @@ DWORD WindowsApplication::runKinectV1StreamEvent(WindowsApplication * pThis)
 
 	 HANDLE events[] = {
 						pThis->m_hStopStreamEventThread,
-						pThis->m_kinectV1Controller.getCorlorFrameEvent(), 
-						pThis->m_kinectV1Controller.getDepthFrameEvent(),
+						pThis->m_kinectV1Controller.getCorlorFrameEvent(),
+						pThis->m_kinectV1Controller.getDepthFrameEvent(),						 
 						pThis->m_hPauseStreamEventThread} ;
 
 	int colorDepth = 0;
@@ -180,59 +182,47 @@ DWORD WindowsApplication::runKinectV1StreamEvent(WindowsApplication * pThis)
 		
         if (WAIT_OBJECT_0 == ret)
             break;
-
-        if (WAIT_OBJECT_0 + 1 == ret ) 
-        {
-           //SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_COLOR, 0, 0);
-			pThis->UpdateStreams(1);
-		   /*
-			color_arrived = clock();
-			if (pThis->m_FPSLimit)
-			{
-				// timedelta in seconds
-				timedelta = (double(color_arrived - last_color_arrived)) / CLOCKS_PER_SEC;
-				// if faster than specified target fps: sleep
-				if (timedelta >= (1.0 / pThis->m_FPSLimit))  
-				{
-					last_color_arrived = color_arrived;
-					 SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_COLOR, 0, 0);
-				}// Sleep(((1.0 / pThis->m_FPSLimit) - timedelta) * 1000);
-			}
-			else
-			{
-				 SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_COLOR, 0, 0);
-			}
-			*/
-			
-        }
-		else if( WAIT_OBJECT_0 + 2 == ret)
-		{
-			pThis->UpdateStreams(2);
-			//SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_DEPTH, 0, 0);
-			/*
-			depth_arrived = clock();
-			if (pThis->m_FPSLimit)
-			{
-				// timedelta in seconds
-				timedelta = (double(depth_arrived - last_depth_arrived)) / CLOCKS_PER_SEC;
-				// if faster than specified target fps: sleep
-				if (timedelta >= (1.0 / pThis->m_FPSLimit))  
-				{
-					last_depth_arrived = depth_arrived;
-					 SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_DEPTH, 0, 0);
-				}// Sleep(((1.0 / pThis->m_FPSLimit) - timedelta) * 1000);
-			}
-			else
-			{
-				SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_DEPTH, 0, 0);
-			}
-			*/
-		}
+				
 		else if( WAIT_OBJECT_0 + 3 == ret)
 		{
 			
 			//Sleep(pThis->);
 		}
+		else {
+			if( WAIT_OBJECT_0 == WaitForSingleObject(pThis->m_kinectV1Controller.getDepthFrameEvent(), 0))
+			{
+				//if(pThis->m_kinectV2Enable)
+				//{
+				
+					pThis->UpdateStreams(2);
+				//}
+				//else
+				//{
+					//SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_DEPTH, 0, 0);
+				//}
+
+				//pThis->UpdateStreams(2);
+			
+
+			}
+			if (WAIT_OBJECT_0 == WaitForSingleObject(pThis->m_kinectV1Controller.getCorlorFrameEvent(), 0) )  //+ 1 
+			{
+				//if(pThis->m_kinectV2Enable)
+				//{
+				
+					pThis->UpdateStreams(1);
+					
+				//}
+				//else
+				//{
+					//SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_COLOR, 0, 0);
+				//}
+				//
+			
+			
+			}
+		}
+
 		/*
 		const int depthFps =  pThis->m_kinectV1Controller.getDepthFrameFPS();//30;
 		const int halfADepthFrameMs = (1000 / depthFps) / 2;
@@ -305,14 +295,10 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 		//hv1EventThread = CreateThread(nullptr, 0, m_kinectV1Controller.Update(), 0, 0, nullptr);
 		//m_kinectV1Controller.Update();
 		//std::async(std::launch::async, &KinectV1Controller::Update, &m_kinectV1Controller);
-		hEventThread = CreateThread(nullptr, 100000, (LPTHREAD_START_ROUTINE)runKinectV1StreamEvent, this, 0, nullptr); //
+		hEventThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)runKinectV1StreamEvent, this, 0, nullptr); //
 		
 	}
-	if(m_kinectV2Enable)
-	{
-		//hEventThread1 = CreateThread(nullptr, 10000000, (LPTHREAD_START_ROUTINE)runKinectV2Update, this, 0, nullptr);
-		
-	}
+
 	//HANDLE hEventThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)StreamEventThread, this, 0, nullptr);
 	// Main message loop
 	while (WM_QUIT != msg.message)
@@ -336,6 +322,11 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 			{
 				m_kinectFrameGrabber.update();
 			}
+			else
+			{
+				Sleep(5);
+			}
+
 			
 		}
 
@@ -376,11 +367,14 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 			Sleep(10);
 		}
 	}
-	WaitForSingleObject(hEventThread, INFINITE);
-	//WaitForSingleObject(hEventThread1, INFINITE);
-	SetEvent(m_hStopStreamEventThread);
-	//m_kinectV2Enable = false;
-    CloseHandle(hEventThread);
+	if(m_kinectV1Enable)
+	{
+		WaitForSingleObject(hEventThread, INFINITE);
+
+		SetEvent(m_hStopStreamEventThread);
+
+		CloseHandle(hEventThread);
+	}
 	//CloseHandle(hEventThread1);
 	
 	
@@ -605,14 +599,13 @@ void WindowsApplication::initTabs()
 	auto commonConfiguration = initCommonDataModel();
 	m_recordTabHandler.setSharedCommonConfiguration(commonConfiguration);
 
+	m_recordTabHandler.setSharedRecordingConfiguration(recordingConfiguration);
 	if(m_kinectV2Enable)
 	{
 		
 		auto imageRecordingConfiguration = initImageRecordDataModel();
 		auto stringFileRecordingConfiguration = initStringFileRecordDataModel();
-		
-
-		m_recordTabHandler.setSharedRecordingConfiguration(recordingConfiguration);
+				
 		m_recordTabHandler.setSharedImageRecordingConfiguration(imageRecordingConfiguration);
 		m_recordTabHandler.setSharedStringStringRecordingConfiguration(stringFileRecordingConfiguration);
 		
@@ -651,7 +644,8 @@ void WindowsApplication::initTabs()
 		m_kinectV1Controller.SetConfiguration(commonConfiguration[KinectV1_COMMON]);
 		m_recordTabHandler.v1ShowOptChanged.connect(boost::bind(&KinectV1Controller::showOptUpdated, &m_kinectV1Controller, _1));
 		m_recordTabHandler.v1ShowResolutionChanged.connect(boost::bind(&KinectV1Controller::showResolutionUpdated, &m_kinectV1Controller, _1));
-		m_recordTabHandler.v1RecordingResolutionChanged.connect(boost::bind(&KinectV1Controller::recordingResolutionUpdated, &m_kinectV1Controller, _1,_2));
+		m_recordTabHandler.v1RecordingResolutionChanged.connect(boost::bind(&KinectV1Controller::recordingResolutionUpdated, &m_kinectV1Controller, _1,_2)); 
+		m_recordTabHandler.kinectV1AlignmentEnable.connect(boost::bind(&WindowsApplication::setKinectV1AlignmentEnable, this, _1));
 	}
 
 	//init playbackt tab
@@ -1011,7 +1005,13 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 	}
 	if(m_kinectV1Enable)
 	{
+		m_kinectV1DataUpdateMutex.lock();
 		for (int i = 0; i < V1_IMAGE_RECORD_TYPE_COUNT; i++){
+			
+			if(!m_kinectV1Controller.getAlignmentEnable() && i == KinectAlignedDepthRaw)
+			{
+				continue;
+			}
 			auto recordingConfig = imageRecordingConfigurationsForV1[i];
 			auto imageWriter = m_kinectV1ImageOutputWriter[i];
 			imageWriter->setRecordingConfiguration(recordingConfig);
@@ -1025,6 +1025,8 @@ void WindowsApplication::startRecording(bool isColoredStream, SharedRecordingCon
 				imageWriter->startWriting();
 			}
 		}
+		m_kinectV1DataUpdateMutex.unlock();
+		
 	}
 }
 
@@ -1152,7 +1154,12 @@ void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConf
 
 	if(m_kinectV1Enable)
 	{
+		m_kinectV1DataUpdateMutex.lock();
 		for (int i = 0; i < V1_IMAGE_RECORD_TYPE_COUNT; i++){
+			if(!m_kinectV1Controller.getAlignmentEnable() && i == KinectAlignedDepthRaw)
+			{
+				continue;
+			}
 			auto recordingConfig = imageRecordingConfigurationsForV1[i];
 			auto imageWriter = m_kinectV1ImageOutputWriter[i];
 			if (recordingConfig->isEnabled() ){
@@ -1162,6 +1169,7 @@ void WindowsApplication::stopRecording(bool isColoredStream, SharedRecordingConf
 			m_kinectV1OutputStreamUpdater->imageUpdated[i].disconnect_all_slots();
 			
 		}
+		m_kinectV1DataUpdateMutex.unlock();
 	}
 }
 
@@ -1192,6 +1200,12 @@ void WindowsApplication::setFPSLimit(int fps)
 {
 	m_FPSLimit = fps;
 	m_kinectV1Controller.setLimitedFPS(fps);
+}
+
+void WindowsApplication::setKinectV1AlignmentEnable(bool enable)
+{
+
+	m_kinectV1Controller.setAlignmentEnable(enable);
 }
 
 bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce)

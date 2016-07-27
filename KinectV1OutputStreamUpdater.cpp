@@ -12,19 +12,19 @@ KinectV1OutPutStreamUpdater::KinectV1OutPutStreamUpdater()
 {
 	m_colorBuffer = nullptr;
 	m_depthBuffer = nullptr;
-	m_depthImageBuffer = nullptr;
+	m_alignedDepthBuffer = nullptr;
 
 }
 KinectV1OutPutStreamUpdater::~KinectV1OutPutStreamUpdater()
 {
 }
 
-void KinectV1OutPutStreamUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer,RGBQUAD* depthIntensityBuffer, int depthWidth, int depthHeight, int colorWidth, int colorHeight)
+void KinectV1OutPutStreamUpdater::startKinectV1DataCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer,UINT16* alignedDepthBuffer, int depthWidth, int depthHeight, int colorWidth, int colorHeight)
 {
 
 	m_colorBuffer = colorBuffer;
 	m_depthBuffer = depthBuffer;
-	m_depthImageBuffer = depthIntensityBuffer;
+	m_alignedDepthBuffer = alignedDepthBuffer;
 	
 	m_depthWidth = depthWidth;
 	m_depthHeight = depthHeight;
@@ -32,7 +32,7 @@ void KinectV1OutPutStreamUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT
 	m_colorHeight = colorHeight;
 }
 
-void KinectV1OutPutStreamUpdater::stopFaceCollection()
+void KinectV1OutPutStreamUpdater::stopKinectV1DataCollection()
 {	
 	static int pushCounts = 0;
 		//KinectColorRaw
@@ -105,10 +105,10 @@ void KinectV1OutPutStreamUpdater::stopFaceCollection()
 	if (!imageUpdated[2].empty()){
 		// update writer
 		//cv::Mat m_alignedDepthImage = cv::Mat(m_colorHeight, m_colorWidth, CV_8UC4, m_alignedDepthBuffer, cv::Mat::AUTO_STEP);   
-		cv::Mat m_infraredImage = cv::Mat(m_depthHeight, m_depthWidth, CV_8UC4, m_depthImageBuffer, cv::Mat::AUTO_STEP);   
-		boost::shared_ptr<cv::Mat> m_infraredImagePtr(new cv::Mat());
-		*m_infraredImagePtr = m_infraredImage.clone();
-		imageUpdated[2](m_infraredImagePtr);
+		cv::Mat m_alignedDepthImage = cv::Mat(m_colorHeight, m_colorWidth,  CV_16UC1, m_alignedDepthBuffer, cv::Mat::AUTO_STEP);   
+		boost::shared_ptr<cv::Mat> m_alignedDepthImagePtr(new cv::Mat());
+		*m_alignedDepthImagePtr = m_alignedDepthImage.clone();
+		imageUpdated[2](m_alignedDepthImagePtr);
 	}
 
 
@@ -116,6 +116,6 @@ void KinectV1OutPutStreamUpdater::stopFaceCollection()
 	//m_isValidFaceFrame = false;
 	m_colorBuffer = nullptr;
 	m_depthBuffer = nullptr;
-	m_depthImageBuffer = nullptr;
+	m_alignedDepthBuffer = nullptr;
 }
 

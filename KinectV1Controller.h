@@ -16,7 +16,8 @@
 #include "KinectV1Controller.h"
 #include "KinectV1OutputStreamUpdater.h"
 #include "IImageREcordingConfiguration.h"
-
+#include <thread>
+#include <mutex>
 //#include "WindowsApplication.h"
 
 #define MIN_DEPTH                   400
@@ -129,6 +130,15 @@ public:
 
 	void setLimitedFPS(int fps);
 
+	void setAlignmentEnable(bool enable);
+
+	bool getAlignmentEnable();
+	//std::mutex getColorMutex();
+	//std::mutex getDepthMutex();
+	//std::mutex getUpdateMutex();
+
+
+	//std::mutex m_updateMutex;
 private:
     
     // Current Kinect
@@ -262,4 +272,15 @@ private:
 	
 	bool  ifDumpColorFrame(NUI_IMAGE_FRAME *frame);
 	bool  ifDumpDepthFrame(NUI_IMAGE_FRAME *frame);
+
+	
+
+	bool  m_alignmentEnabled;
+
+	std::mutex m_colorMutex;
+	std::mutex m_depthMutex;
+
+	
+
+	
 };

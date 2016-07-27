@@ -25,7 +25,7 @@ public:
 
 	
 	/** \brief	The images updated */
-	boost::signals2::signal<void(boost::shared_ptr<cv::Mat>)> imageUpdated[3]; // 1 -> color 2 ->depth 3->depth image
+	boost::signals2::signal<void(boost::shared_ptr<cv::Mat>)> imageUpdated[3]; // 1 -> color 2 ->depth 3->aligned depth
 
 	/**
 	 * \fn	void ColoredOutputStreamUpdater::startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer);
@@ -34,7 +34,7 @@ public:
 	 * \param [in]	colorBuffer the current color Buffer
 	 * \param [in]	depthBuffer the current depth Buffer
 	 */
-	void startFaceCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer,RGBQUAD* depthIntensityBuffer£¬, int depthWidth, int depthHeight, int colorWidth, int colorHeight);
+	void startKinectV1DataCollection(RGBQUAD* colorBuffer, UINT16* depthBuffer,UINT16* alignedDepthBuffer, int depthWidth, int depthHeight, int colorWidth, int colorHeight);
 
 	/**
 	 * \fn	void ColoredOutputStreamUpdater::stopFaceCollection();
@@ -42,7 +42,7 @@ public:
 	 * \brief	Stops the collection of the faces, runs the conversion of the entire depth buffer if neccesary and
 	 * 			 calls the signals.
 	 */
-	void stopFaceCollection();
+	void stopKinectV1DataCollection();
 
 	/**
 	* \fn	void RecordTabHandler::setCeterEnabled(bool enable);
@@ -70,6 +70,7 @@ private:
 	/** \brief	Buffer for depth data. */
 	UINT16*	m_depthBuffer;
 
+	UINT16*	m_alignedDepthBuffer;
 	
 	/** \brief	Width of the depth frame. */
 	int							m_depthWidth;

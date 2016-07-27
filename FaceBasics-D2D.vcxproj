@@ -222,8 +222,10 @@
       </StackReserveSize>
       <StackCommitSize>
       </StackCommitSize>
-      <HeapReserveSize>10000000</HeapReserveSize>
-      <HeapCommitSize>10000000</HeapCommitSize>
+      <HeapReserveSize>
+      </HeapReserveSize>
+      <HeapCommitSize>
+      </HeapCommitSize>
     </Link>
     <PostBuildEvent>
       <Command>xcopy "$(KINECTSDK20_DIR)Redist\Face\x64\NuiDatabase" "$(TargetDir)NuiDatabase" /e /y /i /r

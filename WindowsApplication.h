@@ -300,6 +300,15 @@ private:
 	*/
 	void setFPSLimit(int fps);
 
+	
+	/**
+	* \fn	void WindowsApplication::setKinectV1AlignmentEnable(bool enable);
+	*
+	* \brief	enable or disable alignment of KinectV1
+	*
+	* \param	enable.
+	*/
+	void setKinectV1AlignmentEnable(bool enable);
 	/**
 	 * \fn	int WindowsApplication::insertTabItem(HWND tab, LPTSTR text, int tabid);
 	 *
@@ -437,6 +446,8 @@ public:
 
 	static DWORD WINAPI runKinectV1StreamEvent(WindowsApplication * pThis);
 	static DWORD WINAPI runKinectV2Update(WindowsApplication * pThis);
+
+	std::mutex m_kinectV1DataUpdateMutex;
 	
 };
 

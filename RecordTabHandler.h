@@ -151,6 +151,9 @@ public:
 	/** \brief	The fps limit changed signal. */
 	boost::signal<void(int)> fpsLimitUpdated;
 
+		/** \brief	enbale aligment of kinect v1 signal. */
+	boost::signal<void(bool)> kinectV1AlignmentEnable;
+
 	/** \brief	The color configuration changed signal: color is now enabled or not. */
 	boost::signal<void(bool)> colorConfigurationChanged;
 
