@@ -467,6 +467,9 @@ public:
 	/** \brief	thread for update stream of V1. */
 	static DWORD WINAPI runKinectV1StreamEvent(WindowsApplication * pThis);
 	static DWORD WINAPI runKinectV2Update(WindowsApplication * pThis);
+	
+	/* \brief set the title angle for kinect v1*/
+	void  setTitleAngle(LONG degree);
 
 	/** \mutex for protecting the opereation of kinect v1 in two threads */
 	std::mutex m_kinectV1DataUpdateMutex;

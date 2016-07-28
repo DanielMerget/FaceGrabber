@@ -20,6 +20,7 @@
 #define IDC_NEXT_FRAME_BUTTON2          1006
 #define IDC_BUTTON1                     1007
 #define IDC_KINECT_RAW_COLOR_STATUS     1007
+#define IDC_TILTANGLE_SLIDER            1007
 #define IDC_KINECT_RAW_DEPTH_STATUS     1008
 #define IDC_TAB2                        1009
 #define IDC_HD_FACE_2D_STATUS           1009
@@ -176,6 +177,8 @@
 #define IDC_V1_COLOR_RECORDING_TYPE_COMBO 1144
 #define IDC_V1_RECORDING_COLOR_CHECK    1145
 #define IDC_V1_DEPTH_RECORDING_TYPE_COMBO 1146
+#define IDC_EDIT3                       1147
+#define IDC_ANGLE_STATUS                1147
 #define IDC_KINECT_INFRARED_COMBO_BOX_THREADS 1806
 #define IDC_PLAY_PAUSE_BUTTON           1807
 #define IDC_PLAY_PAUSE_BUTTON2          1808
@@ -196,7 +199,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1146
+#define _APS_NEXT_CONTROL_VALUE         1148
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

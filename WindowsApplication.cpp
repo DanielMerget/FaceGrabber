@@ -259,7 +259,8 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 		hEventThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)runKinectV1StreamEvent, this, 0, nullptr); //
 		
 	}
-
+	//_CrtDumpMemoryLeaks();
+	_CrtMemState s1, s2, s3;
 	//HANDLE hEventThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)StreamEventThread, this, 0, nullptr);
 	// Main message loop
 	while (WM_QUIT != msg.message)
@@ -277,6 +278,7 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
 		}
+		//_CrtMemCheckpoint(&s1);
 		if (m_isKinectRunning)
 		{
 			if(m_kinectV2Enable)
@@ -290,6 +292,9 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 
 			
 		}
+		//_CrtMemCheckpoint(&s2);
+		//if ( _CrtMemDifference( &s3, &s1, &s2) )
+				//_CrtMemDumpStatistics( &s3 );
 
 		int sel = TabCtrl_GetCurSel(tabControlHandle);
 
@@ -317,10 +322,10 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 
 			FPSinfo.str("");
 			FPSinfo.clear();
-			FPSinfo << "UPDATE Loop actual fps: " << actualFPS << " target fps: " << m_FPSLimit;
+			//FPSinfo << "UPDATE Loop actual fps: " << actualFPS << " target fps: " << m_FPSLimit;
 			msgCstring = CString(FPSinfo.str().c_str());
 			msgCstring += L"\n";
-			OutputDebugString(msgCstring);
+			//OutputDebugString(msgCstring);
 		}
 		// Playback/Convert Tab active
 		else{
@@ -653,7 +658,9 @@ void WindowsApplication::initTabs()
 	//HWND tabShowOPTHandle = GetDlgItem(tabrecordHandle, IDC_GROUP_SHOW_OPT);	
 	GetWindowRect(tabShowOPTHandle, &showOptGroupRect);
 
-
+	HWND hWndSlider = GetDlgItem(m_recordTabHandle, IDC_TILTANGLE_SLIDER);
+	SendMessageW(hWndSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, NUI_CAMERA_ELEVATION_MAXIMUM - NUI_CAMERA_ELEVATION_MINIMUM));
+	
 	if(m_kinectV2Enable && ! m_kinectV1Enable)
 	{
 		const int height = showOptGroupRect.top - tabControlRect.top-40; //(width / 16) * 9;
@@ -689,6 +696,14 @@ void WindowsApplication::initTabs()
 		m_kinectV1Controller.setImageRenderer(m_pDrawDataStreamsForV1,m_pD2DFactory);	
 
 		m_kinectV1Controller.SetIcon(m_liveViewWindow_for_v1);
+
+		LONG degree = m_kinectV1Controller.getTitleDegree();
+		SendMessageW(hWndSlider, TBM_SETPOS, TRUE, (LPARAM)(NUI_CAMERA_ELEVATION_MAXIMUM - degree));
+		m_recordTabHandler.v1TitleAngleChanged.connect(boost::bind(&WindowsApplication::setTitleAngle, this, _1));
+		WCHAR buffer[128];
+		swprintf_s(buffer, 128, L"%d\x00B0", degree);
+		SetDlgItemTextW(m_recordTabHandle, IDC_ANGLE_STATUS, buffer);
+
 
 	}
 	else if(m_kinectV2Enable &&  m_kinectV1Enable)
@@ -733,6 +748,13 @@ void WindowsApplication::initTabs()
 		m_kinectV1Controller.setImageRenderer(m_pDrawDataStreamsForV1,m_pD2DFactory);	
 
 		m_kinectV1Controller.SetIcon(m_liveViewWindow_for_v1);
+
+		LONG degree = m_kinectV1Controller.getTitleDegree();
+		WCHAR buffer[128];
+		swprintf_s(buffer, 128, L"%d\x00B0", degree);
+		SetDlgItemTextW(m_recordTabHandle, IDC_ANGLE_STATUS, buffer);
+		SendMessageW(hWndSlider, TBM_SETPOS, TRUE, (LPARAM)(NUI_CAMERA_ELEVATION_MAXIMUM - degree));
+		m_recordTabHandler.v1TitleAngleChanged.connect(boost::bind(&WindowsApplication::setTitleAngle, this, _1));
 	}
 
 }
@@ -1187,4 +1209,9 @@ bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce
 	return false;
 }
 
+
+void  WindowsApplication::setTitleAngle(LONG degree)
+{
+	m_kinectV1Controller.setTitleDegree(degree);
+}
 

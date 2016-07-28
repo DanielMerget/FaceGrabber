@@ -19,6 +19,10 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <strsafe.h>
 
+#define _CRTDBG_MAP_ALLOC
+#include <stdlib.h>
+#include <crtdbg.h>
+
 // face property text layout offset in X axis
 static const float c_FaceTextLayoutOffsetX = -0.1f;
 

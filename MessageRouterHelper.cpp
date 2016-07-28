@@ -70,6 +70,9 @@ LRESULT CALLBACK MessageRouterHelper::DlgProc(HWND hWnd, UINT message, WPARAM wP
 	case WM_HSCROLL:
 		onSliderChanged(wParam, lParam);
 		break;
+	case WM_VSCROLL:
+		onSliderScroll(wParam, lParam);
+		break;
 	case WM_NOTIFY:
 		switch (((LPNMHDR)lParam)->code)
 		{
@@ -104,6 +107,7 @@ void MessageRouterHelper::processUIMessage(WPARAM wParam, LPARAM handle)
 		break;
 	case EN_CHANGE:
 		onEditBoxeChanged(wParam, handle);
+
 	default:
 		break;
 	}
@@ -121,6 +125,12 @@ void MessageRouterHelper::onButtonClicked(WPARAM wParam, LPARAM handle)
 {
 
 }
+
+void MessageRouterHelper::onSliderScroll(WPARAM wParam, LPARAM handle)
+{
+
+}
+
 void MessageRouterHelper::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 {
 

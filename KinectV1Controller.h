@@ -212,8 +212,9 @@ public:
     /// <returns>bool</returns>
 	bool getAlignmentEnable();
 
+	LONG getTitleDegree();
 
-
+	void setTitleDegree(LONG degree);
 	//std::mutex m_updateMutex;
 private:
     
@@ -403,7 +404,13 @@ private:
 	std::mutex m_colorMutex;
 	std::mutex m_depthMutex;
 
+	 /// Pointer to camera settings interface
+    INuiColorCameraSettings* m_pNuiColorCameraSettings;
+
+
+	INuiColorCameraSettings* m_pNuiDepthCameraSettings;
 	
 
+	
 	
 };

@@ -178,6 +178,8 @@ public:
 	boost::signal<void(int)> v1ShowResolutionChanged;
 	boost::signal<void(KinectV1ImageRecordType,int)> v1RecordingResolutionChanged;
 
+
+	boost::signal<void(LONG)> v1TitleAngleChanged;
 	/**
 	* \fn	void RecordTabHandler::recordPathChanged(RecordCloudType type);
 	*
@@ -240,6 +242,7 @@ private:
 	void setupRecording();
 
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
+	void onSliderScroll(WPARAM wParam, LPARAM handle);
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
 	void movieShowOptWindosOfV1();

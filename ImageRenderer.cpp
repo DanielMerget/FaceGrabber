@@ -108,32 +108,32 @@ HRESULT ImageRenderer::ensureResources()
 
         if (SUCCEEDED(hr))
         {
-            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Red, 2.0f)), &m_pFaceBrush[0]);
+            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Red, 0.3f)), &m_pFaceBrush[0]);
         }
 
         if (SUCCEEDED(hr))
         {
-            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Green, 2.0f)), &m_pFaceBrush[1]);			
+            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Green, 0.3f)), &m_pFaceBrush[1]);			
         }
 
         if (SUCCEEDED(hr))
         {
-            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::White, 2.0f)), &m_pFaceBrush[2]);			
+            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::White, 0.3f)), &m_pFaceBrush[2]);			
         }
 
         if (SUCCEEDED(hr))
         {
-            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Purple, 2.0f)), &m_pFaceBrush[3]);			
+            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Purple, 0.3f)), &m_pFaceBrush[3]);			
         }
 
         if (SUCCEEDED(hr))
         {
-            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Orange, 2.0f)), &m_pFaceBrush[4]);			
+            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Orange, 0.3f)), &m_pFaceBrush[4]);			
         }
 
         if (SUCCEEDED(hr))
         {
-            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Pink, 2.0f)), &m_pFaceBrush[5]);					
+            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Pink, 0.3f)), &m_pFaceBrush[5]);					
         }        
     }
 

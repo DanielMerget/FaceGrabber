@@ -641,10 +641,39 @@ void RecordTabHandler::updateWriterStatus(StringFileRecordType recordType, std::
 	}
 }
 
+void RecordTabHandler::onSliderScroll(WPARAM wParam, LPARAM handle)
+{
+	if( m_KinectEnableOpt == NoneEnable)
+	{
+			return;
+	}
+	HWND hWndSlider = GetDlgItem(m_hWnd, IDC_TILTANGLE_SLIDER);
+	if (hWndSlider == (HWND)handle)
+	{
+
+		WORD lo = LOWORD(wParam);
+		if (TB_ENDTRACK == lo) // Mouse button released
+		{
+			LONG trackValue ;
+			trackValue =(LONG)SendMessageW(hWndSlider, TBM_GETPOS, 0, 0);
+			LONG degree;
+			degree= NUI_CAMERA_ELEVATION_MAXIMUM - trackValue;
+						
+			WCHAR buffer[128];
+			swprintf_s(buffer, 128, L"%d\x00B0", degree);
+			SetDlgItemTextW(m_hWnd, IDC_ANGLE_STATUS, buffer);
+			v1TitleAngleChanged(degree);
+			
+
+		}
+
+	}
+}
 
 void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 {
 	int currentSelection = ComboBox_GetCurSel(GetDlgItem(m_hWnd, LOWORD(wParam)));
+
 	switch (LOWORD(wParam))
 	{
 	case IDC_3D_POINTS_CLOUDS_FORMAT_COMBOX:

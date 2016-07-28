@@ -101,20 +101,26 @@ HRESULT KinectV1Controller::init()
 {
 
 	HRESULT hr = CreateFirstConnected();
+
 	if(FAILED(hr))
 	{
 		return hr;
 	}
-
-
-	
+	//m_pNuiSensor->NuiGetDepthCameraSettings(&m_pNuiDepthCameraSettings);
+	hr = m_pNuiSensor->NuiGetColorCameraSettings(&m_pNuiColorCameraSettings);
+	int a = E_NUI_HARDWARE_FEATURE_UNAVAILABLE;
+	if(FAILED(hr))
+	{
+		//return hr;
+	}
 	m_depthResolution = NUI_IMAGE_RESOLUTION_320x240;
 	hr = openDepthStream(); //NUI_IMAGE_RESOLUTION_320x240 NUI_IMAGE_RESOLUTION_640x480
 	m_colorImageType = NUI_IMAGE_TYPE_COLOR;
+	
 
 	m_colorResolution = NUI_IMAGE_RESOLUTION_640x480;
 	hr = openColorStream();
-
+	
 
 	return hr;
 }
@@ -760,52 +766,35 @@ void KinectV1Controller::UpdateColorFrameRate()
 
 bool  KinectV1Controller::ifDumpColorFrame(NUI_IMAGE_FRAME *frame)
 {
+	if(m_pNuiColorCameraSettings || m_FPSLimit <=0 )
+	{
+		return false;
+	}
+
 	LARGE_INTEGER     colorTimeStamp = frame->liTimeStamp;
 	static LARGE_INTEGER last_acceptedColorTS = {0};
 	//UINT colorFps            = (UINT)((double)(m_colorFrameCount - m_lastColorFrameCount) * 1000.0 / (double)span + 0.5);
 
 	if(m_FPSLimit)
 	{
+		
 		double span      = double(colorTimeStamp.QuadPart-last_acceptedColorTS.QuadPart)/1000;
 		if(span <(1.0 / m_FPSLimit))
 		{
 			return true;
 		}
 		last_acceptedColorTS = colorTimeStamp;
+	
 	}
-		
 
-#if 0
-	static DWORD last_checkTick = 0;
-	/*
-	if(last_checkTick == 0)
-	{
 
-	}
-	*/
-	if(m_FPSLimit)
-	{
-		//if(m_colorFps>m_FPSLimit)
-			//return true;
-		//timedelta = (double(clock() - start)) 
-		DWORD tickCount = clock();
-		double span      = double((tickCount - last_checkTick))/CLOCKS_PER_SEC;
-		
-		if (span < (1.0 / m_FPSLimit))
-		{
-			return true;
-		}
-		last_checkTick = tickCount;
-		
-	}
-#endif 
 	return false;
 
 }
 
 bool  KinectV1Controller::ifDumpDepthFrame(NUI_IMAGE_FRAME *frame)
 {
-	if(!m_FPSLimit)
+	if(m_pNuiColorCameraSettings || m_FPSLimit <=0)
 	{
 		return false;
 	}
@@ -932,6 +921,19 @@ UINT KinectV1Controller::getColorFrameFPS()
 void KinectV1Controller::setLimitedFPS(int fps)
 {
 	m_FPSLimit = fps;
+	if(m_pNuiColorCameraSettings==nullptr )
+	{
+		return;
+	}
+	if(!m_FPSLimit)
+	{
+		m_pNuiColorCameraSettings->SetFrameInterval(0);
+	}
+	else
+	{
+		double interval = 1/m_FPSLimit;	
+		m_pNuiColorCameraSettings->SetFrameInterval(interval*10000);
+	}
 }
 
 void KinectV1Controller::setAlignmentEnable(bool enable)
@@ -953,5 +955,18 @@ bool KinectV1Controller::getAlignmentEnable()
 	return m_alignmentEnabled;
 }
 
+
+LONG KinectV1Controller::getTitleDegree()
+{
+	LONG degree;
+    m_pNuiSensor->NuiCameraElevationGetAngle(&degree);
+	return 	degree;
+}
+
+void KinectV1Controller::setTitleDegree(LONG degree)
+{
+    m_pNuiSensor->NuiCameraElevationSetAngle(degree);
+	return;
+}
 
 
