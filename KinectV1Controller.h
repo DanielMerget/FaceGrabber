@@ -75,6 +75,10 @@ public:
     /// </summary>
     void                    Update();
 	
+	/// <summary>
+    /// set the imagee renderer for showing in the screen
+    /// </summary>
+    /// <returns>void</returns>
 	void setImageRenderer(ImageRenderer* renderer,ID2D1Factory * pD2DFactory );
 
 	void SetConfiguration(CommonConfigurationPtr commonConfiguration)
@@ -82,22 +86,45 @@ public:
 		m_commonConfiguration = commonConfiguration;
 	}
 
+	/// <summary>
+    /// change the show option, rgb or depth
+    /// </summary>
+    /// <returns>void</returns>
 	void showOptUpdated(KinectV1ImageRecordType showOpt);
 
-
+	
+	/// <summary>
+    /// change the show resolution
+    /// </summary>
+    /// <returns>void</returns>
 	void showResolutionUpdated(int showResolution);
 
+	/// <summary>
+    /// change the show resolution of color images
+    /// </summary>
+    /// <returns>void</returns>
 	void showcolorResolutionUpdated(v1ColorType showResolution);
 
+	/// <summary>
+    /// change the show resolution of depth images
+    /// </summary>
+    /// <returns>void</returns>
 	void showdepthResolutionUpdated(v1DepthType showResolution);
 
 	void SetIcon(HWND hWnd);
-
+	
+	/// <summary>
+    /// get the string for showing in UI
+    /// </summary>
+    /// <returns>CString</returns>
 	static CString getColorTypeAsString(v1ColorType colorType);
 
+	/// <summary>
+    /// get the string for showing in UI
+    /// </summary>
+    /// <returns>CString</returns>
 	static CString getDepthTypeAsString(v1DepthType depthType);
 
-	//DWORD run(WindowsApplication* pThis);
 
 	   /// <summary>
     /// Handle new depth data
@@ -111,31 +138,80 @@ public:
     /// <returns>S_OK on success, otherwise failure code</returns>
     void                 ProcessColor();
 
+	/// <summary>
+    /// get the event handle of color frame 
+    /// </summary>
+    /// <returns>HANDLE</returns>
 	HANDLE getCorlorFrameEvent();
 
+	/// <summary>
+    /// get the event handle of depth frame 
+    /// </summary>
+    /// <returns>HANDLE</returns>
 	HANDLE getDepthFrameEvent();
 
+	/// <summary>
+    /// set the stream updater 
+    /// </summary>
+    /// <returns>void</returns>
 	void setOutPutStreamUpdater(std::shared_ptr<KinectV1OutPutStreamUpdater> KinectV1OutPutStreamUpdater);
 
+	/// <summary>
+    /// get the  time stamp of the last color stream  
+    /// </summary>
+    /// <returns>LARGE_INTEGER</returns>
 	LARGE_INTEGER getLastColorFrameStamp();
+
+	/// <summary>
+    /// get the  time stamp of the last depth stream  
+    /// </summary>
+    /// <returns>LARGE_INTEGER</returns>
 	LARGE_INTEGER getLastDepthFrameStamp();
 
+	/// <summary>
+    /// check if needs to update the stream to oupput stream writer  
+    /// </summary>
+    /// <returns>void</returns>
 	void updateWriter();
 
+	
+	/// <summary>
+    /// cchange the resolution for recording
+    /// </summary>
+    /// <returns>void</returns>
 	void recordingResolutionUpdated(KinectV1ImageRecordType opt,int showResolution);
 
 
+	/// <summary>
+    /// get the FPS of depth streams
+    /// </summary>
+    /// <returns>UINT</returns>
 	UINT getDepthFrameFPS();
+
+	/// <summary>
+    /// get the FPS of color streams
+    /// </summary>
+    /// <returns>UINT</returns>
 	UINT getColorFrameFPS();
 
+	/// <summary>
+    /// set the limited FPS
+    /// </summary>
+    /// <returns>void</returns>
 	void setLimitedFPS(int fps);
 
+	/// <summary>
+    /// enable or disable the aligment of depth to color
+    /// </summary>
+    /// <returns>void</returns>
 	void setAlignmentEnable(bool enable);
 
+	/// <summary>
+    /// check if the aligment is either enabled or disabled
+    /// </summary>
+    /// <returns>bool</returns>
 	bool getAlignmentEnable();
-	//std::mutex getColorMutex();
-	//std::mutex getDepthMutex();
-	//std::mutex getUpdateMutex();
+
 
 
 	//std::mutex m_updateMutex;
@@ -150,43 +226,58 @@ private:
     
     
 
-
+	// handle of color stream
     HANDLE                  m_pColorStreamHandle;
+
+	// handle of depth stream
 	HANDLE                  m_pDepthStreamHandle;
 
-
+	// event handle of color stream
     HANDLE                  m_hNextColorFrameEvent;
+
+	// event handle of depth stream
 	HANDLE                  m_hNextDepthFrameEvent;
 
-
+	// current width of depth streams
     LONG                    m_depthWidth;
+
+	// current height of depth streams
     LONG                    m_depthHeight;
 
+	// current width of color streams
     LONG                    m_colorWidth;
+
+	// current height of color streams
     LONG                    m_colorHeight;
 
+	/* the ratio of color to depth in width*/
     LONG                    m_colorToDepthDivisor;
 
+	/* the current received raw depth data*/
     USHORT*                 m_depthD16;
+
+	/* the current aligned  depth data if the aligment enabled*/
 	USHORT*					m_alignedDepthD16;
+
+	/* buffer for save color imgages */
     NuiImageBuffer          m_colorRGBX;
     
+	/*resverve, buffer for save depth intensity imgages */
 	NuiImageBuffer			m_DepthRGBX;
-    NuiImageBuffer			m_alignedDepthRGBX;
-	NuiImageBuffer          m_infraredRGBX;
-	NuiImageBuffer          m_alignedInfraredRGBX;
-	NuiImageBuffer*          m_drawRGBX;
-	
 
-    LONG*                   m_colorCoordinates;
+	/* resverve, buffer for save aligned depth intensity imgages */
+   // NuiImageBuffer			m_alignedDepthRGBX;
+		
+	/* pointer to buffer for showing */
+	NuiImageBuffer*          m_drawRGBX;
+	    
 
     LARGE_INTEGER           m_depthTimeStamp;
     LARGE_INTEGER           m_colorTimeStamp;
 
-    NuiSensorChooser*       m_pSensorChooser;
-    NuiSensorChooserUI*     m_pSensorChooserUI;
-
+	/* ImageRenderer */
 	ImageRenderer*			m_pDrawDataStreams;
+
 	ID2D1Factory*           m_pD2DFactory;
 
     /// <summary>
@@ -195,10 +286,16 @@ private:
     /// <returns>S_OK on success, otherwise failure code</returns>
     HRESULT                 CreateFirstConnected();
 
- 
+     /// <summary>
+    /// convert to raw depth data 
+    /// </summary>
+    /// <returns>void</returns>
 	void getRawDepthData(const BYTE* srcpImage, UINT size, USHORT* depthpImage, int width, int height);
 
-
+	 /// <summary>
+    /// align the depth to color space
+    /// </summary>
+    /// <returns>void</returns>
     void                 AlignDepthToColorSpace();
 
 	
@@ -220,28 +317,49 @@ private:
     /// </summary>
 	void UpdateNscControlStatus();
 
+		
+	/// <summary>
+    /// show the image in the screen 
+    /// </summary>
+    /// <returns>void</returns>
 	void show();
-
+		
+	/// <summary>
+    /// caculat the current frame rate of color streams
+    /// </summary>
+    /// <returns>void</returns>
 	void UpdateColorFrameRate();
+
+	/// <summary>
+    /// caculat the current frame rate of depth streams
+    /// </summary>
+    /// <returns>void</returns>
 	void UpdateDepthFrameRate();
+
 	bool m_paused;
 
 	DEPTH_TREATMENT				m_depthTreatment;
 
-	UINT*						m_depthColorTable[MAX_PLAYER_INDEX + 1]; //[USHRT_MAX + 1]
+	//UINT*						m_depthColorTable[MAX_PLAYER_INDEX + 1]; //[USHRT_MAX + 1]
 
 	bool						m_nearMode;
 
 	CommonConfigurationPtr		m_commonConfiguration;
 
-
+	// the current  resolution of color streams
 	NUI_IMAGE_RESOLUTION		m_colorResolution;
+
+	// the current the resolution of depth streams
 	NUI_IMAGE_RESOLUTION		m_depthResolution;
+
+	// the image type  resolution of depth streams
 	NUI_IMAGE_TYPE				m_colorImageType;
 	//NUI_IMAGE_TYPE				m_depthImageType;
 
+	// the current resolution of images will be showed
 	NUI_IMAGE_RESOLUTION		m_showResolution;
 
+	// show option
 	KinectV1ImageRecordType			m_showOpt;
 
 	HWND m_hWnd; 
@@ -258,9 +376,11 @@ private:
     UINT                m_lastDepthFrameCount;
     DWORD               m_lastDepthTick;
 
-	bool				m_colorFrameArrived;
-	bool				m_depthFrameArrived;
+	//bool				m_colorFrameArrived;
+	//bool				m_depthFrameArrived;
 
+
+	// for recording the images
 	std::shared_ptr<KinectV1OutPutStreamUpdater> m_outPutStreamUpdater;
 
 	LARGE_INTEGER		m_LastColorTimeStamp;
@@ -270,7 +390,10 @@ private:
 	int					m_FPSLimit;
 
 	
+	// check if the color frame should be dumped because of the limited FPS
 	bool  ifDumpColorFrame(NUI_IMAGE_FRAME *frame);
+
+	// check if the depth frame should be dumped because of the limited FPS
 	bool  ifDumpDepthFrame(NUI_IMAGE_FRAME *frame);
 
 	

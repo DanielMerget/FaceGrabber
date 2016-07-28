@@ -344,9 +344,10 @@ HRESULT KinectHDFaceGrabber::initializeDefaultSensor()
     {        		
         hr = m_pKinectSensor->Open();
 		
+		
 		if (SUCCEEDED(hr))
 		{
-			Sleep(1000);
+			Sleep(2000);
 			hr = m_pKinectSensor->get_IsAvailable(&isAvailable);
 			if(SUCCEEDED(hr))
 			{
@@ -356,8 +357,12 @@ HRESULT KinectHDFaceGrabber::initializeDefaultSensor()
 					return E_FAIL;
 				}
 			}
+			else{
+					m_pKinectSensor->Close();
+					return E_FAIL;
+			}
 		}
-
+		
 		if (SUCCEEDED(hr)){
 			hr = initColorFrameReader();
 		}

@@ -128,6 +128,14 @@ private:
 	* 			handler
 	*/
 	void onRecordTabSelected();
+		
+	/**
+	* \fn	void WindowsApplication::UpdateStreams()
+	*
+	* \brief	update the frame of kinect v1
+	* 			
+	* 			
+	*/
 
 	void UpdateStreams(int i);
 	/**
@@ -210,6 +218,11 @@ private:
 	*/
 	void initImageWriter();
 
+	/**
+	* \fn	void WindowsApplication::initStringFileWriter();
+	*
+	* \brief	Initialises the string file writer for keypoints writing.
+	*/
 	void initStringFileWriter();
 	/**
 	 * \fn	void WindowsApplication::initInputReaderBufferAndSynchronizer();
@@ -431,22 +444,31 @@ private:
 
 	std::shared_ptr<KinectV1OutPutStreamUpdater> m_kinectV1OutputStreamUpdater;
 	
-
+	/** \brief indicate if kinect v1 is running */
 	bool m_kinectV1Enable;
+
+	/** \brief indicate if kinect v2 is running */
 	bool m_kinectV2Enable;
+
 	/** \brief	FPS Limit. */
 	int m_FPSLimit;
 
 	KinectV1Controller m_kinectV1Controller;
 	//UINT m_v1SleepMillsecond;
 public:
+	/* \brief exit the thread of V1*/
 	HANDLE m_hStopStreamEventThread;
+
 	HANDLE m_hPauseStreamEventThread;
+
+	/* \brief get the Handle of the current window*/
 	HWND GetWindow() const;
 
+	/** \brief	thread for update stream of V1. */
 	static DWORD WINAPI runKinectV1StreamEvent(WindowsApplication * pThis);
 	static DWORD WINAPI runKinectV2Update(WindowsApplication * pThis);
 
+	/** \mutex for protecting the opereation of kinect v1 in two threads */
 	std::mutex m_kinectV1DataUpdateMutex;
 	
 };

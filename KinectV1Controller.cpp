@@ -82,6 +82,17 @@ KinectV1Controller::~KinectV1Controller()
         delete m_pDrawDataStreams;
         m_pDrawDataStreams = nullptr;
     }
+	if(m_depthD16)
+	{
+		delete m_depthD16;
+		m_depthD16=nullptr;
+	}
+
+	if(m_alignedDepthD16)
+	{
+		delete m_alignedDepthD16;
+		m_alignedDepthD16=nullptr;
+	}
 
 
 }
@@ -104,9 +115,6 @@ HRESULT KinectV1Controller::init()
 	m_colorResolution = NUI_IMAGE_RESOLUTION_640x480;
 	hr = openColorStream();
 
-	//hr = openInfraredStream();
-	m_alignedDepthRGBX.SetImageSize(NUI_IMAGE_RESOLUTION_640x480); 
-	//hr = openInfraredStream(NUI_IMAGE_RESOLUTION_640x480);
 
 	return hr;
 }
@@ -605,7 +613,7 @@ void KinectV1Controller::ProcessColor()
     // Make sure we've received valid data
     if (lockedRect.Pitch != 0)
     {
-			m_colorFrameArrived = true;
+			//m_colorFrameArrived = true;
  
 			//m_colorRGBX.CopyRGB(lockedRect.pBits, lockedRect.size);
 			switch (m_colorImageType)

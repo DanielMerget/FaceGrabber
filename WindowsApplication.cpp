@@ -191,55 +191,16 @@ DWORD WindowsApplication::runKinectV1StreamEvent(WindowsApplication * pThis)
 		else {
 			if( WAIT_OBJECT_0 == WaitForSingleObject(pThis->m_kinectV1Controller.getDepthFrameEvent(), 0))
 			{
-				//if(pThis->m_kinectV2Enable)
-				//{
-				
-					pThis->UpdateStreams(2);
-				//}
-				//else
-				//{
-					//SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_DEPTH, 0, 0);
-				//}
-
-				//pThis->UpdateStreams(2);
-			
+				pThis->UpdateStreams(2);
 
 			}
 			if (WAIT_OBJECT_0 == WaitForSingleObject(pThis->m_kinectV1Controller.getCorlorFrameEvent(), 0) )  //+ 1 
-			{
-				//if(pThis->m_kinectV2Enable)
-				//{
-				
-					pThis->UpdateStreams(1);
-					
-				//}
-				//else
-				//{
-					//SendMessageW(pThis->GetWindow(), WM_STREAMEVENT_COLOR, 0, 0);
-				//}
-				//
-			
-			
+			{				
+				pThis->UpdateStreams(1);					
 			}
 		}
 
-		/*
-		const int depthFps =  pThis->m_kinectV1Controller.getDepthFrameFPS();//30;
-		const int halfADepthFrameMs = (1000 / depthFps) / 2;
-		if (pThis->m_FPSLimit)
-		{
-			// timedelta in seconds
-			timedelta = (double(clock() - start)) / CLOCKS_PER_SEC;
-			// if faster than specified target fps: sleep
-			if (timedelta < (1.0 / pThis->m_FPSLimit)) Sleep(((1.0 / pThis->m_FPSLimit) - timedelta) * 1000);
-		}
-		*/
-		/*
-        else if(WAIT_OBJECT_0 + 4 >= ret)
-        {
-            SendMessageW(pThis->GetWindow(), WM_STREAMEVENT, 0, 0);
-        }*/
-    }
+	}
 
     return 0;
 }
@@ -369,10 +330,8 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	}
 	if(m_kinectV1Enable)
 	{
-		WaitForSingleObject(hEventThread, INFINITE);
-
 		SetEvent(m_hStopStreamEventThread);
-
+		WaitForSingleObject(hEventThread, INFINITE);
 		CloseHandle(hEventThread);
 	}
 	//CloseHandle(hEventThread1);
@@ -412,9 +371,12 @@ void WindowsApplication::onCreate()
 	m_recordTabHandler.setKinectEnableOpt(m_kinectV1Enable,m_kinectV2Enable);
 
 	initTabs();
+	
+	m_pclFaceViewer = std::shared_ptr<PCLViewer>(new PCLViewer(2, "Face-Viewer"));
+
 	if(m_kinectV2Enable)
 	{
-		m_pclFaceViewer = std::shared_ptr<PCLViewer>(new PCLViewer(2, "Face-Viewer"));
+		//m_pclFaceViewer = std::shared_ptr<PCLViewer>(new PCLViewer(2, "Face-Viewer"));
 		initCloudWriter();
 		
 		initStringFileWriter();
