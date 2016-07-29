@@ -206,7 +206,7 @@ void RecordTabHandler::movieShowOptWindosOfV1()
 			/* show opt group*/
 	MoveWindow(v1Depth,
 		recordingOPTV2Rect.left-tabRecord.left+tmpRect_depth.left-recordingOPTV1Rect.left,
-		recordingOPTV2Rect.top-tabRecord.top+tmpRect_depth.top-recordingOPTV1Rect.top,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect_depth.top-recordingOPTV1Rect.top+20,
 					tmpRect_depth.right - tmpRect_depth.left,
 					tmpRect_depth.bottom - tmpRect_depth.top,
 					TRUE);
@@ -216,7 +216,7 @@ void RecordTabHandler::movieShowOptWindosOfV1()
 	GetWindowRect(v1ColrCombox, &tmpRect);
 			/* show opt group*/
 	MoveWindow(v1ColrCombox,
-		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left+20,
 		recordingOPTV2Rect.top-tabRecord.top+tmpRect_color.top-recordingOPTV1Rect.top,
 					tmpRect.right - tmpRect.left,
 					tmpRect.bottom - tmpRect.top,
@@ -226,7 +226,7 @@ void RecordTabHandler::movieShowOptWindosOfV1()
 	GetWindowRect(v1DepthCombox, &tmpRect);
 			/* show opt group*/
 	MoveWindow(v1DepthCombox,
-		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left+20,
 		recordingOPTV2Rect.top-tabRecord.top+tmpRect_depth.top-recordingOPTV1Rect.top+20,
 					tmpRect.right - tmpRect.left,
 					tmpRect.bottom - tmpRect.top,
@@ -238,8 +238,8 @@ void RecordTabHandler::movieShowOptWindosOfV1()
 	GetWindowRect(v1Aligned, &tmpRect);
 			/* show opt group*/
 	MoveWindow(v1Aligned,
-		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left,
-		recordingOPTV2Rect.top-tabRecord.top+tmpRect.top-recordingOPTV1Rect.top,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left+240,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect.top-recordingOPTV1Rect.top-40,
 					tmpRect.right - tmpRect.left,
 					tmpRect.bottom - tmpRect.top,
 					TRUE);
@@ -358,8 +358,11 @@ void RecordTabHandler::onCreate()
 		
 		ComboBox_Enable(v1RecordingDepthTypeComboBox, false);
 
+		Button_Enable(GetDlgItem(m_hWnd, IDC_RECORD_COLOR), false);
+		Button_Enable(GetDlgItem(m_hWnd, IDC_CENTER_CLOUDS), false);
 		
-		
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_3D_POINTS_CLOUDS_FORMAT_COMBOX), false);
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_KP_FORMAT), false);
 
 	}
 	else if (m_KinectEnableOpt == OnlyKinectV2Enabled)
@@ -383,6 +386,14 @@ void RecordTabHandler::onCreate()
 		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_V1_ENABLE_CHECK), SW_HIDE);
 		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_V2_ENABLE_CHECK), SW_HIDE);
 
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO), SW_HIDE);
+
+		ShowWindow(GetDlgItem(m_hWnd, IDC_TILTANGLE_SLIDER), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_MAX_STATIC), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_MIN_STATIC), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_ANGLE_STATUS), SW_HIDE);
 	}
 	
 	else if(m_KinectEnableOpt == BothKinectEnabled)

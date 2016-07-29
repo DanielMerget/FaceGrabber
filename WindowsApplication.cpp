@@ -270,7 +270,7 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 	// creat a thread to capture  frames of V2
 	if(m_kinectV2Enable)
 	{
-		hEventThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)runKinectV2Update, this, 0, nullptr); //
+		hEventThread1 = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)runKinectV2Update, this, 0, nullptr); //
 	}
 
 	start = clock();
@@ -669,7 +669,8 @@ void WindowsApplication::initTabs()
 		const int height = showOptGroupRect.top - tabControlRect.top-40; //(width / 16) * 9;
 		const int width = (height/9)*16; 
 		const int xPos = (windowRect.right - windowRect.left - width) / 2;
-		const int yPos = (showOptGroupRect.top - tabControlRect.top - height) / 2;
+		//const int yPos = (showOptGroupRect.top - tabControlRect.top - height) / 2;
+		const int yPos = tabControlRect.top;
 		m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, yPos, width, height, m_hWnd, NULL, m_hInstance, NULL);
 
 		HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
@@ -694,8 +695,8 @@ void WindowsApplication::initTabs()
 		const int height = showOptGroupRect.top - tabControlRect.top-40; //(width / 16) * 9;
 		const int width = (height/3)*4; 
 		const int xPos = (windowRect.right - windowRect.left - width) / 2;
-		const int yPos = (showOptGroupRect.top - tabControlRect.top - height) / 2;
-
+		//const int yPos = (showOptGroupRect.top - tabControlRect.top - height) / 2;
+		const int yPos = tabControlRect.top;
 
 		m_liveViewWindow_for_v1 = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, yPos, width, height, m_hWnd, NULL, m_hInstance, NULL);
 		HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
@@ -726,7 +727,6 @@ void WindowsApplication::initTabs()
 		const int height = showOptGroupRect.top - tabControlRect.top-60; //(width / 16) * 9;
 		const int width = (height/9)*16; 
 		const int xPos = 7;
-		//const int yPos = (showOptGroupRect.top - tabControlRect.top - height) / 2;
 		m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, tabControlRect.top, width, height, m_hWnd, NULL, m_hInstance, NULL);
 
 				

@@ -177,8 +177,9 @@
 #define IDC_V1_COLOR_RECORDING_TYPE_COMBO 1144
 #define IDC_V1_RECORDING_COLOR_CHECK    1145
 #define IDC_V1_DEPTH_RECORDING_TYPE_COMBO 1146
-#define IDC_EDIT3                       1147
 #define IDC_ANGLE_STATUS                1147
+#define IDC_MAX_STATIC                  1148
+#define IDC_MIN_STATIC                  1149
 #define IDC_KINECT_INFRARED_COMBO_BOX_THREADS 1806
 #define IDC_PLAY_PAUSE_BUTTON           1807
 #define IDC_PLAY_PAUSE_BUTTON2          1808
@@ -199,7 +200,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1148
+#define _APS_NEXT_CONTROL_VALUE         1150
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
