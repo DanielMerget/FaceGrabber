@@ -986,7 +986,6 @@ void RecordTabHandler::setupRecording()
 
 }
 
-//void RecordTabHandler::recordingStopped()
 void RecordTabHandler::recordingStopped()
 {
 	SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Record");

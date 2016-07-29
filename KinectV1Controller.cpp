@@ -84,13 +84,13 @@ KinectV1Controller::~KinectV1Controller()
     }
 	if(m_depthD16)
 	{
-		delete m_depthD16;
+		delete []m_depthD16;
 		m_depthD16=nullptr;
 	}
 
 	if(m_alignedDepthD16)
 	{
-		delete m_alignedDepthD16;
+		delete []m_alignedDepthD16;
 		m_alignedDepthD16=nullptr;
 	}
 
@@ -421,16 +421,8 @@ void KinectV1Controller::ProcessDepth()
 	
 		
 		getRawDepthData(lockedRect.pBits, lockedRect.size, m_depthD16,m_depthWidth, m_depthHeight);
-        //memcpy((BYTE *)&m_depthD16[0],,);
 
 		m_DepthRGBX.CopyDepth(lockedRect.pBits, lockedRect.size, nearMode, m_depthTreatment);
-		//AlignDepthToColorSpace();
-		/*
-		m_pDrawDataStreams->setSize(m_DepthRGBX.GetWidth(),m_DepthRGBX.GetHeight(),m_DepthRGBX.GetWidth() * sizeof(RGBQUAD));
-		hr = m_pDrawDataStreams->beginDrawing();
-		hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_DepthRGBX.GetBuffer()), m_DepthRGBX.GetWidth() * m_DepthRGBX.GetHeight()* sizeof(RGBQUAD));
-		m_pDrawDataStreams->endDrawing();
-		*/
 
     }
 
@@ -445,14 +437,6 @@ void KinectV1Controller::ProcessDepth()
 	{
 		m_showFps = m_depthFps;
 		show();
-		//int a = 5;
-		//cv::Mat m_depthImage = cv::Mat(m_DepthRGBX.GetHeight(), m_DepthRGBX.GetWidth(), CV_8UC4, m_DepthRGBX.GetBuffer(), cv::Mat::AUTO_STEP);
-		//cv::imshow("DepthWindow",m_depthImage);
-		//boost::shared_ptr<cv::Mat> m_depthImagePtr(new cv::Mat());
-		//*m_depthImagePtr = m_depthImage.clone();
-		//imageUpdated[1](m_depthImagePtr);
-
-
 	}
 ReleaseFrame:
     // Release the frame
@@ -521,7 +505,7 @@ HRESULT KinectV1Controller::openColorStream()
 		{
 			if(m_alignedDepthD16)
 			{
-				delete m_alignedDepthD16;
+				delete []m_alignedDepthD16;
 			}
 			m_alignedDepthD16 = new USHORT [m_colorWidth*m_colorHeight];
 		}
@@ -560,7 +544,7 @@ HRESULT KinectV1Controller::openDepthStream()
 
 			if(m_depthD16)
 			{
-				delete m_depthD16;
+				delete []m_depthD16;
 				//m_depthD16 = nullptr;
 			
 			}
@@ -602,7 +586,7 @@ void KinectV1Controller::ProcessColor()
         return;
     }
 
-	
+	//goto ReleaseFrame;
     if (m_paused || ifDumpColorFrame(&imageFrame))
     {
         // Stream paused. Skip frame process and release the frame.
@@ -670,8 +654,8 @@ void	KinectV1Controller::AlignDepthToColorSpace()
 		   *(m_alignedDepthD16 + colorPoints[i].x + colorPoints[i].y*m_colorWidth) = *(m_depthD16 + i );
 	
 	
-	delete colorPoints;
-	delete depthPoints;
+	delete []colorPoints;
+	delete []depthPoints;
 	/*  //for testing
 	cv::Mat m_depthImage1 = cv::Mat( m_depthHeight, m_depthWidth,CV_16UC1, m_depthD16, cv::Mat::AUTO_STEP);
 	cv::Mat m_depthImage = cv::Mat( m_colorHeight, m_colorWidth,CV_16UC1, m_alignedDepthD16, cv::Mat::AUTO_STEP);
@@ -943,7 +927,7 @@ void KinectV1Controller::setAlignmentEnable(bool enable)
 	{
 		if(m_alignedDepthD16)
 		{
-			delete m_alignedDepthD16;
+			delete []m_alignedDepthD16;
 		}
 		m_alignedDepthD16 = new USHORT [m_colorWidth*m_colorHeight];
 	}

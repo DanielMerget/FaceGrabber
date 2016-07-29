@@ -410,9 +410,7 @@ void KinectHDFaceGrabber::update()
 	if (!m_pColorFrameReader || !m_pBodyFrameReader){
 		return;
 	}
-
-	
-
+		
     IColorFrame* pColorFrame = nullptr;
     HRESULT hr = m_pColorFrameReader->AcquireLatestFrame(&pColorFrame);
 	
@@ -724,38 +722,30 @@ void KinectHDFaceGrabber::renderColorFrameAndProcessFaces()
 				case 	Color_Raw:
 					pShowBuffer = &m_colorBuffer;
 					showWidth = m_colorWidth;
-					showHeight = m_colorHeight;
-					//hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_colorBuffer.data()), c * m_colorHeight* sizeof(RGBQUAD));
+					showHeight = m_colorHeight;					
 					break;
 				case Depth_Raw:
 					pShowBuffer = &depth;
 					showWidth = m_depthWidth;
-					showHeight = m_depthHeight;
-					//hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(depth.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+					showHeight = m_depthHeight;					
 					break;
 				case Color_Body:
 					pShowBuffer = &m_alighedColorBuffer;
 					showWidth = m_colorWidth;
-					showHeight = m_colorHeight;
-					//hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_alighedColorBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+					showHeight = m_colorHeight;					
 					break;
 				case Depth_Body:
 					pShowBuffer = &m_alighedDepthBuffer;
 					showWidth = m_colorWidth;
-					showHeight = m_colorHeight;
-					//hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_alighedDepthBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
-					
+					showHeight = m_colorHeight;					
 				    break;
 				case Infrared_Raw:
 					pShowBuffer = &m_infraredBuffer;
 					showWidth = m_depthWidth;
-					showHeight = m_depthHeight;
-					//hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_alighedInfraredBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
-					//hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(infrared.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+					showHeight = m_depthHeight;					
 				    break;
 					
-				default:
-					//hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_colorBuffer.data()), m_colorWidth * m_colorHeight* sizeof(RGBQUAD));
+				default:				
 					break;
 			}
 
@@ -766,11 +756,7 @@ void KinectHDFaceGrabber::renderColorFrameAndProcessFaces()
 				hr = m_pDrawDataStreams->beginDrawing();
 				hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(pShowBuffer->data()), showWidth * showHeight* sizeof(RGBQUAD));
 				m_pDrawDataStreams->DrawFPS(m_fps);
-			}
-			//test code end
-
-
-			
+			}			
         }
         else
         {
@@ -897,7 +883,9 @@ void KinectHDFaceGrabber::processFaces()
 				m_HDFaceDetectedPointsCamSpace[iFace].data(), m_HDFaceDetectedPointsColorSpace[iFace].data(),keyPoints);
 			updatedOneFace = true;
 		}
-			
+
+		SafeRelease(pHDFaceFrame);
+
 		if (SUCCEEDED(hr)){
 			if (m_commonConfiguration->getFacePointsShowOpt() == FacePointsShowOpt::HDFacePoints_Opt &&
 				m_commonConfiguration->getShowOpt() != Depth_Raw &&

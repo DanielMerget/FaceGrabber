@@ -39,15 +39,14 @@ LRESULT CALLBACK MessageRouterHelper::DlgProc(HWND hWnd, UINT message, WPARAM wP
 {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
-
 	switch (message)
 	{
 
 	case WM_STREAMEVENT_COLOR:
-        UpdateStreams(1);
+        //UpdateStreams(1);
         break;
 	case WM_STREAMEVENT_DEPTH:
-        UpdateStreams(2);
+        //UpdateStreams(2);
         break;
 
 	case WM_INITDIALOG:
@@ -85,8 +84,6 @@ LRESULT CALLBACK MessageRouterHelper::DlgProc(HWND hWnd, UINT message, WPARAM wP
 		}
 
 	default:
-		break;
-
 		break;
 
 	}

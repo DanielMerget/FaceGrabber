@@ -90,6 +90,9 @@ WindowsApplication::~WindowsApplication()
 
 void WindowsApplication::UpdateStreams(int i)
 {
+	//_CrtMemState s1, s2, s3;
+	//_CrtMemCheckpoint(&s1);
+	
 	if(m_kinectV1Enable)
 	{
 		switch(i)
@@ -102,34 +105,33 @@ void WindowsApplication::UpdateStreams(int i)
 				break;
 			default:break;
 		}
-		//m_kinectV1Controller.Update();
-	}
 
-	const int depthFps =  30;//30;
-    const int halfADepthFrameMs = (1000 / depthFps) / 2;
-	const LARGE_INTEGER lastColorFrameStampp = m_kinectV1Controller.getLastColorFrameStamp();
-	const LARGE_INTEGER lastDepthFrameStampp = m_kinectV1Controller.getLastDepthFrameStamp();
-	bool needUpdateWriter = true;
-    // If we have not yet received any data for either color or depth since we started up, we shouldn't draw
-    if (lastColorFrameStampp.QuadPart == 0 || lastDepthFrameStampp.QuadPart == 0)
-    {
-        needUpdateWriter = false;
-    }
+		const int depthFps =  30;//30;
+		const int halfADepthFrameMs = (1000 / depthFps) / 2;
+		const LARGE_INTEGER lastColorFrameStampp = m_kinectV1Controller.getLastColorFrameStamp();
+		const LARGE_INTEGER lastDepthFrameStampp = m_kinectV1Controller.getLastDepthFrameStamp();
+		bool needUpdateWriter = true;
+		// If we have not yet received any data for either color or depth since we started up, we shouldn't draw
+		if (lastColorFrameStampp.QuadPart == 0 || lastDepthFrameStampp.QuadPart == 0)
+		{
+			needUpdateWriter = false;
+		}
 
-    // If the color frame is more than half a depth frame ahead of the depth frame we have,
-    // then we should wait for another depth frame.  Otherwise, just go with what we have.
-    if (lastDepthFrameStampp.QuadPart - lastDepthFrameStampp.QuadPart > halfADepthFrameMs)
-    {
-        needUpdateWriter = false;
-    }
+		// If the color frame is more than half a depth frame ahead of the depth frame we have,
+		// then we should wait for another depth frame.  Otherwise, just go with what we have.
+		if (lastDepthFrameStampp.QuadPart - lastDepthFrameStampp.QuadPart > halfADepthFrameMs)
+		{
+			needUpdateWriter = false;
+		}
 	
-	if(needUpdateWriter)
-	{
-		m_kinectV1DataUpdateMutex.lock();
-		m_kinectV1Controller.updateWriter();
-		m_kinectV1DataUpdateMutex.unlock();
-	}
+		if(needUpdateWriter)
+		{
+			m_kinectV1DataUpdateMutex.lock();
+			m_kinectV1Controller.updateWriter();
+			m_kinectV1DataUpdateMutex.unlock();
+		}
 	//Sleep(halfADepthFrameMs);
+	}
 	return ;
 }
 /// <summary>
@@ -143,12 +145,23 @@ HWND WindowsApplication::GetWindow() const
 
 DWORD WindowsApplication::runKinectV2Update(WindowsApplication * pThis)
 {
-	
+	clock_t start;
+	double timedelta;
 	while(pThis->m_kinectV2Enable)
 	{
 		if (pThis->m_isKinectRunning)
 		{
 			pThis->m_kinectFrameGrabber.update();
+		
+			if (pThis->m_FPSLimit != 0)
+			{
+				// timedelta in seconds
+				timedelta = (double(clock() - start)) / CLOCKS_PER_SEC;
+				// if faster than specified target fps: sleep
+				if (timedelta < (1.0 / pThis->m_FPSLimit)) Sleep(((1.0 / pThis->m_FPSLimit) - timedelta) * 1000);
+			}
+				
+			start = clock();
 		}
 	}
 	
@@ -168,15 +181,10 @@ DWORD WindowsApplication::runKinectV1StreamEvent(WindowsApplication * pThis)
 						pThis->m_kinectV1Controller.getDepthFrameEvent(),						 
 						pThis->m_hPauseStreamEventThread} ;
 
-	int colorDepth = 0;
-	clock_t color_arrived;
-	clock_t last_color_arrived=clock();;
-	clock_t depth_arrived;
-	clock_t last_depth_arrived=clock();;
+
     while (true)
     {
 		
-		start = clock();
 		
         DWORD ret = WaitForMultipleObjects(ARRAYSIZE(events), events, FALSE, INFINITE);
 		
@@ -249,25 +257,29 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 
 	HANDLE hEventThread;
 	HANDLE hEventThread1;
+
+	// creat a thread to capture  frames of V1
 	if(m_kinectV1Enable)
 	{
 		m_hStopStreamEventThread = CreateEventW(nullptr, TRUE, FALSE, nullptr);
 		m_hPauseStreamEventThread = CreateEventW(nullptr, TRUE, FALSE, nullptr);
-		//hv1EventThread = CreateThread(nullptr, 0, m_kinectV1Controller.Update(), 0, 0, nullptr);
-		//m_kinectV1Controller.Update();
-		//std::async(std::launch::async, &KinectV1Controller::Update, &m_kinectV1Controller);
 		hEventThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)runKinectV1StreamEvent, this, 0, nullptr); //
 		
 	}
-	//_CrtDumpMemoryLeaks();
-	_CrtMemState s1, s2, s3;
-	//HANDLE hEventThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)StreamEventThread, this, 0, nullptr);
-	// Main message loop
+
+	// creat a thread to capture  frames of V2
+	if(m_kinectV2Enable)
+	{
+		hEventThread = CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)runKinectV2Update, this, 0, nullptr); //
+	}
+
+	start = clock();
 	while (WM_QUIT != msg.message)
 	{
-		start = clock();
+		//start = clock();
 		
-		while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+		//while (PeekMessageW(&msg, NULL, 0, 0, PM_REMOVE))
+		while (GetMessageW(&msg, NULL, 0, 0))
 		{
 			// If a dialog message will be taken care of by the dialog proc
 			if (hWndApp && IsDialogMessageW(hWndApp, &msg))
@@ -278,24 +290,8 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 			TranslateMessage(&msg);
 			DispatchMessageW(&msg);
 		}
-		//_CrtMemCheckpoint(&s1);
-		if (m_isKinectRunning)
-		{
-			if(m_kinectV2Enable)
-			{
-				m_kinectFrameGrabber.update();
-			}
-			else
-			{
-				Sleep(5);
-			}
 
-			
-		}
-		//_CrtMemCheckpoint(&s2);
-		//if ( _CrtMemDifference( &s3, &s1, &s2) )
-				//_CrtMemDumpStatistics( &s3 );
-
+#if 0
 		int sel = TabCtrl_GetCurSel(tabControlHandle);
 
 		// Record Tab active
@@ -319,27 +315,36 @@ int WindowsApplication::run(HINSTANCE hInstance, int nCmdShow)
 
 			actualFPS = CLOCKS_PER_SEC / (float(clock() - start));
 			start = clock();
-
+			/*
 			FPSinfo.str("");
 			FPSinfo.clear();
-			//FPSinfo << "UPDATE Loop actual fps: " << actualFPS << " target fps: " << m_FPSLimit;
+			FPSinfo << "UPDATE Loop actual fps: " << actualFPS << " target fps: " << m_FPSLimit;
 			msgCstring = CString(FPSinfo.str().c_str());
 			msgCstring += L"\n";
-			//OutputDebugString(msgCstring);
+			OutputDebugString(msgCstring);
+			*/
 		}
 		// Playback/Convert Tab active
 		else{
 			// Limit CPU usage from while(WM_QUIT != msg.message)
 			Sleep(10);
 		}
+		//Sleep(5);
+#endif
 	}
 	if(m_kinectV1Enable)
 	{
 		SetEvent(m_hStopStreamEventThread);
+
 		WaitForSingleObject(hEventThread, INFINITE);
 		CloseHandle(hEventThread);
 	}
-	//CloseHandle(hEventThread1);
+	if(m_kinectV2Enable)
+	{
+		m_kinectV2Enable = false;
+		WaitForSingleObject(hEventThread1, INFINITE);
+		CloseHandle(hEventThread1);
+	}
 	
 	
 	return static_cast<int>(msg.wParam);
@@ -362,12 +367,6 @@ void WindowsApplication::onCreate()
 	//Create the pcl viewer
 	
 
-	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
-	hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactoryForKinectV1);
-	if (FAILED(hr))
-	{
-		setStatusMessage(L"Failed to initialize the Direct2D draw device.", true);
-	}
 
 	initKinectFrameGrabber();
 
@@ -661,6 +660,10 @@ void WindowsApplication::initTabs()
 	HWND hWndSlider = GetDlgItem(m_recordTabHandle, IDC_TILTANGLE_SLIDER);
 	SendMessageW(hWndSlider, TBM_SETRANGE, TRUE, MAKELPARAM(0, NUI_CAMERA_ELEVATION_MAXIMUM - NUI_CAMERA_ELEVATION_MINIMUM));
 	
+	
+	
+	
+
 	if(m_kinectV2Enable && ! m_kinectV1Enable)
 	{
 		const int height = showOptGroupRect.top - tabControlRect.top-40; //(width / 16) * 9;
@@ -669,6 +672,13 @@ void WindowsApplication::initTabs()
 		const int yPos = (showOptGroupRect.top - tabControlRect.top - height) / 2;
 		m_liveViewWindow = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, yPos, width, height, m_hWnd, NULL, m_hInstance, NULL);
 
+		HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
+		
+		if (FAILED(hr))
+		{
+			setStatusMessage(L"Failed to initialize the Direct2D draw device.", true);
+			return;
+		}
 		m_pDrawDataStreams = new ImageRenderer();
 		if(m_pD2DFactory)
 			m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
@@ -688,7 +698,12 @@ void WindowsApplication::initTabs()
 
 
 		m_liveViewWindow_for_v1 = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos, yPos, width, height, m_hWnd, NULL, m_hInstance, NULL);
-
+		HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
+		if (FAILED(hr))
+		{
+			setStatusMessage(L"Failed to initialize the Direct2D draw device.", true);
+			return;
+		}
 		m_pDrawDataStreamsForV1 = new ImageRenderer();
 		if(m_pD2DFactory)
 			m_pDrawDataStreamsForV1->initialize(m_liveViewWindow_for_v1, m_pD2DFactory, cColorWidthForV1, cColorHeightForV1, cColorWidthForV1 * sizeof(RGBQUAD));
@@ -719,7 +734,12 @@ void WindowsApplication::initTabs()
 		const int height_v1 = (width_v1 / 4) * 3;
 		const int xPos_v1 = xPos+width+10;
 		m_liveViewWindow_for_v1 = CreateWindow(WC_STATIC, L"", WS_CHILD | WS_VISIBLE, xPos_v1, tabControlRect.top, width_v1, height_v1, m_hWnd, NULL, m_hInstance, NULL);
-		
+		HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
+		if (FAILED(hr))
+		{
+			setStatusMessage(L"Failed to initialize the Direct2D draw device.", true);
+			return;
+		}
 		m_pDrawDataStreams = new ImageRenderer();
 		if(m_pDrawDataStreams && m_pD2DFactory)
 		{
@@ -730,9 +750,14 @@ void WindowsApplication::initTabs()
 			return ;
 		}
 				
-
+		
 		m_kinectFrameGrabber.setImageRenderer(m_pDrawDataStreams);
-
+		HRESULT hr1 = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactoryForKinectV1);
+		if (FAILED(hr1))
+		{
+			setStatusMessage(L"Failed to initialize the Direct2D draw device.", true);
+			return;
+		}
 		m_pDrawDataStreamsForV1 = new ImageRenderer();
 		if(m_pDrawDataStreamsForV1 && m_pD2DFactoryForKinectV1)
 		{
@@ -742,10 +767,8 @@ void WindowsApplication::initTabs()
 		{
 			return;
 		}
-				
-
 		
-		m_kinectV1Controller.setImageRenderer(m_pDrawDataStreamsForV1,m_pD2DFactory);	
+		m_kinectV1Controller.setImageRenderer(m_pDrawDataStreamsForV1,m_pD2DFactoryForKinectV1);	
 
 		m_kinectV1Controller.SetIcon(m_liveViewWindow_for_v1);
 

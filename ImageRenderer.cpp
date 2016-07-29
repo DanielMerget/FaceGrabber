@@ -134,7 +134,10 @@ HRESULT ImageRenderer::ensureResources()
         if (SUCCEEDED(hr))
         {
             hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Pink, 0.3f)), &m_pFaceBrush[5]);					
-        }        
+        }     
+
+		CreateSolidBrushes();
+		CreateTextFormats();
     }
 
     if (FAILED(hr))
@@ -150,6 +153,19 @@ HRESULT ImageRenderer::ensureResources()
 /// </summary>
 void ImageRenderer::discardResources()
 {
+	// Release all solid brushes
+    for (int i = 0; i < ImageRendererBrushCount; i++)
+    {
+        SafeRelease(m_brushes[i]);
+    }
+
+    // Release all text formats
+    for (int i = 0; i < ImageRendererTextFormatCount; i++)
+    {
+        SafeRelease(m_formats[i]);
+    }
+
+
     for (int i = 0; i < BODY_COUNT; i++)
     {
         SafeRelease(m_pFaceBrush[i]);
@@ -231,8 +247,6 @@ HRESULT ImageRenderer::beginDrawing()
 
     if (SUCCEEDED(hr))
     {
-		CreateSolidBrushes();
-		CreateTextFormats();
 
         m_pRenderTarget->BeginDraw();
 		m_pRenderTarget->Clear();
