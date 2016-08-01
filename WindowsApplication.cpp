@@ -592,7 +592,7 @@ void WindowsApplication::initTabs()
 		reinterpret_cast<LPARAM>(&m_recordTabHandler));
 	m_recordTabHandler.colorConfigurationChanged.connect(boost::bind(&WindowsApplication::colorStreamingChangedTo, this, _1));
 	m_recordTabHandler.centerConfigurationChanged.connect(boost::bind(&WindowsApplication::centerRecordingChangedTo, this, _1));
-	m_recordTabHandler.fpsLimitUpdated.connect(boost::bind(&WindowsApplication::setFPSLimit, this, _1));
+	m_recordTabHandler.fpsLimitUpdated.connect(boost::bind(&WindowsApplication::setFPSLimit, this, _1,_2));
 
 	m_recordTabHandler.startWriting.connect(boost::bind(&WindowsApplication::startRecording, this, _1, _2, _3,_4,_5));
 
@@ -1203,10 +1203,18 @@ void WindowsApplication::centerRecordingChangedTo(bool enable)
 	}
 }
 
-void WindowsApplication::setFPSLimit(int fps)
+void WindowsApplication::setFPSLimit(int fps,KinectVersionType kinectVersion)
 {
-	m_FPSLimit = fps;
-	m_kinectV1Controller.setLimitedFPS(fps);
+	if(kinectVersion==KinectV1)
+	{
+		m_kinectV1Controller.setLimitedFPS(fps);
+	}
+	else if(kinectVersion==KinectV2)
+	{
+		m_FPSLimit = fps;
+	}
+	
+	
 }
 
 void WindowsApplication::setKinectV1AlignmentEnable(bool enable)

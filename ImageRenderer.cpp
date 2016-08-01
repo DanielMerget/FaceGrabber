@@ -456,9 +456,9 @@ void ImageRenderer::drawFaceFrameResults(int iFace, const RectI* pFaceBox, const
         int pitch, yaw, roll;
         extractFaceRotationInDegrees(pFaceRotation, &pitch, &yaw, &roll);
 
-        faceText += L"FaceYaw : " + std::to_wstring(yaw) + L"\n";
-        faceText += L"FacePitch : " + std::to_wstring(pitch) + L"\n";
-        faceText += L"FaceRoll : " + std::to_wstring(roll) + L"\n";
+        faceText += L"Yaw : " + std::to_wstring(yaw) + L"\n";
+        faceText += L"Pitch : " + std::to_wstring(pitch) + L"\n";
+        faceText += L"Roll : " + std::to_wstring(roll) + L"\n";
 
 		ColorSpacePoint tmp;
 		tmp.X = pFaceTextLayout->x;

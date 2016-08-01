@@ -364,6 +364,8 @@ void RecordTabHandler::onCreate()
 		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_3D_POINTS_CLOUDS_FORMAT_COMBOX), false);
 		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_KP_FORMAT), false);
 
+		Button_Enable(GetDlgItem(m_hWnd, IDC_LIMIT_V2_FRAMERATE_CHECK), false);
+
 	}
 	else if (m_KinectEnableOpt == OnlyKinectV2Enabled)
 	{
@@ -394,6 +396,8 @@ void RecordTabHandler::onCreate()
 		ShowWindow(GetDlgItem(m_hWnd, IDC_MAX_STATIC), SW_HIDE);
 		ShowWindow(GetDlgItem(m_hWnd, IDC_MIN_STATIC), SW_HIDE);
 		ShowWindow(GetDlgItem(m_hWnd, IDC_ANGLE_STATUS), SW_HIDE);
+
+		Button_Enable(GetDlgItem(m_hWnd, IDC_LIMIT_FRAMERATE_CHECK), false);
 	}
 	
 	else if(m_KinectEnableOpt == BothKinectEnabled)
@@ -441,9 +445,29 @@ void RecordTabHandler::onCreate()
 		ComboBox_Enable(v1RecordingDepthTypeComboBox, false);
 		//Edit_Enable(v1RecordingDepthTypeComboBox,false);
 
-
+		
 	}
-	
+
+	HWND v1FPSComboBox = GetDlgItem(m_hWnd, IDC_V1_FPS_COMBO);
+	int cout = 0;
+	for (int i = 1; i < 31; i++){
+		if(30%i != 0)
+		{
+			continue;
+		}
+
+		//CString depthType = KinectV1Controller::getDepthTypeAsString(static_cast<v1DepthType>( i));
+		CString fpsString;
+		fpsString.Format(L"%d", i);
+		ComboBox_AddString(v1FPSComboBox, fpsString);
+			
+		if(i==30)
+			ComboBox_SetCurSel(v1FPSComboBox, cout);
+		m_thirtyModTable[cout] = i;
+		cout++;
+	}
+	ComboBox_Enable(v1FPSComboBox,false);
+
 	for (int i = 0; i < RECORD_SHOW_OPT_COUNT; i++){
 		CString ShowOpt = CommonConfiguration::getShowOptAsString(static_cast<RecordingShowOpt>(i));
 		ComboBox_AddString(kinectShowOptComboBox, ShowOpt);
@@ -845,6 +869,9 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 	case IDC_V1_DEPTH_RECORDING_TYPE_COMBO:
 		v1RecordingResolutionChanged(KinectV1DepthRaw,currentSelection);
 		break;
+	case IDC_V1_FPS_COMBO:
+		updateFPSLimit();
+		break;
 	default:break;
 	}
 }
@@ -1139,19 +1166,38 @@ void RecordTabHandler::updateFrameLimit()
 void RecordTabHandler::updateFPSLimit()
 {
 	bool isLimited = IsDlgButtonChecked(m_hWnd, IDC_LIMIT_FRAMERATE_CHECK);
-	Edit_Enable(GetDlgItem(m_hWnd, IDC_LIMIT_FRAMRATE_EDIT_BOX), isLimited);
+	ComboBox_Enable(GetDlgItem(m_hWnd, IDC_V1_FPS_COMBO), isLimited);
+	
+	int fps = 0;
+
+	//if the user has set an limit it is now parsed and overridden
+	if (isLimited){
+
+		auto comboboxHandle = GetDlgItem(m_hWnd, IDC_V1_FPS_COMBO);
+		int cur;
+		cur =ComboBox_GetCurSel(comboboxHandle);
+		fps = m_thirtyModTable[cur];
+
+	}
+
+	fpsLimitUpdated(fps,KinectV1);
+}
+void RecordTabHandler::updateV2FPSLimit()
+{
+	bool isLimited = IsDlgButtonChecked(m_hWnd, IDC_LIMIT_V2_FRAMERATE_CHECK);
+	Edit_Enable(GetDlgItem(m_hWnd, IDC_LIMIT_V2_FRAMRATE_EDIT_BOX), isLimited);
 
 	int fps = 0;
 
 	//if the user has set an limit it is now parsed and overridden
 	if (isLimited){
-		auto editBoxHandle = GetDlgItem(m_hWnd, IDC_LIMIT_FRAMRATE_EDIT_BOX);
+		auto editBoxHandle = GetDlgItem(m_hWnd, IDC_LIMIT_V2_FRAMRATE_EDIT_BOX);
 		std::vector<wchar_t> buffer(MAX_PATH);
 		Edit_GetText(editBoxHandle, buffer.data(), buffer.size());
 		fps = _tstoi(buffer.data());
 	}
 
-	fpsLimitUpdated(fps);
+	fpsLimitUpdated(fps,KinectV2);
 }
 
 void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
@@ -1226,9 +1272,17 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		{
 			return;
 		}
+
 		updateFPSLimit();
 		break;
 		
+	case IDC_LIMIT_V2_FRAMERATE_CHECK:
+		if( m_KinectEnableOpt == NoneEnable)
+		{
+			return;
+		}
+		updateV2FPSLimit();
+		break;
 	case IDC_RAW_COLOR_CHECK:
 		if( m_KinectEnableOpt == NoneEnable ||  m_KinectEnableOpt == OnlyKinectV1Enabled)
 		{
@@ -1584,8 +1638,11 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 	case IDC_LIMIT_FRAMES_EDIT_BOX:
 		updateFrameLimit();
 		break;
-	case IDC_LIMIT_FRAMRATE_EDIT_BOX:
-		updateFPSLimit();
+	//case IDC_LIMIT_FRAMRATE_EDIT_BOX:
+		//updateFPSLimit();
+		//break;
+	case IDC_LIMIT_V2_FRAMRATE_EDIT_BOX:
+		updateV2FPSLimit();
 		break;
 	case IDC_FILE_PATH_EDIT_BOX:
 	{

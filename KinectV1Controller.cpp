@@ -750,11 +750,11 @@ void KinectV1Controller::UpdateColorFrameRate()
 
 bool  KinectV1Controller::ifDumpColorFrame(NUI_IMAGE_FRAME *frame)
 {
-	if(m_pNuiColorCameraSettings || m_FPSLimit <=0 )
+	if(m_pNuiColorCameraSettings || m_FPSLimit <=0 || m_FPSLimit >30)
 	{
 		return false;
 	}
-
+	/*
 	LARGE_INTEGER     colorTimeStamp = frame->liTimeStamp;
 	static LARGE_INTEGER last_acceptedColorTS = {0};
 	//UINT colorFps            = (UINT)((double)(m_colorFrameCount - m_lastColorFrameCount) * 1000.0 / (double)span + 0.5);
@@ -770,19 +770,29 @@ bool  KinectV1Controller::ifDumpColorFrame(NUI_IMAGE_FRAME *frame)
 		last_acceptedColorTS = colorTimeStamp;
 	
 	}
+	*/	
+	static UINT frameCount;
+	int divisor = 30/m_FPSLimit;
+	frameCount= frameCount % divisor; // 2 is the divisor
+	if (frameCount == 0)
+	{
+		frameCount++;
+		return false;
+	}
+	frameCount++;
 
-
-	return false;
+	return true;
 
 }
 
 bool  KinectV1Controller::ifDumpDepthFrame(NUI_IMAGE_FRAME *frame)
 {
-	if(m_pNuiColorCameraSettings || m_FPSLimit <=0)
+	if(m_pNuiColorCameraSettings || m_FPSLimit <=0 || m_FPSLimit >30) //
 	{
 		return false;
 	}
 
+	/*
 	LARGE_INTEGER     depthTimeStamp = frame->liTimeStamp;
 	static LARGE_INTEGER last_acceptedColorTS = {0};
 	//static   UINT      colorFrameCount;
@@ -794,18 +804,17 @@ bool  KinectV1Controller::ifDumpDepthFrame(NUI_IMAGE_FRAME *frame)
 		last_acceptedColorTS = depthTimeStamp;
 		return false;
 	}
+	*/
+	static UINT frameCount;
+	int divisor = 30/m_FPSLimit;
+	frameCount= frameCount % divisor; // 2 is the divisor
+	if (frameCount == 0)
+	{
+		frameCount++;
+		return false;
+	}
+	frameCount++;
 	
-	//if(m_FPSLimit)
-	//{
-		//double span      = double(depthTimeStamp.QuadPart-last_acceptedColorTS.QuadPart)/1000;
-		//if(span  <(1.0 / m_FPSLimit))
-		//{
-			//return true;
-		//}
-		//last_acceptedColorTS = depthTimeStamp;
-		//lastColorFrameCount++;
-	//}
-
  
 	return true;
 }

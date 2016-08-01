@@ -305,13 +305,13 @@ private:
 	void centerRecordingChangedTo(bool enable);
 
 	/**
-	* \fn	void WindowsApplication::setFPSLimit(int fps);
+	* \fn	void WindowsApplication::setFPSLimit(int fps,KinectVersionType kinectVersion);
 	*
 	* \brief	Sets fps limit
 	*
 	* \param	fps.
 	*/
-	void setFPSLimit(int fps);
+	void setFPSLimit(int fps,KinectVersionType kinectVersion);
 
 	
 	/**
