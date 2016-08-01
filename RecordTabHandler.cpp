@@ -1453,29 +1453,53 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 
 
 			m_imageRecordingConfigurationForKinectV1[KinectColorRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK));
-		
+			if(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK))
+			{
+				int cur;
+				cur =ComboBox_GetCurSel(v1RecordingColorTypeComboBox);
+				v1RecordingResolutionChanged(KinectV1ColorRaw,cur);
+
+			}
 
 			Button_Enable(GetDlgItem(m_hWnd, IDC_V1_COLOR_SHOW_RADIO),!(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) ));
 			Button_Enable(GetDlgItem(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO),!(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) ));
 			ComboBox_Enable(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO), !(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) ));
 		
-			if(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) )
+					
+			if(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK) )
 			{
 				int cur;
-				if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
+				if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
+				{
+					cur = 0;
+				}
+				else if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
 				{
 					v1ShowOptChanged(KinectV1ColorRaw); //IDC_V1_SHOW_TYPE_COMBO
 					cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
-					ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO),cur);
+					v1ShowResolutionChanged(cur);
 				}
-				else if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
-				{
-					v1ShowOptChanged(KinectV1DepthRaw); //IDC_V1_SHOW_TYPE_COMBO
-					cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
 
+				ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO),cur);
+				v1RecordingResolutionChanged(KinectV1ColorRaw,cur);
+			
+			}
+			else if(!IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK) &&!IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) )
+			{
+				int cur;
+				cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
+				if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
+				{
+					v1ShowOptChanged(KinectV1DepthRaw); //IDC_V1_SHOW_TYPE_COMBO						
+				}
+				else if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
+				{
+					v1ShowOptChanged(KinectV1ColorRaw); //IDC_V1_SHOW_TYPE_COMBO
 				}
 				v1ShowResolutionChanged(cur);
+
 			}
+
 		}
 		break;
 	case IDC_V1_RECORD_DEPTH_CHECK:
@@ -1486,16 +1510,8 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		HWND v1RecordingDepthTypeComboBox ;
 		v1RecordingDepthTypeComboBox= GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO);
 		
-		/*
-		for (int i = 0; i < V1_COLOR_TYPE_COUNT; i++){
-			CString colorType = KinectV1Controller::getDepthTypeAsString(static_cast<v1DepthType>( i));
-			ComboBox_AddString(v1RecordingDepthTypeComboBox, colorType);
-			if(i==0)
-				ComboBox_SetCurSel(v1RecordingDepthTypeComboBox, 0);
-			//ComboBox_ResetContent
-		}
-		*/
 		ComboBox_Enable(v1RecordingDepthTypeComboBox, IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK));
+
 		m_imageRecordingConfigurationForKinectV1[KinectDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK));
 	
 		
@@ -1503,24 +1519,41 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		Button_Enable(GetDlgItem(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO),!(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK)) );
 		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO), !(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) ));
 		
-		if(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) )
+		if(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) )
 		{
 			int cur;
 			if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
 			{
-				v1ShowOptChanged(KinectV1ColorRaw); //IDC_V1_SHOW_TYPE_COMBO
-				cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
+				cur = 0;
 			}
 			else if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
 			{
 				v1ShowOptChanged(KinectV1DepthRaw); //IDC_V1_SHOW_TYPE_COMBO
 				cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
-				ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO),cur);
+				v1ShowResolutionChanged(cur);
+			}
 
+			ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO),cur);
+			v1RecordingResolutionChanged(KinectV1DepthRaw,cur);
+			
+		}
+
+		else if(!IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK) &&!IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) )
+		{
+			int cur;
+			cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
+			if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
+			{
+				v1ShowOptChanged(KinectV1DepthRaw); //IDC_V1_SHOW_TYPE_COMBO						
+			}
+			else if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
+			{
+				v1ShowOptChanged(KinectV1ColorRaw); //IDC_V1_SHOW_TYPE_COMBO
 			}
 			v1ShowResolutionChanged(cur);
+
 		}
-	
+
 		break;
 	case IDC_V1_RECORDING_ALIGNED_CHECKBOX:
 		if( m_KinectEnableOpt == NoneEnable ||  m_KinectEnableOpt == OnlyKinectV2Enabled)
