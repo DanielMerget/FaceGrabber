@@ -206,7 +206,7 @@ void RecordTabHandler::movieShowOptWindosOfV1()
 			/* show opt group*/
 	MoveWindow(v1Depth,
 		recordingOPTV2Rect.left-tabRecord.left+tmpRect_depth.left-recordingOPTV1Rect.left,
-		recordingOPTV2Rect.top-tabRecord.top+tmpRect_depth.top-recordingOPTV1Rect.top,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect_depth.top-recordingOPTV1Rect.top+20,
 					tmpRect_depth.right - tmpRect_depth.left,
 					tmpRect_depth.bottom - tmpRect_depth.top,
 					TRUE);
@@ -216,7 +216,7 @@ void RecordTabHandler::movieShowOptWindosOfV1()
 	GetWindowRect(v1ColrCombox, &tmpRect);
 			/* show opt group*/
 	MoveWindow(v1ColrCombox,
-		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left+20,
 		recordingOPTV2Rect.top-tabRecord.top+tmpRect_color.top-recordingOPTV1Rect.top,
 					tmpRect.right - tmpRect.left,
 					tmpRect.bottom - tmpRect.top,
@@ -226,7 +226,7 @@ void RecordTabHandler::movieShowOptWindosOfV1()
 	GetWindowRect(v1DepthCombox, &tmpRect);
 			/* show opt group*/
 	MoveWindow(v1DepthCombox,
-		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left+20,
 		recordingOPTV2Rect.top-tabRecord.top+tmpRect_depth.top-recordingOPTV1Rect.top+20,
 					tmpRect.right - tmpRect.left,
 					tmpRect.bottom - tmpRect.top,
@@ -238,8 +238,8 @@ void RecordTabHandler::movieShowOptWindosOfV1()
 	GetWindowRect(v1Aligned, &tmpRect);
 			/* show opt group*/
 	MoveWindow(v1Aligned,
-		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left,
-		recordingOPTV2Rect.top-tabRecord.top+tmpRect.top-recordingOPTV1Rect.top,
+		recordingOPTV2Rect.left-tabRecord.left+tmpRect.left-recordingOPTV1Rect.left+240,
+		recordingOPTV2Rect.top-tabRecord.top+tmpRect.top-recordingOPTV1Rect.top-40,
 					tmpRect.right - tmpRect.left,
 					tmpRect.bottom - tmpRect.top,
 					TRUE);
@@ -358,8 +358,13 @@ void RecordTabHandler::onCreate()
 		
 		ComboBox_Enable(v1RecordingDepthTypeComboBox, false);
 
+		Button_Enable(GetDlgItem(m_hWnd, IDC_RECORD_COLOR), false);
+		Button_Enable(GetDlgItem(m_hWnd, IDC_CENTER_CLOUDS), false);
 		
-		
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_3D_POINTS_CLOUDS_FORMAT_COMBOX), false);
+		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_KP_FORMAT), false);
+
+		Button_Enable(GetDlgItem(m_hWnd, IDC_LIMIT_V2_FRAMERATE_CHECK), false);
 
 	}
 	else if (m_KinectEnableOpt == OnlyKinectV2Enabled)
@@ -383,6 +388,16 @@ void RecordTabHandler::onCreate()
 		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_V1_ENABLE_CHECK), SW_HIDE);
 		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_V2_ENABLE_CHECK), SW_HIDE);
 
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO), SW_HIDE);
+
+		ShowWindow(GetDlgItem(m_hWnd, IDC_TILTANGLE_SLIDER), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_MAX_STATIC), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_MIN_STATIC), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_ANGLE_STATUS), SW_HIDE);
+
+		Button_Enable(GetDlgItem(m_hWnd, IDC_LIMIT_FRAMERATE_CHECK), false);
 	}
 	
 	else if(m_KinectEnableOpt == BothKinectEnabled)
@@ -430,9 +445,29 @@ void RecordTabHandler::onCreate()
 		ComboBox_Enable(v1RecordingDepthTypeComboBox, false);
 		//Edit_Enable(v1RecordingDepthTypeComboBox,false);
 
-
+		
 	}
-	
+
+	HWND v1FPSComboBox = GetDlgItem(m_hWnd, IDC_V1_FPS_COMBO);
+	int cout = 0;
+	for (int i = 1; i < 31; i++){
+		if(30%i != 0)
+		{
+			continue;
+		}
+
+		//CString depthType = KinectV1Controller::getDepthTypeAsString(static_cast<v1DepthType>( i));
+		CString fpsString;
+		fpsString.Format(L"%d", i);
+		ComboBox_AddString(v1FPSComboBox, fpsString);
+			
+		if(i==30)
+			ComboBox_SetCurSel(v1FPSComboBox, cout);
+		m_thirtyModTable[cout] = i;
+		cout++;
+	}
+	ComboBox_Enable(v1FPSComboBox,false);
+
 	for (int i = 0; i < RECORD_SHOW_OPT_COUNT; i++){
 		CString ShowOpt = CommonConfiguration::getShowOptAsString(static_cast<RecordingShowOpt>(i));
 		ComboBox_AddString(kinectShowOptComboBox, ShowOpt);
@@ -641,10 +676,39 @@ void RecordTabHandler::updateWriterStatus(StringFileRecordType recordType, std::
 	}
 }
 
+void RecordTabHandler::onSliderScroll(WPARAM wParam, LPARAM handle)
+{
+	if( m_KinectEnableOpt == NoneEnable)
+	{
+			return;
+	}
+	HWND hWndSlider = GetDlgItem(m_hWnd, IDC_TILTANGLE_SLIDER);
+	if (hWndSlider == (HWND)handle)
+	{
+
+		WORD lo = LOWORD(wParam);
+		if (TB_ENDTRACK == lo) // Mouse button released
+		{
+			LONG trackValue ;
+			trackValue =(LONG)SendMessageW(hWndSlider, TBM_GETPOS, 0, 0);
+			LONG degree;
+			degree= NUI_CAMERA_ELEVATION_MAXIMUM - trackValue;
+						
+			WCHAR buffer[128];
+			swprintf_s(buffer, 128, L"%d\x00B0", degree);
+			SetDlgItemTextW(m_hWnd, IDC_ANGLE_STATUS, buffer);
+			v1TitleAngleChanged(degree);
+			
+
+		}
+
+	}
+}
 
 void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 {
 	int currentSelection = ComboBox_GetCurSel(GetDlgItem(m_hWnd, LOWORD(wParam)));
+
 	switch (LOWORD(wParam))
 	{
 	case IDC_3D_POINTS_CLOUDS_FORMAT_COMBOX:
@@ -805,6 +869,9 @@ void RecordTabHandler::onSelectionChanged(WPARAM wParam, LPARAM handle)
 	case IDC_V1_DEPTH_RECORDING_TYPE_COMBO:
 		v1RecordingResolutionChanged(KinectV1DepthRaw,currentSelection);
 		break;
+	case IDC_V1_FPS_COMBO:
+		updateFPSLimit();
+		break;
 	default:break;
 	}
 }
@@ -957,7 +1024,6 @@ void RecordTabHandler::setupRecording()
 
 }
 
-//void RecordTabHandler::recordingStopped()
 void RecordTabHandler::recordingStopped()
 {
 	SetDlgItemText(m_hWnd, IDC_RECORD_BUTTON, L"Record");
@@ -1100,19 +1166,38 @@ void RecordTabHandler::updateFrameLimit()
 void RecordTabHandler::updateFPSLimit()
 {
 	bool isLimited = IsDlgButtonChecked(m_hWnd, IDC_LIMIT_FRAMERATE_CHECK);
-	Edit_Enable(GetDlgItem(m_hWnd, IDC_LIMIT_FRAMRATE_EDIT_BOX), isLimited);
+	ComboBox_Enable(GetDlgItem(m_hWnd, IDC_V1_FPS_COMBO), isLimited);
+	
+	int fps = 0;
+
+	//if the user has set an limit it is now parsed and overridden
+	if (isLimited){
+
+		auto comboboxHandle = GetDlgItem(m_hWnd, IDC_V1_FPS_COMBO);
+		int cur;
+		cur =ComboBox_GetCurSel(comboboxHandle);
+		fps = m_thirtyModTable[cur];
+
+	}
+
+	fpsLimitUpdated(fps,KinectV1);
+}
+void RecordTabHandler::updateV2FPSLimit()
+{
+	bool isLimited = IsDlgButtonChecked(m_hWnd, IDC_LIMIT_V2_FRAMERATE_CHECK);
+	Edit_Enable(GetDlgItem(m_hWnd, IDC_LIMIT_V2_FRAMRATE_EDIT_BOX), isLimited);
 
 	int fps = 0;
 
 	//if the user has set an limit it is now parsed and overridden
 	if (isLimited){
-		auto editBoxHandle = GetDlgItem(m_hWnd, IDC_LIMIT_FRAMRATE_EDIT_BOX);
+		auto editBoxHandle = GetDlgItem(m_hWnd, IDC_LIMIT_V2_FRAMRATE_EDIT_BOX);
 		std::vector<wchar_t> buffer(MAX_PATH);
 		Edit_GetText(editBoxHandle, buffer.data(), buffer.size());
 		fps = _tstoi(buffer.data());
 	}
 
-	fpsLimitUpdated(fps);
+	fpsLimitUpdated(fps,KinectV2);
 }
 
 void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
@@ -1187,9 +1272,17 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		{
 			return;
 		}
+
 		updateFPSLimit();
 		break;
 		
+	case IDC_LIMIT_V2_FRAMERATE_CHECK:
+		if( m_KinectEnableOpt == NoneEnable)
+		{
+			return;
+		}
+		updateV2FPSLimit();
+		break;
 	case IDC_RAW_COLOR_CHECK:
 		if( m_KinectEnableOpt == NoneEnable ||  m_KinectEnableOpt == OnlyKinectV1Enabled)
 		{
@@ -1414,29 +1507,53 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 
 
 			m_imageRecordingConfigurationForKinectV1[KinectColorRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK));
-		
+			if(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK))
+			{
+				int cur;
+				cur =ComboBox_GetCurSel(v1RecordingColorTypeComboBox);
+				v1RecordingResolutionChanged(KinectV1ColorRaw,cur);
+
+			}
 
 			Button_Enable(GetDlgItem(m_hWnd, IDC_V1_COLOR_SHOW_RADIO),!(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) ));
 			Button_Enable(GetDlgItem(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO),!(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) ));
 			ComboBox_Enable(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO), !(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) ));
 		
-			if(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) )
+					
+			if(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK) )
 			{
 				int cur;
-				if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
+				if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
+				{
+					cur = 0;
+				}
+				else if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
 				{
 					v1ShowOptChanged(KinectV1ColorRaw); //IDC_V1_SHOW_TYPE_COMBO
 					cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
-					ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO),cur);
+					v1ShowResolutionChanged(cur);
 				}
-				else if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
-				{
-					v1ShowOptChanged(KinectV1DepthRaw); //IDC_V1_SHOW_TYPE_COMBO
-					cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
 
+				ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO),cur);
+				v1RecordingResolutionChanged(KinectV1ColorRaw,cur);
+			
+			}
+			else if(!IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK) &&!IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) )
+			{
+				int cur;
+				cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
+				if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
+				{
+					v1ShowOptChanged(KinectV1DepthRaw); //IDC_V1_SHOW_TYPE_COMBO						
+				}
+				else if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
+				{
+					v1ShowOptChanged(KinectV1ColorRaw); //IDC_V1_SHOW_TYPE_COMBO
 				}
 				v1ShowResolutionChanged(cur);
+
 			}
+
 		}
 		break;
 	case IDC_V1_RECORD_DEPTH_CHECK:
@@ -1447,16 +1564,8 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		HWND v1RecordingDepthTypeComboBox ;
 		v1RecordingDepthTypeComboBox= GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO);
 		
-		/*
-		for (int i = 0; i < V1_COLOR_TYPE_COUNT; i++){
-			CString colorType = KinectV1Controller::getDepthTypeAsString(static_cast<v1DepthType>( i));
-			ComboBox_AddString(v1RecordingDepthTypeComboBox, colorType);
-			if(i==0)
-				ComboBox_SetCurSel(v1RecordingDepthTypeComboBox, 0);
-			//ComboBox_ResetContent
-		}
-		*/
 		ComboBox_Enable(v1RecordingDepthTypeComboBox, IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK));
+
 		m_imageRecordingConfigurationForKinectV1[KinectDepthRaw]->setEnabled(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK));
 	
 		
@@ -1464,24 +1573,41 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		Button_Enable(GetDlgItem(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO),!(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK)) );
 		ComboBox_Enable(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO), !(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) ));
 		
-		if(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK)||IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) )
+		if(IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) )
 		{
 			int cur;
 			if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
 			{
-				v1ShowOptChanged(KinectV1ColorRaw); //IDC_V1_SHOW_TYPE_COMBO
-				cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
+				cur = 0;
 			}
 			else if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
 			{
 				v1ShowOptChanged(KinectV1DepthRaw); //IDC_V1_SHOW_TYPE_COMBO
 				cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
-				ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO),cur);
+				v1ShowResolutionChanged(cur);
+			}
 
+			ComboBox_SetCurSel(GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO),cur);
+			v1RecordingResolutionChanged(KinectV1DepthRaw,cur);
+			
+		}
+
+		else if(!IsDlgButtonChecked(m_hWnd, IDC_V1_RECORDING_COLOR_CHECK) &&!IsDlgButtonChecked(m_hWnd, IDC_V1_RECORD_DEPTH_CHECK) )
+		{
+			int cur;
+			cur =ComboBox_GetCurSel(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO));
+			if(IsDlgButtonChecked(m_hWnd, IDC_V1_DEPTH_SHOW_RADIO))
+			{
+				v1ShowOptChanged(KinectV1DepthRaw); //IDC_V1_SHOW_TYPE_COMBO						
+			}
+			else if(IsDlgButtonChecked(m_hWnd, IDC_V1_COLOR_SHOW_RADIO))
+			{
+				v1ShowOptChanged(KinectV1ColorRaw); //IDC_V1_SHOW_TYPE_COMBO
 			}
 			v1ShowResolutionChanged(cur);
+
 		}
-	
+
 		break;
 	case IDC_V1_RECORDING_ALIGNED_CHECKBOX:
 		if( m_KinectEnableOpt == NoneEnable ||  m_KinectEnableOpt == OnlyKinectV2Enabled)
@@ -1512,8 +1638,11 @@ void RecordTabHandler::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 	case IDC_LIMIT_FRAMES_EDIT_BOX:
 		updateFrameLimit();
 		break;
-	case IDC_LIMIT_FRAMRATE_EDIT_BOX:
-		updateFPSLimit();
+	//case IDC_LIMIT_FRAMRATE_EDIT_BOX:
+		//updateFPSLimit();
+		//break;
+	case IDC_LIMIT_V2_FRAMRATE_EDIT_BOX:
+		updateV2FPSLimit();
 		break;
 	case IDC_FILE_PATH_EDIT_BOX:
 	{

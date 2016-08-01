@@ -108,33 +108,36 @@ HRESULT ImageRenderer::ensureResources()
 
         if (SUCCEEDED(hr))
         {
-            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Red, 2.0f)), &m_pFaceBrush[0]);
+            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Red, 0.3f)), &m_pFaceBrush[0]);
         }
 
         if (SUCCEEDED(hr))
         {
-            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Green, 2.0f)), &m_pFaceBrush[1]);			
+            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Green, 0.3f)), &m_pFaceBrush[1]);			
         }
 
         if (SUCCEEDED(hr))
         {
-            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::White, 2.0f)), &m_pFaceBrush[2]);			
+            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::White, 0.3f)), &m_pFaceBrush[2]);			
         }
 
         if (SUCCEEDED(hr))
         {
-            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Purple, 2.0f)), &m_pFaceBrush[3]);			
+            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Purple, 0.3f)), &m_pFaceBrush[3]);			
         }
 
         if (SUCCEEDED(hr))
         {
-            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Orange, 2.0f)), &m_pFaceBrush[4]);			
+            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Orange, 0.3f)), &m_pFaceBrush[4]);			
         }
 
         if (SUCCEEDED(hr))
         {
-            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Pink, 2.0f)), &m_pFaceBrush[5]);					
-        }        
+            hr = m_pRenderTarget->CreateSolidColorBrush((D2D1::ColorF(D2D1::ColorF::Pink, 0.3f)), &m_pFaceBrush[5]);					
+        }     
+
+		CreateSolidBrushes();
+		CreateTextFormats();
     }
 
     if (FAILED(hr))
@@ -150,6 +153,19 @@ HRESULT ImageRenderer::ensureResources()
 /// </summary>
 void ImageRenderer::discardResources()
 {
+	// Release all solid brushes
+    for (int i = 0; i < ImageRendererBrushCount; i++)
+    {
+        SafeRelease(m_brushes[i]);
+    }
+
+    // Release all text formats
+    for (int i = 0; i < ImageRendererTextFormatCount; i++)
+    {
+        SafeRelease(m_formats[i]);
+    }
+
+
     for (int i = 0; i < BODY_COUNT; i++)
     {
         SafeRelease(m_pFaceBrush[i]);
@@ -231,8 +247,6 @@ HRESULT ImageRenderer::beginDrawing()
 
     if (SUCCEEDED(hr))
     {
-		CreateSolidBrushes();
-		CreateTextFormats();
 
         m_pRenderTarget->BeginDraw();
 		m_pRenderTarget->Clear();
@@ -442,9 +456,9 @@ void ImageRenderer::drawFaceFrameResults(int iFace, const RectI* pFaceBox, const
         int pitch, yaw, roll;
         extractFaceRotationInDegrees(pFaceRotation, &pitch, &yaw, &roll);
 
-        faceText += L"FaceYaw : " + std::to_wstring(yaw) + L"\n";
-        faceText += L"FacePitch : " + std::to_wstring(pitch) + L"\n";
-        faceText += L"FaceRoll : " + std::to_wstring(roll) + L"\n";
+        faceText += L"Yaw : " + std::to_wstring(yaw) + L"\n";
+        faceText += L"Pitch : " + std::to_wstring(pitch) + L"\n";
+        faceText += L"Roll : " + std::to_wstring(roll) + L"\n";
 
 		ColorSpacePoint tmp;
 		tmp.X = pFaceTextLayout->x;

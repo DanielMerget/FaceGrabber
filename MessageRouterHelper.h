@@ -91,6 +91,17 @@ private:
 	 */
 	virtual void onButtonClicked(WPARAM wParam, LPARAM handle);
 
+	
+	/**
+	 * \fn	virtual void MessageRouterHelper::onButtonClicked(WPARAM wParam, LPARAM handle);
+	 *
+	 * \brief	Callback for the slider scroll actions.
+	 *
+	 * \param	wParam	The wParam field of the message.
+	 * \param	handle	The lParam field of the message.
+	 */
+	virtual void onSliderScroll(WPARAM wParam, LPARAM handle);
+	
 	/**
 	 * \fn	virtual void MessageRouterHelper::onEditBoxeChanged(WPARAM wParam, LPARAM handle);
 	 *

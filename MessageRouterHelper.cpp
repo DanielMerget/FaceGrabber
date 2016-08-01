@@ -39,15 +39,14 @@ LRESULT CALLBACK MessageRouterHelper::DlgProc(HWND hWnd, UINT message, WPARAM wP
 {
 	UNREFERENCED_PARAMETER(wParam);
 	UNREFERENCED_PARAMETER(lParam);
-
 	switch (message)
 	{
 
 	case WM_STREAMEVENT_COLOR:
-        UpdateStreams(1);
+        //UpdateStreams(1);
         break;
 	case WM_STREAMEVENT_DEPTH:
-        UpdateStreams(2);
+        //UpdateStreams(2);
         break;
 
 	case WM_INITDIALOG:
@@ -70,6 +69,9 @@ LRESULT CALLBACK MessageRouterHelper::DlgProc(HWND hWnd, UINT message, WPARAM wP
 	case WM_HSCROLL:
 		onSliderChanged(wParam, lParam);
 		break;
+	case WM_VSCROLL:
+		onSliderScroll(wParam, lParam);
+		break;
 	case WM_NOTIFY:
 		switch (((LPNMHDR)lParam)->code)
 		{
@@ -82,8 +84,6 @@ LRESULT CALLBACK MessageRouterHelper::DlgProc(HWND hWnd, UINT message, WPARAM wP
 		}
 
 	default:
-		break;
-
 		break;
 
 	}
@@ -104,6 +104,7 @@ void MessageRouterHelper::processUIMessage(WPARAM wParam, LPARAM handle)
 		break;
 	case EN_CHANGE:
 		onEditBoxeChanged(wParam, handle);
+
 	default:
 		break;
 	}
@@ -121,6 +122,12 @@ void MessageRouterHelper::onButtonClicked(WPARAM wParam, LPARAM handle)
 {
 
 }
+
+void MessageRouterHelper::onSliderScroll(WPARAM wParam, LPARAM handle)
+{
+
+}
+
 void MessageRouterHelper::onEditBoxeChanged(WPARAM wParam, LPARAM handle)
 {
 

@@ -82,6 +82,17 @@ KinectV1Controller::~KinectV1Controller()
         delete m_pDrawDataStreams;
         m_pDrawDataStreams = nullptr;
     }
+	if(m_depthD16)
+	{
+		delete []m_depthD16;
+		m_depthD16=nullptr;
+	}
+
+	if(m_alignedDepthD16)
+	{
+		delete []m_alignedDepthD16;
+		m_alignedDepthD16=nullptr;
+	}
 
 
 }
@@ -90,23 +101,26 @@ HRESULT KinectV1Controller::init()
 {
 
 	HRESULT hr = CreateFirstConnected();
+
 	if(FAILED(hr))
 	{
 		return hr;
 	}
-
-
-	
+	//m_pNuiSensor->NuiGetDepthCameraSettings(&m_pNuiDepthCameraSettings);
+	hr = m_pNuiSensor->NuiGetColorCameraSettings(&m_pNuiColorCameraSettings);
+	int a = E_NUI_HARDWARE_FEATURE_UNAVAILABLE;
+	if(FAILED(hr))
+	{
+		//return hr;
+	}
 	m_depthResolution = NUI_IMAGE_RESOLUTION_320x240;
 	hr = openDepthStream(); //NUI_IMAGE_RESOLUTION_320x240 NUI_IMAGE_RESOLUTION_640x480
 	m_colorImageType = NUI_IMAGE_TYPE_COLOR;
+	
 
 	m_colorResolution = NUI_IMAGE_RESOLUTION_640x480;
 	hr = openColorStream();
-
-	//hr = openInfraredStream();
-	m_alignedDepthRGBX.SetImageSize(NUI_IMAGE_RESOLUTION_640x480); 
-	//hr = openInfraredStream(NUI_IMAGE_RESOLUTION_640x480);
+	
 
 	return hr;
 }
@@ -407,16 +421,8 @@ void KinectV1Controller::ProcessDepth()
 	
 		
 		getRawDepthData(lockedRect.pBits, lockedRect.size, m_depthD16,m_depthWidth, m_depthHeight);
-        //memcpy((BYTE *)&m_depthD16[0],,);
 
 		m_DepthRGBX.CopyDepth(lockedRect.pBits, lockedRect.size, nearMode, m_depthTreatment);
-		//AlignDepthToColorSpace();
-		/*
-		m_pDrawDataStreams->setSize(m_DepthRGBX.GetWidth(),m_DepthRGBX.GetHeight(),m_DepthRGBX.GetWidth() * sizeof(RGBQUAD));
-		hr = m_pDrawDataStreams->beginDrawing();
-		hr = m_pDrawDataStreams->drawBackground(reinterpret_cast<BYTE*>(m_DepthRGBX.GetBuffer()), m_DepthRGBX.GetWidth() * m_DepthRGBX.GetHeight()* sizeof(RGBQUAD));
-		m_pDrawDataStreams->endDrawing();
-		*/
 
     }
 
@@ -431,14 +437,6 @@ void KinectV1Controller::ProcessDepth()
 	{
 		m_showFps = m_depthFps;
 		show();
-		//int a = 5;
-		//cv::Mat m_depthImage = cv::Mat(m_DepthRGBX.GetHeight(), m_DepthRGBX.GetWidth(), CV_8UC4, m_DepthRGBX.GetBuffer(), cv::Mat::AUTO_STEP);
-		//cv::imshow("DepthWindow",m_depthImage);
-		//boost::shared_ptr<cv::Mat> m_depthImagePtr(new cv::Mat());
-		//*m_depthImagePtr = m_depthImage.clone();
-		//imageUpdated[1](m_depthImagePtr);
-
-
 	}
 ReleaseFrame:
     // Release the frame
@@ -507,7 +505,7 @@ HRESULT KinectV1Controller::openColorStream()
 		{
 			if(m_alignedDepthD16)
 			{
-				delete m_alignedDepthD16;
+				delete []m_alignedDepthD16;
 			}
 			m_alignedDepthD16 = new USHORT [m_colorWidth*m_colorHeight];
 		}
@@ -546,7 +544,7 @@ HRESULT KinectV1Controller::openDepthStream()
 
 			if(m_depthD16)
 			{
-				delete m_depthD16;
+				delete []m_depthD16;
 				//m_depthD16 = nullptr;
 			
 			}
@@ -588,7 +586,7 @@ void KinectV1Controller::ProcessColor()
         return;
     }
 
-	
+	//goto ReleaseFrame;
     if (m_paused || ifDumpColorFrame(&imageFrame))
     {
         // Stream paused. Skip frame process and release the frame.
@@ -605,7 +603,7 @@ void KinectV1Controller::ProcessColor()
     // Make sure we've received valid data
     if (lockedRect.Pitch != 0)
     {
-			m_colorFrameArrived = true;
+			//m_colorFrameArrived = true;
  
 			//m_colorRGBX.CopyRGB(lockedRect.pBits, lockedRect.size);
 			switch (m_colorImageType)
@@ -656,8 +654,8 @@ void	KinectV1Controller::AlignDepthToColorSpace()
 		   *(m_alignedDepthD16 + colorPoints[i].x + colorPoints[i].y*m_colorWidth) = *(m_depthD16 + i );
 	
 	
-	delete colorPoints;
-	delete depthPoints;
+	delete []colorPoints;
+	delete []depthPoints;
 	/*  //for testing
 	cv::Mat m_depthImage1 = cv::Mat( m_depthHeight, m_depthWidth,CV_16UC1, m_depthD16, cv::Mat::AUTO_STEP);
 	cv::Mat m_depthImage = cv::Mat( m_colorHeight, m_colorWidth,CV_16UC1, m_alignedDepthD16, cv::Mat::AUTO_STEP);
@@ -752,56 +750,49 @@ void KinectV1Controller::UpdateColorFrameRate()
 
 bool  KinectV1Controller::ifDumpColorFrame(NUI_IMAGE_FRAME *frame)
 {
+	if(m_pNuiColorCameraSettings || m_FPSLimit <=0 || m_FPSLimit >30)
+	{
+		return false;
+	}
+	/*
 	LARGE_INTEGER     colorTimeStamp = frame->liTimeStamp;
 	static LARGE_INTEGER last_acceptedColorTS = {0};
 	//UINT colorFps            = (UINT)((double)(m_colorFrameCount - m_lastColorFrameCount) * 1000.0 / (double)span + 0.5);
 
 	if(m_FPSLimit)
 	{
+		
 		double span      = double(colorTimeStamp.QuadPart-last_acceptedColorTS.QuadPart)/1000;
 		if(span <(1.0 / m_FPSLimit))
 		{
 			return true;
 		}
 		last_acceptedColorTS = colorTimeStamp;
+	
 	}
-		
-
-#if 0
-	static DWORD last_checkTick = 0;
-	/*
-	if(last_checkTick == 0)
+	*/	
+	static UINT frameCount;
+	int divisor = 30/m_FPSLimit;
+	frameCount= frameCount % divisor; // 2 is the divisor
+	if (frameCount == 0)
 	{
+		frameCount++;
+		return false;
+	}
+	frameCount++;
 
-	}
-	*/
-	if(m_FPSLimit)
-	{
-		//if(m_colorFps>m_FPSLimit)
-			//return true;
-		//timedelta = (double(clock() - start)) 
-		DWORD tickCount = clock();
-		double span      = double((tickCount - last_checkTick))/CLOCKS_PER_SEC;
-		
-		if (span < (1.0 / m_FPSLimit))
-		{
-			return true;
-		}
-		last_checkTick = tickCount;
-		
-	}
-#endif 
-	return false;
+	return true;
 
 }
 
 bool  KinectV1Controller::ifDumpDepthFrame(NUI_IMAGE_FRAME *frame)
 {
-	if(!m_FPSLimit)
+	if(m_pNuiColorCameraSettings || m_FPSLimit <=0 || m_FPSLimit >30) //
 	{
 		return false;
 	}
 
+	/*
 	LARGE_INTEGER     depthTimeStamp = frame->liTimeStamp;
 	static LARGE_INTEGER last_acceptedColorTS = {0};
 	//static   UINT      colorFrameCount;
@@ -813,18 +804,17 @@ bool  KinectV1Controller::ifDumpDepthFrame(NUI_IMAGE_FRAME *frame)
 		last_acceptedColorTS = depthTimeStamp;
 		return false;
 	}
+	*/
+	static UINT frameCount;
+	int divisor = 30/m_FPSLimit;
+	frameCount= frameCount % divisor; // 2 is the divisor
+	if (frameCount == 0)
+	{
+		frameCount++;
+		return false;
+	}
+	frameCount++;
 	
-	//if(m_FPSLimit)
-	//{
-		//double span      = double(depthTimeStamp.QuadPart-last_acceptedColorTS.QuadPart)/1000;
-		//if(span  <(1.0 / m_FPSLimit))
-		//{
-			//return true;
-		//}
-		//last_acceptedColorTS = depthTimeStamp;
-		//lastColorFrameCount++;
-	//}
-
  
 	return true;
 }
@@ -924,6 +914,19 @@ UINT KinectV1Controller::getColorFrameFPS()
 void KinectV1Controller::setLimitedFPS(int fps)
 {
 	m_FPSLimit = fps;
+	if(m_pNuiColorCameraSettings==nullptr )
+	{
+		return;
+	}
+	if(!m_FPSLimit)
+	{
+		m_pNuiColorCameraSettings->SetFrameInterval(0);
+	}
+	else
+	{
+		double interval = 1/m_FPSLimit;	
+		m_pNuiColorCameraSettings->SetFrameInterval(interval*10000);
+	}
 }
 
 void KinectV1Controller::setAlignmentEnable(bool enable)
@@ -933,7 +936,7 @@ void KinectV1Controller::setAlignmentEnable(bool enable)
 	{
 		if(m_alignedDepthD16)
 		{
-			delete m_alignedDepthD16;
+			delete []m_alignedDepthD16;
 		}
 		m_alignedDepthD16 = new USHORT [m_colorWidth*m_colorHeight];
 	}
@@ -945,5 +948,18 @@ bool KinectV1Controller::getAlignmentEnable()
 	return m_alignmentEnabled;
 }
 
+
+LONG KinectV1Controller::getTitleDegree()
+{
+	LONG degree;
+    m_pNuiSensor->NuiCameraElevationGetAngle(&degree);
+	return 	degree;
+}
+
+void KinectV1Controller::setTitleDegree(LONG degree)
+{
+    m_pNuiSensor->NuiCameraElevationSetAngle(degree);
+	return;
+}
 
 

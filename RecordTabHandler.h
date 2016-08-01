@@ -149,7 +149,7 @@ public:
 	void updateWriterStatus(ImageRecordType type, std::wstring status);
 
 	/** \brief	The fps limit changed signal. */
-	boost::signal<void(int)> fpsLimitUpdated;
+	boost::signal<void(int,KinectVersionType)> fpsLimitUpdated;
 
 		/** \brief	enbale aligment of kinect v1 signal. */
 	boost::signal<void(bool)> kinectV1AlignmentEnable;
@@ -178,6 +178,8 @@ public:
 	boost::signal<void(int)> v1ShowResolutionChanged;
 	boost::signal<void(KinectV1ImageRecordType,int)> v1RecordingResolutionChanged;
 
+
+	boost::signal<void(LONG)> v1TitleAngleChanged;
 	/**
 	* \fn	void RecordTabHandler::recordPathChanged(RecordCloudType type);
 	*
@@ -240,6 +242,7 @@ private:
 	void setupRecording();
 
 	void onSelectionChanged(WPARAM wParam, LPARAM handle);
+	void onSliderScroll(WPARAM wParam, LPARAM handle);
 	void onButtonClicked(WPARAM wParam, LPARAM handle);
 	void onEditBoxeChanged(WPARAM wParam, LPARAM handle);
 	void movieShowOptWindosOfV1();
@@ -292,7 +295,7 @@ private:
 
 	void updateFPSLimit();
 
-
+	void updateV2FPSLimit();
 	/** \brief	The recording configuration. */
 	SharedCommonConfiguration m_commonConfiguration;
 
@@ -320,5 +323,6 @@ private:
 	bool m_isRecording;
 
 	kinectEnabledOpt m_KinectEnableOpt; // 0 KinectV2 1 KinectV1 2 both
+	int m_thirtyModTable[8];
 };
 

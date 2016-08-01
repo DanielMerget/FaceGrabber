@@ -20,6 +20,7 @@
 #define IDC_NEXT_FRAME_BUTTON2          1006
 #define IDC_BUTTON1                     1007
 #define IDC_KINECT_RAW_COLOR_STATUS     1007
+#define IDC_TILTANGLE_SLIDER            1007
 #define IDC_KINECT_RAW_DEPTH_STATUS     1008
 #define IDC_TAB2                        1009
 #define IDC_HD_FACE_2D_STATUS           1009
@@ -107,8 +108,10 @@
 #define IDC_LIMIT_FRAMRATE_EDIT_BOX     1072
 #define IDC_OUTPUT_FOLDER_LABEL2        1073
 #define IDC_HD3DFACE_RADIO              1073
+#define IDC_LIMIT_V2_FRAMRATE_EDIT_BOX  1073
 #define IDC_COMBO_OUTPUT_FORMAT         1074
 #define IDC_FACERAW_RADIO               1074
+#define IDC_LIMIT_V2_FRAMERATE_CHECK    1074
 #define IDC_EDIT_BOX_FILE_NAME          1075
 #define IDC_FACEALL_RADIO               1075
 #define IDC_COMBO_OUTPUT_FORMAT2        1076
@@ -176,6 +179,11 @@
 #define IDC_V1_COLOR_RECORDING_TYPE_COMBO 1144
 #define IDC_V1_RECORDING_COLOR_CHECK    1145
 #define IDC_V1_DEPTH_RECORDING_TYPE_COMBO 1146
+#define IDC_ANGLE_STATUS                1147
+#define IDC_MAX_STATIC                  1148
+#define IDC_MIN_STATIC                  1149
+#define IDC_COMBO2                      1150
+#define IDC_V1_FPS_COMBO                1150
 #define IDC_KINECT_INFRARED_COMBO_BOX_THREADS 1806
 #define IDC_PLAY_PAUSE_BUTTON           1807
 #define IDC_PLAY_PAUSE_BUTTON2          1808
@@ -196,7 +204,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1146
+#define _APS_NEXT_CONTROL_VALUE         1151
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif
