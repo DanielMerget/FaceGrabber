@@ -17,6 +17,14 @@
 #include "opencv2/highgui/highgui.hpp"
 #include "opencv2/features2d/features2d.hpp"
 
+inline void SafeCloseHandle(HANDLE handle)
+{
+    if (handle != INVALID_HANDLE_VALUE)
+    {
+        CloseHandle(handle);
+    }
+}
+
 KinectV1Controller::KinectV1Controller():m_pNuiSensor(nullptr),m_pDrawDataStreams(nullptr),m_colorFrameCount(0),m_depthFrameCount(0)
 {		
 	DWORD width = 0;
@@ -27,7 +35,7 @@ KinectV1Controller::KinectV1Controller():m_pNuiSensor(nullptr),m_pDrawDataStream
     NuiImageResolutionToSize(cDepthResolution, width, height);
     m_depthWidth  = static_cast<LONG>(width);
     m_depthHeight = static_cast<LONG>(height);
-
+	m_removeBGEnabled = false;
 	
 	m_depthD16 = nullptr;
 
@@ -54,7 +62,11 @@ KinectV1Controller::KinectV1Controller():m_pNuiSensor(nullptr),m_pDrawDataStream
 	//m_hNextInfaredFrameEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 	m_hNextDepthFrameEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
 
-	
+		// Create an event that will be signaled when skeleton frame is available
+    m_hNextSkeletonFrameEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	// Create an event that will be signaled when the segmentation frame is ready
+    m_hNextBackgroundRemovedFrameEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
     m_depthTimeStamp.QuadPart = 0;
     m_colorTimeStamp.QuadPart = 0;
 
@@ -94,7 +106,10 @@ KinectV1Controller::~KinectV1Controller()
 		m_alignedDepthD16=nullptr;
 	}
 
-
+	SafeCloseHandle(m_hNextColorFrameEvent);
+    SafeCloseHandle(m_hNextDepthFrameEvent);
+    SafeCloseHandle(m_hNextSkeletonFrameEvent);
+    SafeCloseHandle(m_hNextBackgroundRemovedFrameEvent);
 }
 
 HRESULT KinectV1Controller::init()
@@ -121,7 +136,7 @@ HRESULT KinectV1Controller::init()
 	m_colorResolution = NUI_IMAGE_RESOLUTION_640x480;
 	hr = openColorStream();
 	
-
+	//enableRemoveBackGround();
 	return hr;
 }
 
@@ -192,6 +207,14 @@ HANDLE KinectV1Controller::getDepthFrameEvent()
 	return m_hNextDepthFrameEvent;
 }
 
+HANDLE KinectV1Controller::getBodyFrameEvent()
+{
+	return m_hNextSkeletonFrameEvent;
+}
+HANDLE KinectV1Controller::getRemoveBGFrameEvent()
+{
+	return m_hNextBackgroundRemovedFrameEvent;
+}
 void KinectV1Controller::Update()
 {
 
@@ -199,15 +222,16 @@ void KinectV1Controller::Update()
     {
         return;
     }
-	const int eventCount = 2;
+	const int eventCount = 4;
     HANDLE hEvents[eventCount];
 
 	hEvents[0] = m_hNextColorFrameEvent;
 	hEvents[1] = m_hNextDepthFrameEvent;
-	//hEvents[2] = m_hNextInfaredFrameEvent;
+	hEvents[2] = m_hNextSkeletonFrameEvent;
+	hEvents[3] = m_hNextBackgroundRemovedFrameEvent;
+	
 
-
-	MsgWaitForMultipleObjects(eventCount, hEvents, FALSE, INFINITE, QS_ALLINPUT);
+	//MsgWaitForMultipleObjects(eventCount, hEvents, FALSE, INFINITE, QS_ALLINPUT);
 
 	if(WAIT_OBJECT_0 == WaitForSingleObject(m_hNextColorFrameEvent, 0))
 	{
@@ -219,6 +243,15 @@ void KinectV1Controller::Update()
 		ProcessDepth();
 	}
 
+	if (WAIT_OBJECT_0 == WaitForSingleObject(m_hNextSkeletonFrameEvent, 0) )
+    {
+        ProcessSkeleton();
+    }
+	    
+	if (WAIT_OBJECT_0 == WaitForSingleObject(m_hNextBackgroundRemovedFrameEvent, 0))
+    {
+        ComposeImage();
+    }
 
 	//show();
 	
@@ -239,7 +272,10 @@ void KinectV1Controller::showOptUpdated(KinectV1ImageRecordType showOpt)
 			m_colorImageType = NUI_IMAGE_TYPE_COLOR;
 			m_colorResolution = NUI_IMAGE_RESOLUTION_640x480;
 			openColorStream();
-			m_drawRGBX = &m_colorRGBX;
+			if(m_removeBGEnabled)
+				m_drawRGBX = &m_rmBGRGBX;
+			else
+				m_drawRGBX = &m_colorRGBX;
 			
 			break;
 
@@ -252,6 +288,11 @@ void KinectV1Controller::showOptUpdated(KinectV1ImageRecordType showOpt)
 	}
 	m_showOpt = showOpt;
 	
+	if(m_removeBGEnabled)
+	{
+		disableRemoveBackGround();
+		enableRemoveBackGround();
+	}
 	return ;
 
 }
@@ -271,6 +312,11 @@ void KinectV1Controller::showResolutionUpdated(int showResolution)
 			break;
 		default:break;
 	}
+	if(m_removeBGEnabled)
+	{
+		disableRemoveBackGround();
+		enableRemoveBackGround();
+	}
 }
 
 
@@ -287,6 +333,11 @@ void KinectV1Controller::recordingResolutionUpdated(KinectV1ImageRecordType opt,
 			showdepthResolutionUpdated((v1DepthType)(showResolution));
 			break;
 		default:break;
+	}
+	if(m_removeBGEnabled)
+	{
+		disableRemoveBackGround();
+		enableRemoveBackGround();
 	}
 }
 
@@ -362,7 +413,7 @@ void KinectV1Controller::showdepthResolutionUpdated(v1DepthType showResolution)
 void KinectV1Controller::show()
 {
 
-	 
+
 	m_pDrawDataStreams->setSize(m_drawRGBX->GetWidth(),m_drawRGBX->GetHeight(),m_drawRGBX->GetWidth() * sizeof(RGBQUAD));
 	//m_pDrawDataStreams->initialize(m_liveViewWindow, m_pD2DFactory, cColorWidth, cColorHeight, cColorWidth * sizeof(RGBQUAD));
 	//m_pDrawDataStreams->initialize(m_hWnd, m_pD2DFactory, m_drawRGBX->GetWidth(),m_drawRGBX->GetHeight(),m_drawRGBX->GetWidth() * sizeof(RGBQUAD));
@@ -419,7 +470,10 @@ void KinectV1Controller::ProcessDepth()
         // Conver depth data to color image and copy to image buffer
 		//m_DepthRGBX.CopyDepth(lockedRect.pBits, lockedRect.size, nearMode, m_depthTreatment);
 	
-		
+		if(m_removeBGEnabled)
+		{
+			m_pBackgroundRemovalStream->ProcessDepth(m_depthWidth * m_depthHeight * cBytesPerPixel, lockedRect.pBits, m_depthTimeStamp);
+		}
 		getRawDepthData(lockedRect.pBits, lockedRect.size, m_depthD16,m_depthWidth, m_depthHeight);
 
 		m_DepthRGBX.CopyDepth(lockedRect.pBits, lockedRect.size, nearMode, m_depthTreatment);
@@ -604,7 +658,7 @@ void KinectV1Controller::ProcessColor()
     if (lockedRect.Pitch != 0)
     {
 			//m_colorFrameArrived = true;
- 
+
 			//m_colorRGBX.CopyRGB(lockedRect.pBits, lockedRect.size);
 			switch (m_colorImageType)
 			{
@@ -620,8 +674,14 @@ void KinectV1Controller::ProcessColor()
 					m_colorRGBX.CopyRGB(lockedRect.pBits, lockedRect.size);
 					break;
 			}
+
+			if(m_removeBGEnabled)
+			{
+				m_pBackgroundRemovalStream->ProcessColor(m_colorWidth * m_colorHeight * cBytesPerPixel, m_colorRGBX.GetBuffer(), m_colorTimeStamp);
+			}
+
 			UpdateColorFrameRate();
-			if(m_showOpt ==  Color_Raw) 
+			if(m_showOpt ==  Color_Raw && !m_removeBGEnabled) 
 			{
 				m_showFps = m_colorFps;
 				show();
@@ -869,7 +929,11 @@ void KinectV1Controller::updateWriter()
 		{
 			AlignDepthToColorSpace();
 		}
-		m_outPutStreamUpdater->startKinectV1DataCollection((RGBQUAD* )m_colorRGBX.GetBuffer(),m_depthD16,m_alignedDepthD16, m_DepthRGBX.GetWidth(), m_DepthRGBX.GetHeight(), m_colorRGBX.GetWidth(), m_colorRGBX.GetHeight());
+		if(m_removeBGEnabled)
+			m_outPutStreamUpdater->startKinectV1DataCollection((RGBQUAD* )m_rmBGRGBX.GetBuffer(),m_depthD16,m_alignedDepthD16, m_DepthRGBX.GetWidth(), m_DepthRGBX.GetHeight(), m_colorRGBX.GetWidth(), m_colorRGBX.GetHeight());
+		else
+			m_outPutStreamUpdater->startKinectV1DataCollection((RGBQUAD* )m_colorRGBX.GetBuffer(),m_depthD16,m_alignedDepthD16, m_DepthRGBX.GetWidth(), m_DepthRGBX.GetHeight(), m_colorRGBX.GetWidth(), m_colorRGBX.GetHeight());
+		
 		m_outPutStreamUpdater->stopKinectV1DataCollection();
 		
 	}
@@ -943,6 +1007,7 @@ void KinectV1Controller::setAlignmentEnable(bool enable)
 
 }
 
+
 bool KinectV1Controller::getAlignmentEnable()
 {
 	return m_alignmentEnabled;
@@ -963,3 +1028,211 @@ void KinectV1Controller::setTitleDegree(LONG degree)
 }
 
 
+
+HRESULT KinectV1Controller::enableRemoveBackGround()
+{
+	m_removeBGMutex.lock();
+	// Create an event that will be signaled when skeleton frame is available
+    //m_hNextSkeletonFrameEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+	// Create an event that will be signaled when the segmentation frame is ready
+    //m_hNextBackgroundRemovedFrameEvent = CreateEvent(NULL, TRUE, FALSE, NULL);
+
+    HRESULT hr = m_pNuiSensor->NuiSkeletonTrackingEnable(m_hNextSkeletonFrameEvent, NUI_SKELETON_TRACKING_FLAG_ENABLE_IN_NEAR_RANGE);
+    if (FAILED(hr))
+    {
+		m_removeBGMutex.unlock();
+        return hr;
+    }
+	hr = NuiCreateBackgroundRemovedColorStream(m_pNuiSensor, &m_pBackgroundRemovalStream);
+	if (FAILED(hr))
+    {
+		m_removeBGMutex.unlock();
+        return hr;
+    }
+	hr = m_pBackgroundRemovalStream->Enable(m_colorResolution, m_depthResolution, m_hNextBackgroundRemovedFrameEvent);
+	if (FAILED(hr))
+    {
+		m_removeBGMutex.unlock();
+        return hr;
+    }
+
+
+	m_backgroundRGBX = new BYTE[m_colorWidth * m_colorHeight * cBytesPerPixel];
+	memset(m_backgroundRGBX,0,m_colorWidth * m_colorHeight * cBytesPerPixel);
+	m_removeBGRGBX = new BYTE[m_colorWidth * m_colorHeight * cBytesPerPixel];
+	m_rmBGRGBX.SetImageSize(m_colorResolution);
+	m_trackedSkeleton = NUI_SKELETON_INVALID_TRACKING_ID;
+    
+	m_removeBGEnabled = true;
+	if(m_showOpt == Color_Raw)
+		m_drawRGBX = &m_rmBGRGBX;
+
+	m_removeBGMutex.unlock();
+	return hr;
+	//hr = m_pBackgroundRemovalStream->Enable(cColorResolution, cDepthResolution, m_hNextBackgroundRemovedFrameEvent);
+
+}
+
+void KinectV1Controller::disableRemoveBackGround()
+{
+
+	m_removeBGMutex.lock();
+	m_removeBGEnabled = false;
+	 m_pNuiSensor->NuiSkeletonTrackingDisable();
+	 m_pBackgroundRemovalStream->Disable();
+	 delete [] m_backgroundRGBX;
+	 m_backgroundRGBX = nullptr;
+		
+	 delete [] m_removeBGRGBX;
+	 m_removeBGRGBX = nullptr;
+	 m_removeBGMutex.unlock();
+	 if(m_showOpt == Color_Raw)
+		m_drawRGBX = &m_colorRGBX;
+	 //else if(m_showOpt == Depth_Raw)
+		//m_drawRGBX = &m_DepthRGBX;
+}
+/// <summary>
+/// Handle new skeleton data
+/// </summary>
+/// <returns>S_OK for success or error code</returns>
+HRESULT KinectV1Controller::ProcessSkeleton()
+{
+    HRESULT hr;
+
+	NUI_SKELETON_FRAME skeletonFrame;
+	m_skeletonMutex.lock();
+
+    hr = m_pNuiSensor->NuiSkeletonGetNextFrame(0, &skeletonFrame);
+    if (FAILED(hr))
+    {
+		m_skeletonMutex.unlock();
+        return hr;
+    }
+
+	NUI_SKELETON_DATA* pSkeletonData = skeletonFrame.SkeletonData;
+    // Background Removal Stream requires us to specifically tell it what skeleton ID to use as the foreground
+	hr = ChooseSkeleton(pSkeletonData);
+	if (FAILED(hr))
+    {
+		m_skeletonMutex.unlock();
+        return hr;
+    }
+
+    hr = m_pBackgroundRemovalStream->ProcessSkeleton(NUI_SKELETON_COUNT, pSkeletonData, skeletonFrame.liTimeStamp);
+	m_skeletonMutex.unlock();
+    return hr;
+}
+HRESULT KinectV1Controller::ChooseSkeleton(NUI_SKELETON_DATA* pSkeletonData)
+{
+	HRESULT hr = S_OK;
+
+	// First we go through the stream to find the closest skeleton, and also check whether our current tracked
+	// skeleton is still visibile in the stream
+	float closestSkeletonDistance = FLT_MAX;
+	DWORD closestSkeleton = NUI_SKELETON_INVALID_TRACKING_ID;
+	BOOL isTrackedSkeletonVisible = false;
+	for (int i = 0; i < NUI_SKELETON_COUNT; ++i)
+	{
+		NUI_SKELETON_DATA skeleton = pSkeletonData[i];
+		if (NUI_SKELETON_TRACKED == skeleton.eTrackingState)
+		{
+			if (m_trackedSkeleton == skeleton.dwTrackingID)
+			{
+				isTrackedSkeletonVisible = true;
+				break;
+			}
+
+			if (skeleton.Position.z < closestSkeletonDistance)
+			{
+				closestSkeleton = skeleton.dwTrackingID;
+				closestSkeletonDistance = skeleton.Position.z;
+			}
+		}
+	}
+
+	// Now we choose a new skeleton unless the currently tracked skeleton is still visible
+	if (!isTrackedSkeletonVisible && closestSkeleton != NUI_SKELETON_INVALID_TRACKING_ID)
+	{
+		hr = m_pBackgroundRemovalStream->SetTrackedPlayer(closestSkeleton);
+		if (FAILED(hr))
+		{
+			return hr;
+		}
+
+		m_trackedSkeleton = closestSkeleton;
+	}
+
+	return hr;
+}
+
+/// <summary>
+/// compose the background removed color image with the background image
+/// </summary>
+/// <returns>S_OK on success, otherwise failure code</returns>
+HRESULT  KinectV1Controller::ComposeImage()
+{
+    HRESULT hr;
+    NUI_BACKGROUND_REMOVED_COLOR_FRAME bgRemovedFrame;
+	m_removeBGMutex.lock();
+    hr = m_pBackgroundRemovalStream->GetNextFrame(0, &bgRemovedFrame);
+    if (FAILED(hr))
+    {
+		m_removeBGMutex.unlock();
+        return hr;
+    }
+
+    const BYTE* pBackgroundRemovedColor = bgRemovedFrame.pBackgroundRemovedColorData;
+
+    int dataLength = static_cast<int>(m_colorWidth) * static_cast<int>(m_colorHeight) * cBytesPerPixel;
+    BYTE alpha = 0;
+    const int alphaChannelBytePosition = 3;
+    for (int i = 0; i < dataLength; ++i)
+    {
+        if (i % cBytesPerPixel == 0)
+        {
+            alpha = pBackgroundRemovedColor[i + alphaChannelBytePosition];
+        }
+
+        if (i % cBytesPerPixel != alphaChannelBytePosition)
+        {
+            m_removeBGRGBX[i] = static_cast<BYTE>(
+                ( (UCHAR_MAX - alpha) * m_backgroundRGBX[i] + alpha * pBackgroundRemovedColor[i] ) / UCHAR_MAX
+                );
+        }
+    }
+
+    hr = m_pBackgroundRemovalStream->ReleaseFrame(&bgRemovedFrame);
+    if (FAILED(hr))
+    {
+		m_removeBGMutex.unlock();
+        return hr;
+    }
+	m_removeBGMutex.unlock();
+
+	m_rmBGRGBX.CopyRGB(m_removeBGRGBX, dataLength);
+	//m_drawRGBX = &m_rmBGRGBX;
+	if(m_showOpt ==  Color_Raw && m_removeBGEnabled) 
+	{
+		m_showFps = m_colorFps;
+		show();
+	}
+
+    //hr = m_pDrawBackgroundRemovalBasics->Draw(m_outputRGBX, m_colorWidth * m_colorHeight * cBytesPerPixel);
+
+    return hr;
+}
+
+void KinectV1Controller::removeBackGround(bool enable)
+{
+	if(enable)
+	{
+		enableRemoveBackGround();
+	}
+	else
+	{
+		disableRemoveBackGround();
+
+	}
+
+
+}

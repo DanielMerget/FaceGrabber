@@ -95,6 +95,8 @@ void WindowsApplication::UpdateStreams(int i)
 	
 	if(m_kinectV1Enable)
 	{
+		m_kinectV1Controller.Update();
+		/*
 		switch(i)
 		{
 			case 1:
@@ -105,6 +107,7 @@ void WindowsApplication::UpdateStreams(int i)
 				break;
 			default:break;
 		}
+		*/
 
 		const int depthFps =  30;//30;
 		const int halfADepthFrameMs = (1000 / depthFps) / 2;
@@ -177,9 +180,12 @@ DWORD WindowsApplication::runKinectV1StreamEvent(WindowsApplication * pThis)
 
 	 HANDLE events[] = {
 						pThis->m_hStopStreamEventThread,
+						pThis->m_hPauseStreamEventThread,
 						pThis->m_kinectV1Controller.getCorlorFrameEvent(),
-						pThis->m_kinectV1Controller.getDepthFrameEvent(),						 
-						pThis->m_hPauseStreamEventThread} ;
+						pThis->m_kinectV1Controller.getDepthFrameEvent(),
+						pThis->m_kinectV1Controller.getBodyFrameEvent(),
+						pThis->m_kinectV1Controller.getRemoveBGFrameEvent()
+						} ;
 
 
     while (true)
@@ -191,12 +197,14 @@ DWORD WindowsApplication::runKinectV1StreamEvent(WindowsApplication * pThis)
         if (WAIT_OBJECT_0 == ret)
             break;
 				
-		else if( WAIT_OBJECT_0 + 3 == ret)
+		else if( WAIT_OBJECT_0 + 1 == ret)
 		{
 			
 			//Sleep(pThis->);
 		}
 		else {
+			pThis->UpdateStreams(0);
+			/*
 			if( WAIT_OBJECT_0 == WaitForSingleObject(pThis->m_kinectV1Controller.getDepthFrameEvent(), 0))
 			{
 				pThis->UpdateStreams(2);
@@ -206,6 +214,7 @@ DWORD WindowsApplication::runKinectV1StreamEvent(WindowsApplication * pThis)
 			{				
 				pThis->UpdateStreams(1);					
 			}
+			*/
 		}
 
 	}
@@ -612,6 +621,7 @@ void WindowsApplication::initTabs()
 		m_recordTabHandler.v1ShowResolutionChanged.connect(boost::bind(&KinectV1Controller::showResolutionUpdated, &m_kinectV1Controller, _1));
 		m_recordTabHandler.v1RecordingResolutionChanged.connect(boost::bind(&KinectV1Controller::recordingResolutionUpdated, &m_kinectV1Controller, _1,_2)); 
 		m_recordTabHandler.kinectV1AlignmentEnable.connect(boost::bind(&WindowsApplication::setKinectV1AlignmentEnable, this, _1));
+		m_recordTabHandler.kinectV1RemoveBGEnable.connect(boost::bind(&WindowsApplication::removeKinectV1BG, this, _1));
 	}
 
 	//init playbackt tab
@@ -1222,6 +1232,13 @@ void WindowsApplication::setKinectV1AlignmentEnable(bool enable)
 
 	m_kinectV1Controller.setAlignmentEnable(enable);
 }
+
+void WindowsApplication::removeKinectV1BG(bool enable)
+{
+
+	m_kinectV1Controller.removeBackGround(enable);
+}
+
 
 bool WindowsApplication::setStatusMessage(std::wstring statusString, bool bForce)
 {

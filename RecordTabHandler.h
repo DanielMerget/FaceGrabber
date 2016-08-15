@@ -153,7 +153,9 @@ public:
 
 		/** \brief	enbale aligment of kinect v1 signal. */
 	boost::signal<void(bool)> kinectV1AlignmentEnable;
-
+	
+	boost::signal<void(bool)> kinectV1RemoveBGEnable;
+	
 	/** \brief	The color configuration changed signal: color is now enabled or not. */
 	boost::signal<void(bool)> colorConfigurationChanged;
 

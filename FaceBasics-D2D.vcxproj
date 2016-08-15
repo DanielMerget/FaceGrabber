@@ -182,8 +182,8 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(KINECTSDK20_DIR)\inc;$(IncludePath)</IncludePath>
-    <LibraryPath>$(KINECTSDK20_DIR)\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(KINECTSDK20_DIR)\inc;$(KINECT_TOOLKIT_DIR)inc;$(IncludePath)</IncludePath>
+    <LibraryPath>$(KINECTSDK20_DIR)\lib\x64;$(KINECT_TOOLKIT_DIR)lib\amd64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
@@ -193,7 +193,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <IncludePath>$(KINECTSDK20_DIR)\inc;$(IncludePath)</IncludePath>
-    <LibraryPath>$(KINECTSDK20_DIR)\lib\x64;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(KINECTSDK20_DIR)\lib\x64;$(KINECT_TOOLKIT_DIR)\lib\amd64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -230,7 +230,7 @@
     <PostBuildEvent>
       <Command>xcopy "$(KINECTSDK20_DIR)Redist\Face\x64\NuiDatabase" "$(TargetDir)NuiDatabase" /e /y /i /r
 xcopy "$(KINECTSDK20_DIR)Redist\Face\x64\Kinect20.Face.dll" "$(TargetDir)" /c /y
-      </Command>
+    </Command>
     </PostBuildEvent>
     <Bscmake>
       <PreserveSbr>true</PreserveSbr>
@@ -284,7 +284,7 @@ xcopy "$(KINECTSDK20_DIR)Redist\Face\x86\Kinect20.Face.dll" "$(TargetDir)" /c /y
     <PostBuildEvent>
       <Command>xcopy "$(KINECTSDK20_DIR)Redist\Face\x64\NuiDatabase" "$(TargetDir)NuiDatabase" /e /y /i /r
 xcopy "$(KINECTSDK20_DIR)Redist\Face\x64\Kinect20.Face.dll" "$(TargetDir)" /c /y
-      </Command>
+     </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
