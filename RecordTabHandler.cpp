@@ -125,6 +125,15 @@ void RecordTabHandler::movieShowOptWindosOfV1()
 					tmpRect.bottom - tmpRect.top,
 					TRUE);
 
+	HWND v1RemoveBG =GetDlgItem(m_hWnd, IDC_V1_REMOVE_BG_CHECK);
+	GetWindowRect(v1RemoveBG, &tmpRect);
+	MoveWindow(v1RemoveBG,
+		showOptGroupRect.left-tabRecord.left+tmpRect.left-showOptGroupV1Rect.left,
+		showOptGroupRect.top-tabRecord.top+tmpRect.top-showOptGroupV1Rect.top,
+					tmpRect.right - tmpRect.left,
+					tmpRect.bottom - tmpRect.top,
+					TRUE);
+	
 	/*
 	HWND v1InfraredShow =GetDlgItem(m_hWnd, IDC_V1_INFRARED_SHOW_RADIO);
 	GetWindowRect(v1InfraredShow, &tmpRect);
@@ -389,6 +398,8 @@ void RecordTabHandler::onCreate()
 		ShowWindow(GetDlgItem(m_hWnd, IDC_RECORDING_V2_ENABLE_CHECK), SW_HIDE);
 
 		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_SHOW_TYPE_COMBO), SW_HIDE);
+		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_REMOVE_BG_CHECK), SW_HIDE);
+		
 		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_COLOR_RECORDING_TYPE_COMBO), SW_HIDE);
 		ShowWindow(GetDlgItem(m_hWnd, IDC_V1_DEPTH_RECORDING_TYPE_COMBO), SW_HIDE);
 
@@ -1399,6 +1410,13 @@ void RecordTabHandler::onButtonClicked(WPARAM wParam, LPARAM handle)
 		}
 		//m_KeyPointsRecordingConfiguration[FiveKeyPoints]->setPointsEnabled(IsDlgButtonChecked(m_hWnd, IDC_KINECT_KEYPOINTS_CHECKBOX));
 		break;
+	case IDC_V1_REMOVE_BG_CHECK:
+		if(m_KinectEnableOpt == OnlyKinectV1Enabled || m_KinectEnableOpt == BothKinectEnabled)
+		{
+	
+			kinectV1RemoveBGEnable(IsDlgButtonChecked(m_hWnd, IDC_V1_REMOVE_BG_CHECK));
+			//m_commonConfiguration[KinectV1_COMMON]->setKeepBGEnabled();
+		}
 
 	case HD_FACE_SHOW_RADIO:
 		m_commonConfiguration[KinectV2_COMMON]->setFacePointsShowOpt(FacePointsShowOpt::HDFacePoints_Opt);

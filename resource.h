@@ -182,8 +182,9 @@
 #define IDC_ANGLE_STATUS                1147
 #define IDC_MAX_STATIC                  1148
 #define IDC_MIN_STATIC                  1149
-#define IDC_COMBO2                      1150
 #define IDC_V1_FPS_COMBO                1150
+#define IDC_CHECK2                      1151
+#define IDC_V1_REMOVE_BG_CHECK          1151
 #define IDC_KINECT_INFRARED_COMBO_BOX_THREADS 1806
 #define IDC_PLAY_PAUSE_BUTTON           1807
 #define IDC_PLAY_PAUSE_BUTTON2          1808
@@ -204,7 +205,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        106
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1151
+#define _APS_NEXT_CONTROL_VALUE         1152
 #define _APS_NEXT_SYMED_VALUE           102
 #endif
 #endif

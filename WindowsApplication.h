@@ -322,6 +322,8 @@ private:
 	* \param	enable.
 	*/
 	void setKinectV1AlignmentEnable(bool enable);
+	void removeKinectV1BG(bool enable);
+	
 	/**
 	 * \fn	int WindowsApplication::insertTabItem(HWND tab, LPTSTR text, int tabid);
 	 *

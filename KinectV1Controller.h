@@ -8,9 +8,11 @@
 
 #include "resource.h"
 #include "NuiApi.h"
+#include <KinectBackgroundRemoval.h>
 #include "ImageRenderer.h"
 #include "CommonConfiguration.h"
 #include <NuiSensorChooser.h>
+
 #include "NuiSensorChooserUI.h"
 #include "NuiImageBuffer.h"
 #include "KinectV1Controller.h"
@@ -18,6 +20,7 @@
 #include "IImageREcordingConfiguration.h"
 #include <thread>
 #include <mutex>
+
 //#include "WindowsApplication.h"
 
 #define MIN_DEPTH                   400
@@ -149,7 +152,10 @@ public:
     /// </summary>
     /// <returns>HANDLE</returns>
 	HANDLE getDepthFrameEvent();
-
+	HANDLE getBodyFrameEvent();
+	HANDLE getRemoveBGFrameEvent();
+	 
+	
 	/// <summary>
     /// set the stream updater 
     /// </summary>
@@ -205,7 +211,7 @@ public:
     /// </summary>
     /// <returns>void</returns>
 	void setAlignmentEnable(bool enable);
-
+	void removeBackGround(bool enable);
 	/// <summary>
     /// check if the aligment is either enabled or disabled
     /// </summary>
@@ -404,13 +410,27 @@ private:
 	std::mutex m_colorMutex;
 	std::mutex m_depthMutex;
 
+	std::mutex m_skeletonMutex;
+	std::mutex m_removeBGMutex;
+
 	 /// Pointer to camera settings interface
     INuiColorCameraSettings* m_pNuiColorCameraSettings;
 
 
 	INuiColorCameraSettings* m_pNuiDepthCameraSettings;
 	
-
-	
-	
+	/*test */
+	DWORD                              m_trackedSkeleton;
+	HRESULT ChooseSkeleton(NUI_SKELETON_DATA* pSkeletonData);
+	HRESULT  ComposeImage();
+	HRESULT ProcessSkeleton();
+	HRESULT enableRemoveBackGround();
+	void disableRemoveBackGround();
+	HANDLE                             m_hNextSkeletonFrameEvent;
+    HANDLE                             m_hNextBackgroundRemovedFrameEvent;
+	INuiBackgroundRemovedColorStream*  m_pBackgroundRemovalStream;
+	BYTE*                              m_removeBGRGBX;
+	BYTE*								m_backgroundRGBX;
+	NuiImageBuffer			m_rmBGRGBX;
+	bool	m_removeBGEnabled;		
 };
