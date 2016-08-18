@@ -826,7 +826,15 @@ void KinectHDFaceGrabber::processFaces()
 		return;
 
 	//indicate the start of data providing
-	m_outputStreamUpdater->startFaceCollection(m_colorBuffer.data(), m_depthBuffer.data(),m_alignedRawDepthBuffer.data(),m_infraredBuffer.data(),m_alighedInfraredBuffer.data()); //m_alighedColorBuffer m_alighedDepthBuffer m_infraredBuffer
+	if(m_commonConfiguration->isKeepBGEnabled() == false)
+	{
+		m_outputStreamUpdater->startFaceCollection(m_alighedColorBuffer.data(), m_depthBuffer.data(),m_alignedRawDepthBuffer.data(),m_infraredBuffer.data(),m_alighedInfraredBuffer.data()); //m_alighedColorBuffer m_alighedDepthBuffer m_infraredBuffer
+	}
+	else
+	{
+		m_outputStreamUpdater->startFaceCollection(m_colorBuffer.data(), m_depthBuffer.data(),m_alignedRawDepthBuffer.data(),m_infraredBuffer.data(),m_alighedInfraredBuffer.data()); //m_alighedColorBuffer m_alighedDepthBuffer m_infraredBuffer
+	}
+
 	bool updatedOneFace = false;
 	UINT32 vertex = 0;
 	hr = GetFaceModelVertexCount(&vertex); // 1347
