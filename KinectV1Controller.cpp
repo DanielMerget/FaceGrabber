@@ -1207,7 +1207,7 @@ HRESULT  KinectV1Controller::ComposeImage()
 		m_removeBGMutex.unlock();
         return hr;
     }
-	m_removeBGMutex.unlock();
+	
 
 	m_rmBGRGBX.CopyRGB(m_removeBGRGBX, dataLength);
 	//m_drawRGBX = &m_rmBGRGBX;
@@ -1216,7 +1216,7 @@ HRESULT  KinectV1Controller::ComposeImage()
 		m_showFps = m_colorFps;
 		show();
 	}
-
+	m_removeBGMutex.unlock();
     //hr = m_pDrawBackgroundRemovalBasics->Draw(m_outputRGBX, m_colorWidth * m_colorHeight * cBytesPerPixel);
 
     return hr;
